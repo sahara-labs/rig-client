@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:rc="http://remotelabs.eng.uts.edu.au/rc" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="RigClientService" targetNamespace="http://remotelabs.eng.uts.edu.au/rc">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://remotelabs.eng.uts.edu.au/rc">
+      <xsd:element name="allocate" type="rc:UserType">
+      </xsd:element>
+      <xsd:element name="allocateResponse"
+      	type="rc:OperationResponseType">
+      </xsd:element>
+      <xsd:element name="NewOperationResponse1">
+      	<xsd:complexType>
+      		<xsd:sequence>
+      			<xsd:element name="out" type="xsd:string"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="release" type="rc:UserType"></xsd:element>
+      <xsd:element name="releaseResponse"
+      	type="rc:OperationResponseType">
+      </xsd:element>
+      <xsd:element name="notify" type="rc:NotificationRequestType">
+      </xsd:element>
+      <xsd:element name="notifyResponse"
+      	type="rc:OperationResponseType">
+      </xsd:element>
+      <xsd:element name="performBatchControl"
+      	type="rc:BatchRequestType">
+      </xsd:element>
+      <xsd:element name="performBatchControlResponse"
+      	type="rc:OperationResponseType">
+      </xsd:element>
+      <xsd:element name="performPrimitiveControl"
+      	type="rc:PrimitiveControlRequestType">
+      </xsd:element>
+      <xsd:element name="performPrimitiveControlResponse"
+      	type="rc:PrimitiveControlResponseType">
+      </xsd:element>
+      <xsd:element name="getAttribute" type="rc:AttributeRequestType">
+      </xsd:element>
+      <xsd:element name="getAttributeResponse"
+      	type="rc:AttributeResponseType">
+      </xsd:element>
+      <xsd:element name="getStatus" type="rc:NullType"></xsd:element>
+      <xsd:element name="getStatusResponse"
+      	type="rc:StatusResponseType">
+      </xsd:element>
+      <xsd:element name="setMaintenance"
+      	type="rc:MaintenanceRequestType">
+      </xsd:element>
+      <xsd:element name="setMaintenanceResponse"
+      	type="rc:OperationResponseType">
+      </xsd:element>
+      <xsd:element name="setTestInterval"
+      	type="rc:TestIntervalRequestType">
+      </xsd:element>
+      <xsd:element name="setTestIntervalResponse"
+      	type="rc:OperationResponseType">
+      </xsd:element>
+
+      <xsd:complexType name="UserType">
+      	<xsd:annotation>
+      		<xsd:documentation>
+      			Specifies the name of the user to either allocate /
+      			release.
+      		</xsd:documentation>
+      	</xsd:annotation>
+      	<xsd:sequence>
+      		<xsd:element name="user" type="xsd:string"></xsd:element>
+      	</xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="in" type="rc:UserType"></xsd:element>
+    
+            <xsd:complexType name="OperationResponseType">
+                <xsd:annotation>
+                	<xsd:documentation>Response from performing a request.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:sequence>
+                	<xsd:element name="success" type="xsd:boolean">
+                		<xsd:annotation>
+                			<xsd:documentation>
+                				True if the operation is successful.
+                			</xsd:documentation>
+                		</xsd:annotation>
+                	</xsd:element>
+                	<xsd:element maxOccurs="1" minOccurs="0"
+                		ref="rc:error">
+                		<xsd:annotation>
+                			<xsd:documentation>
+                				If the operation success was false
+                			</xsd:documentation>
+                		</xsd:annotation>
+                	</xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+    
+            <xsd:complexType name="ErrorType">
+                <xsd:annotation>
+                	<xsd:documentation>Error information.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:sequence>
+            		<xsd:element name="code" type="xsd:int">
+            			<xsd:annotation>
+            				<xsd:documentation></xsd:documentation>
+            			</xsd:annotation></xsd:element>
+            		<xsd:element name="operation" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>Operation that was attempted</xsd:documentation>
+            			</xsd:annotation></xsd:element>
+            		<xsd:element name="reason" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>Reason for error.</xsd:documentation>
+            			</xsd:annotation></xsd:element>
+            		<xsd:element name="trace" type="xsd:string" maxOccurs="1" minOccurs="0">
+            			<xsd:annotation>
+            				<xsd:documentation>Extra information to help debugging.</xsd:documentation>
+            			</xsd:annotation></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="error" type="rc:ErrorType">
+            	<xsd:annotation></xsd:annotation>
+            </xsd:element>
+        
+            <xsd:complexType name="NotificationRequestType">
+            	<xsd:sequence>
+            		<xsd:element name="message" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+    
+            <xsd:complexType name="BatchRequestType">
+            	<xsd:complexContent>
+            		<xsd:extension base="rc:UserType">
+            			<xsd:sequence>
+            				<xsd:element name="batchFile"
+            					type="xsd:base64Binary">
+            				</xsd:element>
+            			</xsd:sequence>
+            		</xsd:extension>
+            	</xsd:complexContent>
+            </xsd:complexType>
+            <xsd:element name="abortBatchControl" type="rc:UserType">
+            </xsd:element>
+            <xsd:element name="abortBatchControlResponse"
+            	type="rc:OperationResponseType">
+            </xsd:element>
+    
+            <xsd:complexType name="PrimitiveControlRequestType">
+            	<xsd:annotation>
+            		<xsd:documentation>
+            			Parameter name.
+            		</xsd:documentation>
+            	</xsd:annotation>
+            	<xsd:complexContent>
+            		<xsd:extension base="rc:UserType">
+            			<xsd:sequence>
+            				<xsd:element name="controller"
+            					type="xsd:string">
+            				</xsd:element>
+            				<xsd:element name="action"
+            					type="xsd:string">
+            				</xsd:element>
+            				<xsd:element name="param"
+            					type="rc:ParamType" maxOccurs="unbounded" minOccurs="0">
+            				</xsd:element>
+            			</xsd:sequence>
+            		</xsd:extension>
+            	</xsd:complexContent>
+            </xsd:complexType>
+
+            <xsd:complexType name="ParamType">
+            	<xsd:sequence>
+            		<xsd:element name="name" type="xsd:string"></xsd:element>
+            		<xsd:element name="value" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>Parameter value.</xsd:documentation>
+            			</xsd:annotation></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getBatchControlStatus"
+            	type="rc:UserType">
+            </xsd:element>
+            <xsd:element name="getBatchControlStatusResponse"
+            	type="rc:BatchStatusResponseType">
+            </xsd:element>
+            <xsd:element name="slaveAllocate" type="rc:SlaveUserType">
+            </xsd:element>
+            <xsd:element name="slaveAllocateResponse"
+            	type="rc:OperationResponseType">
+            </xsd:element>
+            <xsd:element name="slaveRelease" type="rc:UserType">
+            </xsd:element>
+            <xsd:element name="slaveReleaseResponse"
+            	type="rc:OperationResponseType">
+            </xsd:element>
+    
+            <xsd:complexType name="PrimitiveControlResponseType">
+            	<xsd:complexContent>
+            		<xsd:extension base="rc:OperationResponseType">
+            			<xsd:sequence>
+                            <xsd:element name="wasSuccessful" type="xsd:string">
+            				</xsd:element>
+                            <xsd:element name="result"
+            					type="rc:ParamType" maxOccurs="unbounded"
+            					minOccurs="0">
+            				</xsd:element>
+            				<xsd:element name="error"
+            					type="rc:ErrorType" maxOccurs="1" minOccurs="0">
+            				</xsd:element>
+            			</xsd:sequence>
+            		</xsd:extension>
+            	</xsd:complexContent>
+            </xsd:complexType>
+    
+            <xsd:complexType name="SlaveUserType">
+            	<xsd:complexContent>
+            		<xsd:extension base="rc:UserType">
+            			<xsd:sequence>
+            				<xsd:element name="type">
+            					<xsd:simpleType>
+            						<xsd:restriction
+            							base="xsd:string">
+            							<xsd:enumeration
+            								value="Active">
+            							</xsd:enumeration>
+            							<xsd:enumeration
+            								value="Passive">
+            							</xsd:enumeration>
+            						</xsd:restriction>
+            					</xsd:simpleType>
+            				</xsd:element>
+            			</xsd:sequence>
+            		</xsd:extension>
+            	</xsd:complexContent>
+            </xsd:complexType>
+    
+            <xsd:complexType name="BatchStatusResponseType">
+            	<xsd:sequence>
+            		<xsd:element name="state">
+            			<xsd:simpleType>
+            				<xsd:restriction base="xsd:string">
+            					<xsd:enumeration value="CLEAR"></xsd:enumeration>
+            					<xsd:enumeration value="IN_PROGRESS"></xsd:enumeration>
+            					<xsd:enumeration value="COMPLETE"></xsd:enumeration>
+            					<xsd:enumeration value="FAILED"></xsd:enumeration>
+            					<xsd:enumeration value="NOT_SUPPORTED"></xsd:enumeration>
+            				</xsd:restriction>
+            			</xsd:simpleType>
+            		</xsd:element>
+                    <xsd:element name="progress" type="xsd:string"></xsd:element>
+                    <xsd:element name="resultFilePath" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+    
+            <xsd:complexType name="AttributeRequestType">
+            	<xsd:complexContent>
+            		<xsd:extension base="rc:UserType">
+            			<xsd:sequence>
+            				<xsd:element name="attribute"
+            					type="xsd:string">
+            				</xsd:element>
+            			</xsd:sequence>
+            		</xsd:extension>
+            	</xsd:complexContent>
+            </xsd:complexType>
+    
+            <xsd:complexType name="AttributeResponseType">
+            	<xsd:sequence>
+            		<xsd:element name="attribute" type="xsd:string"></xsd:element>
+            		<xsd:choice>
+            			<xsd:element name="value" type="xsd:string">
+            			</xsd:element>
+            			<xsd:element name="error"
+            				type="rc:ErrorType">
+            			</xsd:element>
+            		</xsd:choice>
+            	</xsd:sequence>
+            </xsd:complexType>
+    
+            <xsd:complexType name="NullType">
+            	<xsd:sequence>
+            		<xsd:element name="void" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+    
+            <xsd:complexType name="StatusResponseType">
+            	<xsd:sequence>
+            		<xsd:element name="isMonitorFailed"
+            			type="xsd:boolean">
+            		</xsd:element>
+            		<xsd:element name="monitorReason"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="isInMaintenance"
+            			type="xsd:boolean">
+            		</xsd:element>
+            		<xsd:element name="maintenanceReason"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="isInSession" type="xsd:boolean"></xsd:element>
+            		<xsd:element name="sessionUser" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="slaveUsers" type="xsd:string" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+    
+            <xsd:complexType name="MaintenanceRequestType">
+            	<xsd:sequence>
+            		<xsd:element name="putOffline" type="xsd:boolean"></xsd:element>
+            		<xsd:element name="runTests" type="xsd:boolean"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+    
+            <xsd:complexType name="TestIntervalRequestType">
+            	<xsd:sequence>
+            		<xsd:element name="interval" type="xsd:int"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="allocateRequest">
+  	<wsdl:part name="parameters" element="rc:allocate"/>
+  </wsdl:message>
+  <wsdl:message name="allocateResponse">
+    <wsdl:part element="rc:allocateResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="NewOperationResponse1">
+  	<wsdl:part name="parameters" element="rc:NewOperationResponse1"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="releaseRequest">
+  	<wsdl:part name="parameters" element="rc:release"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="releaseResponse">
+  	<wsdl:part name="parameters" element="rc:releaseResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="notifyRequest">
+  	<wsdl:part name="parameters" element="rc:notify"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="notifyResponse">
+  	<wsdl:part name="parameters" element="rc:notifyResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="performBatchControlRequest">
+  	<wsdl:part name="parameters" element="rc:performBatchControl"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="performBatchControlResponse">
+  	<wsdl:part name="parameters" element="rc:performBatchControlResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="performPrimitiveControlRequest">
+  	<wsdl:part name="parameters" element="rc:performPrimitiveControl"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="performPrimitiveControlResponse">
+  	<wsdl:part name="parameters" element="rc:performPrimitiveControlResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAttributeRequest">
+  	<wsdl:part name="parameters" element="rc:getAttribute"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAttributeResponse">
+  	<wsdl:part name="parameters" element="rc:getAttributeResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStatusRequest">
+  	<wsdl:part name="parameters" element="rc:getStatus"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStatusResponse">
+  	<wsdl:part name="parameters" element="rc:getStatusResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setMaintenanceRequest">
+  	<wsdl:part name="parameters" element="rc:setMaintenance"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setMaintenanceResponse">
+  	<wsdl:part name="parameters" element="rc:setMaintenanceResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setTestIntervalRequest">
+  	<wsdl:part name="parameters" element="rc:setTestInterval"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setTestIntervalResponse">
+  	<wsdl:part name="parameters" element="rc:setTestIntervalResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="abortBatchControlRequest">
+  	<wsdl:part name="parameters" element="rc:abortBatchControl"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="abortBatchControlResponse">
+  	<wsdl:part name="parameters" element="rc:abortBatchControlResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getBatchControlStatusRequest">
+  	<wsdl:part name="parameters" element="rc:getBatchControlStatus"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getBatchControlStatusResponse">
+  	<wsdl:part name="parameters" element="rc:getBatchControlStatusResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="slaveAllocateRequest">
+  	<wsdl:part name="parameters" element="rc:slaveAllocate"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="slaveAllocateResponse">
+  	<wsdl:part name="parameters" element="rc:slaveAllocateResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="slaveReleaseRequest">
+  	<wsdl:part name="parameters" element="rc:slaveRelease"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="slaveReleaseResponse">
+  	<wsdl:part name="parameters" element="rc:slaveReleaseResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="RigClientService">
+    <wsdl:operation name="allocate">
+      <wsdl:documentation>Allocates a user to a rig (i.e. this starts a session)</wsdl:documentation>
+      <wsdl:input message="rc:allocateRequest"/>
+      <wsdl:output message="rc:allocateResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="release">
+    	<wsdl:input message="rc:releaseRequest"></wsdl:input>
+    	<wsdl:output message="rc:releaseResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slaveAllocate">
+    	<wsdl:input message="rc:slaveAllocateRequest"></wsdl:input>
+    	<wsdl:output message="rc:slaveAllocateResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slaveRelease">
+    	<wsdl:input message="rc:slaveReleaseRequest"></wsdl:input>
+    	<wsdl:output message="rc:slaveReleaseResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="notify">
+    	<wsdl:input message="rc:notifyRequest"></wsdl:input>
+    	<wsdl:output message="rc:notifyResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="performBatchControl">
+    	<wsdl:input message="rc:performBatchControlRequest"></wsdl:input>
+    	<wsdl:output message="rc:performBatchControlResponse"></wsdl:output>
+    </wsdl:operation>
+        <wsdl:operation name="abortBatchControl">
+    	<wsdl:input message="rc:abortBatchControlRequest"></wsdl:input>
+    	<wsdl:output message="rc:abortBatchControlResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getBatchControlStatus">
+    	<wsdl:input message="rc:getBatchControlStatusRequest"></wsdl:input>
+    	<wsdl:output message="rc:getBatchControlStatusResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="performPrimitiveControl">
+    	<wsdl:input message="rc:performPrimitiveControlRequest"></wsdl:input>
+    	<wsdl:output message="rc:performPrimitiveControlResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAttribute">
+    	<wsdl:input message="rc:getAttributeRequest"></wsdl:input>
+    	<wsdl:output message="rc:getAttributeResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getStatus">
+    	<wsdl:input message="rc:getStatusRequest"></wsdl:input>
+    	<wsdl:output message="rc:getStatusResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setMaintenance">
+    	<wsdl:input message="rc:setMaintenanceRequest"></wsdl:input>
+    	<wsdl:output message="rc:setMaintenanceResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setTestInterval">
+    	<wsdl:input message="rc:setTestIntervalRequest"></wsdl:input>
+    	<wsdl:output message="rc:setTestIntervalResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="RigClientServiceSOAP"
+  	type="rc:RigClientService">
+  	<soap:binding style="document"
+  		transport="http://schemas.xmlsoap.org/soap/http" />
+  	<wsdl:operation name="allocate">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/NewOperation" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="release">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/release" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="notify">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/notify" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="performBatchControl">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/batch" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="performPrimitiveControl">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/primitiveControl" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="getAttribute">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/getAttribute" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="getStatus">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/getStatus" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="setMaintenance">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/maintenance" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="setTestInterval">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/testInterval" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="abortBatchControl">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/batchAbort" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="getBatchControlStatus">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/batchStatus" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="RigClientService">
+    <wsdl:port binding="rc:RigClientServiceSOAP" name="RigClientServiceSOAP">
+      <soap:address location="http://remotelabs.eng.uts.edu.au:8080/rigclient"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,3 @@
+Directory for generated API documentation for the Sahara Rig Client.
+
+To generate the documentation run 'ant doc' in the top level directory.

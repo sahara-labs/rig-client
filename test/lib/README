@@ -1,0 +1,14 @@
+Directory for Rig Client test libraries.  The required libraries are:
+
+  - easymock-X.jar - EasyMock library v2 (http://easymock.org/index.html)
+                     EasyMock provides mock objects for interfaces.
+                     Released under the Apache Version 2.0 license.
+  - junit-X.jar    - JUnit library v4 (http://www.junit.org/)
+                     JUnit is a framework for writing and running automated 
+                     tests.
+                     Release under the IBM's Common Public License Version 0.5
+                     license.
+  - hamcrest-core  - Hamcrest library v1 (http://code.google.com/p/hamcrest/)
+     -X.jar          Hamcrest is a framework for writing matcher objects allowing 
+                     'match' rules to be defined declaratively.
+                     Released under the New BSD license.

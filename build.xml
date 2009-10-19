@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ## Sahara Rig Client 
+
+Copyright (c) 2009, University of Technology, Sydney
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, 
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright 
+      notice, this list of conditions and the following disclaimer in the 
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the University of Technology, Sydney nor the names 
+      of its contributors may be used to endorse or promote products derived from 
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Author: Michael Diponio (mdiponio)
+Date: 12th October 2009
+
+Changelog:
+  - 12/10/2009 - mdiponio - Initial file creation
+  - 16/10/2009 - mdiponio - Added JUnit target
+  - 18/10/2009 - mdiponio - Added PMD, Findbugs & Javadoc targets
+-->
+<project name="RigClient" default="build" basedir=".">
+	<!-- Properties -->
+	<property name="component.name" value="Rig Client" /> <!-- Rig Client component name. -->
+	<property name="build.classes.dir" location="bin" /> <!-- Build classes location. -->
+	<property name="lib.dir" location="lib" /> <!-- Library location. -->
+	<property name="javadoc.dir" location="doc" /> <!-- Javadoc location. -->
+	<property name="src.dir" location="src" /> <!-- Source code locatiom. -->
+	<property name="test.lib.dir" location="test/lib" /> <!-- Test library location. -->
+	<property name="tool.lib.dir" location="test/tools" /> <!-- Static analysis tools. -->
+	<property name="reports.junit.xml.dir" location="test/reports/junit" /> <!-- JUnit reports -->
+	<property name="reports.junit.html.dir" location="test/reports/junit/html" /> <!-- JUnit HTML reports -->
+	<property name="reports.pmd.xml.dir" location="test/reports/pmd" /> <!-- PMD reports -->
+	<property name="reports.bugs.xml.dir" location="test/reports/bugs" /> <!-- Findbugs reports -->
+	
+	<!-- Classpath -->
+	<path id="project.classpath">
+		<pathelement location="${build.classes.dir}" />
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${test.lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	<!-- Tools classpath -->
+	<path id="project.tools">
+		<fileset dir="${tool.lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	<!-- Everything! -->
+	<target name="all" depends="clean,build,test"/>
+	
+	<!-- Code compilation -->
+	<target name="build">
+		<mkdir dir="${build.classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${build.classes.dir}" debug="on" listfiles="yes">
+			<classpath refid="project.classpath" />
+		</javac>
+		<echo>The ${component.name} has been successfully built.</echo>
+	</target>
+	
+	<!-- Clean previously built code. -->
+	<target name="clean">
+		<delete dir="${build.classes.dir}" verbose="yes" />
+		<delete dir="${reports.bugs.xml.dir}" verbose="yes" />
+		<delete dir="${reports.junit.html.dir}" verbose="yes" />
+		<delete dir="${reports.junit.xml.dir}" verbose="yes" />
+		<delete dir="${reports.pmd.xml.dir}" verbose="yes" />
+		<delete verbose="yes">
+			<fileset dir="${javadoc.dir}">
+				<exclude name="**/README" />
+				<include name="**/*" />
+				<exclude name="${javadoc.dir}" />
+			</fileset>
+		</delete>
+		<delete dir="${javadoc.dir}/resources" />
+		<delete dir="${javadoc.dir}/au" />
+	</target>
+	
+	<!-- Execute unit test suite. -->
+	<target name="test" depends="build">
+		<mkdir dir="${reports.junit.html.dir}" />
+		<mkdir dir="${reports.junit.xml.dir}" />
+		<junit printsummary="on" fork="on" failureproperty="junit.failure">
+			<classpath refid="project.classpath" />
+			<batchtest todir="${reports.junit.xml.dir}">
+				<formatter type="xml" />
+				<fileset dir="${build.classes.dir}">
+					<include name="**/*Tester.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<junitreport>
+			 <fileset dir="${reports.junit.xml.dir}"/>
+			 <report todir="${reports.junit.html.dir}"/>
+		</junitreport>
+		<delete file="TESTS-TestSuites.xml" />
+	</target>
+	
+	<!-- EMMA code coverage results. -->
+	
+	<!-- PMD results. -->
+	<target name="pmd" depends="build">
+		<mkdir dir="${reports.pmd.xml.dir}"/>
+		<taskdef name="pmd" classpathref="project.tools" classname="net.sourceforge.pmd.ant.PMDTask"/>
+		<pmd shortFilenames="true" targetjdk="1.6">
+		 	<ruleset>basic</ruleset>
+		 	<!-- <ruleset>braces</ruleset> --> <!-- False positives with curly braces. -->
+		 	<ruleset>codesize</ruleset>
+		 	<!-- <ruleset>controversial</ruleset>-->
+		 	<ruleset>coupling</ruleset>
+			<ruleset>migrating</ruleset>
+		 	<ruleset>optimizations</ruleset>
+		  	<formatter type="xml" toFile="${reports.pmd.xml.dir}/pmd_report.xml" />
+		  	<fileset dir="${src.dir}">
+		   		<include name="**/*.java" />
+		  		<exclude name="**/*Tester.java" />
+		  		<exclude name="**/*TestSuite.java" />
+			</fileset>
+		</pmd>
+		<xslt in="${reports.pmd.xml.dir}/pmd_report.xml" style="${tool.lib.dir}/pmd-4.2.5/etc/xslt/pmd-report-per-class.xslt" out="${reports.pmd.xml.dir}/pmd_report.html" />
+		<echo>PMD execution successful, report ${pmd-report} generated</echo>
+	</target>
+	
+	<!-- Find bugs -->
+	<property name="findbugs.report.xml" value="${reports.bugs.xml.dir}/bug_report.xml" />
+	<property name="findbugs.report.html" value="${reports.bugs.xml.dir}/bug_report.html" />
+	<property name="findbugs.home" value="${tool.lib.dir}/findbugs-1.3.9" />
+	<target name="bugs" depends="build">
+		<mkdir dir="${reports.bugs.xml.dir}"/>
+		<taskdef name="findbugs" classpathref="project.tools" 
+				classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+		<findbugs home="${findbugs.home}" output="xml:withMessages" outputFile="${findbugs.report.xml}">
+		    <sourcePath path="${src.dir}" /> 
+			<class location="${build.classes.dir}" />
+		</findbugs>
+	<findbugs home="${findbugs.home}" output="html" stylesheet="fancy-hist.xsl" outputFile="${findbugs.report.html}">
+			<sourcePath path="${src.dir}" /> 
+			<class location="${build.classes.dir}" />
+		</findbugs>
+	</target>	
+	
+	<!-- Javadoc -->
+	<target name="doc">
+		<javadoc access="public" destdir="${javadoc.dir}" author="true" version="true" use="true" windowtitle="Sahara Rig Client">
+			<fileset dir="${src.dir}" defaultexcludes="yes">
+				<include name="**/*.java"/>
+				<exclude name="**/*Tester.java" />
+				<exclude name="**/*TestSuite.java" />
+			</fileset>
+		</javadoc>
+	</target>
+</project>

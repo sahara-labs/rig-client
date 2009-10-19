@@ -1,0 +1,10 @@
+Directory for Rig Client libraries. The required libraries:
+
+  - log4j         - Log4J (http://logging.apache.org/log4j/1.2/index.html)
+                    Logging library which outputs log statements to a variety of 
+                    output targets.
+                    Released under the Apache Software License, Version 2.0.
+  - Apache Axis 2 - Apache Axis2/Java (http://ws.apache.org/axis2/)
+                    Apache Axis2 is a Java-based implementation of both the client 
+                    and server sides of the Web services equation.
+                    Release under the Apache Software License, Version 2.0.
