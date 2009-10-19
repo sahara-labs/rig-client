@@ -41,15 +41,15 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util.tests;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import junit.framework.TestCase;
 
 /**
  * 
  */
-public class PropertiesConfigTester
+public class PropertiesConfigTester extends TestCase
 {
 
     /**

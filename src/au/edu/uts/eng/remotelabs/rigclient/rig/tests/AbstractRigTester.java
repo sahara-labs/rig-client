@@ -58,6 +58,8 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import junit.framework.TestCase;
+
 import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.ITestAction;
@@ -74,7 +76,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
  * <code>AbstractRig</code> is abstract. 
  */
 @SuppressWarnings("all")
-public class AbstractRigTester
+public class AbstractRigTester extends TestCase
 {
     /** Class under test. */
     private MockRig rig;
