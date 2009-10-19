@@ -83,12 +83,12 @@ Changelog:
 	
 	<!-- Clean previously built code. -->
 	<target name="clean">
-		<delete dir="${build.classes.dir}" />
-		<delete dir="${reports.bugs.xml.dir}" />
-		<delete dir="${reports.junit.html.dir}" />
-		<delete dir="${reports.junit.xml.dir}" />
-		<delete dir="${reports.pmd.xml.dir}" />
-		<delete verbose="yes">
+		<delete dir="${build.classes.dir}" verbose="no" />
+		<delete dir="${reports.bugs.xml.dir}" verbose="no" />
+		<delete dir="${reports.junit.html.dir}" verbose="no" />
+		<delete dir="${reports.junit.xml.dir}" verbose="no" />
+		<delete dir="${reports.pmd.xml.dir}" verbose="no" />
+		<delete verbose="no">
 			<fileset dir="${javadoc.dir}">
 				<exclude name="**/README" />
 				<include name="**/*" />
