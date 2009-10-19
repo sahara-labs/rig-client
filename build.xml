@@ -35,6 +35,7 @@ Changelog:
   - 12/10/2009 - mdiponio - Initial file creation
   - 16/10/2009 - mdiponio - Added JUnit target
   - 18/10/2009 - mdiponio - Added PMD, Findbugs & Javadoc targets
+  - 19/10/2009 - mdiponio - Removed vebosity from delete target
 -->
 <project name="RigClient" default="build" basedir=".">
 	<!-- Properties -->
@@ -82,11 +83,11 @@ Changelog:
 	
 	<!-- Clean previously built code. -->
 	<target name="clean">
-		<delete dir="${build.classes.dir}" verbose="yes" />
-		<delete dir="${reports.bugs.xml.dir}" verbose="yes" />
-		<delete dir="${reports.junit.html.dir}" verbose="yes" />
-		<delete dir="${reports.junit.xml.dir}" verbose="yes" />
-		<delete dir="${reports.pmd.xml.dir}" verbose="yes" />
+		<delete dir="${build.classes.dir}" />
+		<delete dir="${reports.bugs.xml.dir}" />
+		<delete dir="${reports.junit.html.dir}" />
+		<delete dir="${reports.junit.xml.dir}" />
+		<delete dir="${reports.pmd.xml.dir}" />
 		<delete verbose="yes">
 			<fileset dir="${javadoc.dir}">
 				<exclude name="**/README" />
