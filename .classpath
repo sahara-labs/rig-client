@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="lib/Axis2/axis2-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/Axis2/axis2-adb-1.5.jar"/>
+	<classpathentry kind="lib" path="lib/Axis2/geronimo-saaj_1.3_spec-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/Axis2/xercesImpl-2.6.2.jar"/>
+	<classpathentry kind="lib" path="lib/Axis2/xml-apis-1.3.02.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="test/lib/easymock-2.5.2.jar"/>
+	<classpathentry kind="lib" path="test/lib/hamcrest-core-1.1.jar"/>
+	<classpathentry kind="lib" path="test/lib/junit.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
