@@ -79,6 +79,7 @@ public abstract class AbstractRig implements IRig
         RESET,        /* Rig reset. */
         TEST          /* Monitor test. */
     }
+    
     /** Session users in the form key => user name, value => user type */
     private Map<String, Session> sessionUsers;
     
@@ -320,8 +321,9 @@ public abstract class AbstractRig implements IRig
                 this.logger.info("Registering a test access action with provided type of "); //+ test.getActionType());
                 
                 /* Test actions run it their own thread, so create one and start it. */
-//                new Thread(this.testThreads, test).start();
+                new Thread(this.testThreads, test).start();
                 return this.testActions.add(test);
+                
             default:
                 /* DODGY This is an impossible situation that _should_ never be hit. 
                  * Java type safety ahoy! */
@@ -840,6 +842,15 @@ public abstract class AbstractRig implements IRig
         }
         
         return ret;
+    }
+    
+    /**
+     * Cleans up this class. This should be called before the rig client
+     * is shutdown. 
+     */
+    public void cleanUp()
+    {
+        this.testThreads.interrupt();
     }
     
     /**

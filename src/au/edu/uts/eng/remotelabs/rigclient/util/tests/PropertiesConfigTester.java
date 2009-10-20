@@ -41,16 +41,24 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util.tests;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
 import junit.framework.TestCase;
 
 /**
- * 
+ * Tests the <code>PropertiesConfig</code> class.
  */
 public class PropertiesConfigTester extends TestCase
 {
+    /** Location of test file. */
+    public static final String TEST_FILE = "test/resources/test.properties";
+    
+    /** Object of class under test. */
+    private PropertiesConfig config;
 
     /**
      * @throws java.lang.Exception
@@ -58,24 +66,7 @@ public class PropertiesConfigTester extends TestCase
     @Before
     public void setUp() throws Exception
     {
-    }
-
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig#PropertiesConfig()}.
-     */
-    @Test
-    public void testPropertiesConfig()
-    {
-        fail("Not yet implemented"); // TODO
-    }
-
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig#PropertiesConfig(java.lang.String)}.
-     */
-    @Test
-    public void testPropertiesConfigString()
-    {
-        fail("Not yet implemented"); // TODO
+        this.config = new PropertiesConfig(PropertiesConfigTester.TEST_FILE);
     }
 
     /**
@@ -84,7 +75,10 @@ public class PropertiesConfigTester extends TestCase
     @Test
     public void testGetProperty()
     {
-        fail("Not yet implemented"); // TODO
+        for (int i = 1; i <= 10; i++)
+        {
+            assertEquals("Value" + i, this.config.getProperty("Prop" + i));
+        }
     }
 
     /**
@@ -93,7 +87,15 @@ public class PropertiesConfigTester extends TestCase
     @Test
     public void testGetAllProperties()
     {
-        fail("Not yet implemented"); // TODO
+        Map<String, String> all = this.config.getAllProperties();
+        
+        assertEquals(10, all.size());
+        
+        for (int i = 1; i <= 10; i++)
+        {
+            assertTrue(all.containsKey("Prop" + i));
+            assertEquals("Value" + i, all.get("Prop" + i));
+        }
     }
 
     /**
@@ -129,7 +131,7 @@ public class PropertiesConfigTester extends TestCase
     @Test
     public void testGetConfigurationInfomation()
     {
-        fail("Not yet implemented"); // TODO
+        assertNotNull(this.config.getConfigurationInfomation());
     }
 
     /**
@@ -138,7 +140,14 @@ public class PropertiesConfigTester extends TestCase
     @Test
     public void testDumpConfiguration()
     {
-        fail("Not yet implemented"); // TODO
+        String dump = this.config.dumpConfiguration();
+        assertNotNull(dump);
+        
+        for (int i = 1; i <= 10; i++)
+        {
+            assertTrue(dump.indexOf("Prop" + i) >= 0);
+            assertTrue(dump.indexOf("Value" + i) > 0);
+        }
     }
 
 }
