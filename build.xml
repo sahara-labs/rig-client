@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- ## Sahara Rig Client 
+                         ## Sahara Rig Client ##
 
 Copyright (c) 2009, University of Technology, Sydney
 All rights reserved.
@@ -36,6 +36,8 @@ Changelog:
   - 16/10/2009 - mdiponio - Added JUnit target
   - 18/10/2009 - mdiponio - Added PMD, Findbugs & Javadoc targets
   - 19/10/2009 - mdiponio - Removed vebosity from delete target
+  - 20/10/2009 - mdiponio - Changed JUnit target to generate an associated
+                            EMMA code coverage report
 -->
 <project name="RigClient" default="build" basedir=".">
 	<!-- Properties -->
@@ -50,6 +52,7 @@ Changelog:
 	<property name="reports.junit.html.dir" location="test/reports/junit/html" /> <!-- JUnit HTML reports -->
 	<property name="reports.pmd.xml.dir" location="test/reports/pmd" /> <!-- PMD reports -->
 	<property name="reports.bugs.xml.dir" location="test/reports/bugs" /> <!-- Findbugs reports -->
+	<property name="reports.emma.dir" location="test/reports/coverage" /> <!-- Emma coverage report -->
 	
 	<!-- Classpath -->
 	<path id="project.classpath">
@@ -70,7 +73,7 @@ Changelog:
 	</path>
 	
 	<!-- Everything! -->
-	<target name="all" depends="clean,build,test"/>
+	<target name="all" depends="clean,build,test,pmd,bugs,doc"/>
 	
 	<!-- Code compilation -->
 	<target name="build">
@@ -97,14 +100,37 @@ Changelog:
 		</delete>
 		<delete dir="${javadoc.dir}/resources" />
 		<delete dir="${javadoc.dir}/au" />
+		<delete dir="${reports.emma.dir}" verbose="no" />
 	</target>
 	
-	<!-- Execute unit test suite. -->
+	<!-- Execute unit test suite with EMMA code coverage. -->
+	<property name="instr.dir" location="test/reports/instr" />
+	<path id="project.emma.classpath">
+		<pathelement location="${instr.dir}" />
+		<fileset dir="${tool.lib.dir}">
+			<include name="emma*/*.jar" />
+		</fileset>
+		<path refid="project.classpath" />
+	</path>
+	<path id="emma.instrumented">
+		<pathelement location="${build.classes.dir}" />
+	</path>
 	<target name="test" depends="build">
+		<taskdef resource="emma_ant.properties" classpathref="project.tools" />
+		<mkdir dir="${reports.emma.dir}" />
+		<mkdir dir="${instr.dir}" />
 		<mkdir dir="${reports.junit.html.dir}" />
 		<mkdir dir="${reports.junit.xml.dir}" />
+		
+		<!-- Set up EMMA for code instrumentation. -->
+		<emma enabled="true" >
+		     <instr instrpathref="emma.instrumented" destdir="${instr.dir}" metadatafile="${reports.emma.dir}/metadata.emma" />
+	    </emma>
+			
+		<!-- Execute JUnit test cases. -->
 		<junit printsummary="on" fork="on" failureproperty="junit.failure">
-			<classpath refid="project.classpath" />
+			<classpath refid="project.emma.classpath" />
+			<jvmarg value="-Demma.coverage.out.file=${reports.emma.dir}/coverage.emma" />
 			<batchtest todir="${reports.junit.xml.dir}">
 				<formatter type="xml" />
 				<fileset dir="${build.classes.dir}">
@@ -112,14 +138,28 @@ Changelog:
 				</fileset>
 			</batchtest>
 		</junit>
+		
+		<!-- Generate JUnit report. -->
 		<junitreport>
 			 <fileset dir="${reports.junit.xml.dir}"/>
 			 <report todir="${reports.junit.html.dir}"/>
 		</junitreport>
+			 	
+		<!-- Generate EMMA reports. -->
+		<emma enabled="true" >
+			<report sourcepath="${src.dir}" >
+				<fileset dir="${reports.emma.dir}" >
+			 		<include name="*.emma" />
+			 	</fileset>
+			 	<txt outfile="${reports.emma.dir}/coverage.txt" />
+			 	<html outfile="${reports.emma.dir}/index.html" depth="method" />
+			 	<xml outfile="${reports.emma.dir}/coverage.xml" depth="method" />
+			</report>
+		</emma>
+			 	        	
 		<delete file="TESTS-TestSuites.xml" />
+		<delete dir="${instr.dir}" />
 	</target>
-	
-	<!-- EMMA code coverage results. -->
 	
 	<!-- PMD results. -->
 	<target name="pmd" depends="build">
@@ -160,7 +200,7 @@ Changelog:
 			<sourcePath path="${src.dir}" /> 
 			<class location="${build.classes.dir}" />
 		</findbugs>
-	</target>	
+	</target>
 	
 	<!-- Javadoc -->
 	<target name="doc">
