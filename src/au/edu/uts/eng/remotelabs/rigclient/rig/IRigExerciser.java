@@ -45,16 +45,18 @@ package au.edu.uts.eng.remotelabs.rigclient.rig;
  * Interface for rig exerciser / monitoring operations. The exerciser is a
  * rig <strong>watch-dog</strong> to ensure the rig is within operational
  * tolerance. Exercisers are built chaining together multiple exerciser
- * tests and should test the following rig attribtues:
+ * tests and should test the following rig attributes:
  * 
- *    - Existence (network, device nodes) - can the device be contacted.
- *    - Environment (power, air pressure) - does the current environment
- *              support the operating needs of the rig.
- *    - Hardware (pistons, actuators, solenoids, motors) - can be the hardware
- *              be commanded to be perform its desired actions.
- *    - Sensor (LVDS, magnetostrictive, temperature, time) - does a movement 
+ * <ul>
+ *    <li>Existence (network, device nodes) - can the device be contacted.</li>
+ *    <li>Environment (power, air pressure) - does the current environment
+ *              support the operating needs of the rig.</li>
+ *    <li>Hardware (pistons, actuators, solenoids, motors) - can be the hardware
+ *              be commanded to be perform its desired actions.</li>
+ *    <li>ensor (LVDS, magnetostrictive, temperature, time) - does a movement 
  *              of the hardware generated the desired measurable result
- *              with the tolerance of the sensors.
+ *              with the tolerance of the sensors.</li>
+ * </ul>
  *  
  * The <code>setInterval</code> method provides an indication of how often the
  * test should run, but the test implementor has discretion to either honour
@@ -103,7 +105,8 @@ public interface IRigExerciser
      * Gets the reason provided for the rig to be in maintenance mode.
      * If the rig is not in maintenance mode or not reason was provided,
      * <code>null</code> is returned. 
-     * @return
+     * 
+     * @return in maintenance reason
      */
     public String getMaintenanceReason();
     
@@ -131,8 +134,9 @@ public interface IRigExerciser
      *  
      * @param offline true if the rig is put into maintenance mode
      * @param reason a reason why the rig is being put in maintenance mode
-     * @param stopTests true if rig exerciser tests should be run in 
+     * @param runTests true if rig exerciser tests should be run in 
      *              maintenance mode
+     *              
      * @return true if operation successful, false otherwise
      */
     public boolean setMaintenance(boolean offline, String reason, boolean runTests);

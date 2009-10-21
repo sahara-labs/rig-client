@@ -115,10 +115,12 @@ public interface IRigSession
      * Checks if the user has the specified permission type. The session
      * permission hierarchy is from highest to lowest:
      * 
-     *  1. - Master
-     *  2. - Active Slave
-     *  3. - Passive Slave
-     *  4. - Not in session
+     * <ol>
+     *     <li>Master</li>
+     *     <li>Active Slave</li>
+     *     <li>Passive Slave</li>
+     *     <li>Not in session</li>
+     *  </ol>
      *  
      * So for example, a master user has the permission of an active slave
      * and below and an active slave has permission of a passive slave 
@@ -137,17 +139,20 @@ public interface IRigSession
     
     /**
      * Checks the users session. The return may be:
-     *  - <code>Session.MASTER</code> - master user - session initiator,
-     *            should have complete access to rig, including assigning 
-     *            slave users.
-     *  - <code>Session.SLAVE_ACTIVE</code> - active slave user (should 
-     *            have the same rig access rigs as the master user,
-     *            except assigning slave users.
-     *  - <code>Session.SLAVE_PASSIVE</code> - passive slave user (should have 
-     *            restricted access, perhaps read-only access.
-     *  - <code>Session.NOT_IN</code> - user not in session.
      *  
-     * @param name
+     * <ul>
+     *     <li><code>Session.MASTER</code> - master user - session initiator,
+     *            should have complete access to rig, including assigning 
+     *            slave users.</li>
+     *     <li><code>Session.SLAVE_ACTIVE</code> - active slave user (should 
+     *            have the same rig access rigs as the master user,
+     *            except assigning slave users.</li>
+     *     <li>code>Session.SLAVE_PASSIVE</code> - passive slave user (should have 
+     *            restricted access, perhaps read-only access.</li>
+     *     <li><code>Session.NOT_IN</code> - user not in session.</li>
+     * </ul> 
+     * 
+     * @param name the name of to user to check if in session
      * @return enumeration value of <code>Session</code>
      */
     public Session isInSession(String name);

@@ -55,11 +55,13 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 /**
  * Abstract rig type class that contains lists of the following actions:
  * 
- *   - IAcessAction
- *   - ISlaveAccessAction
- *   - IResetAction
- *   - INotifyAction
- *   - ITestAction
+ * <ul>
+ *   <li>IAcessAction</li>
+ *   <li>ISlaveAccessAction</li>
+ *   <li>IResetAction</li>
+ *   <li>INotifyAction</li>
+ *   <li>ITestActionM</li>
+ *  </ul>
  *   
  * When a method is called, the corresponding action list is iterated through
  * and the action initiating method is called. For example, if the

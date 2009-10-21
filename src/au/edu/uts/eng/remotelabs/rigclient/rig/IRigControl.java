@@ -208,7 +208,7 @@ public interface IRigControl
         }
 
         /**
-         * @param to file to add
+         * @param file name of file to add
          */
         public void addResultsFile(String file)
         {
