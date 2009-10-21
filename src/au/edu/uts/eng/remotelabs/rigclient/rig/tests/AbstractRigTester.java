@@ -659,7 +659,7 @@ public class AbstractRigTester extends TestCase
         assertFalse(this.rig.isSessionActive());
         assertTrue(this.rig.assign(name));
         assertTrue(this.rig.isSessionActive());
-        Session type = this.rig.isInSession(name);
+        assertTrue(Session.MASTER == this.rig.isInSession(name));
 
         assertTrue(this.rig.isInSession(name) == Session.MASTER);
         assertTrue(this.rig.isNotInMaintenance());
