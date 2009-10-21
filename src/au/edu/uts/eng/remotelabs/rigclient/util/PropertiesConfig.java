@@ -38,10 +38,14 @@
  *
  * Changelog:
  * - 05/10/2009 - mdiponio - Initial file creation.
+ * - 21/10/2009 - mdiponio - Implmented the <code>reload</code>, <code>serialise</code>
+ *                           and <code>removeProperty</code> methods.
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -56,7 +60,10 @@ public class PropertiesConfig implements IConfig
     private static final String DEFAULT_CONFIG_FILE = "config/rigclient.properties";
 
     /** Java Properties class. */
-    private Properties prop = null;
+    private Properties prop;
+    
+    /** Properties file input stream. */
+    private FileInputStream propStream;
     
     /** Loaded configuration file. */
     private String configFile;
@@ -81,11 +88,13 @@ public class PropertiesConfig implements IConfig
         this.prop = new Properties();
         try
         {
-            this.prop.load(new FileInputStream(filename));
+            this.propStream = new FileInputStream(filename);
+            this.prop.load(this.propStream);
         }
         catch (Exception ex)
         {
-            System.err.println("Failed to load configuration file.");
+            System.err.println("Failed to load configuration file (" + this.configFile + "). The error is of type" +
+                    ex.getClass().getCanonicalName() + " with message " + ex.getMessage() + ".");
         }
     }
 
@@ -106,12 +115,12 @@ public class PropertiesConfig implements IConfig
     {
         final Map<String, String> all = new HashMap<String, String>();
         
-        for (Object k : this.prop.keySet())
+        for (Object key : this.prop.keySet())
         {
-            final Object v = this.prop.get(k);
-            if (k instanceof String && v instanceof String)
+            final Object val = this.prop.get(key);
+            if (key instanceof String && val instanceof String)
             {
-                all.put((String)k, (String)v);
+                all.put((String)key, (String)val);
             }
         }
         
@@ -126,6 +135,14 @@ public class PropertiesConfig implements IConfig
     {
         this.prop.setProperty(key, value);
     }
+    
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#removeProperty(String key)
+     */
+    public void removeProperty(final String key)
+    {
+        this.prop.remove(key);
+    }
 
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#reload()
@@ -133,8 +150,18 @@ public class PropertiesConfig implements IConfig
     @Override
     public synchronized void reload()
     {
-        // TODO PropertiesConfig->reload implement properties configuration reloading
-        throw new UnsupportedOperationException();        
+        try
+        {
+            this.propStream.close();
+            this.propStream = new FileInputStream(this.configFile);
+            this.prop = new Properties();
+            this.prop.load(this.propStream);
+        }
+        catch (IOException e)
+        {
+            System.err.println("Failed to reload configuration file (" + this.configFile + "). The error is of type" +
+            		e.getClass().getCanonicalName() + " with message " + e.getMessage() + ".");
+        }
     }
 
     /* 
@@ -143,8 +170,23 @@ public class PropertiesConfig implements IConfig
     @Override
     public synchronized void serialise()
     {
-        // TODO ProperitesConfig->serialise implement properties configuration serialisation
-        throw new UnsupportedOperationException();
+        try
+        {
+            this.propStream.close();
+            final FileOutputStream output = new FileOutputStream(this.configFile);
+            this.prop.store(output, "Sahara Rig Client Properties Configuration File");
+            output.flush();
+            output.close();
+            
+            this.propStream = new FileInputStream(this.configFile);
+            this.prop = new Properties();
+            this.prop.load(this.propStream);
+        }
+        catch (IOException e)
+        {
+            System.err.println("Failed to seroalise configuration file (" + this.configFile + "). The error is of type" +
+                    e.getClass().getCanonicalName() + " with message " + e.getMessage() + ".");
+        }
     }
 
     /* 
@@ -166,7 +208,7 @@ public class PropertiesConfig implements IConfig
         for (Object o : this.prop.keySet())
         {
             buf.append(o);
-            buf.append(" ");
+            buf.append(' ');
             buf.append(this.prop.get(o));
             buf.append('\n');
         }

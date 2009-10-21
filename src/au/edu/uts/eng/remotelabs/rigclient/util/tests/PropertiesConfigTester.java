@@ -104,7 +104,9 @@ public class PropertiesConfigTester extends TestCase
     @Test
     public void testSetProperty()
     {
-        fail("Not yet implemented"); // TODO
+    	this.config.setProperty("Prop11", "Value11");
+    	assertTrue(this.config.getAllProperties().containsKey("Prop11"));
+    	assertEquals("Value11", this.config.getProperty("Prop11"));
     }
 
     /**
@@ -113,7 +115,14 @@ public class PropertiesConfigTester extends TestCase
     @Test
     public void testReload()
     {
-        fail("Not yet implemented"); // TODO
+        this.config.setProperty("Prop11", "Value11");
+        assertTrue(this.config.getAllProperties().containsKey("Prop11"));
+        assertEquals("Value11", this.config.getProperty("Prop11"));
+        
+        /* Reload should clear the added property. */
+        this.config.reload();
+        assertFalse(this.config.getAllProperties().containsKey("Prop11"));
+        assertNull(this.config.getProperty("Prop11"));
     }
 
     /**
@@ -122,7 +131,39 @@ public class PropertiesConfigTester extends TestCase
     @Test
     public void testSerialise()
     {
-        fail("Not yet implemented"); // TODO
+        final String key1 = "Prop11", key2 = "Prop12", key3 = "Prop13";
+        final String val1 = "Value11", val2 = "Value12", val3 = "Value13";
+        Map<String, String> all = this.config.getAllProperties();
+        assertFalse(all.containsKey(key1));
+        assertFalse(all.containsKey(key2));
+        assertFalse(all.containsKey(key3));
+        
+        
+        this.config.setProperty(key1, val1);
+        this.config.setProperty(key2, val2);
+        this.config.setProperty(key3, val3);
+        this.config.serialise();
+        
+        /* Force reload (clears in memory properties). */
+        this.config.reload();
+        all = this.config.getAllProperties();
+        assertTrue(all.containsKey(key1));
+        assertEquals(val1, this.config.getProperty(key1));
+        assertTrue(all.containsKey(key2));
+        assertEquals(val2, this.config.getProperty(key2));
+        assertTrue(all.containsKey(key3));
+        assertEquals(val3, this.config.getProperty(key3));
+        
+        /* Remove add properties and reserialise. */
+        this.config.removeProperty(key1);
+        this.config.removeProperty(key2);
+        this.config.removeProperty(key3);
+        this.config.serialise();
+        this.config.reload();
+        all = this.config.getAllProperties();
+        assertFalse(all.containsKey(key1));
+        assertFalse(all.containsKey(key2));
+        assertFalse(all.containsKey(key3));
     }
 
     /**

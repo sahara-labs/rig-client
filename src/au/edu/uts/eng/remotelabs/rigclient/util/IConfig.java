@@ -34,10 +34,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date <day> <month> 2009
+ * @date 5th October 2009
  *
  * Changelog:
  * - 05/10/2009 - mdiponio - Initial file creation.
+ * - 21/10/2009 - mdiponio - Added <code>removeProperty</code> method.
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
@@ -72,6 +73,13 @@ public interface IConfig
      * @param value value of configuration item
      */
     public void setProperty(String key, String value);
+    
+    /**
+     * Removes a property from configuration.
+     * 
+     * @param key property to remove
+     */
+    public void removeProperty(String key);
     
     /**
      * Reload configuration from a persistent store. If the in memory
