@@ -318,7 +318,7 @@ public abstract class AbstractRig implements IRig
                 }
                 /* Looks good so actually register the action. */
                 final ITestAction test = (ITestAction)action;
-                this.logger.info("Registering a test access action with provided type of "); //+ test.getActionType());
+                this.logger.info("Registering a test access action with provided type of " + test.getActionType());
                 
                 /* Test actions run it their own thread, so create one and start it. */
                 new Thread(this.testThreads, test).start();
@@ -467,7 +467,18 @@ public abstract class AbstractRig implements IRig
                 buf.append(test.getActionType());
                 buf.append(": ");
                 buf.append(test.getReason());
+                buf.append(' ');
             }
+        }
+        
+        if (this.maintenanceReason != null)
+        {
+            buf.append(this.maintenanceReason);
+        }
+        
+        if (buf.length() == 0)
+        {
+            return null;
         }
         
         this.logger.info("Monitor bad reason:" + buf.toString());
@@ -480,7 +491,7 @@ public abstract class AbstractRig implements IRig
     @Override
     public boolean isMonitorStatusGood()
     {
-        if (this.inMaintenance) return true;
+        if (this.inMaintenance) return false;
         for (ITestAction test : this.testActions)
         {
             if (test == null) continue;
@@ -593,6 +604,9 @@ public abstract class AbstractRig implements IRig
     {
         this.logger.debug("Adding slave user " + name + " with " + (passive ? "passive" : "active") + " access.");
         
+        /* Slaves can't be assigned if there is no session. */
+        if (!this.isSessionActive()) return false;
+        
         if (this.sessionUsers.containsKey(name))
         {
             final Session currentPerm = this.sessionUsers.get(name);
@@ -625,7 +639,7 @@ public abstract class AbstractRig implements IRig
             if (action == null) continue;
             if (!action.assign(name, passive))
             {
-                this.setMaintenanceActionFailure(action, ActionType.SLAVE_ACCESS);
+                this.setMonitorBadFromActionFailure(action, ActionType.SLAVE_ACCESS);
                 return false;
             }
         }
@@ -650,6 +664,22 @@ public abstract class AbstractRig implements IRig
             return false;
         }
         
+        /* Check the rig is in a state to be assigned. */
+        if (!(this.isMonitorStatusGood() && this.isNotInMaintenance()))
+        {
+            String message = "Failed allocation, the rig is not in an operable state.";
+            if (this.getMaintenanceReason() != null)
+            {
+                message += " The rig is in maintenance with reason " + this.getMaintenanceReason() + "."; 
+            }
+            if (this.getMonitorReason() != null)
+            {
+                message += " The rig is detected to be bad with reason " + this.getMonitorReason() + ".";
+            }
+            this.logger.warn(message);
+            return false;
+        }
+        
         /* Stop tests. */
         this.stopTests();
          
@@ -658,7 +688,8 @@ public abstract class AbstractRig implements IRig
             if (action == null) continue;            
             if (!action.assign(name))
             {
-                this.setMaintenanceActionFailure(action, ActionType.ACCESS);
+                this.setMonitorBadFromActionFailure(action, ActionType.ACCESS);
+                this.startTests();
                 return false;
             }
         }
@@ -681,17 +712,17 @@ public abstract class AbstractRig implements IRig
         switch (this.sessionUsers.get(name))
         {
             case MASTER:
-                return ses == Session.MASTER;
+                return ses == Session.MASTER || ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE ||
+                        ses == Session.NOT_IN;
             case SLAVE_ACTIVE:
-                return ses == Session.MASTER || ses == Session.SLAVE_ACTIVE;
+                return ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE || ses == Session.NOT_IN;
             case SLAVE_PASSIVE:
-                /* This is redundant but defensive. */
-                return ses == Session.MASTER || ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE;
+                return ses == Session.SLAVE_PASSIVE || ses == Session.NOT_IN;
         }
         
         this.logger.error("All permission states unaccounted for, someone has been been naughty" +
         		"and put a Session.NOT_IN user as a session user. Please file bug report. (RC22_Unexpected_Error)");
-        return false;
+        throw new RuntimeException("Error in AbstractRig->hasPermission");
     }
 
     /* 
@@ -714,6 +745,8 @@ public abstract class AbstractRig implements IRig
     @Override
     public boolean notify(final String message)
     {
+        if (!this.isSessionActive()) return false;
+        
         boolean ret = true;
         final String typeSafe[] = new String[0];
         this.logger.debug("Running notification for all users with message " + message);
@@ -722,7 +755,7 @@ public abstract class AbstractRig implements IRig
             if (action == null) continue;
             if (!action.notify(message, this.sessionUsers.keySet().toArray(typeSafe)))
             {
-                this.setMaintenanceActionFailure(action, ActionType.NOTIFY);
+                this.setMonitorBadFromActionFailure(action, ActionType.NOTIFY);
                 ret = false;
             }
         }
@@ -748,7 +781,7 @@ public abstract class AbstractRig implements IRig
 
         String user = null;
         Session perm;
-        for (Entry<String, Session> entry : this.sessionUsers.entrySet())
+        for (Entry<String, Session> entry : this.getSessionUsersClone().entrySet())
         {
             user = entry.getKey();
             perm = entry.getValue();
@@ -761,7 +794,7 @@ public abstract class AbstractRig implements IRig
                     if (action == null) continue;
                     if (!action.revoke(user))
                     {
-                        this.setMaintenanceActionFailure(action, ActionType.ACCESS);
+                        this.setMonitorBadFromActionFailure(action, ActionType.ACCESS);
                         ret = false;
                     }
                 }
@@ -783,7 +816,7 @@ public abstract class AbstractRig implements IRig
             if (action == null) continue;
             if (!action.reset())
             {
-                this.setMaintenanceActionFailure(action, ActionType.RESET);
+                this.setMonitorBadFromActionFailure(action, ActionType.RESET);
                 ret = false;
             }
         }
@@ -836,7 +869,7 @@ public abstract class AbstractRig implements IRig
             if (action == null) continue;
             if (!action.revoke(name, perm == Session.SLAVE_PASSIVE ? true : false))
             {
-                this.setMaintenanceActionFailure(action, ActionType.SLAVE_ACCESS);
+                this.setMonitorBadFromActionFailure(action, ActionType.SLAVE_ACCESS);
                 ret = false;
             }
         }
@@ -859,7 +892,7 @@ public abstract class AbstractRig implements IRig
      * 
      * @param action action which failed
      */
-    protected void setMaintenanceActionFailure(final IAction action, final ActionType type)
+    protected void setMonitorBadFromActionFailure(final IAction action, final ActionType type)
     {
         String ac = null, errCode = null;
         switch (type)
@@ -870,7 +903,7 @@ public abstract class AbstractRig implements IRig
                 break;
             case SLAVE_ACCESS:
                 ac = "Slave access";
-                errCode = "";
+                errCode = ""; // TODO slave access failure error code
                 break;
             case NOTIFY:
                 ac = "Notification";
@@ -882,7 +915,7 @@ public abstract class AbstractRig implements IRig
                 break;
             case TEST:
                 ac = "Exerciser test";
-                errCode = "";
+                errCode = ""; // TODO exerciser test failure error code
                 break;
         }
         this.logger.error(ac + " action of type " + action.getActionType() + " failed with reason " + 
@@ -899,7 +932,7 @@ public abstract class AbstractRig implements IRig
         {
             this.actionFailureCount.put(action, 1);
             this.logger.info("First action failure for " + action.getActionType() + "Threshold for action failures" +
-            		"is " + this.actionFailureThreshold + ".");
+            		" is " + this.actionFailureThreshold + ".");
         }
         
         if (this.actionFailureCount.get(action) >= this.actionFailureThreshold)
@@ -910,6 +943,21 @@ public abstract class AbstractRig implements IRig
             this.inMaintenance = true;
             this.maintenanceReason = ac + " action failed with reason " + action.getFailureReason(); 
         }
+    }
+    
+    /**
+     * Returns a deep clone of the session users hash map.
+     * 
+     * @return session users map clone
+     */
+    private Map<String, Session> getSessionUsersClone()
+    {
+        final Map<String, Session> sessions = new HashMap<String, Session>(this.sessionUsers.size());
+        for (Entry<String, Session> entry : this.sessionUsers.entrySet())
+        {
+            sessions.put(entry.getKey(), entry.getValue());
+        }
+        return sessions;
     }
 
 }

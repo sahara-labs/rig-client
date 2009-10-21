@@ -102,7 +102,9 @@ public interface IRigSession
     public boolean revokeSlave(String name);
     
     /**
-     * Displays a notification message to the user(s) who are in session.
+     * Displays a notification message to the user(s) who are in session. 
+     * If this method is invoked when a session is not active, it will
+     * return <code>false</code>.
      * 
      * @param message message to display
      * @return true if successful
@@ -117,6 +119,10 @@ public interface IRigSession
      *  2. - Active Slave
      *  3. - Passive Slave
      *  4. - Not in session
+     *  
+     * So for example, a master user has the permission of an active slave
+     * and below and an active slave has permission of a passive slave 
+     * and below but not a master user permission.
      * 
      * By definition, a master user is also an active slave and a passive
      * slave. Semantically, a session user is NOT not in session, however,
