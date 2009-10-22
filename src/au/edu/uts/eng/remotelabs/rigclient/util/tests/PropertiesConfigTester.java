@@ -41,13 +41,20 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util.tests;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
-import junit.framework.TestCase;
 
 /**
  * Tests the <code>PropertiesConfig</code> class.
@@ -56,6 +63,9 @@ public class PropertiesConfigTester extends TestCase
 {
     /** Location of test file. */
     public static final String TEST_FILE = "test/resources/test.properties";
+    
+    /** Location of clean test file. */
+    public static final String TEST_FILE_CLEAN = "test/resources/test.properties.example";
     
     /** Object of class under test. */
     private PropertiesConfig config;
@@ -66,6 +76,23 @@ public class PropertiesConfigTester extends TestCase
     @Before
     public void setUp() throws Exception
     {
+        final File file = new File(PropertiesConfigTester.TEST_FILE);
+        if (file.exists())
+        {
+            file.delete();
+        }
+        
+        final InputStream input = new FileInputStream(PropertiesConfigTester.TEST_FILE_CLEAN);
+        final OutputStream output = new FileOutputStream(PropertiesConfigTester.TEST_FILE);
+        byte buf[] = new byte[1024];
+        int len;
+        while ((len = input.read(buf)) > 0)
+        {
+            output.write(buf, 0, len);
+        }
+        input.close();
+        output.close();
+        
         this.config = new PropertiesConfig(PropertiesConfigTester.TEST_FILE);
     }
 
@@ -190,5 +217,28 @@ public class PropertiesConfigTester extends TestCase
             assertTrue(dump.indexOf("Value" + i) > 0);
         }
     }
-
+    
+    /**
+     * @throws java.lang.Exception
+     */
+    @After
+    public void tearDown() throws Exception
+    {
+        final File file = new File(PropertiesConfigTester.TEST_FILE);
+        if (file.exists())
+        {
+            file.delete();
+        }
+        
+        final InputStream input = new FileInputStream(PropertiesConfigTester.TEST_FILE_CLEAN);
+        final OutputStream output = new FileOutputStream(PropertiesConfigTester.TEST_FILE);
+        byte buf[] = new byte[1024];
+        int len;
+        while ((len = input.read(buf)) > 0)
+        {
+            output.write(buf, 0, len);
+        }
+        input.close();
+        output.close();
+    }
 }
