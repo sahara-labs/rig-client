@@ -38,6 +38,8 @@ Changelog:
   - 19/10/2009 - mdiponio - Removed vebosity from delete target
   - 20/10/2009 - mdiponio - Changed JUnit target to generate an associated
                             EMMA code coverage report
+  - 22/10/2009 - mdiponio - Added classpathref to Javadoc task to fix warning
+                            about missing classes.
 -->
 <project name="RigClient" default="build" basedir=".">
 	<!-- Properties -->
@@ -204,7 +206,7 @@ Changelog:
 	
 	<!-- Javadoc -->
 	<target name="doc">
-		<javadoc access="public" destdir="${javadoc.dir}" author="true" version="true" use="true" windowtitle="Sahara Rig Client">
+		<javadoc access="public" destdir="${javadoc.dir}" classpathref="project.classpath" version="true" use="true" windowtitle="Sahara Rig Client">
 			<fileset dir="${src.dir}" defaultexcludes="yes">
 				<include name="**/*.java"/>
 				<exclude name="**/*Tester.java" />

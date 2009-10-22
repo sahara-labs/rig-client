@@ -39,103 +39,97 @@
  * Changelog:
  * - 22/10/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.rig;
+package au.edu.uts.eng.remotelabs.rigclient.rig.tests;
+
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * Abstract rig type class for rigs which provide direct control of the 
- * rig using the rig client.  Direct control takes two forms:
- * 
+ * Tests the <code>AbstractControllerRigTester</code> c;ass.
  */
-public abstract class AbstractControlledRig extends AbstractRig implements IRigControl
+public class AbstractControlledRigTester
 {
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig#init()
+    /**
+     * @throws java.lang.Exception
      */
-    @Override
-    protected void init()
+    @Before
+    public void setUp() throws Exception
     {
-        // TODO Auto-generated method stub
-
-    }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#performPrimitive(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)
-     */
-    @Override
-    public PrimitiveResponse performPrimitive(PrimitiveRequest req)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#performBatch(java.lang.String)
-     */
-    @Override
-    public boolean performBatch(String fileName)
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#isBatchRunning()
-     */
-    @Override
-    public boolean isBatchRunning()
-    {
-        // TODO Auto-generated method stub
-        return false;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#abortBatch()
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#performPrimitive(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)}.
      */
-    @Override
-    public boolean abortBatch()
+    @Test
+    public void testPerformPrimitive()
     {
-        // TODO Auto-generated method stub
-        return false;
+        fail("Not yet implemented"); // TODO
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#expungePrimitiveControllerCache()
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#performBatch(java.lang.String)}.
      */
-    @Override
-    public void expungePrimitiveControllerCache()
+    @Test
+    public void testPerformBatch()
     {
-        // TODO Auto-generated method stub
-        
+        fail("Not yet implemented"); // TODO
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#getBatchProgress()
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#isBatchRunning()}.
      */
-    @Override
-    public int getBatchProgress()
+    @Test
+    public void testIsBatchRunning()
     {
-        // TODO Auto-generated method stub
-        return 0;
+        fail("Not yet implemented"); // TODO
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#getBatchResults()
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#abortBatch()}.
      */
-    @Override
-    public BatchResults getBatchResults()
+    @Test
+    public void testAbortBatch()
     {
-        // TODO Auto-generated method stub
-        return null;
+        fail("Not yet implemented"); // TODO
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#getBatchState()
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#expungePrimitiveControllerCache()}.
      */
-    @Override
-    public BatchState getBatchState()
+    @Test
+    public void testExpungePrimitiveControllerCache()
     {
-        // TODO Auto-generated method stub
-        return null;
+        fail("Not yet implemented"); // TODO
     }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#getBatchProgress()}.
+     */
+    @Test
+    public void testGetBatchProgress()
+    {
+        fail("Not yet implemented"); // TODO
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#getBatchResults()}.
+     */
+    @Test
+    public void testGetBatchResults()
+    {
+        fail("Not yet implemented"); // TODO
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#getBatchState()}.
+     */
+    @Test
+    public void testGetBatchState()
+    {
+        fail("Not yet implemented"); // TODO
+    }
+
 }

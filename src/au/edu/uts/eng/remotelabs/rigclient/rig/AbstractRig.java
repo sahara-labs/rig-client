@@ -38,6 +38,10 @@
  *
  * Changelog:
  * - 07/10/2009 - mdiponio - Initial file creation.
+ * - 21/10/2009 - mdiponio - Fixed bugs in setMonitorBadFromActionFailure and
+ *                           assign and revoke methods.
+ * - 22/10/2009 - mdiponio - Refactored setMonitorBadFromActionFailure to
+ *                           a more sensible name and fixed enum Javadoc.
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
@@ -56,12 +60,12 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * Abstract rig type class that contains lists of the following actions:
  * 
  * <ul>
- *   <li>IAcessAction</li>
- *   <li>ISlaveAccessAction</li>
- *   <li>IResetAction</li>
- *   <li>INotifyAction</li>
- *   <li>ITestActionM</li>
- *  </ul>
+ *    <li>IAcessAction</li>
+ *    <li>ISlaveAccessAction</li>
+ *    <li>IResetAction</li>
+ *    <li>INotifyAction</li>
+ *    <li>ITestActionM</li>
+ * </ul>
  *   
  * When a method is called, the corresponding action list is iterated through
  * and the action initiating method is called. For example, if the
@@ -75,11 +79,16 @@ public abstract class AbstractRig implements IRig
      */
     public enum ActionType 
     {
-        ACCESS,       /* Master access and revocation. */
-        SLAVE_ACCESS, /* Slave access and revocation. */
-        NOTIFY,       /* User notification. */
-        RESET,        /* Rig reset. */
-        TEST          /* Monitor test. */
+        /** Master access and revocation. */
+        ACCESS,
+        /** Slave access and revocation. */
+        SLAVE_ACCESS,
+        /** User notification. */
+        NOTIFY,
+        /** Rig reset. */
+        RESET,
+        /** Monitor test. */
+        TEST
     }
     
     /** Session users in the form key => user name, value => user type */
@@ -641,7 +650,7 @@ public abstract class AbstractRig implements IRig
             if (action == null) continue;
             if (!action.assign(name, passive))
             {
-                this.setMonitorBadFromActionFailure(action, ActionType.SLAVE_ACCESS);
+                this.setMaintenanceFromActionFailure(action, ActionType.SLAVE_ACCESS);
                 return false;
             }
         }
@@ -690,7 +699,7 @@ public abstract class AbstractRig implements IRig
             if (action == null) continue;            
             if (!action.assign(name))
             {
-                this.setMonitorBadFromActionFailure(action, ActionType.ACCESS);
+                this.setMaintenanceFromActionFailure(action, ActionType.ACCESS);
                 this.startTests();
                 return false;
             }
@@ -757,7 +766,7 @@ public abstract class AbstractRig implements IRig
             if (action == null) continue;
             if (!action.notify(message, this.sessionUsers.keySet().toArray(typeSafe)))
             {
-                this.setMonitorBadFromActionFailure(action, ActionType.NOTIFY);
+                this.setMaintenanceFromActionFailure(action, ActionType.NOTIFY);
                 ret = false;
             }
         }
@@ -796,7 +805,7 @@ public abstract class AbstractRig implements IRig
                     if (action == null) continue;
                     if (!action.revoke(user))
                     {
-                        this.setMonitorBadFromActionFailure(action, ActionType.ACCESS);
+                        this.setMaintenanceFromActionFailure(action, ActionType.ACCESS);
                         ret = false;
                     }
                 }
@@ -818,7 +827,7 @@ public abstract class AbstractRig implements IRig
             if (action == null) continue;
             if (!action.reset())
             {
-                this.setMonitorBadFromActionFailure(action, ActionType.RESET);
+                this.setMaintenanceFromActionFailure(action, ActionType.RESET);
                 ret = false;
             }
         }
@@ -871,7 +880,7 @@ public abstract class AbstractRig implements IRig
             if (action == null) continue;
             if (!action.revoke(name, perm == Session.SLAVE_PASSIVE ? true : false))
             {
-                this.setMonitorBadFromActionFailure(action, ActionType.SLAVE_ACCESS);
+                this.setMaintenanceFromActionFailure(action, ActionType.SLAVE_ACCESS);
                 ret = false;
             }
         }
@@ -894,7 +903,7 @@ public abstract class AbstractRig implements IRig
      * 
      * @param action action which failed
      */
-    protected void setMonitorBadFromActionFailure(final IAction action, final ActionType type)
+    protected void setMaintenanceFromActionFailure(final IAction action, final ActionType type)
     {
         String ac = null, errCode = null;
         switch (type)

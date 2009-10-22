@@ -38,6 +38,7 @@
  *
  * Changelog:
  * - 05/10/2009 - mdiponio - Initial file creation.
+ * - 22/10/2009 - mdiponio - Fixed BatchState enum Javadoc.
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
@@ -68,11 +69,16 @@ public interface IRigControl
      */
     public enum BatchState
     {
-        CLEAR,        /* None started. */
-        IN_PROGRESS,  /* Invocation currently in progress. */
-        COMPLETE,     /* Invocation successfully completed. */
-        FAILED,       /* Invocation failed. */
-        NOT_SUPPORTED /* Rig type not supporting batch. */
+        /** None started. */
+        CLEAR,
+        /** Invocation currently in progress. */
+        IN_PROGRESS,
+        /** Invocation successfully completed. */
+        COMPLETE,
+        /** Invocation failed. */
+        FAILED,
+        /** Rig type not supporting batch. */
+        NOT_SUPPORTED
     }
     
     

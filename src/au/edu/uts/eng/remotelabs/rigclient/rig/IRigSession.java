@@ -38,6 +38,7 @@
  *
  * Changelog:
  * - 05/10/2009 - mdiponio - Initial file creation.
+ * - 22/10/2009 - mdiponio - Fixed Javadoc enum.
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
@@ -52,10 +53,14 @@ public interface IRigSession
      */
     public enum Session
     {
-        MASTER,        /* Master user. */
-        SLAVE_ACTIVE,  /* Active slave user. */
-        SLAVE_PASSIVE, /* Passive slave user. */
-        NOT_IN         /* Not in session. */
+        /** Master user. */
+        MASTER,
+        /** Active slave user. */
+        SLAVE_ACTIVE,
+        /** Passive slave user. */
+        SLAVE_PASSIVE,
+        /** Not in session. */
+        NOT_IN
     }
     
     /**
