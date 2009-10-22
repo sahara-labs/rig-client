@@ -43,22 +43,10 @@ package au.edu.uts.eng.remotelabs.rigclient.rig;
 
 /**
  * Abstract rig type class for rigs which provide direct control of the 
- * rig using the rig client.  Direct control takes two forms:
- * 
+ * rig using the rig client.
  */
 public abstract class AbstractControlledRig extends AbstractRig implements IRigControl
 {
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig#init()
-     */
-    @Override
-    protected void init()
-    {
-        // TODO Auto-generated method stub
-
-    }
-    
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#performPrimitive(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)
      */
@@ -67,6 +55,16 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#expungePrimitiveControllerCache()
+     */
+    @Override
+    public void expungePrimitiveControllerCache()
+    {
+        // TODO Auto-generated method stub
+        
     }
     
     /* 
@@ -97,16 +95,6 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#expungePrimitiveControllerCache()
-     */
-    @Override
-    public void expungePrimitiveControllerCache()
-    {
-        // TODO Auto-generated method stub
-        
     }
 
     /* 

@@ -41,15 +41,15 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.tests;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the <code>AbstractControllerRigTester</code> c;ass.
+ * Tests the <code>AbstractControllerRigTester</code> class.
  */
-public class AbstractControlledRigTester
+public class AbstractControlledRigTester extends TestCase
 {
 
     /**
