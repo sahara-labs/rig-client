@@ -41,6 +41,9 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.control;
 
+import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
+
 /**
  * Abstract class for batch control. Batch control in Sahara is run by 
  * invoking a system executable which does the batch control and
@@ -52,8 +55,8 @@ package au.edu.uts.eng.remotelabs.rigclient.rig.control;
  *     on the provided batch instruction file.</li>
  *     <li>invoke() - Should start the batch control executable.</li>
  *     <li>sync() - This is run after the completion of batch
- *     control and should do syncronisation of the generated results 
- *     files to a persistant store.</li>
+ *     control and should do synchronisation of the generated results 
+ *     files to a persistent store.</li>
  * </ul>
  */
 public abstract class AbstractBatchRunner
@@ -61,7 +64,16 @@ public abstract class AbstractBatchRunner
     /** File name of instruction file. */
     protected String fileName;
     
+    /** Logger. */
+    protected ILogger logger;
     
+    public AbstractBatchRunner(String file)
+    {
+        this.logger = LoggerFactory.getLoggerInstance();
+        this.logger.debug("Creating a Batch Runner.");
+        
+        this.fileName = file;
+    }
     
     /**
      * Provides a sanity check on the provided batch instruction file.
@@ -87,11 +99,11 @@ public abstract class AbstractBatchRunner
     
     /**
      * This method is run after completion of the batch control executable 
-     * and should do cleanup, if needed and file syncronisation to some 
-     * persistant user accessible store, again if needed.
+     * and should do cleanup, if needed and file synchronisation to some 
+     * persistent user accessible store, again if needed.
      * 
-     * This is provided as a utility with a guarentee that it is run
-     * <strong>only</strong> after the successful compeletion of the 
+     * This is provided as a utility with a guarantee that it is run
+     * <strong>only</strong> after the successful completion of the 
      * batch control executable.
      * 
      * @return true if successfully completed
