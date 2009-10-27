@@ -41,6 +41,11 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.control;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -49,7 +54,6 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * invoking a system executable which does the batch control and
  * (presumably) generates a results file. The following methods
  * should be overridden for rig specific batch control.
- * 
  * <ul>
  *     <li><code>testFile()</code> - Should provide a sanity check
  *     on the provided batch instruction file.</li>
@@ -59,10 +63,26 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  *     files to a persistent store.</li>
  * </ul>
  */
-public abstract class AbstractBatchRunner
+public abstract class AbstractBatchRunner implements Runnable
 {
+    /** Batch process. */
+    private Process batchProc;
+    
+    /** Command line argument to invoke. */
+    private String command;
+    
+    /** Command line argument to invoke. */ 
+    private List<String> commandArgs;
+    
     /** File name of instruction file. */
     protected String fileName;
+    
+    /** Processes working directory. */
+    private String workingDir;
+    
+    /** Enviroment variables for the batch process. */
+    private Map<String, String> env;
+    
     
     /** Logger. */
     protected ILogger logger;
@@ -73,7 +93,35 @@ public abstract class AbstractBatchRunner
         this.logger.debug("Creating a Batch Runner.");
         
         this.fileName = file;
+        this.commandArgs = new ArrayList<String>();
+        this.env = new HashMap<String, String>();
     }
+    
+    public void run()
+    {
+        
+    }
+    
+    /**
+     * Sets the required batch control process variables. The variables that
+     * should be set in this method are:
+     * 
+     * <ul>
+     *     <li><strong><code>command</code></strong> - The batch command name
+     *     executable name.</li>
+     *     <li><strong><code>commandArgs</code></strong> - The command line 
+     *     arguments to provide for the </li>
+     *     <li></li> 
+     * </ul>
+     * 
+     * The arguments are provided to command line program in the order they
+     * are inserted into the <code>commandArgs</code> array. <strong>NOTE: </strong>
+     * You must add the <code>fileName</code> parameter at its appropriate 
+     * location in the argument sequence.
+     * 
+     * @return true if successful, false otherwise
+     */
+    protected abstract boolean init();
     
     /**
      * Provides a sanity check on the provided batch instruction file.
@@ -88,6 +136,8 @@ public abstract class AbstractBatchRunner
      */
     protected abstract boolean testFile();
     
+    
+    
     /**
      * Invokes the batch control executable providing the instruction files
      * as a command line parameter. The function should return after the 
@@ -95,7 +145,13 @@ public abstract class AbstractBatchRunner
      * 
      * @return true if the executable was successfully invoked
      */
-    protected abstract boolean invoke();
+    protected boolean invoke()
+    {
+        
+        
+        
+        return false;
+    }
     
     /**
      * This method is run after completion of the batch control executable 
