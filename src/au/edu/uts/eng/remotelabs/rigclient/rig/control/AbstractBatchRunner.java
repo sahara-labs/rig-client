@@ -41,12 +41,12 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.control;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -114,7 +114,7 @@ public abstract class AbstractBatchRunner implements Runnable
     protected int exitCode;
     
     /** Results files. */
-    List<String> resultsFiles;
+    protected List<String> resultsFiles;
     
     /** Logger. */
     protected ILogger logger;
@@ -134,38 +134,53 @@ public abstract class AbstractBatchRunner implements Runnable
         this.envMap = new HashMap<String, String>();
     }
     
+    /**
+     * Processes the batch control invocation performing the following steps, 
+     * calling the listed methods:
+     * <ol>
+     *      <li><strong><code>init()</code></strong> - Command, argument, 
+     *      working directory and enviroment setip.</li>
+     *      <li><strong><code>testFile()</code></strong> - Instruction file
+     *      test.</li>
+     *      <li><strong><code>invoke()</code></strong> - Process creation.
+     *      </li>
+     *      <li><strong><code>sync()</code></strong> - Generated file 
+     *      syncronisation.<li>
+     *      <li><strong><code>clean()</code></strong> - Invocation 
+     *      cleanup.</li>
+     * </ol>
+     * If a preceding method fails (returns <code>false</code>), successive 
+     * methods in the stack are not called, except <code>cleanup()</code>
+     * which is always called.
+     */
+    @Override
     public void run()
     {
         try
         {
-            /* Batch initalisation. */
-            if (!this.init())
+            if (!this.init()) // Batch initialisation
             {
                 this.logger.warn("Batch process initialisation has failed.");
                 this.isFailed = true;
                 return;
             }
-            
-            /* Batch test file. */
-            if (!this.testFile())
+            else if (!this.testFile()) // Test batch file
             {
                 this.logger.warn("Uploaded batch file has failed the instruction file sanity test.");
                 this.isFailed = true;
-            }
-            
-            /* Invoke batch control. */
-            if (!this.invoke())
+            }          
+            else if (!this.invoke()) // Invoke command and create process
             {
                 this.logger.warn("Batch control invocation has failed.");
                 this.isFailed = true;
                 this.isRunning = false;
                 return;
             }
-            this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
             
             this.batchStdOut = new BufferedReader(new InputStreamReader(this.batchProc.getInputStream()));
             this.batchStdErr = new BufferedReader(new InputStreamReader(this.batchProc.getErrorStream()));
             
+            this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
             this.exitCode = this.batchProc.waitFor(); // Blocks up process completion.
             this.logger.info("The batch control process terminated with error code " + this.exitCode + " at " +
                     this.getTimeStamp('/', ' ', ':') + ".");
@@ -173,21 +188,29 @@ public abstract class AbstractBatchRunner implements Runnable
             this.isRunning = false;
             this.isFailed = false;
             
-            /* Find out the list of results files. */
-            // TODO run completion
-            
-            /* Syncronise. */
-            if (!this.sync())
-            {
+            if (!this.isFailed)
+            {            
+                /* Find out the list of results files. */
+                File wd = new File(this.workingDir);            
+                this.resultsFiles = Arrays.asList(wd.list());
                 
+                /* Syncronise. */
+                if (!!this.sync())
+                {
+                    this.logger.warn("File syncronisation has failed.");
+                }
             }
         }
         catch (Exception ex)
         {
-            
+            this.logger.warn("Batch control failed with exception of type " + ex.getClass().getName() + " and with " +
+            		"message " + ex.getMessage());
         }
-        
-        
+        finally
+        {
+            /* Cleanup. */
+            this.cleanup();
+        }
     }
     
     /**
@@ -362,8 +385,6 @@ public abstract class AbstractBatchRunner implements Runnable
         this.isRunning = true;
         return true;
     }
-
-    
     
     /**
      * This method is run after completion of the batch control executable 
@@ -379,20 +400,34 @@ public abstract class AbstractBatchRunner implements Runnable
     protected abstract boolean sync();
     
     /**
-     * 
-     */
-    protected void cleanup()
-    {
-        // TODO cleanup
-    }
-    
-    /**
      * Terminate the batch process.
      */
     public void terminate()
     {
         this.logger.info("Terminating batch process.");
         this.batchProc.destroy();
+    }
+    
+    /**
+     * Cleans up a batch control invocation.
+     */
+    protected void cleanup()
+    {
+        this.logger.debug("Cleaning a batch control invocation.");
+        try
+        {
+            this.batchStdErr.close();
+            this.batchStdOut.close();
+            
+            /* Delete the working directory. */
+            
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
     }
     
     /**
@@ -478,16 +513,19 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     public boolean isFailed()
     {
-       return isFailed; 
+       return this.isFailed; 
     }
     
     /**
+     * Returns the decteced results files for a batch control invocation.
+     * Detected results files are those that are generated in the set
+     * batch process working directory.
      * 
      * @return
      */
     public List<String> getResultsFiles()
     {
-       // TODO results files
+        if (this.resultsFiles == null) return null;
         
         return null;
     }
