@@ -64,10 +64,10 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * (presumably) generates a results file. The following methods
  * should be overridden for rig specific batch control.
  * <ul>
- *     <li><code>checkFile()</code> - Should provide a sanity check
- *     on the provided batch instruction file.</li>
  *     <li>init() - Should setup the command, arguments, working directory and 
  *     execution environment.</li>
+ *     <li><code>checkFile()</code> - Should provide a sanity check
+ *     on the provided batch instruction file.</li>
  *     <li>sync() - This is run after the completion of batch
  *     control and should do synchronisation of the generated results 
  *     files to a persistent store.</li>
@@ -78,11 +78,15 @@ public abstract class AbstractBatchRunner implements Runnable
     /** Batch process. */
     private Process batchProc;
     
-    /** Standand out of the batch process. */
+    /** Standard out of the batch process. */
     private BufferedReader batchStdOut;
     
     /** Standard err of the batch process. */
     private BufferedReader batchStdErr;
+    
+    private StringBuffer stdOutBuffer;
+    
+    private StringBuffer stdErrBuffer;
     
     /** Command line argument to invoke. */
     protected String command;
@@ -100,7 +104,7 @@ public abstract class AbstractBatchRunner implements Runnable
     /** Batch process working directory. */
     protected String workingDir;
     
-    /** Enviroment variables for the batch process. */
+    /** Environment variables for the batch process. */
     protected Map<String, String> envMap;
     
     /** Flag to specify if batch execution has started. */
@@ -134,6 +138,9 @@ public abstract class AbstractBatchRunner implements Runnable
         this.fileName = file;
         this.commandArgs = new ArrayList<String>();
         this.envMap = new HashMap<String, String>();
+        
+        this.stdOutBuffer = new StringBuffer();
+        this.stdErrBuffer = new StringBuffer();
     }
     
     /**
@@ -141,13 +148,13 @@ public abstract class AbstractBatchRunner implements Runnable
      * calling the listed methods:
      * <ol>
      *      <li><strong><code>init()</code></strong> - Command, argument, 
-     *      working directory and enviroment setip.</li>
+     *      working directory and environment setup.</li>
      *      <li><strong><code>checkFile()</code></strong> - Instruction file
      *      test.</li>
      *      <li><strong><code>invoke()</code></strong> - Process creation.
      *      </li>
      *      <li><strong><code>sync()</code></strong> - Generated file 
-     *      syncronisation.<li>
+     *      synchronisation.<li>
      *      <li><strong><code>clean()</code></strong> - Invocation 
      *      cleanup.</li>
      * </ol>
@@ -195,7 +202,7 @@ public abstract class AbstractBatchRunner implements Runnable
                 /* Find out the list of results files. */            
                 this.resultsFiles = Arrays.asList(new File(this.workingDir).list());
                 
-                /* Syncronise. */
+                /* Synchronise. */
                 if (!this.sync())
                 {
                     this.logger.warn("File syncronisation has failed.");
@@ -235,8 +242,8 @@ public abstract class AbstractBatchRunner implements Runnable
      *     (<em>assuming</em> it puts the files in its current working 
      *     directory.)</li>
      *     <li><strong><code>envMap</code></strong> - Environment variable map
-     *     for the batch process enviroment. Additions to this will be appended
-     *     to the default enviroment variables.</li>
+     *     for the batch process environment. Additions to this will be appended
+     *     to the default environment variables.</li>
      * </ul>
      * 
      * @return true if successful, false otherwise
@@ -259,7 +266,7 @@ public abstract class AbstractBatchRunner implements Runnable
     /**
      * Invokes the batch control executable providing the instruction files
      * as a command line parameter. Returns are invocation and does not
-     * wait for completeion.
+     * wait for completion.
      * 
      * @return true if the executable was successfully invoked
      * @throws IOException exception caused by starting the batch command
@@ -286,7 +293,7 @@ public abstract class AbstractBatchRunner implements Runnable
         /* --------------------------------------------------------------------
          * ---- 2. Set up working directory. ----------------------------------
          * --------------------------------------------------------------------*/
-        if (this.workingDirBase == null) // NOPMD by mdiponio on 29/10/09 11:54 AM
+        if (this.workingDirBase == null)
         {
             /* Default is a directory in the system directory. */
             this.workingDirBase = System.getProperty("java.io.tmpdir");
@@ -321,7 +328,7 @@ public abstract class AbstractBatchRunner implements Runnable
         builder.directory(wDir);
         
         /* --------------------------------------------------------------------
-         * ---- 3. Set up enviroment variables. -------------------------------
+         * ---- 3. Set up environment variables. -------------------------------
          * ------------------------------------------------------------------*/
         final Map<String, String> env = builder.environment();
         for (Entry<String, String> e : this.envMap.entrySet())
@@ -437,6 +444,12 @@ public abstract class AbstractBatchRunner implements Runnable
     /**
      * Reads and returns the batch process standard output stream. 
      * <code>null</code> is returned if there is nothing to read.
+     * This returns the portion of the standard output stream which is
+     * between the end of the last read of the standard output stream
+     * and the end of the stream.
+     * <br /><br />
+     * <strong>NOTE:</strong> The standard output stream is buffered
+     * and may be accessed using <code>getAllStandardOut</code>.
      * 
      * @return batch process standard out 
      */
@@ -457,12 +470,24 @@ public abstract class AbstractBatchRunner implements Runnable
         }
         
         this.logger.debug("Read from batch process standard out: " + buf.toString());
+        this.stdOutBuffer.append(buf);
         return buf.toString();
+    }
+    
+    public StringBuffer getAllStandardOut()
+    {
+        return new StringBuffer(this.stdOutBuffer);
     }
     
     /**
      * Reads and returns the batch process standard error stream. 
      * <code>null</code> is returned if there is nothing to read.
+     * This returns the portion of the standard error stream which is
+     * between the end of the last read of the standard error stream
+     * and the end of the stream.
+     * <br /><br />
+     * <strong>NOTE:</strong> The standard error stream is buffered
+     * and may be accessed using <code>getAllStandardErr</code>.
      * 
      * @return batch process standard error 
      */
@@ -483,8 +508,11 @@ public abstract class AbstractBatchRunner implements Runnable
         }
         
         this.logger.debug("Read from batch process standard err: " + buf.toString());
+        this.stdErrBuffer.append(buf);
         return buf.toString();
     }
+    
+    
     
     /**
      * Returns <code>true</code> if a batch process has been started. Started
@@ -521,11 +549,11 @@ public abstract class AbstractBatchRunner implements Runnable
     }
     
     /**
-     * Returns the decteced results files for a batch control invocation.
-     * Detected results files are those that are generated in the set
+     * Returns the detected results files for a batch control invocation.
+     * Detected results files are those that are generated in the
      * batch process working directory.
      * 
-     * @return
+     * @return list of generated results files
      */
     public List<String> getResultsFiles()
     {
@@ -536,11 +564,11 @@ public abstract class AbstractBatchRunner implements Runnable
     
     /**
      * Gets a formatted time stamp with day, month, year, hour, minute
-     * and second components seperated with the <code>glue</code> parameter.
+     * and second components separated with the <code>glue</code> parameter.
      * 
      * @param dateGlue character to append date components with
-     * @param join charater to join date and time with
-     * @paarm timeGlue charater to append time with
+     * @param join character to join date and time with
+     * @param timeGlue character to append time with
      * @return String formatted timestamp
      */
     protected String getTimeStamp(final char dateGlue, final char join, final char timeGlue)
@@ -579,7 +607,11 @@ public abstract class AbstractBatchRunner implements Runnable
             return;
         }
         
-        /* DODGY This apparently works according to Java Bug ID 4313887. */
+        /* Try to detect symbolic links to so some mischievous moron doesn't 
+         * symlink their to the server root directory or some other 
+         * inconvenient place and end up potentially deleting the rig client
+         * server. */
+        /* DODGY This apparently works according to Java Bug ID: 4313887. */
         if (!file.getCanonicalPath().equals(file.getAbsolutePath()))
         {
             this.logger.warn("Not deleting " + file.getAbsolutePath() + " as it appears to a symbolic link.");

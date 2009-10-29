@@ -34,32 +34,66 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date 16th October 2009
+ * @date 29th October 2009
  *
  * Changelog:
- * - 16/10/2009 - mdiponio - Initial file creation.
+ * - 29/10/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.tester;
+package au.edu.uts.eng.remotelabs.rigclient.rig.control.tests;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
-import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractControlledRigTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractRigTester;
-import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
 
 /**
- * Runs all the Rig Client unit tests.
+ * Mock batch runner for testing.
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    AbstractBatchRunnerTester.class,
-    AbstractControlledRigTester.class,
-    AbstractRigTester.class,
-    PropertiesConfigTester.class
-})
-public class RigClientTestSuite
+public class MockBatchRunner extends AbstractBatchRunner
 {
-    // Does nothing...
+    /** Flag to specify if checkFile returns true. */
+    private boolean checkFileFlag;
+    
+    /** Flag to specify if init returns true. */
+    private boolean initFlag;
+    
+    /** Flag to specify if sync returns true. */
+    private boolean syncFlag;
+    
+    /**
+     * Instruction file name.
+     * 
+     * @param fileName
+     */
+    public MockBatchRunner(String fileName)
+    {
+        super(fileName);
+    }
+
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#checkFile()
+     */
+    @Override
+    protected boolean checkFile()
+    {
+        return this.checkFileFlag;
+    }
+
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#init()
+     */
+    @Override
+    protected boolean init()
+    {
+       return this.initFlag;
+    }
+
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#sync()
+     */
+    @Override
+    protected boolean sync()
+    {
+        return this.syncFlag;
+    }
+    
+    
+
 }
