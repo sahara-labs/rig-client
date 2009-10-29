@@ -93,7 +93,4 @@ public class MockBatchRunner extends AbstractBatchRunner
     {
         return this.syncFlag;
     }
-    
-    
-
 }

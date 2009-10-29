@@ -41,14 +41,19 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.control.tests;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Calendar;
 
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.easymock.EasyMock.*;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
@@ -70,6 +75,7 @@ public class AbstractBatchRunnerTester extends TestCase
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -169,7 +175,27 @@ public class AbstractBatchRunnerTester extends TestCase
     @Test
     public void testGetTimeStamp()
     {
-        fail("Not yet implemented"); // TODO
+        try
+        {
+            Method meth = AbstractBatchRunner.class.getDeclaredMethod("getTimeStamp", char.class, char.class, char.class);
+            meth.setAccessible(true);
+            String ts = (String) meth.invoke(this.runner, '-', '-', '-');
+            String[] parts = ts.split("-");
+            
+            /* Format should be day - month - year - hour - minute - second. */
+            Calendar cal = Calendar.getInstance();
+            assertEquals(cal.get(Calendar.DAY_OF_MONTH), Integer.parseInt(parts[0]));
+            assertEquals(cal.get(Calendar.MONTH) + 1, Integer.parseInt(parts[1]));
+            assertEquals(cal.get(Calendar.YEAR), Integer.parseInt(parts[2]));
+            assertEquals(cal.get(Calendar.HOUR_OF_DAY), Integer.parseInt(parts[3]));
+            assertEquals(cal.get(Calendar.MINUTE), Integer.parseInt(parts[4]));
+            assertTrue(Integer.parseInt(parts[5]) >= 0 && Integer.parseInt(parts[5]) < 60);
+        }
+        catch (Exception e)
+        {
+            fail(e.getClass().getName());
+        }
+        
     }
 
 }
