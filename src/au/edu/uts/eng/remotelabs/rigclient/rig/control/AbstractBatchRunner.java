@@ -64,14 +64,23 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * (presumably) generates a results file. The following methods
  * should be overridden for rig specific batch control.
  * <ul>
- *     <li>init() - Should setup the command, arguments, working directory and 
- *     execution environment.</li>
+ *     <li><code>init()</code> - Should setup the command, arguments,
+ *     working directory and execution environment.</li>
  *     <li><code>checkFile()</code> - Should provide a sanity check
  *     on the provided batch instruction file.</li>
- *     <li>sync() - This is run after the completion of batch
+ *     <li><code>sync()</code> - This is run after the completion of batch
  *     control and should do synchronisation of the generated results 
  *     files to a persistent store.</li>
  * </ul>
+ * 
+ * <strong>NOTE:</strong>The premise of uploading code and running it on 
+ * a laboratory server is inherently <strong><em>insecure.</em></strong>
+ * Care must be taken with what is run, what may be generated, 
+ * how it is cleaned up and with what permission the batch process is run
+ * with.
+ * 
+ * <div align="center"><strong style="color:red;font-size:3em">YOU HAVE BEEN 
+ * WARNED!</strong></div>
  */
 public abstract class AbstractBatchRunner implements Runnable
 {
@@ -474,9 +483,14 @@ public abstract class AbstractBatchRunner implements Runnable
         return buf.toString();
     }
     
-    public StringBuffer getAllStandardOut()
+    /**
+     * Returns the captured standard out of the batch process.
+     * 
+     * @return standard out 
+     */
+    public String getAllStandardOut()
     {
-        return new StringBuffer(this.stdOutBuffer);
+        return this.stdOutBuffer.toString();
     }
     
     /**
@@ -512,7 +526,15 @@ public abstract class AbstractBatchRunner implements Runnable
         return buf.toString();
     }
     
-    
+    /**
+     * Returns the captured standard err of the batch process.
+     * 
+     * @param standard err 
+     */
+    public String getAllStandardErr()
+    {
+        return this.stdErrBuffer.toString();
+    }
     
     /**
      * Returns <code>true</code> if a batch process has been started. Started
@@ -607,8 +629,8 @@ public abstract class AbstractBatchRunner implements Runnable
             return;
         }
         
-        /* Try to detect symbolic links to so some mischievous moron doesn't 
-         * symlink their to the server root directory or some other 
+        /* Try to detect symbolic links so some mischievous moron doesn't 
+         * symlink to their  server root directory or some other 
          * inconvenient place and end up potentially deleting the rig client
          * server. */
         /* DODGY This apparently works according to Java Bug ID: 4313887. */
