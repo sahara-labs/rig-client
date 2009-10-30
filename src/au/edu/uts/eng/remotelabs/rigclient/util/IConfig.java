@@ -59,6 +59,17 @@ public interface IConfig
     public String getProperty(String key);
     
     /**
+     * Returns the configuration value of the property key.
+     * If the key value cannot be found in configuration, the 
+     * <code>defaultValue</code> parameter is returned.
+     *
+     * @param key name of the configuration item
+     * @param defaultValue the value to return if the key value is not found
+     * @return configuration value set in properties if found, null otherwise
+     */
+    public String getProperty(String key, String defaultValue);
+    
+    /**
      * Gets a map of all the configuration properties in key => value pairs.
      * 
      * @return all configuration properties

@@ -45,10 +45,13 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Calendar;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -103,17 +106,11 @@ public class AbstractBatchRunnerTester extends TestCase
         expect(this.mockConfig.getProperty("Clean_Up_Batch"));
         
         
-        
+        // TODO
+        fail();
     }
 
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#cleanup()}.
-     */
-    @Test
-    public void testCleanup()
-    {
-        fail("Not yet implemented"); // TODO
-    }
+    
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#getBatchStandardOut()}.
@@ -166,9 +163,142 @@ public class AbstractBatchRunnerTester extends TestCase
     @Test
     public void testGetResultsFiles()
     {
-        fail("Not yet implemented"); // TODO
+        
+        try
+        {
+            String wdBase = System.getProperty("user.dir") + "/test/resources/BatchRunner";
+            String wd = wdBase + "/ResultsFiles";
+            
+            Field wdBaseField = AbstractBatchRunner.class.getDeclaredField("workingDirBase");
+            wdBaseField.setAccessible(true);
+            wdBaseField.set(this.runner, wdBase);
+            
+            Field wdField = AbstractBatchRunner.class.getDeclaredField("workingDir");
+            wdField.setAccessible(true);
+            wdField.set(this.runner, wd);
+            
+            Method meth = AbstractBatchRunner.class.getDeclaredMethod("detectResultsFiles");
+            meth.setAccessible(true);
+            meth.invoke(this.runner);
+            
+            List<String> results = this.runner.getResultsFiles();
+            assertTrue(results.size() > 3); // There is at least a .svn directory also in this directory
+            assertTrue(results.contains("a.txt"));
+            assertTrue(results.contains("b.txt"));
+            assertTrue(results.contains("c.txt"));
+        }
+        catch (Exception e)
+        {
+            fail(e.getClass().getName() + " - " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#cleanup()}.
+     * This is a highly risky test due to the risky nature of the tested 
+     * operation (i.e. don't fraking symlink to somewhere dangerous). 
+     */
+    @Test
+    public void testCleanup()
+    {
+        try
+        {
+            final String wdBase = System.getProperty("user.dir") + "/test/resources/BatchRunner";
+            final String wd = wdBase + "/To_Be_Deleted";
+            final String tDir = "/testdirectory";
+            final String tFile = "/testfile";
+            
+            /* Create directory to be deleted. */
+            assertTrue(new File(wd).mkdir());
+            
+            /* Create directory in directory to be deleted. */
+            assertTrue(new File(wd + tDir).mkdir());
+            
+            /* Create files in directories to be deleted. */
+            for (int i = 1; i <= 10; i++)
+            {
+                assertTrue(new File(wd + tFile + i).createNewFile());
+                assertTrue(new File(wd + tDir + tFile + i).createNewFile());
+            }
+            
+            Field wdBaseField = AbstractBatchRunner.class.getDeclaredField("workingDirBase");
+            wdBaseField.setAccessible(true);
+            wdBaseField.set(this.runner, wdBase);
+            
+            Field wdField = AbstractBatchRunner.class.getDeclaredField("workingDir");
+            wdField.setAccessible(true);
+            wdField.set(this.runner, wd);
+            
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
+                .andReturn("true"); // True will run recursive delete
+            replay(this.mockConfig);
+            
+            Method meth = AbstractBatchRunner.class.getDeclaredMethod("cleanup");
+            meth.setAccessible(true);
+            meth.invoke(this.runner); 
+            
+            assertFalse(new File(wd).exists());
+            assertFalse(new File(wd + tDir).exists());
+            for (int i = 1; i <= 10; i++)
+            {
+                assertFalse(new File(wd + tFile + i).exists());
+                assertFalse(new File(wd + tDir + tFile + i).exists());
+            }
+            
+            verify(this.mockConfig); 
+        }
+        catch (Exception e)
+        {
+            fail(e.getClass().getName() + " - " + e.getMessage());
+        }
     }
 
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#cleanup()}.
+     * This is a highly risky test due to the risky nature of the tested 
+     * operation (i.e. don't fraking symlink to somewhere dangerous). 
+     */
+    @Test
+    public void testCleanupConfigOff()
+    {
+        try
+        {
+            final String wdBase = System.getProperty("user.dir") + "/test/resources/BatchRunner";
+            final String wd = wdBase + "/To_Not_Be_Deleted";
+       
+            /* Create directory to be deleted. */
+            assertTrue(new File(wd).mkdir());
+            
+            Field wdBaseField = AbstractBatchRunner.class.getDeclaredField("workingDirBase");
+            wdBaseField.setAccessible(true);
+            wdBaseField.set(this.runner, wdBase);
+            
+            Field wdField = AbstractBatchRunner.class.getDeclaredField("workingDir");
+            wdField.setAccessible(true);
+            wdField.set(this.runner, wd);
+            
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
+                .andReturn("false");
+            replay(this.mockConfig);
+            
+            Method meth = AbstractBatchRunner.class.getDeclaredMethod("cleanup");
+            meth.setAccessible(true);
+            meth.invoke(this.runner); 
+            
+            assertTrue(new File(wd).exists());
+            assertTrue(new File(wd).delete());
+            
+            verify(this.mockConfig); 
+        }
+        catch (Exception e)
+        {
+            fail(e.getClass().getName() + " - " + e.getMessage());
+        }
+    }
+    
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#getTimeStamp(char, char, char)}.
      */
@@ -193,7 +323,7 @@ public class AbstractBatchRunnerTester extends TestCase
         }
         catch (Exception e)
         {
-            fail(e.getClass().getName());
+            fail(e.getClass().getName() + " - " + e.getMessage());
         }
         
     }

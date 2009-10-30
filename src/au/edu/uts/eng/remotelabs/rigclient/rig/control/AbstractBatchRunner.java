@@ -196,14 +196,16 @@ public abstract class AbstractBatchRunner implements Runnable
                 this.running = false;
                 return;
             }
-            
-            this.batchStdOut = new BufferedReader(new InputStreamReader(this.batchProc.getInputStream()));
-            this.batchStdErr = new BufferedReader(new InputStreamReader(this.batchProc.getErrorStream()));
-            
-            this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
-            this.exitCode = this.batchProc.waitFor(); // Blocks up process completion.
-            this.logger.info("The batch control process terminated with error code " + this.exitCode + " at " +
-                    this.getTimeStamp('/', ' ', ':') + ".");
+            else
+            {
+                this.batchStdOut = new BufferedReader(new InputStreamReader(this.batchProc.getInputStream()));
+                this.batchStdErr = new BufferedReader(new InputStreamReader(this.batchProc.getErrorStream()));
+                
+                this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
+                this.exitCode = this.batchProc.waitFor(); // Blocks up process completion.
+                this.logger.info("The batch control process terminated with error code " + this.exitCode + " at " +
+                        this.getTimeStamp('/', ' ', ':') + ".");
+            }
             
             this.running = false;
             this.failed = false;
@@ -211,7 +213,7 @@ public abstract class AbstractBatchRunner implements Runnable
             if (!this.failed)
             {            
                 /* Find out the list of results files. */            
-                this.resultsFiles = Arrays.asList(new File(this.workingDir).list());
+                this.detectResultsFiles();
                 
                 /* Synchronise. */
                 if (!this.sync())
@@ -231,6 +233,8 @@ public abstract class AbstractBatchRunner implements Runnable
             this.cleanup();
         }
     }
+
+ 
     
     /**
      * Sets the required batch control process variables. The variables that
@@ -304,7 +308,8 @@ public abstract class AbstractBatchRunner implements Runnable
         /* --------------------------------------------------------------------
          * ---- 2. Set up working directory. ----------------------------------
          * --------------------------------------------------------------------*/
-        if (this.workingDirBase == null)
+        final IConfig config = ConfigFactory.getInstance();
+        if ((this.workingDirBase = config.getProperty("Batch_Working_Dir")) == null)
         {
             /* Default is a directory in the system directory. */
             this.workingDirBase = System.getProperty("java.io.tmpdir");
@@ -321,22 +326,34 @@ public abstract class AbstractBatchRunner implements Runnable
         {
             this.logger.info("User set batch working directory base is " + this.workingDirBase);
         }
-        /* Add a new folder with a timestamp as the name. */
-        this.workingDir = this.workingDirBase + File.separatorChar + this.getTimeStamp('-', '-', '-');
-        this.logger.info("Batch process working directory is " + this.workingDir);
-        final File wDir = new File(this.workingDir);
-        if (!wDir.mkdir())
+        
+        if (!Boolean.parseBoolean(config.getProperty("Batch_Create_Nested_Dir", "true")))
         {
-            final File wdBase = new File(this.workingDirBase);
-            final StringBuffer buf = new StringBuffer(22);
-            buf.append("Unable to create batch process working directory (" + this.workingDir + ").");
-            if (!wdBase.exists()) buf.append(" Base " + this.workingDirBase + " does not exist.");
-            if (!wdBase.isDirectory()) buf.append(" Base " + this.workingDirBase + " is not a directory");
-            if (!wdBase.canWrite()) buf.append("Base " + this.workingDirBase +  " is not writeable");
-            this.logger.warn(buf.toString());
-            return false;
+            /* Add a new folder with a timestamp as the name. */
+            final String dirName = this.getTimeStamp('-', '-', '-');
+            this.workingDir = this.workingDirBase + File.separatorChar + dirName;
+            this.logger.debug("Creating a nested working directory with name " + dirName + ".");
+            
+            final File wDir = new File(this.workingDir);
+            if (!wDir.mkdir())
+            {
+                final File wdBase = new File(this.workingDirBase);
+                final StringBuffer buf = new StringBuffer(22);
+                buf.append("Unable to create batch process working directory (" + this.workingDir + ").");
+                if (!wdBase.exists()) buf.append(" Base " + this.workingDirBase + " does not exist.");
+                if (!wdBase.isDirectory()) buf.append(" Base " + this.workingDirBase + " is not a directory");
+                if (!wdBase.canWrite()) buf.append("Base " + this.workingDirBase +  " is not writeable");
+                this.logger.warn(buf.toString());
+                return false;
+            }
         }
-        builder.directory(wDir);
+        else
+        {
+            this.logger.debug("Not creating a nested working directory.");
+            this.workingDir = this.workingDirBase;
+        }
+        builder.directory(new File(this.workingDir));
+        this.logger.info("Batch process working directory is " + this.workingDir);
         
         /* --------------------------------------------------------------------
          * ---- 3. Set up environment variables. -------------------------------
@@ -407,6 +424,25 @@ public abstract class AbstractBatchRunner implements Runnable
     }
     
     /**
+     * Detects results files by reading the list of files in the batch process
+     * working directory. This may be overridden to remove superfluous
+     * results files.
+     */
+    protected void detectResultsFiles()
+    {
+        String[] files = new File(this.workingDir).list();
+        if (files != null)
+        {
+            this.resultsFiles = Arrays.asList(files);
+            this.logger.info("Detected batch results files " + this.resultsFiles);
+        }
+        else
+        {
+            this.logger.info("No results files have been detected.");
+        }
+    }
+    
+    /**
      * This method is run after completion of the batch control executable 
      * and should do cleanup, if needed and file synchronisation to some 
      * persistent user accessible store, again if needed.
@@ -436,11 +472,12 @@ public abstract class AbstractBatchRunner implements Runnable
         this.logger.debug("Cleaning a batch control invocation.");
         try
         {
-            this.batchStdErr.close();
-            this.batchStdOut.close();
+            if (this.batchStdErr != null) this.batchStdErr.close();
+            if (this.batchStdOut != null) this.batchStdOut.close();
             
             final IConfig conf = ConfigFactory.getInstance();
-            if (Boolean.parseBoolean(conf.getProperty("Clean_Up_Batch")))
+            if (Boolean.parseBoolean(conf.getProperty("Batch_Clean_Up", "false")) 
+                    && !this.workingDir.equals(this.workingDirBase))
             {
                 this.recusiveDelete(new File(this.workingDir));
             }

@@ -108,6 +108,20 @@ public class PropertiesConfig implements IConfig
     }
     
     /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#getProperty(java.lang.String, java.lang.String)
+     */
+    @Override
+    public String getProperty(final String key, final String defaultValue)
+    {
+        final String val = this.prop.getProperty(key);
+        if (val == null)
+        {
+            return defaultValue;
+        }
+        return val;
+    }
+    
+    /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#getAllProperties()
      */
     @Override

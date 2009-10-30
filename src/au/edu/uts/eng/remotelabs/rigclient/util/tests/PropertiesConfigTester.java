@@ -107,6 +107,15 @@ public class PropertiesConfigTester extends TestCase
             assertEquals("Value" + i, this.config.getProperty("Prop" + i));
         }
     }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig#getProperty(java.lang.String, java.lang.String)}.
+     */
+    @Test
+    public void testGetPropertyWithDefault()
+    {
+        assertEquals("Default Value", this.config.getProperty("Not_A_Key", "Default Value"));
+    }
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig#getAllProperties()}.
