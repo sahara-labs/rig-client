@@ -58,7 +58,9 @@ public class ConfigFactory
      * Singleton class.
      */
     private ConfigFactory()
-    { }
+    { 
+        /* Singleton constructor. */
+    }
     
     /**
      * Gets a IConfig instance.

@@ -54,7 +54,7 @@ public class RigClient
      */
     public RigClient()
     {
-        
+        // TODO service instatisation 
     }
     
     public void runProgram()

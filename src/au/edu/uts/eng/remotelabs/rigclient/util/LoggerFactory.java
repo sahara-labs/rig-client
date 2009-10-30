@@ -83,7 +83,9 @@ public class LoggerFactory
      * Don't want instances of this class.
      */
     private LoggerFactory()
-    { }
+    { 
+        /* Singleton constructor. */
+    }
     
     /**
      * Returns an instance of a ILogger implementation.

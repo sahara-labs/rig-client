@@ -50,7 +50,9 @@ class SystemErrLogger extends AbstractLogger
      * Default constructor.
      */
     public SystemErrLogger()
-    { }
+    { 
+        /* Does nothing. */
+    }
    
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.util.ILogger#log(java.lang.short, java.lang.String)

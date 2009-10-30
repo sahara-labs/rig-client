@@ -239,7 +239,10 @@ public interface IRigControl
         /**
          * Constructor.
          */
-        public PrimitiveRequest () { }
+        public PrimitiveRequest () 
+        { 
+            /* Does nothing. */
+        }
         
         /**
          * Constructor.
