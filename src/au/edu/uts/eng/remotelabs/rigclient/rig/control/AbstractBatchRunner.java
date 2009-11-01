@@ -355,6 +355,11 @@ public abstract class AbstractBatchRunner implements Runnable
          * ---- 3. Set up environment variables. -------------------------------
          * ------------------------------------------------------------------*/
         final Map<String, String> env = builder.environment();
+        if (Boolean.parseBoolean(config.getProperty("Batch_Flush_Env", "false")))
+        {
+            env.clear();
+        }
+        
         for (Entry<String, String> e : this.envMap.entrySet())
         {
             this.logger.info("Adding batch control env variable " + e.getKey() + " with value " + e.getValue());

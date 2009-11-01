@@ -104,6 +104,7 @@ public class AbstractBatchRunnerTester extends TestCase
     public void testInvokeRunDirEnvFlush()
     {
         final String wdBase = System.getProperty("user.dir") + "/test/resources/BatchRunner";
+        
     }
     
     /**
@@ -118,6 +119,8 @@ public class AbstractBatchRunnerTester extends TestCase
             .andReturn(wd);
         expect(this.mockConfig.getProperty("Batch_Create_Nested_Dir", "true"))
             .andReturn("false").atLeastOnce();
+        expect(this.mockConfig.getProperty("Batch_Flush_Env", "false"))
+            .andReturn("false");
         replay(this.mockConfig);
         
         try
@@ -126,8 +129,8 @@ public class AbstractBatchRunnerTester extends TestCase
             field.setAccessible(true);
             
             /* Sets a command which prints out the contents of a test file. On
-             * Windows uses 'type' (appparently) and on sane operating
-             * systems - Linux / UNIX uses'cat'. */
+             * Windows uses 'type' (apparently) and on sane operating
+             * systems - Linux / UNIX, uses'cat'. */
             if (System.getProperty("os.name").equals("Windows"))
             {
                 field.set(this.runner, "type");
