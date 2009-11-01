@@ -50,6 +50,7 @@ import static org.easymock.EasyMock.verify;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -70,7 +71,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 public class AbstractBatchRunnerTester extends TestCase
 {
     /** Object of class under test. */
-    private AbstractBatchRunner runner;
+    private MockBatchRunner runner;
     
     /** Mock configuration class. */
     private IConfig mockConfig;
@@ -100,14 +101,76 @@ public class AbstractBatchRunnerTester extends TestCase
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#invoke()}.
      */
     @Test
-    public void testInvoke()
+    public void testInvokeRunDirEnvFlush()
     {
+        final String wdBase = System.getProperty("user.dir") + "/test/resources/BatchRunner";
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#invoke()}.
+     */
+    @Test
+    public void testInvokeNoRunDirNoEnvFlush()
+    {
+        final String wd = System.getProperty("user.dir") + "/test/resources/BatchRunner";
         reset(this.mockConfig);
-        expect(this.mockConfig.getProperty("Clean_Up_Batch"));
+        expect(this.mockConfig.getProperty("Batch_Working_Dir"))
+            .andReturn(wd);
+        expect(this.mockConfig.getProperty("Batch_Create_Nested_Dir", "true"))
+            .andReturn("false").atLeastOnce();
+        replay(this.mockConfig);
         
-        
-        // TODO
-        fail();
+        try
+        {
+            Field field = AbstractBatchRunner.class.getDeclaredField("command");
+            field.setAccessible(true);
+            
+            /* Sets a command which prints out the contents of a test file. On
+             * Windows uses 'type' (appparently) and on sane operating
+             * systems - Linux / UNIX uses'cat'. */
+            if (System.getProperty("os.name").equals("Windows"))
+            {
+                field.set(this.runner, "type");
+            }
+            else
+            {
+                field.set(this.runner, "cat");
+            }
+            
+            final List<String> args = new ArrayList<String>();
+            args.add(wd + "/TestFileToCat.txt");
+            field = AbstractBatchRunner.class.getDeclaredField("commandArgs");
+            field.setAccessible(true);
+            field.set(this.runner, args);
+            
+            Method meth = AbstractBatchRunner.class.getDeclaredMethod("invoke");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+            
+            field = AbstractBatchRunner.class.getDeclaredField("workingDirBase");
+            field.setAccessible(true);
+            assertEquals(wd, field.get(this.runner));
+            
+            field = AbstractBatchRunner.class.getDeclaredField("workingDir");
+            field.setAccessible(true);
+            assertEquals(wd, field.get(this.runner));
+            
+            final String out = this.runner.getAllStandardOut();
+            assertEquals("", this.runner.getAllStandardErr());
+            
+            assertNotNull(out);
+            String lines[]  = out.split("\n");
+            assertEquals("Start File 1", lines[0]);
+            for (int i = 1; i <= 20; i++)
+            {
+                assertEquals(String.valueOf(i), lines[i]);
+            }
+            assertEquals("End File 1", lines[21]);
+        }
+        catch (Exception e)
+        {
+           fail(e.getClass().getName() + " - " + e.getMessage());
+        }   
     }
 
     

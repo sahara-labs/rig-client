@@ -198,10 +198,6 @@ public abstract class AbstractBatchRunner implements Runnable
             }
             else
             {
-                this.batchStdOut = new BufferedReader(new InputStreamReader(this.batchProc.getInputStream()));
-                this.batchStdErr = new BufferedReader(new InputStreamReader(this.batchProc.getErrorStream()));
-                
-                this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
                 this.exitCode = this.batchProc.waitFor(); // Blocks up process completion.
                 this.logger.info("The batch control process terminated with error code " + this.exitCode + " at " +
                         this.getTimeStamp('/', ' ', ':') + ".");
@@ -327,7 +323,7 @@ public abstract class AbstractBatchRunner implements Runnable
             this.logger.info("User set batch working directory base is " + this.workingDirBase);
         }
         
-        if (!Boolean.parseBoolean(config.getProperty("Batch_Create_Nested_Dir", "true")))
+        if (Boolean.parseBoolean(config.getProperty("Batch_Create_Nested_Dir", "true")))
         {
             /* Add a new folder with a timestamp as the name. */
             final String dirName = this.getTimeStamp('-', '-', '-');
@@ -340,9 +336,9 @@ public abstract class AbstractBatchRunner implements Runnable
                 final File wdBase = new File(this.workingDirBase);
                 final StringBuffer buf = new StringBuffer(22);
                 buf.append("Unable to create batch process working directory (" + this.workingDir + ").");
-                if (!wdBase.exists()) buf.append(" Base " + this.workingDirBase + " does not exist.");
-                if (!wdBase.isDirectory()) buf.append(" Base " + this.workingDirBase + " is not a directory");
-                if (!wdBase.canWrite()) buf.append("Base " + this.workingDirBase +  " is not writeable");
+                if (!wdBase.exists()) buf.append(" Base " + this.workingDirBase + " does not exist. ");
+                if (!wdBase.isDirectory()) buf.append(" Base " + this.workingDirBase + " is not a directory. ");
+                if (!wdBase.canWrite()) buf.append("Base " + this.workingDirBase +  " is not writeable. ");
                 this.logger.warn(buf.toString());
                 return false;
             }
@@ -374,9 +370,9 @@ public abstract class AbstractBatchRunner implements Runnable
         File commFile = new File(this.command);
         if (!commFile.isAbsolute())
         {
-            this.logger.info("Batch control command is not absolute. This isn't recommended. Will test path for" +
-            		"command file.");
-            final String path = env.get("path");
+            this.logger.info("Batch control command is not absolute. This isn't recommended but will test path for" +
+            		" command file.");
+            final String path = env.get("PATH");
             if (path == null)
             {
                 this.logger.error("Path enviroment variable (path) for batch control not found, batch failing.");
@@ -418,6 +414,10 @@ public abstract class AbstractBatchRunner implements Runnable
          * ---- 5. Invoke command. --------------------------------------------
          * ------------------------------------------------------------------*/
         this.batchProc = builder.start();
+        this.batchStdOut = new BufferedReader(new InputStreamReader(this.batchProc.getInputStream()));
+        this.batchStdErr = new BufferedReader(new InputStreamReader(this.batchProc.getErrorStream()));
+        this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
+        
         this.started = true;
         this.running = true;
         return true;
@@ -509,6 +509,7 @@ public abstract class AbstractBatchRunner implements Runnable
             while (this.batchStdOut.ready())
             {
                 buf.append(this.batchStdOut.readLine());
+                buf.append('\n');
             }
         }
         catch (IOException e)
@@ -517,7 +518,10 @@ public abstract class AbstractBatchRunner implements Runnable
             return null;
         }
         
-        this.logger.debug("Read from batch process standard out: " + buf.toString());
+        this.logger.debug("--- Batch process standard out read at " + this.getTimeStamp('/', ' ', ':') + " ------");
+        this.logger.debug(buf.toString());
+        this.logger.debug("--- End batch process standard out read ------");
+
         this.stdOutBuffer.append(buf);
         return buf.toString();
     }
@@ -529,6 +533,7 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     public String getAllStandardOut()
     {
+        this.getBatchStandardOut();
         return this.stdOutBuffer.toString();
     }
     
@@ -552,6 +557,7 @@ public abstract class AbstractBatchRunner implements Runnable
             while (this.batchStdErr.ready())
             {
                 buf.append(this.batchStdErr.readLine());
+                buf.append('\n');
             }
         }
         catch (IOException e)
@@ -560,7 +566,10 @@ public abstract class AbstractBatchRunner implements Runnable
             return null;
         }
         
-        this.logger.debug("Read from batch process standard err: " + buf.toString());
+        this.logger.debug("--- Batch process standard err read at " + this.getTimeStamp('/', ' ', ':') + " ------");
+        this.logger.debug(buf.toString());
+        this.logger.debug("--- End batch process standard err read ------");
+        
         this.stdErrBuffer.append(buf);
         return buf.toString();
     }
@@ -572,6 +581,7 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     public String getAllStandardErr()
     {
+        this.getBatchStandardError();
         return this.stdErrBuffer.toString();
     }
     
