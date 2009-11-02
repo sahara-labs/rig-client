@@ -477,8 +477,18 @@ public abstract class AbstractBatchRunner implements Runnable
         this.logger.debug("Cleaning a batch control invocation.");
         try
         {
-            if (this.batchStdErr != null) this.batchStdErr.close();
-            if (this.batchStdOut != null) this.batchStdOut.close();
+            if (this.batchStdErr != null) 
+            {
+                this.getBatchStandardError();
+                this.batchStdErr.close();
+                this.batchStdErr = null;
+            }
+            if (this.batchStdOut != null)
+            {
+                this.getAllStandardOut();
+                this.batchStdOut.close();
+                this.batchStdOut = null;
+            }
             
             final IConfig conf = ConfigFactory.getInstance();
             if (Boolean.parseBoolean(conf.getProperty("Batch_Clean_Up", "false")) 
@@ -511,10 +521,10 @@ public abstract class AbstractBatchRunner implements Runnable
         final StringBuffer buf = new StringBuffer();
         try
         {
-            while (this.batchStdOut.ready())
+            while (this.batchStdOut != null && this.batchStdOut.ready())
             {
                 buf.append(this.batchStdOut.readLine());
-                buf.append('\n');
+                buf.append(System.getProperty("line.separator"));
             }
         }
         catch (IOException e)
@@ -559,10 +569,10 @@ public abstract class AbstractBatchRunner implements Runnable
         final StringBuffer buf = new StringBuffer();
         try
         {
-            while (this.batchStdErr.ready())
+            while (this.batchStdErr != null && this.batchStdErr.ready())
             {
                 buf.append(this.batchStdErr.readLine());
-                buf.append('\n');
+                buf.append(System.getProperty("line.separator"));
             }
         }
         catch (IOException e)
@@ -636,6 +646,17 @@ public abstract class AbstractBatchRunner implements Runnable
         if (this.resultsFiles == null) return null;
         
         return new ArrayList<String>(Arrays.asList(this.resultsFiles.toArray(new String[0])));
+    }
+    
+    /**
+     * Gets the exit code of the batch process. If the batch process has not
+     * completed, the returned exit code is 0.
+     * 
+     * @return exit code
+     */
+    public int getExitCode()
+    {
+        return this.exitCode;
     }
     
     /**
