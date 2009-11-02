@@ -338,7 +338,7 @@ public abstract class AbstractBatchRunner implements Runnable
             if (!wDir.mkdir())
             {
                 final File wdBase = new File(this.workingDirBase);
-                final StringBuffer buf = new StringBuffer(22);
+                final StringBuffer buf = new StringBuffer(25);
                 buf.append("Unable to create batch process working directory (" + this.workingDir + ").");
                 if (!wdBase.exists()) buf.append(" Base " + this.workingDirBase + " does not exist. ");
                 if (!wdBase.isDirectory()) buf.append(" Base " + this.workingDirBase + " is not a directory. ");
@@ -439,16 +439,15 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     protected void detectResultsFiles()
     {
-        String[] files = new File(this.workingDir).list();
-        if (files != null)
-        {
-            this.resultsFiles = Arrays.asList(files);
-            this.logger.info("Detected batch results files " + this.resultsFiles);
-        }
-        else
+        final String[] files = new File(this.workingDir).list();
+        if (files == null)
         {
             this.logger.info("No results files have been detected.");
+            return;
         }
+
+        this.resultsFiles = Arrays.asList(files);
+        this.logger.info("Detected batch results files " + this.resultsFiles);
     }
     
     /**
