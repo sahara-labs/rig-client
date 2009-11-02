@@ -97,7 +97,7 @@ public class AbstractBatchRunnerTester extends TestCase
         configField.setAccessible(true);
         configField.set(null, this.mockConfig);
         
-        this.runner = new MockBatchRunner(null, true);
+        this.runner = new MockBatchRunner(null, null, true);
     }
     
     /**
@@ -796,7 +796,16 @@ public class AbstractBatchRunnerTester extends TestCase
         {
             fail(e.getClass().getName() + " - " + e.getMessage());
         }
-        
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#getBatchUser()}
+     */
+    @Test
+    public void testGetBatchUser()
+    {
+        AbstractBatchRunner r = new MockBatchRunner(null, "tuser");
+        assertEquals("tuser", r.getBatchUser());
     }
 
 }

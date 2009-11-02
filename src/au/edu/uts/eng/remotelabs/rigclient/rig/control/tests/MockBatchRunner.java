@@ -61,21 +61,23 @@ public class MockBatchRunner extends AbstractBatchRunner
      * Constructor  - sets instruction file name.
      * 
      * @param fileName
+     * @param user 
      */
-    public MockBatchRunner(String fileName)
+    public MockBatchRunner(String fileName, String user)
     {
-        super(fileName);
+        super(fileName, user);
     }
     
     /**
      * Constructor.
      * 
      * @param fileName
+     * @param user
      * @param statues sets all method returns.
      */
-    public MockBatchRunner(String fileName, boolean statues)
+    public MockBatchRunner(String fileName, String user, boolean statues)
     {
-        super(fileName);
+        super(fileName, user);
         this.checkFileFlag = statues;
         this.initFlag = statues;
         this.syncFlag = statues;

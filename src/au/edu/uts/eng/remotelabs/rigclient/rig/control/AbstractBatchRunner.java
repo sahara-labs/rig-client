@@ -108,6 +108,9 @@ public abstract class AbstractBatchRunner implements Runnable
     /** File name of instruction file. */
     protected String fileName;
     
+    /** User name who invoked batch control. */
+    protected String username;
+    
     /** Batch process working directory base (base has a new folder added to
      *  be set as the batch processes CWD. */
     protected String workingDirBase;
@@ -141,12 +144,13 @@ public abstract class AbstractBatchRunner implements Runnable
      * 
      * @param file uploaded instruction file
      */
-    public AbstractBatchRunner(final String file)
+    public AbstractBatchRunner(final String file, final String user)
     {
         this.logger = LoggerFactory.getLoggerInstance();
         this.logger.debug("Creating a Batch Runner.");
         
         this.fileName = file;
+        this.username = user;
         this.commandArgs = new ArrayList<String>();
         this.envMap = new HashMap<String, String>();
         
@@ -657,6 +661,16 @@ public abstract class AbstractBatchRunner implements Runnable
     public int getExitCode()
     {
         return this.exitCode;
+    }
+    
+    /**
+     * Gets the user who invoked batch control.
+     * 
+     * @return batch user
+     */
+    public String getBatchUser()
+    {
+        return this.username;
     }
     
     /**
