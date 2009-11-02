@@ -44,21 +44,24 @@ package au.edu.uts.eng.remotelabs.rigclient.rig.control.tests;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.fail;
+import static org.easymock.EasyMock.reset;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner;
-import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
 /**
  * Tests the <code>ConfiguredBatchRunner</code> class.
  */
-public class ConfiguredBatchRunnerTester
+public class ConfiguredBatchRunnerTester extends TestCase
 {
     /** Object of class under test. */
     private ConfiguredBatchRunner runner;
@@ -69,6 +72,7 @@ public class ConfiguredBatchRunnerTester
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -80,6 +84,9 @@ public class ConfiguredBatchRunnerTester
         replay(this.mockConfig);
         
         this.runner = new ConfiguredBatchRunner(null, null);
+        Field field = ConfiguredBatchRunner.class.getDeclaredField("batchConfig");
+        field.setAccessible(true);
+        field.set(this.runner, this.mockConfig);
        
     }
 
@@ -89,18 +96,53 @@ public class ConfiguredBatchRunnerTester
     @Test
     public void testInit()
     {
-     //   final long magicNumber = Long.parseLong("CAFEBABE", 16);
-       int magicNumber = 1;
-        
-        byte b[] = new byte[8]; 
-        int i;
-        for (i = 0; i < b.length && magicNumber > 0; i++)
+        fail ("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#fileSizeTest()}.
+     */
+    @Test
+    public void testFileSizeTest()
+    {
+        fail("Not yet implemented."); // TODO
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#fileExtensionTest()}.
+     */
+    @Test
+    public void testFileExtensionTest()
+    {
+        try
         {
-            int off = 8 * i;
-            b[i] = (byte) ((magicNumber >> off) & 0xFF);
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("File_Extension"))
+                .andReturn("class");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/IRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("fileExtensionTest");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
         }
-        
-        fail("Not yet implemented"); // TODO
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#magicNumberTest()}.
+     */
+    @Test
+    public void testMagicNumverTest()
+    {
+        // TODO
+        fail();
     }
 
     /**
