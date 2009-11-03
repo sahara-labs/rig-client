@@ -73,6 +73,16 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     /** Batch configuration. */
     private IConfig batchConfig;
     
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#init()
+     */
+    @Override
+    protected boolean init()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    
     /**
      * Default constructor.
      * 
@@ -260,16 +270,6 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
             return false;
         }
         return true;
-    }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#init()
-     */
-    @Override
-    protected boolean init()
-    {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     /* 

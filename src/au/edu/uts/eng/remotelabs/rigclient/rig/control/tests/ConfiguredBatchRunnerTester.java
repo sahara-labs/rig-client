@@ -86,7 +86,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
                 .andReturn("DEBUG");
         replay(this.mockConfig);
         
-        this.runner = new ConfiguredBatchRunner(null, null);
+        this.runner = new ConfiguredBatchRunner("", "");
         Field field = ConfiguredBatchRunner.class.getDeclaredField("batchConfig");
         field.setAccessible(true);
         field.set(this.runner, this.mockConfig);

@@ -97,7 +97,7 @@ public class AbstractBatchRunnerTester extends TestCase
         configField.setAccessible(true);
         configField.set(null, this.mockConfig);
         
-        this.runner = new MockBatchRunner(null, null, true);
+        this.runner = new MockBatchRunner("", "", true);
     }
     
     /**
@@ -400,7 +400,7 @@ public class AbstractBatchRunnerTester extends TestCase
             .andReturn("false");
         expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
             .andReturn("true");
-        expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "false"))
+        expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "true"))
             .andReturn("false");
         replay(this.mockConfig);
         
@@ -429,6 +429,10 @@ public class AbstractBatchRunnerTester extends TestCase
             field = AbstractBatchRunner.class.getDeclaredField("commandArgs");
             field.setAccessible(true);
             field.set(this.runner, args);
+            
+            field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            field.set(this.runner, wdBase + "/test/resources/AbstractRig.class");
             
             Thread t = new Thread(this.runner);
             t.start();
@@ -524,6 +528,8 @@ public class AbstractBatchRunnerTester extends TestCase
             .andReturn("false");
         expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
             .andReturn("true");
+        expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "true"))
+        .andReturn("false");
         replay(this.mockConfig);
         
         try
@@ -551,6 +557,10 @@ public class AbstractBatchRunnerTester extends TestCase
             field = AbstractBatchRunner.class.getDeclaredField("commandArgs");
             field.setAccessible(true);
             field.set(this.runner, args);
+            
+            field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            field.set(this.runner, wdBase + "/tests/resources/BatchRunner/AbstractRig.class");
             
             Thread t = new Thread(this.runner);
             t.start();
@@ -704,12 +714,12 @@ public class AbstractBatchRunnerTester extends TestCase
             
             Field batchFile = AbstractBatchRunner.class.getDeclaredField("fileName");
             batchFile.setAccessible(true);
-            batchFile.set(this.runner, wdBase + "/AbstractRig.class");
+            batchFile.set(this.runner, wdBase + "/test/resources/BatchRunner/AbstractRig.class");
             
             reset(this.mockConfig);
             expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
                 .andReturn("true"); // True will run recursive delete
-            expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "false"))
+            expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "true"))
                 .andReturn("false");
             replay(this.mockConfig);
             
@@ -760,12 +770,12 @@ public class AbstractBatchRunnerTester extends TestCase
             
             Field batchFile = AbstractBatchRunner.class.getDeclaredField("fileName");
             batchFile.setAccessible(true);
-            batchFile.set(this.runner, wdBase + "/AbstractRig.class");
+            batchFile.set(this.runner, wdBase + "/test/resources/BatchRunner/AbstractRig.class");
             
             reset(this.mockConfig);
             expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
                 .andReturn("false");
-            expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "false"))
+            expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "true"))
                 .andReturn("false");
             replay(this.mockConfig);
             
@@ -818,7 +828,7 @@ public class AbstractBatchRunnerTester extends TestCase
     @Test
     public void testGetBatchUser()
     {
-        AbstractBatchRunner r = new MockBatchRunner(null, "tuser");
+        AbstractBatchRunner r = new MockBatchRunner("", "tuser");
         assertEquals("tuser", r.getBatchUser());
     }
 

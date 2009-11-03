@@ -143,11 +143,28 @@ public abstract class AbstractBatchRunner implements Runnable
      * Constructor.
      * 
      * @param file uploaded instruction file
+     * @throws NullPointerException if the <code>file</code> or \
+     *         </code>user>/code> parameters are <code>null</code>
      */
     public AbstractBatchRunner(final String file, final String user)
     {
         this.logger = LoggerFactory.getLoggerInstance();
         this.logger.debug("Creating a Batch Runner.");
+        
+        if (file == null)
+        {
+            // TODO bug reporting.
+            this.logger.error("An null parameter was passed as the uploaded instruction file path.");
+            throw new NullPointerException("file parameter must not be null.");
+        }
+        
+        if (file == null)
+        {
+            // TODO bug reporting.
+            this.logger.error("An null parameter was passed as the batch initating username.");
+            throw new NullPointerException("user parameter must not be null.");
+        }
+        
         
         this.fileName = file;
         this.username = user;
@@ -697,11 +714,11 @@ public abstract class AbstractBatchRunner implements Runnable
         buf.append(cal.get(Calendar.MONTH) + 1);
         buf.append(dateGlue);
         buf.append(cal.get(Calendar.YEAR));
-        buf.append(dateGlue);
+        buf.append(join);
         buf.append(cal.get(Calendar.HOUR_OF_DAY));
-        buf.append(dateGlue);
+        buf.append(timeGlue);
         buf.append(cal.get(Calendar.MINUTE));
-        buf.append(dateGlue);
+        buf.append(timeGlue);
         buf.append(cal.get(Calendar.SECOND));
         return buf.toString();
     }
