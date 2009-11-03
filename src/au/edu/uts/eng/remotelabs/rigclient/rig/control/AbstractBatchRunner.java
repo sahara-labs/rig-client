@@ -499,6 +499,13 @@ public abstract class AbstractBatchRunner implements Runnable
             {
                 this.recusiveDelete(new File(this.workingDir));
             }
+            
+            /* Delete instruction file. */
+            final File file = new File(this.fileName);
+            if (Boolean.parseBoolean(conf.getProperty("Batch_Instruct_File_Delete", "true")) && file.isFile())
+            {
+                file.delete();
+            }
         }
         catch (IOException ex)
         {

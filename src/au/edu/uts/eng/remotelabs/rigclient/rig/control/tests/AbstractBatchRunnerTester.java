@@ -400,6 +400,8 @@ public class AbstractBatchRunnerTester extends TestCase
             .andReturn("false");
         expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
             .andReturn("true");
+        expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "false"))
+            .andReturn("false");
         replay(this.mockConfig);
         
         try
@@ -700,9 +702,15 @@ public class AbstractBatchRunnerTester extends TestCase
             wdField.setAccessible(true);
             wdField.set(this.runner, wd);
             
+            Field batchFile = AbstractBatchRunner.class.getDeclaredField("fileName");
+            batchFile.setAccessible(true);
+            batchFile.set(this.runner, wdBase + "/AbstractRig.class");
+            
             reset(this.mockConfig);
             expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
                 .andReturn("true"); // True will run recursive delete
+            expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "false"))
+                .andReturn("false");
             replay(this.mockConfig);
             
             Method meth = AbstractBatchRunner.class.getDeclaredMethod("cleanup");
@@ -750,8 +758,14 @@ public class AbstractBatchRunnerTester extends TestCase
             wdField.setAccessible(true);
             wdField.set(this.runner, wd);
             
+            Field batchFile = AbstractBatchRunner.class.getDeclaredField("fileName");
+            batchFile.setAccessible(true);
+            batchFile.set(this.runner, wdBase + "/AbstractRig.class");
+            
             reset(this.mockConfig);
             expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "false"))
                 .andReturn("false");
             replay(this.mockConfig);
             
