@@ -45,6 +45,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
@@ -67,7 +68,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
      * conventions on the how long a magic number must be. Nevertheless,
      * even if the magic number exceeds this size, a reasonably accurate
      * file type finger print should be able to be determined. */
-    public static final short MAGIC_NUMBER_BYTE_LEN = 8;
+    public static final int MAGIC_NUMBER_LEN = 8;
     
     /** Batch configuration. */
     private IConfig batchConfig;
@@ -78,7 +79,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
      * @param file reference to uploaded instruction file
      * @param user name of user who invoked batch control
      */
-    public ConfiguredBatchRunner(String file, String user)
+    public ConfiguredBatchRunner(final String file, String user)
     {
         super(file, user);
         
@@ -117,8 +118,11 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     }
 
     /**
-     * @param magicNumber
-     * @return
+     * Tests if the uploaded instruction file magic number is the same as
+     * the configured magic number give by the <code>File_Magic_Number</code>
+     * property.
+     * 
+     * @return true if the magic numbers are the same
      */
     private boolean magicNumberTest()
     {
@@ -132,34 +136,60 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
         
         if (magicNumberStr.startsWith("0x")) // Remove the hexadecimal notation prefix 
         {
-            magicNumberStr = magicNumberStr.substring(0, 2);
+            magicNumberStr = magicNumberStr.substring(2, magicNumberStr.length());
         }
         
-        final long magicNumber = Long.parseLong(magicNumberStr);
+        final long magicNumber = Long.parseLong(magicNumberStr, 16);
         this.logger.debug("Testing instruction file for " + Long.toHexString(magicNumber) + " magic number.");
         final File file = new File(this.fileName);
         
+        FileInputStream input = null;
         try
         {
+            input = new FileInputStream(file);
+            int i, c;
+            byte fileBuf[] = new byte[ConfiguredBatchRunner.MAGIC_NUMBER_LEN];
+            byte magicBuf[] = new byte[ConfiguredBatchRunner.MAGIC_NUMBER_LEN];
+            
             /* Read the first 8 bytes of the file. */
-            FileInputStream input = new FileInputStream(file);
-            final short len = ConfiguredBatchRunner.MAGIC_NUMBER_BYTE_LEN;
-            byte fileBuf[] = new byte[len];
-            byte magicBuf[] = new byte[len];
-            if (input.read(fileBuf, 0, len) > len)
+            if (input.read(fileBuf, 0, ConfiguredBatchRunner.MAGIC_NUMBER_LEN) > 
+                    ConfiguredBatchRunner.MAGIC_NUMBER_LEN)
             {
-                this.logger.warn("Unable to read the first " + len + " bytes of " + this.fileName + " failing magic " +
-                        "number test.");
+                this.logger.warn("Unable to read the first " + ConfiguredBatchRunner.MAGIC_NUMBER_LEN + " bytes " +
+                		"of " + this.fileName + " failing magic number test.");
                 return false;
             }
-
-            for (int i = 0; i < magicBuf.length; i++)
+            
+            /* Populate the array with the long bytes. */
+            for (i = 0; i < magicBuf.length; i++) magicBuf[7 - i] = (byte) ((magicNumber >> (8 * i)) & 0xFF);
+            
+            /* Count left empty cells. */
+            for (i = 0, c = 0; i < magicBuf.length; i++) 
             {
-                magicBuf[i] = (byte) ((magicNumber >> (8 * i)) & 0xFF);
+                if (magicBuf[i] == 0x00)
+                {
+                    c++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            /* Shift cell left so the left cell is the first byte of the magic number. */
+            for (i = c; i < magicBuf.length; i++)
+            {
+                magicBuf[i - c] = magicBuf[i];
+                magicBuf[i] = 0x00;
+            }
+            
+            /* Compare the cell values. */
+            for (i = 0; i < magicBuf.length; i++)
+            {
                 if (magicBuf[i] != 0 && magicBuf[i] != fileBuf[i])
                 {
-                    this.logger.warn("File magic numer comparision failed for " + this.fileName + ". It should" +
-                            " be 0x" + Long.toHexString(magicNumber) + ". Actually read 0x" + fileBuf + ".");
+                    this.logger.warn("File magic number comparison failed for " + this.fileName + ". It should" +
+                            " be 0x" + Long.toHexString(magicNumber) + ". Actually read 0x" + 
+                            Long.toHexString(ByteBuffer.wrap(fileBuf).getLong()) + ".");
                     return false;
                 }
             }
@@ -175,6 +205,17 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
             this.logger.warn("Unable to read instruction " + file.getAbsolutePath() + " because of error" +
                     e.getMessage() + ".");
             return false;
+        }
+        finally
+        {
+            try
+            {
+                if (input != null)  input.close();
+            }
+            catch (IOException e)
+            {
+                this.logger.debug("Failed to close file input stream with error " + e.getMessage());
+            }
         }
         
         return true;
@@ -193,13 +234,13 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
         final File file = new File(this.fileName);
         final long maxSize = Long.parseLong(this.batchConfig.getProperty("Max_File_Size"));
         this.logger.debug("Testing instruction file for less that maximum size " + maxSize + ".");
-        if (!((file.length() / 1024) > maxSize))
+        if ((file.length() / 1024) > maxSize)
         {
             this.logger.warn("Instruction file " + this.fileName + " failed maximum size test (max " +
                     maxSize + "kB). The file size is " + (file.length() / 1024) + "kB.");
             return false;
         }
-        return false;
+        return true;
     }
 
     /**

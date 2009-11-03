@@ -45,6 +45,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -59,7 +60,9 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
 /**
- * Tests the <code>ConfiguredBatchRunner</code> class.
+ * Tests the <code>ConfiguredBatchRunner</code> class. Successful 
+ * interpretation of this test case requires a working knowledge
+ * of <em>HexSpeak</em>.
  */
 public class ConfiguredBatchRunnerTester extends TestCase
 {
@@ -105,7 +108,56 @@ public class ConfiguredBatchRunnerTester extends TestCase
     @Test
     public void testFileSizeTest()
     {
-        fail("Not yet implemented."); // TODO
+        try
+        {
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("Max_File_Size"))
+                .andReturn("50");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("fileSizeTest");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+            
+            verify(this.mockConfig);
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#fileSizeTest()}.
+     */
+    @Test
+    public void testFileSizeTestFail()
+    {
+        try
+        {
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("Max_File_Size"))
+                .andReturn("10");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("fileSizeTest");
+            meth.setAccessible(true);
+            assertFalse((Boolean)meth.invoke(this.runner));
+            
+            verify(this.mockConfig);
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
     }
     
     /**
@@ -123,11 +175,40 @@ public class ConfiguredBatchRunnerTester extends TestCase
             
             Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
             field.setAccessible(true);
-            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/IRig.class");
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
             
             Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("fileExtensionTest");
             meth.setAccessible(true);
             assertTrue((Boolean)meth.invoke(this.runner));
+            
+            verify(this.mockConfig);
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#fileExtensionTest()}.
+     */
+    @Test
+    public void testFileExtensionTestFailed()
+    {
+        try
+        {
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("File_Extension"))
+                .andReturn("properties");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("fileExtensionTest");
+            meth.setAccessible(true);
+            assertFalse((Boolean)meth.invoke(this.runner));
         }
         catch (Exception e)
         {
@@ -141,8 +222,82 @@ public class ConfiguredBatchRunnerTester extends TestCase
     @Test
     public void testMagicNumverTest()
     {
-        // TODO
-        fail();
+        try
+        {
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("File_Magic_Number"))
+                .andReturn("CAFEBABE");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            /* Java class files have a cool magic number - CAFEBABE. */
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("magicNumberTest");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#magicNumberTest()}.
+     */
+    @Test
+    public void testMagicNumverTestPrefixed()
+    {
+        try
+        {
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("File_Magic_Number"))
+                .andReturn("0xCAFEBABE");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            /* Java class files have a cool magic number - CAFEBABE. */
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("magicNumberTest");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#magicNumberTest()}.
+     */
+    @Test
+    public void testMagicNumverTestFailed()
+    {
+        try
+        {
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("File_Magic_Number"))
+                .andReturn("0xDEADBEEF"); /* Another awesome magic number. */
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            /* Java class files have a cool magic number - CAFEBABE. */
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("magicNumberTest");
+            meth.setAccessible(true);
+            assertFalse((Boolean)meth.invoke(this.runner));
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
     }
 
     /**
@@ -151,7 +306,193 @@ public class ConfiguredBatchRunnerTester extends TestCase
     @Test
     public void testCheckFile()
     {
-        fail("Not yet implemented"); // TODO
+        try
+        {
+            reset(this.mockConfig);
+            /* Run file size test. */
+            expect(this.mockConfig.getProperty("Test_Max_File_Size", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("Max_File_Size"))
+                .andReturn("100");
+            expect(this.mockConfig.getProperty("Test_Magic_Number", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("File_Magic_Number"))
+                .andReturn("0xcafebabe");
+            expect(this.mockConfig.getProperty("Test_File_Extension", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("File_Extension"))
+                .andReturn(".class");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            /* Java class files have a cool magic number - 0xCAFEBABE. */
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("checkFile");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#checkFile()}.
+     */
+    @Test
+    public void testCheckFileFailMaxSize()
+    {
+        try
+        {
+            reset(this.mockConfig);
+            /* Run file size test. */
+            expect(this.mockConfig.getProperty("Test_Max_File_Size", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("Max_File_Size"))
+                .andReturn("1");
+            expect(this.mockConfig.getProperty("Test_Magic_Number", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("File_Magic_Number"))
+                .andReturn("0xcafebabe");
+            expect(this.mockConfig.getProperty("Test_File_Extension", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("File_Extension"))
+                .andReturn(".class");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            /* Java class files have a cool magic number - 0xCAFEBABE. */
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("checkFile");
+            meth.setAccessible(true);
+            assertFalse((Boolean)meth.invoke(this.runner));
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#checkFile()}.
+     */
+    @Test
+    public void testCheckFileFailMagic()
+    {
+        try
+        {
+            reset(this.mockConfig);
+            /* Run file size test. */
+            expect(this.mockConfig.getProperty("Test_Max_File_Size", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("Max_File_Size"))
+                .andReturn("100");
+            expect(this.mockConfig.getProperty("Test_Magic_Number", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("File_Magic_Number"))
+                .andReturn("0xABADBABE"); // That's a bad babe!
+            expect(this.mockConfig.getProperty("Test_File_Extension", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("File_Extension"))
+                .andReturn(".class");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            /* Java class files have a cool magic number - 0xCAFEBABE. */
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("checkFile");
+            meth.setAccessible(true);
+            assertFalse((Boolean)meth.invoke(this.runner));
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#checkFile()}.
+     */
+    @Test
+    public void testCheckFileFailExtension()
+    {
+        try
+        {
+            reset(this.mockConfig);
+            /* Run file size test. */
+            expect(this.mockConfig.getProperty("Test_Max_File_Size", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("Max_File_Size"))
+                .andReturn("100");
+            expect(this.mockConfig.getProperty("Test_Magic_Number", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("File_Magic_Number"))
+                .andReturn("0xcafebabe");
+            expect(this.mockConfig.getProperty("Test_File_Extension", "false"))
+                .andReturn("true");
+            expect(this.mockConfig.getProperty("File_Extension"))
+                .andReturn(".java");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            /* Java class files have a cool magic number - 0xCAFEBABE. */
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("checkFile");
+            meth.setAccessible(true);
+            assertFalse((Boolean)meth.invoke(this.runner));
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#checkFile()}.
+     */
+    @Test
+    public void testCheckFileNoTestFailAll()
+    {
+        try
+        {
+            reset(this.mockConfig);
+            /* Run file size test. */
+            expect(this.mockConfig.getProperty("Test_Max_File_Size", "false"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("Max_File_Size"))
+                .andReturn("1");
+            expect(this.mockConfig.getProperty("Test_Magic_Number", "false"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("File_Magic_Number"))
+                .andReturn("0xCAFED00D"); // Bring on those beans cafe dude!
+            expect(this.mockConfig.getProperty("Test_File_Extension", "false"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("File_Extension"))
+                .andReturn(".java");
+            replay(this.mockConfig);
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            /* Java class files have a cool magic number - 0xCAFEBABE. */
+            field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/AbstractRig.class");
+            
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("checkFile");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
     }
 
     /**
@@ -162,14 +503,4 @@ public class ConfiguredBatchRunnerTester extends TestCase
     {
         fail("Not yet implemented"); // TODO
     }
-
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#run()}.
-     */
-    @Test
-    public void testRun()
-    {
-        fail("Not yet implemented"); // TODO
-    }
-
 }
