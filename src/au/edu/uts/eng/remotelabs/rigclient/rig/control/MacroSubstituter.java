@@ -70,7 +70,7 @@ import java.util.Map;
  * specified by a <code>Calendar</code> instance provided as a construction
  * parameter or if none provided, the current date/time.
  */
-class MacroSubstituter
+public class MacroSubstituter
 {
     /**
      * Substitution macros.
@@ -108,11 +108,11 @@ class MacroSubstituter
      * 
      * @param macroBuilder contains mandatory and optional parameters for construction
      */
-    private MacroSubstituter(MacroBuilder macroBuilder)
+    private MacroSubstituter(final MacroBuilder macroBuilder)
     {
-        fileName = macroBuilder.fileName;
-        userName = macroBuilder.userName;
-        calendar = macroBuilder.calendar;
+        this.fileName = macroBuilder.fileName;
+        this.userName = macroBuilder.userName;
+        this.calendar = macroBuilder.calendar;
         
         this.macros = new HashMap<String, Subs>();
         this.macros.put("FILE", Subs.FILE);
@@ -135,12 +135,12 @@ class MacroSubstituter
      *   
      * @return value substituted string
      */
-    public String substituteMacros(String str)
+    public String substituteMacros(final String str)
     {
         if (str == null) return null;
         
-        String elements[] = str.split("__");
-        StringBuffer buf = new StringBuffer(str.length());
+        final String elements[] = str.split("__");
+        final StringBuffer buf = new StringBuffer(str.length());
         
         for (String e : elements)
         {
@@ -212,15 +212,15 @@ class MacroSubstituter
      * @param val value to add leading zero if less then two digits long
      * @return two digit representation of the provided value 
      */
-    protected String addLeadingZeros(int val)
+    protected String addLeadingZeros(final int val)
     {
-        String rep = String.valueOf(val);
-        if (rep.length() == 1)
+        String str = String.valueOf(val);
+        if (str.length() == 1)
         {
-            rep = "0" + rep;
+            str = "0" + str;
         }
             
-        return rep;
+        return str;
     }
     
     /**
@@ -252,9 +252,10 @@ class MacroSubstituter
         /**
          * @param calendar the calendar to set
          */
-        public void setCalendar(Calendar calendar)
+        public MacroBuilder setCalendar(final Calendar calendar)
         {
             this.calendar = calendar;
+            return this;
         }
 
         /**
