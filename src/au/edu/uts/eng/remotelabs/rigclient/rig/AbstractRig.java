@@ -65,6 +65,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  *    <li>IResetAction</li>
  *    <li>INotifyAction</li>
  *    <li>ITestActionM</li>
+ *    <li>IActivityDetectorAction</li>
  * </ul>
  *   
  * When a method is called, the corresponding action list is iterated through
@@ -88,7 +89,9 @@ public abstract class AbstractRig implements IRig
         /** Rig reset. */
         RESET,
         /** Monitor test. */
-        TEST
+        TEST,
+        /** Activity detection. */
+        DETECT
     }
     
     /** Session users in the form key => user name, value => user type */
@@ -108,6 +111,9 @@ public abstract class AbstractRig implements IRig
     
     /** Test action list. */
     private List<ITestAction> testActions;
+    
+    /** Activity detector action list. */
+    private List<IActivityDetectorAction> detectionActions;
     
     /** Test actions thread group. */
     private ThreadGroup testThreads;
@@ -151,6 +157,7 @@ public abstract class AbstractRig implements IRig
         this.notifyActions = new ArrayList<INotifyAction>();
         this.resetActions = new ArrayList<IResetAction>();
         this.testActions = new ArrayList<ITestAction>();
+        this.detectionActions = new ArrayList<IActivityDetectorAction>();
         this.testThreads = new ThreadGroup("Test Threads");
         
         this.inMaintenance = false;
@@ -306,7 +313,7 @@ public abstract class AbstractRig implements IRig
                 return this.resetActions.add(reset);
                 
             case TEST: /* Adding a test action. */
-                this.logger.debug("Requested to register an test access action type.");
+                this.logger.debug("Requested to register a test access action type.");
                 if (!(action instanceof ITestAction))
                 {
                     this.logger.error("Provided action type instance with class name " + 
@@ -335,11 +342,26 @@ public abstract class AbstractRig implements IRig
                 new Thread(this.testThreads, test).start();
                 return this.testActions.add(test);
                 
+            case DETECT: /* Adding an activity detector type. */
+                this.logger.debug("Requested to register an activity detector type.");
+                if (!(action instanceof IActivityDetectorAction))
+                {
+                    this.logger.error("Provided action type instance with class name " + 
+                            action.getClass().getCanonicalName() + "is not a activity detector action type (must be " +
+                            "derived from au.edu.uts.edu.remotelabs.rigclient.rig.IActivityDetectorAction. " +
+                            "Action type registration has failed. (RC24_Failed_Action_Reg");
+                    return false;
+                }
+                final IActivityDetectorAction detector = (IActivityDetectorAction)action;
+                this.logger.info("Registering an activity detector action with provided type of " + 
+                        detector.getActionType());
+                return this.detectionActions.add(detector);
+                
             default:
                 /* DODGY This is an impossible situation that _should_ never be hit. 
                  * Java type safety ahoy! */
                 this.logger.error("Look out the window, the pigs are flying!");
-                throw new RuntimeException("Look out the window, the pigs are flying!");
+                throw new IllegalStateException("Look out the window, the pigs are flying!");
         }
     }
     
@@ -851,6 +873,26 @@ public abstract class AbstractRig implements IRig
         
         this.logger.debug("Session check providing: " + (isMaster ? "Session is active." : "Session is not active"));
         return isMaster;
+    }
+    
+    /*
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#isActivityDetected
+     */
+    @Override
+    public boolean isActivityDetected()
+    {
+        /* The default answer should be too report activity if activity cannot
+         * be determined. */
+        if (this.detectionActions.size() == 0)
+        {
+            return true;
+        }
+        
+        for (IActivityDetectorAction detector : this.detectionActions)
+        {
+            if (detector.detectActivity()) return true;
+        }
+        return false;
     }
 
     /* 

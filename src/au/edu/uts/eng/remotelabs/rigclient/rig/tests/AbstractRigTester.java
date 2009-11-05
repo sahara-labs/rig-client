@@ -57,6 +57,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IAction;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IActivityDetectorAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.INotifyAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IResetAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.ISlaveAccessAction;
@@ -845,6 +847,71 @@ public class AbstractRigTester extends TestCase
         
         assertNull(this.rig.getRigAttribute("Not_Found"));
         verify(this.mockConfig);
+    }
+    
+    /**
+     * Tests the detecting activity success with registered action.
+     */
+    @Test
+    public void testActivityDetecion()
+    {
+        IActivityDetectorAction detectorMock = createMock(IActivityDetectorAction.class);
+        expect(detectorMock.getActionType())
+            .andReturn("Detector");
+        expect(detectorMock.detectActivity())
+            .andReturn(true);
+        replay(detectorMock);
+        
+        IActivityDetectorAction detMock = createMock(IActivityDetectorAction.class);
+        expect(detMock.getActionType())
+            .andReturn("Detector 2");
+        expect(detMock.detectActivity())
+            .andReturn(false);
+        replay(detMock);
+        
+        assertTrue(this.rig.register(detMock, ActionType.DETECT));
+        assertTrue(this.rig.register(detectorMock, ActionType.DETECT));
+        assertTrue(this.rig.isActivityDetected());
+        
+        verify(detectorMock);
+        verify(detMock);
+    }
+    
+    /**
+     * Tests the detecting activity failure
+     */
+    @Test
+    public void testActivityDetectionFailed()
+    {
+        IActivityDetectorAction detectorMock = createMock(IActivityDetectorAction.class);
+        expect(detectorMock.getActionType())
+            .andReturn("Detector");
+        expect(detectorMock.detectActivity())
+            .andReturn(false);
+        replay(detectorMock);
+        
+        IActivityDetectorAction detMock = createMock(IActivityDetectorAction.class);
+        expect(detMock.getActionType())
+            .andReturn("Detector 2");
+        expect(detMock.detectActivity())
+            .andReturn(false);
+        replay(detMock);
+        
+        assertTrue(this.rig.register(detMock, ActionType.DETECT));
+        assertTrue(this.rig.register(detectorMock, ActionType.DETECT));
+        assertFalse(this.rig.isActivityDetected());
+        
+        verify(detectorMock);
+        verify(detMock);
+    }
+    
+    /**
+     * Tests the detecting activity success with no registered actions.
+     */
+    @Test
+    public void testActivityDetectionNoAction()
+    {
+        assertTrue(this.rig.isActivityDetected());
     }
     
     /**

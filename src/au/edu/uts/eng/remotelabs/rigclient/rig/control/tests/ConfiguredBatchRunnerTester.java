@@ -501,6 +501,6 @@ public class ConfiguredBatchRunnerTester extends TestCase
     @Test
     public void testSync()
     {
-        fail("Not yet implemented"); // TODO
+        fail ("Not yet implemented"); // TODO
     }
 }

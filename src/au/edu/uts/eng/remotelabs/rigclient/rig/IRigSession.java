@@ -161,4 +161,15 @@ public interface IRigSession
      * @return enumeration value of <code>Session</code>
      */
     public Session isInSession(String name);
+    
+    /**
+     * Detect if any activity is present on the rig (i.e. if a user has been
+     * assigned, they are actually using the experiment.).
+     * <strong>NOTE:</strong> If this cannot be detected for the experiment 
+     * type, the response should be <code>true</code> as a <code>false</code>
+     * response may mean the rig is eligible for reassignment. 
+     * 
+     * @return <code>true</code> if activity is detected
+     */
+    public boolean isActivityDetected();
 }
