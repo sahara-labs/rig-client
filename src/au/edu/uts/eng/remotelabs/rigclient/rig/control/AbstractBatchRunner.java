@@ -158,7 +158,7 @@ public abstract class AbstractBatchRunner implements Runnable
             throw new NullPointerException("file parameter must not be null.");
         }
         
-        if (file == null)
+        if (user == null)
         {
             // TODO bug reporting.
             this.logger.error("An null parameter was passed as the batch initating username.");
@@ -618,8 +618,6 @@ public abstract class AbstractBatchRunner implements Runnable
     
     /**
      * Returns the captured standard err of the batch process.
-     * 
-     * @param standard err 
      */
     public String getAllStandardErr()
     {
@@ -727,7 +725,7 @@ public abstract class AbstractBatchRunner implements Runnable
      * Recursively delete a directory. The directory and all its child files 
      * and elements will be deleted.
      *  
-     * @param dir directory to delete
+     * @param file directory or file to delete
      * @throws IOException 
      */
     private void recusiveDelete(final File file) throws IOException

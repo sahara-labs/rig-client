@@ -70,6 +70,9 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
      * file type finger print should be able to be determined. */
     public static final int MAGIC_NUMBER_LEN = 8;
     
+    /** Macro substituter. */
+    private MacroSubstituter substiter;
+    
     /** Batch configuration. */
     private IConfig batchConfig;
     
@@ -97,6 +100,8 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
                 " as the batch configuration file.");
         this.batchConfig = new PropertiesConfig(ConfiguredBatchRunner.BATCH_PROPERTIES);
         this.logger.debug("Batch properites file information is " + this.batchConfig.getConfigurationInfomation());
+        
+        this.substiter = new MacroSubstituter.MacroBuilder(this.fileName, this.username).build();
     }
 
     /* 
@@ -278,8 +283,19 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     @Override
     protected boolean sync()
     {
-        // TODO Auto-generated method stub
+        if (!Boolean.parseBoolean(this.batchConfig.getProperty("Sync_Results_Dir", "false")))
+        {
+            this.logger.debug("Configured to not sync back results files.");
+            return true;
+        }
+        
+        final String destination = this.substiter.substituteMacros(this.batchConfig.getProperty("Sync_Dir_Destination"));
+        this.logger.info("Going to store results files in " + destination + ".");
+        
+        final String name = this.substiter.substituteMacros(this.batchConfig .getProperty("Sync_Dir_Name"));
+
+        // TODO
+        
         return false;
     }
-
 }

@@ -86,7 +86,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
                 .andReturn("DEBUG");
         replay(this.mockConfig);
         
-        this.runner = new ConfiguredBatchRunner("", "");
+        this.runner = new ConfiguredBatchRunner("/var/lib/instructions", "tuser");
         Field field = ConfiguredBatchRunner.class.getDeclaredField("batchConfig");
         field.setAccessible(true);
         field.set(this.runner, this.mockConfig);
@@ -501,6 +501,51 @@ public class ConfiguredBatchRunnerTester extends TestCase
     @Test
     public void testSync()
     {
-        fail ("Not yet implemented"); // TODO
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Sync_Results_Dir", "false"))
+            .andReturn("true");
+        expect(this.mockConfig.getProperty("Sync_Dir_Destination"))
+        .andReturn("/__USER__/__FILE__/");
+        expect(this.mockConfig.getProperty("Sync_Dir_Name"))
+            .andReturn("__ISO8601__");
+        replay(this.mockConfig);
+        
+        try
+        {
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("sync");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+        
+        verify(this.mockConfig);
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#sync()}.
+     */
+    @Test
+    public void testSyncPassNoTest()
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Sync_Results_Dir", "false"))
+            .andReturn("false");
+        replay(this.mockConfig);
+        
+        try
+        {
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("sync");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+        
+        verify(this.mockConfig);
     }
 }
