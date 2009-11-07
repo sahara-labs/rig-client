@@ -63,7 +63,6 @@ import java.util.Map;
  *      <li><code>__MINUTE__</code> - Minutes with leading zeros.</li>
  *      <li><code>__SECOND__</code> - Seconds with leading zeros.</li>
  *      <li><code>__ISO8601__</code> - ISO 8601 formatted date.</li>
- *      <li><code>__RFC2822__</code> - RFC 2822 formatted date.</li>
  *      <li><code>__EPOCH__</code> - Seconds since the Unix Epoch.</li>
  * </ul>
  * <strong>NOTE:</strong>For any date/time macros, the value is the time
@@ -86,8 +85,7 @@ public class MacroSubstituter
         HOUR, /** Hour in day 24 hour format. */
         MINUTE, /** Second in minute. */
         SECOND, /** ISO8601 time. */
-        ISO, /** RFC2822 date time. */
-        RFC, /** Epoch time. */
+        ISO, /** Epoch time. */
         EPOCH 
     }
     
@@ -124,7 +122,6 @@ public class MacroSubstituter
         this.macros.put("MINUTE", Subs.MINUTE);
         this.macros.put("SECOND", Subs.SECOND);
         this.macros.put("ISO8601", Subs.ISO);
-        this.macros.put("RFC2822", Subs.RFC);
         this.macros.put("EPOCH", Subs.EPOCH);
     }
     
@@ -177,18 +174,15 @@ public class MacroSubstituter
                          * http://www.iso.org/iso/date_and_time_format#what-iso-8601-covers. */
                         buf.append(this.calendar.get(Calendar.YEAR));
                         buf.append('-');
-                        buf.append(this.addLeadingZeros(this.calendar.get(Calendar.MONTH)));
+                        buf.append(this.addLeadingZeros(this.calendar.get(Calendar.MONTH) + 1));
                         buf.append('-');
-                        buf.append(this.addLeadingZeros(this.calendar.get(Calendar.DAY_OF_MONTH) + 1));
+                        buf.append(this.addLeadingZeros(this.calendar.get(Calendar.DAY_OF_MONTH)));
                         buf.append('T');
                         buf.append(this.addLeadingZeros(this.calendar.get(Calendar.HOUR_OF_DAY)));
                         buf.append(':');
                         buf.append(this.addLeadingZeros(this.calendar.get(Calendar.MINUTE)));
                         buf.append(':');
                         buf.append(this.addLeadingZeros(this.calendar.get(Calendar.SECOND)));
-                        break;
-                    case RFC:
-                        //TODO
                         break;
                     case EPOCH:
                         buf.append(this.calendar.getTimeInMillis() / 1000);

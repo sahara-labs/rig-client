@@ -46,6 +46,7 @@ import org.junit.runners.Suite;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.MacroSubstituerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractControlledRigTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractRigTester;
 import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
@@ -55,6 +56,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    MacroSubstituerTester.class,
     AbstractBatchRunnerTester.class,
     AbstractControlledRigTester.class,
     AbstractRigTester.class,

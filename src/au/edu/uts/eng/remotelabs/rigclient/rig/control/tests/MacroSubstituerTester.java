@@ -100,5 +100,28 @@ public class MacroSubstituerTester extends TestCase
         }
         
     }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.MacroSubstituter#substituteMacros(String)}
+     */
+    public void testSubstitute()
+    {
+        assertEquals(this.file, this.substituter.substituteMacros("__FILE__"));
+        assertEquals(this.user, this.substituter.substituteMacros("__USER__"));
+        assertEquals("/" + this.user + "/" + this.file + "/", this.substituter.substituteMacros("/__USER__/__FILE__/"));
+        
+        assertEquals(String.valueOf(this.calendar.get(Calendar.YEAR)), this.substituter.substituteMacros("__YEAR__"));
+        assertEquals(String.valueOf(this.calendar.getTimeInMillis() / 1000), this.substituter.substituteMacros("__EPOCH__"));
+        
+        String isoTime = this.substituter.substituteMacros("__ISO8601__");
+        String isoParts[] = isoTime.split("T");
+        assertEquals(2, isoParts.length);
+        String dateParts[] = isoParts[0].split("-");
+        String timeParts[] = isoParts[1].split(":");
+        assertEquals(3, dateParts.length);
+        assertEquals(String.valueOf(this.calendar.get(Calendar.YEAR)), dateParts[0]);
+        assertEquals(3, timeParts.length);
+        System.out.println(this.substituter.substituteMacros("__ISO8601__"));
+    }
 
 }
