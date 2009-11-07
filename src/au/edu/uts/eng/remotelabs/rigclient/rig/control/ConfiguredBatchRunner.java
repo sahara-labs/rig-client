@@ -293,7 +293,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
         this.logger.info("Going to store results files in " + destination + ".");
         
         final String name = this.substiter.substituteMacros(this.batchConfig .getProperty("Sync_Dir_Name"));
-
+        
         // TODO
         
         return false;

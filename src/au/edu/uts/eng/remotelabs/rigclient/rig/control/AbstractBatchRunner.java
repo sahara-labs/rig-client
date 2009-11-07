@@ -521,7 +521,7 @@ public abstract class AbstractBatchRunner implements Runnable
             final File file = new File(this.fileName);
             if (Boolean.parseBoolean(conf.getProperty("Batch_Instruct_File_Delete", "true")) && file.isFile())
             {
-                file.delete();
+                if (!file.delete()) this.logger.warn("Failed to delete file " + file.getAbsolutePath());
             }
         }
         catch (IOException ex)

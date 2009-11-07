@@ -130,6 +130,7 @@ public class MacroSubstituter
      * their macro values. If <code>null</code> is passed as a parameter,
      * <code>null</code> is returned.
      *   
+     * @param str string to replace macros with values
      * @return value substituted string
      */
     public String substituteMacros(final String str)

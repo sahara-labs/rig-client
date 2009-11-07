@@ -242,7 +242,7 @@ public class AbstractBatchRunnerTester extends TestCase
             assertTrue((Boolean)meth.invoke(this.runner));
             
             String env[] = this.runner.getAllStandardOut().split(System.getProperty("line.separator"));
-            assertTrue(env.length == 21);
+            assertEquals(21, env.length);
             Arrays.sort(env);
             for (int i = 1; i <= 20; i++)
             {

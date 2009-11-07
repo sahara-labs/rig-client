@@ -62,10 +62,19 @@ public class MacroSubstituerTester extends TestCase
     private final Calendar calendar = Calendar.getInstance();
     
     /** File. */
-    private final String file = System.getProperty("user.dir");
+    private final String file;
     
     /** User name. */
-    private final String user = "mdiponio";
+    private final String user;
+    
+    /**
+     * Constructor.
+     */
+    public MacroSubstituerTester()
+    {
+        this.file = System.getProperty("user.dir");
+        this.user = "mdiponio";
+    }
     
     /**
      * @throws java.lang.Exception
@@ -121,7 +130,6 @@ public class MacroSubstituerTester extends TestCase
         assertEquals(3, dateParts.length);
         assertEquals(String.valueOf(this.calendar.get(Calendar.YEAR)), dateParts[0]);
         assertEquals(3, timeParts.length);
-        System.out.println(this.substituter.substituteMacros("__ISO8601__"));
     }
 
 }
