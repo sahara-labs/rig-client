@@ -33,8 +33,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @author <First name> <Last name> (mdiponio)
- * @date <day> <month> 2009
+ * @author Michael Diponio (mdiponio)
+ * @date 6th November2009
  *
  * Changelog:
  * - 06/11/2009 - mdiponio - Initial file creation.
@@ -90,7 +90,7 @@ public class MacroSubstituerTester extends TestCase
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.MacroSubstituter#addLeadingZeros}
      */
     public void testAddLeadingZeros()
-    {        
+    {
         try
         {
             Method meth = MacroSubstituter.class.getDeclaredMethod("addLeadingZeros", int.class);

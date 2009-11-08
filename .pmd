@@ -580,10 +580,6 @@
             <ruleset>Java Logging Rules</ruleset>
         </rule>
         <rule>
-            <name>BeanMembersShouldSerialize</name>
-            <ruleset>JavaBean Rules</ruleset>
-        </rule>
-        <rule>
             <name>MissingSerialVersionUID</name>
             <ruleset>JavaBean Rules</ruleset>
         </rule>

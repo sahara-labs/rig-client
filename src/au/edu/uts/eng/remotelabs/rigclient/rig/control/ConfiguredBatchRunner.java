@@ -67,7 +67,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     /* DODGY This is sort of arbitrary based on no formal or even implied
      * conventions on the how long a magic number must be. Nevertheless,
      * even if the magic number exceeds this size, a reasonably accurate
-     * file type finger print should be able to be determined. */
+     * file type fingerprint should be able to be determined. */
     public static final int MAGIC_NUMBER_LEN = 8;
     
     /** Macro substituter. */
@@ -292,7 +292,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
         final String destination = this.substiter.substituteMacros(this.batchConfig.getProperty("Sync_Dir_Destination"));
         this.logger.info("Going to store results files in " + destination + ".");
         
-        final String name = this.substiter.substituteMacros(this.batchConfig .getProperty("Sync_Dir_Name"));
+//        final String name = this.substiter.substituteMacros(this.batchConfig .getProperty("Sync_Dir_Name"));
         
         // TODO
         
