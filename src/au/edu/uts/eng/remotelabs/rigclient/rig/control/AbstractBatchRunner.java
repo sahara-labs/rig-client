@@ -153,14 +153,12 @@ public abstract class AbstractBatchRunner implements Runnable
         
         if (file == null)
         {
-            // TODO bug reporting.
             this.logger.error("An null parameter was passed as the uploaded instruction file path.");
             throw new NullPointerException("file parameter must not be null.");
         }
         
         if (user == null)
         {
-            // TODO bug reporting.
             this.logger.error("An null parameter was passed as the batch initating username.");
             throw new NullPointerException("user parameter must not be null.");
         }

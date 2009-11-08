@@ -82,8 +82,40 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     @Override
     protected boolean init()
     {
-        // TODO Auto-generated method stub
-        return false;
+        /* Batch command. */
+        this.command = this.batchConfig.getProperty("Exec");
+        this.logger.debug("Loaded batch control command as " + this.command + ".");
+        if (this.command == null)
+        {
+            this.logger.error("Unable to load batch control executable, which makes the configured batch " +
+            		"runner sort of redundant, failing.");
+            return false;
+        }
+        
+        /* Batch control arguments. */
+        String arg = null;
+        int i = 1;
+        while ((arg = this.batchConfig.getProperty("Exec_Arg_" + i)) != null)
+        {
+            arg = this.substiter.substituteMacros(arg);
+            this.commandArgs.add(arg);
+            this.logger.debug("Loaded batch argument " + i + " as " + arg + ".");
+        }
+        
+        /* Working directory base. */
+        this.workingDirBase = this.substiter.substituteMacros("Working_Dir_Base");
+        this.logger.debug("Loaded working directory base as " + this.workingDirBase + ".");
+        
+        /* Environment variables. */
+        while ((arg = this.batchConfig.getProperty("Env_" + i)) != null)
+        {
+            String env[] = arg.split(":", 2);
+            env[1] = this.substiter.substituteMacros(env[1]);
+            this.logger.debug("Loaded environment variable " + env[0] + " with value " + env[1] + ".");
+            this.envMap.put(env[0], env[1]);
+        }
+        
+        return true;
     }
     
     /**

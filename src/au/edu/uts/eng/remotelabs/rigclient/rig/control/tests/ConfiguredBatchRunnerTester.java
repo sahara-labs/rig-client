@@ -47,6 +47,8 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -508,20 +510,62 @@ public class ConfiguredBatchRunnerTester extends TestCase
         expect(this.mockConfig.getProperty("Sync_Results_Dir", "false"))
             .andReturn("true");
         expect(this.mockConfig.getProperty("Sync_Dir_Destination"))
-        .andReturn("/tmp/");
+        .andReturn(System.getProperty("user.dir") + "/test/resources/BatchRunner/tmp/");
         expect(this.mockConfig.getProperty("Sync_Dir_Name"))
-            .andReturn("__USER__");
+            .andReturn("__USER__/__ISO8601__");
         expect(this.mockConfig.getProperty("Compress_Dir", "false"))
             .andReturn("false");
         replay(this.mockConfig);
         
         try
-        {
-            
-            
+        {   
             Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("sync");
             meth.setAccessible(true);
             assertTrue((Boolean)meth.invoke(this.runner));
+            
+            File file = new File(System.getProperty("user.dir") + "/test/resources/BatchRunner/tmp");
+            assertTrue(file.isDirectory());
+            assertTrue(file.exists());
+            
+            this.recusiveDelete(file);
+        }
+        catch (Exception e)
+        {
+            fail("Exception " + e.getClass().getName() + " message " + e.getMessage());
+        }
+        
+        verify(this.mockConfig);
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#sync()}.
+     */
+    @Test
+    public void testSyncCompress()
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Sync_Results_Dir", "false"))
+            .andReturn("true");
+        expect(this.mockConfig.getProperty("Sync_Dir_Destination"))
+        .andReturn(System.getProperty("user.dir") + "/test/resources/BatchRunner/");
+        expect(this.mockConfig.getProperty("Sync_Dir_Name"))
+            .andReturn("__USER__");
+        expect(this.mockConfig.getProperty("Compress_Dir", "false"))
+            .andReturn("true");
+        expect(this.mockConfig.getProperty("Compression_Level", "DEFAULT"))
+            .andReturn("FASTEST");
+        replay(this.mockConfig);
+        
+        try
+        {   
+            Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("sync");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+            
+            File file = new File(System.getProperty("user.dir") + "/test/resources/BatchRunner/tuser.zip");
+            assertTrue(file.isFile());
+            assertTrue(file.exists());
+            file.delete();
         }
         catch (Exception e)
         {
@@ -554,5 +598,31 @@ public class ConfiguredBatchRunnerTester extends TestCase
         }
         
         verify(this.mockConfig);
+    }
+    
+    /**
+     * Recursively delete directory and contents.
+     * 
+     * @param file directory to delete
+     * @throws IOException
+     */
+    private void recusiveDelete(final File file) throws IOException
+    {   
+        if (file.isDirectory())
+        {
+            /* Delete all the nested directories and files. */
+            for (File f : file.listFiles())
+            {
+                if (f.isDirectory())
+                {
+                    this.recusiveDelete(f);
+                }
+                else
+                {
+                    f.delete();
+                }
+            }
+        }
+        file.delete();
     }
 }
