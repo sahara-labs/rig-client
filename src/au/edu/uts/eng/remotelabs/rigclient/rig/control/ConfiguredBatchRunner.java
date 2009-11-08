@@ -289,13 +289,29 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
             return true;
         }
         
-        final String destination = this.substiter.substituteMacros(this.batchConfig.getProperty("Sync_Dir_Destination"));
-        this.logger.info("Going to store results files in " + destination + ".");
+        final String dest = this.substiter.substituteMacros(this.batchConfig.getProperty("Sync_Dir_Destination"));
+        final String name = this.substiter.substituteMacros(this.batchConfig .getProperty("Sync_Dir_Name"));
+        final File destFile = new File(dest, name);
         
-//        final String name = this.substiter.substituteMacros(this.batchConfig .getProperty("Sync_Dir_Name"));
-        
-        // TODO
-        
-        return false;
+        if (Boolean.parseBoolean(this.batchConfig.getProperty("Compress_Dir", "false")))
+        {
+            /* Compress results directory. */
+            this.logger.info("Compressing results directory " + this.workingDir + " into " + 
+                    destFile.getName() + " archive located in " + destFile.getParent() + ".");
+            final DirectoryZipper zipper = new 
+                    DirectoryZipper(this.batchConfig.getProperty("Compression_Level", "DEFAULT"));
+            return zipper.compressDirectory(this.workingDir, destFile.getAbsolutePath());
+        }
+        else
+        {
+            /* Move results directory. */
+            this.logger.info("Moving results directory files " + this.workingDir + " to " + destFile.getAbsolutePath() 
+                    + ".");
+            /* This actually uses a copy operation instead of a move. Doing a 
+             * copy is more expensive but clean *should* be before in the
+             * super cleanup method. */
+            final DirectoryCopier copier = new DirectoryCopier();
+            return copier.copyDirectory(this.workingDir, destFile.getAbsolutePath());
+        }
     }
 }

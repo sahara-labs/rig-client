@@ -90,7 +90,10 @@ public class ConfiguredBatchRunnerTester extends TestCase
         Field field = ConfiguredBatchRunner.class.getDeclaredField("batchConfig");
         field.setAccessible(true);
         field.set(this.runner, this.mockConfig);
-       
+        
+        field = AbstractBatchRunner.class.getDeclaredField("workingDir");
+        field.setAccessible(true);
+        field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/ResultsFiles");
     }
 
     /**
@@ -505,13 +508,17 @@ public class ConfiguredBatchRunnerTester extends TestCase
         expect(this.mockConfig.getProperty("Sync_Results_Dir", "false"))
             .andReturn("true");
         expect(this.mockConfig.getProperty("Sync_Dir_Destination"))
-        .andReturn("/__USER__/__FILE__/");
+        .andReturn("/tmp/");
         expect(this.mockConfig.getProperty("Sync_Dir_Name"))
-            .andReturn("__ISO8601__");
+            .andReturn("__USER__");
+        expect(this.mockConfig.getProperty("Compress_Dir", "false"))
+            .andReturn("false");
         replay(this.mockConfig);
         
         try
         {
+            
+            
             Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("sync");
             meth.setAccessible(true);
             assertTrue((Boolean)meth.invoke(this.runner));
@@ -528,7 +535,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#sync()}.
      */
     @Test
-    public void testSyncPassNoTest()
+    public void testSyncPassNoSync()
     {
         reset(this.mockConfig);
         expect(this.mockConfig.getProperty("Sync_Results_Dir", "false"))

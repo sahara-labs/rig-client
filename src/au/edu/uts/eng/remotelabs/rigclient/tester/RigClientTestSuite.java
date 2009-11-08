@@ -44,8 +44,11 @@ package au.edu.uts.eng.remotelabs.rigclient.tester;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.DirectoryCopier;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.DirectoryCopierTester;
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.DirectoryZipperTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.MacroSubstituerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractControlledRigTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractRigTester;
@@ -56,6 +59,8 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    DirectoryCopierTester.class,
+    DirectoryZipperTester.class,
     MacroSubstituerTester.class,
     AbstractBatchRunnerTester.class,
     AbstractControlledRigTester.class,
