@@ -44,7 +44,6 @@ package au.edu.uts.eng.remotelabs.rigclient.tester;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import au.edu.uts.eng.remotelabs.rigclient.rig.control.DirectoryCopier;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.DirectoryCopierTester;

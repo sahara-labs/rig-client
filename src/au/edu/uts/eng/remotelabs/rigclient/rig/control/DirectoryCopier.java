@@ -55,10 +55,10 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 public class DirectoryCopier
 {
     /** File content buffer. */
-    private byte buf[];
+    private final byte buf[];
     
     /** Logger object. */
-    private ILogger logger;
+    private final ILogger logger;
     
     /**
      * Constructor.
@@ -75,15 +75,15 @@ public class DirectoryCopier
      * supplied destination directory does not exist, it is created before
      * proceeding with copying the contents to it.
      * 
-     * @param from location of files to copy
-     * @param to destination of files
+     * @param fromDir location of files to copy
+     * @param toDir destination of files
      * @return true if successful
      */
-    public boolean copyDirectory(String from, String to)
+    public boolean copyDirectory(final String fromDir, final String toDir)
     {
         try
         {
-            this.recursiveCopy(from, to);
+            this.recursiveCopy(fromDir, toDir);
             return true;
         }
         catch (IOException e)
@@ -98,34 +98,34 @@ public class DirectoryCopier
      * supplied destination directory does not exist, it is created before
      * proceeding with copying the contents to it.
      * 
-     * @param from location of files to copy
-     * @param to destination of files
+     * @param fromDir location of files to copy
+     * @param toDir destination of files
      * @throws IOException error copying directories
      */
-    public void recursiveCopy(String from, String to) throws IOException
+    public void recursiveCopy(final String fromDir, final String toDir) throws IOException
     {
-        this.logger.debug("Copying the contents of " + from + " to " + to + ".");
+        this.logger.debug("Copying the contents of " + fromDir + " to " + toDir + ".");
         
-        File fromFile = new File(from);
-        File toFile = new File(to);
+        final File fromFile = new File(fromDir);
+        final File toFile = new File(toDir);
         
         if (!fromFile.isDirectory())
         {
-            this.logger.warn(from + " is not a directory. Directory copy failed.");
-            throw new IOException(from + " is not a directory.");
+            this.logger.warn(fromDir + " is not a directory. Directory copy failed.");
+            throw new IOException(fromDir + " is not a directory.");
         }
        
         if (!toFile.exists() && !toFile.mkdirs())
         {
-            this.logger.warn("Failed to create directory " + to + ". Directory copy failed.");
-            throw new IOException("Failed to create directory " + to + ".");
+            this.logger.warn("Failed to create directory " + toDir + ". Directory copy failed.");
+            throw new IOException("Failed to create directory " + toDir + ".");
         }
         
         for (File f : fromFile.listFiles())
         {
             if (f.isDirectory())
             {
-                this.copyDirectory(f.getAbsolutePath(), to + File.separatorChar + f.getName());
+                this.copyDirectory(f.getAbsolutePath(), toDir + File.separatorChar + f.getName());
             }
             else
             {
@@ -141,18 +141,18 @@ public class DirectoryCopier
      * @param destination directory to copy file into
      * @throws IOException error copying file
      */
-    public void copyFile(File fromFile, File destination) throws IOException
+    public void copyFile(final File fromFile, final File destination) throws IOException
     {
         this.logger.debug("Copying file " + fromFile.getName() + " in " + fromFile.getParent() + " to " + destination + ".");
-        int len = 0;
+        int len;
         
         FileInputStream fis = null;
         FileOutputStream fos = null;
         try
         {
-            File t = new File(destination, fromFile.getName());
+            final File toFile = new File(destination, fromFile.getName());
             fis = new FileInputStream(fromFile);
-            fos = new FileOutputStream(t);
+            fos = new FileOutputStream(toFile);
             
             while ((len = fis.read(this.buf)) > 0)
             {
