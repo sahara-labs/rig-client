@@ -41,12 +41,17 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
+
 /**
  * Abstract rig type class for rigs which provide direct control of the 
  * rig using the rig client.
  */
 public abstract class AbstractControlledRig extends AbstractRig implements IRigControl
 {
+    /** Batch runner. */
+    private AbstractBatchRunner runner;
+    
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#performPrimitive(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)
      */
@@ -73,8 +78,39 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     @Override
     public boolean performBatch(String fileName)
     {
-        // TODO Auto-generated method stub
-        return false;
+        /* Make sure no batch control is currently running. */
+        // TODO
+        
+        this.runner = this.instantiateBatchRunner(fileName, "");
+        this.logger.debug("Performing batch control using a batch runner of type " + this.runner.getClass().getName() + 
+                "with uploaded instruction file "+ fileName);
+        
+        /* Start the batch runner. */
+        Thread thr = new Thread(this.runner);
+        thr.start();
+        
+        /* Wait until it has been started. */
+        int timeCount = 0;
+        int timeOut = Integer.parseInt(this.configuration.getProperty("Batch_Timeout", "60"));
+        while (!(this.runner.isStarted() || this.runner.isFailed()))
+        {
+            try
+            {
+                Thread.sleep(1000);
+                if (++timeCount >= timeOut)
+                {
+                    // TODO
+                }
+            }
+            catch (InterruptedException e)
+            {
+                /* This could only happen when the Rig Client is about to 
+                 * shutdown so return false to notify that the batch
+                 * process (probably) won't be started and run. */ 
+                return false;
+            }
+        }
+        return true;
     }
     
     /* 
@@ -126,4 +162,14 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         // TODO Auto-generated method stub
         return null;
     }
+    
+    /**
+     * /**
+     * Creates an instance of <code>AbstractBatchRunner</code>.
+     * 
+     * @param fileName
+     * @param userName
+     * @return
+     */
+    protected abstract AbstractBatchRunner instantiateBatchRunner(final String fileName, final String userName);
 }

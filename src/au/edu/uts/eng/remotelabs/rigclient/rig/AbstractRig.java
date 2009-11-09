@@ -95,7 +95,7 @@ public abstract class AbstractRig implements IRig
     }
     
     /** Session users in the form key => user name, value => user type */
-    private Map<String, Session> sessionUsers;
+    protected Map<String, Session> sessionUsers;
     
     /** Access action list. */
     private List<IAccessAction> accessActions;
@@ -135,10 +135,10 @@ public abstract class AbstractRig implements IRig
     private Map<IAction, Integer> actionFailureCount;
     
     /** Rig client configuration. */
-    private IConfig configuration;
+    protected IConfig configuration;
     
     /** Logger. */
-    private ILogger logger;    
+    protected ILogger logger;    
     
     /**
      * Constructor, initialises the action lists.
