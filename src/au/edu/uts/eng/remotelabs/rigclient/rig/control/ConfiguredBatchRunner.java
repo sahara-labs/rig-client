@@ -100,19 +100,18 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
             arg = this.substiter.substituteMacros(arg);
             this.commandArgs.add(arg);
             this.logger.debug("Loaded batch argument " + i + " as " + arg + ".");
+            i++;
         }
         
-        /* Working directory base. */
-        this.workingDirBase = this.substiter.substituteMacros("Working_Dir_Base");
-        this.logger.debug("Loaded working directory base as " + this.workingDirBase + ".");
-        
         /* Environment variables. */
+        i = 1;
         while ((arg = this.batchConfig.getProperty("Env_" + i)) != null)
         {
             String env[] = arg.split(":", 2);
             env[1] = this.substiter.substituteMacros(env[1]);
             this.logger.debug("Loaded environment variable " + env[0] + " with value " + env[1] + ".");
             this.envMap.put(env[0], env[1]);
+            i++;
         }
         
         return true;

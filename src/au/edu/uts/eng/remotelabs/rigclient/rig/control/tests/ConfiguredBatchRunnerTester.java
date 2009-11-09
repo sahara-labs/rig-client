@@ -51,6 +51,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -101,10 +104,58 @@ public class ConfiguredBatchRunnerTester extends TestCase
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner#init()}.
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testInit()
     {
-        fail ("Not yet implemented"); // TODO
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Exec"))
+            .andReturn("/bin/ls");
+        expect(this.mockConfig.getProperty("Exec_Arg_1"))
+            .andReturn("-l");
+        expect(this.mockConfig.getProperty("Exec_Arg_2"))
+            .andReturn("__YEAR__");
+        expect(this.mockConfig.getProperty("Exec_Arg_3"))
+            .andReturn(null);
+        expect(this.mockConfig.getProperty("Env_1"))
+            .andReturn("user:__USER__");
+        expect(this.mockConfig.getProperty("Env_2"))
+            .andReturn("foo:bar");
+        expect(this.mockConfig.getProperty("Env_3"))
+            .andReturn(null);
+        replay(this.mockConfig);
+        
+        try
+        {
+            Method meth = AbstractBatchRunner.class.getDeclaredMethod("init");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+            
+            Field field = AbstractBatchRunner.class.getDeclaredField("command");
+            field.setAccessible(true);
+            assertEquals("/bin/ls", (String)field.get(this.runner));
+            
+            field = AbstractBatchRunner.class.getDeclaredField("commandArgs");
+            field.setAccessible(true);
+            List<String> args = (List<String>)field.get(this.runner);
+            assertEquals(2, args.size());
+            assertTrue(args.contains("-l"));
+            assertTrue(args.contains(String.valueOf(Calendar.getInstance().get(Calendar.YEAR))));
+            
+            field = AbstractBatchRunner.class.getDeclaredField("envMap");
+            field.setAccessible(true);
+            Map<String, String> env = (Map<String, String>)field.get(this.runner);
+            assertEquals(2, env.size());
+            assertTrue(env.containsKey("user"));
+            assertEquals("tuser", env.get("user"));
+            assertTrue(env.containsKey("foo"));
+            assertEquals("bar", env.get("foo"));
+        }
+        catch (Exception e)
+        {
+            fail("Exception: " + e.getClass().getName() + ", message: " + e.getMessage());
+        }        
+        verify(this.mockConfig);
     }
     
     /**
