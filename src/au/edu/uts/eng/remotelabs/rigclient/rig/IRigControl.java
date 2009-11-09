@@ -94,9 +94,10 @@ public interface IRigControl
      * invocation is complete.
      * 
      * @param fileName file name of instruction
+     * @param userName user who requested batch control
      * @return true if successful, false otherwise
      */
-    public boolean performBatch(String fileName);
+    public boolean performBatch(String fileName, String userName);
     
     /**
      * Specifies if a batch control invocation is in progress. 

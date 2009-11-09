@@ -76,12 +76,17 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#performBatch(java.lang.String)
      */
     @Override
-    public boolean performBatch(String fileName)
+    public boolean performBatch(String fileName, String userName)
     {
         /* Make sure no batch control is currently running. */
-        // TODO
+        if (this.isBatchRunning())
+        {
+            this.logger.warn("Attempting to start a new batch control invocation, cannot start a new invocation.");
+            this.logger.debug("Tania, congraulations! You have found a debugging message to delete.");
+            return false;
+        }
         
-        this.runner = this.instantiateBatchRunner(fileName, "");
+        this.runner = this.instantiateBatchRunner(fileName, userName);
         this.logger.debug("Performing batch control using a batch runner of type " + this.runner.getClass().getName() + 
                 "with uploaded instruction file "+ fileName);
         
@@ -92,6 +97,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         /* Wait until it has been started. */
         int timeCount = 0;
         int timeOut = Integer.parseInt(this.configuration.getProperty("Batch_Timeout", "60"));
+        this.logger.debug("Loaded batch start up timeout as " + timeOut + " seconds.");
         while (!(this.runner.isStarted() || this.runner.isFailed()))
         {
             try
@@ -99,7 +105,10 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
                 Thread.sleep(1000);
                 if (++timeCount >= timeOut)
                 {
-                    // TODO
+                    this.logger.warn("Batch process has not started in " + timeCount + " seconds, aborting " +
+                    		"batch control.");
+                    this.runner.terminate();
+                    return false;
                 }
             }
             catch (InterruptedException e)
@@ -119,8 +128,9 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     @Override
     public boolean isBatchRunning()
     {
-        // TODO Auto-generated method stub
-        return false;
+        if (this.runner == null) return false;
+        
+        return this.runner.isRunning();
     }
 
     /* 
@@ -129,8 +139,22 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     @Override
     public boolean abortBatch()
     {
-        // TODO Auto-generated method stub
-        return false;
+        if (!this.isBatchRunning())
+        {
+            this.logger.debug("Unable to abort batch since it is not running.");
+            return true;
+        }
+        
+        this.runner.terminate();
+        
+        int termTimeOut = Integer.parseInt(this.configuration.getProperty("Batch_Termination_TimeOut", "10"));
+        int termTimeCount = 0;
+        while (this.runner.isRunning() && (termTimeCount < termTimeOut))
+        {
+            ++termTimeCount;
+        }
+             
+        return this.runner.isRunning();
     }
 
     /* 
@@ -139,8 +163,41 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     @Override
     public int getBatchProgress()
     {
-        // TODO Auto-generated method stub
-        return 0;
+        /* No batch invocation has been started. */
+        if (this.runner == null) return 0;
+        if (!this.runner.isStarted()) return 0;
+        
+        /* Batch invocation failed or finished. */
+        if (!this.isBatchRunning()) return 100;
+        
+        /* Batch invocation is running, so try and give a progression number. */
+        /* DODGY This makes the assuption that the batch process prints an 
+         * integer to standard out specifying the percentage complete and if 
+         * this integer is updated, it should print a number on a new line. So
+         * the standard output should look like:
+         * 
+         *     <progress number>[space]<optional junk>[new line]
+         * 
+         * For example:
+         * mdiponio@eng047151~$ runprocess.sh
+         * 1 <optional junk>\n
+         * 2 <optional junk>\n
+         * ...
+         * 100 <optional junk>\n
+         * mdiponio@eng047151~$ 
+         */
+        String stdOutRead = this.runner.getBatchStandardOut();
+        String lines[] = stdOutRead.split("line.separator");
+        String words[] = lines[lines.length - 1].split(" ", 2);
+        try
+        {
+            return Integer.parseInt(words[0]);
+        }
+        catch (NumberFormatException nfe)
+        {
+            /* DODGY Oh, well, the assumption we made is wrong. */
+            return -1;
+        }
     }
 
     /* 
