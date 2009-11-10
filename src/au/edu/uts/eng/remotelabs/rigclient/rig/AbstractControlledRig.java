@@ -170,7 +170,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         /* Batch invocation failed or finished. */
         if (!this.isBatchRunning()) return 100;
         
-        /* Batch invocation is running, so try and give a progression number. */
+        /* Batch invocation is running, so try and get a progression value. */
         /* DODGY This makes the assumption that the batch process prints an 
          * integer to standard out specifying the percentage complete and if 
          * this integer is updated, it should print a number on a new line. So

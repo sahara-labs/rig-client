@@ -58,6 +58,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchResults;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
@@ -111,7 +112,7 @@ public class AbstractControlledRigTester extends TestCase
     public void testPerformBatch()
     {
         /* Tania, extra points if you can answer the last question asked in the instruction file. */
-        final String WORLD_DOMINATION_INSTRUCTIONS = System.getProperty("user.dir") + 
+        final String worldDominiationInstr = System.getProperty("user.dir") + 
                 "/test/resources/Control/instructions.txt";
         try
         {
@@ -135,22 +136,42 @@ public class AbstractControlledRigTester extends TestCase
             /* Set up batch runner. */
             this.rig.setComm(System.getProperty("user.dir") + "/test/resources/Control/slow-cat.sh");
             List<String> args = new ArrayList<String>();
-            args.add(WORLD_DOMINATION_INSTRUCTIONS);
+            args.add(worldDominiationInstr);
             args.add("1");
             args.add("stdout");
             this.rig.setArgs(args);
             this.rig.setEnv(new HashMap<String, String>());
            
-            assertTrue(this.rig.performBatch(WORLD_DOMINATION_INSTRUCTIONS, "BigBrother_Tania_Machet"));
+            assertTrue(this.rig.getBatchState() == BatchState.CLEAR);
+            assertFalse(this.rig.isBatchRunning());
+            assertEquals(0, this.rig.getBatchProgress());
+            assertTrue(this.rig.performBatch(worldDominiationInstr, "Inner_Party_Tania_Machet"));
+            assertTrue(this.rig.isBatchRunning());
+            assertTrue(this.rig.getBatchState() == BatchState.IN_PROGRESS);
             
+            int progress = -1;
             while (this.rig.isBatchRunning())
             {
-                Thread.sleep(1000);
-                System.out.println("Progress: " + this.rig.getBatchProgress());
-                
-                BatchResults res = this.rig.getBatchResults();
-                System.out.println(res.getStandardOut());                
+                Thread.sleep(3000);
+                assertFalse(progress == this.rig.getBatchProgress()); // This should progess
+                progress = this.rig.getBatchProgress();
+                //assertTrue(progress >= 0 && progress <= 100);
             }
+            
+            assertFalse(this.rig.isBatchRunning());
+            assertEquals(100, this.rig.getBatchProgress());
+            assertTrue(BatchState.COMPLETE == this.rig.getBatchState());
+            BatchResults results = this.rig.getBatchResults();
+            assertNotNull(results);
+            assertTrue(BatchState.COMPLETE == results.getState());
+            assertEquals(1, results.getResultsFiles().length);
+            assertEquals(worldDominiationInstr, results.getInstructionFile());
+            
+            String stdout = results.getStandardOut();
+            assertNotNull(stdout);
+            String lines[] = stdout.split("\n");
+            assertEquals(40, lines.length);
+            assertEquals("Ignorance is Strength", lines[0].trim()); // !!!
             
             verify(this.mockConfig);
         }
