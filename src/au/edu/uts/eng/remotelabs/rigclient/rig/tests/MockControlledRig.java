@@ -34,102 +34,74 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date 29th October 2009
+ * @date 10th November 2009
  *
  * Changelog:
- * - 29/10/2009 - mdiponio - Initial file creation.
+ * - 10/11/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.rig.control.tests;
+package au.edu.uts.eng.remotelabs.rigclient.rig.tests;
 
 import java.util.List;
 import java.util.Map;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.MockBatchRunner;
 
 /**
- * Mock batch runner for testing.
+ * Mock controlled rig for testing.
  */
-public class MockBatchRunner extends AbstractBatchRunner
+public class MockControlledRig extends AbstractControlledRig
 {
-    /** Flag to specify if checkFile returns true. */
-    private boolean checkFileFlag;
+    /** Runner command. */
+    private String comm;
     
-    /** Flag to specify if init returns true. */
-    private boolean initFlag;
+    /** Runner arguments. */
+    private List<String> args;
     
-    /** Flag to specify if sync returns true. */
-    private boolean syncFlag;
-    
-    /**
-     * Constructor  - sets instruction file name.
-     * 
-     * @param fileName
-     * @param user 
+    /** Runner environment variables. */
+    private Map<String, String> env;
+
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#instantiateBatchRunner(java.lang.String, java.lang.String)
      */
-    public MockBatchRunner(String fileName, String user)
+    @Override
+    protected AbstractBatchRunner instantiateBatchRunner(String fileName, String userName)
     {
-        super(fileName, user);
-    }
-    
-    /**
-     * Constructor.
-     * 
-     * @param fileName
-     * @param user
-     * @param statues sets all method returns.
-     */
-    public MockBatchRunner(String fileName, String user, boolean statues)
-    {
-        super(fileName, user);
-        this.checkFileFlag = statues;
-        this.initFlag = statues;
-        this.syncFlag = statues;
-    }
-    
-    /**
-     * Constructor.
-     * 
-     * @param fileName
-     * @param user
-     * @param statues sets all method returns.
-     */
-    public MockBatchRunner(String fileName, String user, String command, List<String> args, Map<String, String> env,
-            boolean statues)
-    {
-        super(fileName, user);
-        this.checkFileFlag = statues;
-        this.initFlag = statues;
-        this.syncFlag = statues;
-        
-        this.command = command;
-        this.commandArgs = args;
-        this.envMap = env;
+        return new MockBatchRunner(fileName, userName, this.comm, this.args, this.env, true);
     }
 
     /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#checkFile()
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig#init()
      */
     @Override
-    protected boolean checkFile()
+    protected void init()
     {
-        return this.checkFileFlag;
+        /* Doesn't need to do any thing. */
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#init()
+    /**
+     * @param comm the comm to set
      */
-    @Override
-    protected boolean init()
+    public void setComm(String comm)
     {
-       return this.initFlag;
+        this.comm = comm;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#sync()
+    /**
+     * @param args the args to set
      */
-    @Override
-    protected boolean sync()
+    public void setArgs(List<String> args)
     {
-        return this.syncFlag;
+        this.args = args;
     }
+
+    /**
+     * @param env the env to set
+     */
+    public void setEnv(Map<String, String> env)
+    {
+        this.env = env;
+    }
+
 }

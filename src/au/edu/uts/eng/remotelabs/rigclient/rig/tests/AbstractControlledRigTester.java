@@ -41,17 +41,36 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.tests;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchResults;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
 /**
  * Tests the <code>AbstractControllerRigTester</code> class.
  */
 public class AbstractControlledRigTester extends TestCase
 {
-
+    /** Object of class under test. */
+    private MockControlledRig rig;
+    
+    /** Mock configuration. */
+    private IConfig mockConfig;
     /**
      * @throws java.lang.Exception
      */
@@ -59,7 +78,21 @@ public class AbstractControlledRigTester extends TestCase
     @Before
     public void setUp() throws Exception
     {
-        // TODO implementation
+        this.mockConfig = createMock(IConfig.class);
+        expect(this.mockConfig.getProperty("Logger_Type"))
+            .andReturn("SystemErr");
+        expect(this.mockConfig.getProperty("Log_Level"))
+            .andReturn("DEBUG");
+        expect(this.mockConfig.getProperty("Action_Failure_Threshold"))
+            .andReturn("2");
+        replay(this.mockConfig);
+
+        Field configField = ConfigFactory.class.getDeclaredField("instance");
+        configField.setAccessible(true);
+        configField.set(null, this.mockConfig);
+
+        this.rig = new MockControlledRig();
+        
     }
 
     /**
@@ -77,7 +110,54 @@ public class AbstractControlledRigTester extends TestCase
     @Test
     public void testPerformBatch()
     {
-        fail("Not yet implemented"); // TODO
+        /* Tania, extra points if you can answer the last question asked in the instruction file. */
+        final String WORLD_DOMINATION_INSTRUCTIONS = System.getProperty("user.dir") + 
+                "/test/resources/Control/instructions.txt";
+        try
+        {
+            /* Set up AbstractRig. */
+            String wdBase = System.getProperty("user.dir") + "/test/resources/Control/WorkDirBase";
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("Batch_Working_Dir"))
+                .andReturn(wdBase);
+            expect(this.mockConfig.getProperty("Batch_Create_Nested_Dir", "true"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("Batch_Flush_Env", "false"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "true"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("Batch_Timeout", "60"))
+                .andReturn("180");
+            replay(this.mockConfig);
+            
+            /* Set up batch runner. */
+            this.rig.setComm(System.getProperty("user.dir") + "/test/resources/Control/slow-cat.sh");
+            List<String> args = new ArrayList<String>();
+            args.add(WORLD_DOMINATION_INSTRUCTIONS);
+            args.add("1");
+            args.add("stdout");
+            this.rig.setArgs(args);
+            this.rig.setEnv(new HashMap<String, String>());
+           
+            assertTrue(this.rig.performBatch(WORLD_DOMINATION_INSTRUCTIONS, "BigBrother_Tania_Machet"));
+            
+            while (this.rig.isBatchRunning())
+            {
+                Thread.sleep(1000);
+                System.out.println("Progress: " + this.rig.getBatchProgress());
+                
+                BatchResults res = this.rig.getBatchResults();
+                System.out.println(res.getStandardOut());                
+            }
+            
+            verify(this.mockConfig);
+        }
+        catch (Exception e)
+        {
+            fail("Exception: " + e.getClass().getName() + ", message: " + e.getMessage() + ".");
+        }
     }
 
     /**

@@ -693,13 +693,23 @@ public abstract class AbstractBatchRunner implements Runnable
     }
     
     /**
+     * Gets the uploaded instruction file path.
+     * 
+     * @return instruction file
+     */
+    public String getInstructionFilePath()
+    {
+        return this.fileName;
+    }
+    
+    /**
      * Gets a formatted time stamp with day, month, year, hour, minute
      * and second components separated with the <code>glue</code> parameter.
      * 
      * @param dateGlue character to append date components with
      * @param join character to join date and time with
      * @param timeGlue character to append time with
-     * @return String formatted timestamp
+     * @return String formatted time stamp
      */
     protected String getTimeStamp(final char dateGlue, final char join, final char timeGlue)
     {

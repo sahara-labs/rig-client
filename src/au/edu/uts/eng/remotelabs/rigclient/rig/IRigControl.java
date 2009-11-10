@@ -169,6 +169,12 @@ public interface IRigControl
         /** List of generated result files. */
         private List<String> resultsFiles;
         
+        /** Standard out output of the batch process. */
+        private String standardOut;
+        
+        /** Standard error output of the batch process. */
+        private String standardErr;
+        
         public BatchResults()
         {
             this.resultsFiles = new ArrayList<String>();
@@ -220,6 +226,46 @@ public interface IRigControl
         public void addResultsFile(String file)
         {
             this.resultsFiles.add(file);
+        }
+
+        /**
+         * @return the standardOut
+         */
+        public String getStandardOut()
+        {
+            return standardOut;
+        }
+
+        /**
+         * @param standardOut the standardOut to set
+         */
+        public void setStandardOut(String standardOut)
+        {
+            this.standardOut = standardOut;
+        }
+
+        /**
+         * @return the standardErr
+         */
+        public String getStandardErr()
+        {
+            return standardErr;
+        }
+
+        /**
+         * @param standardErr the standardErr to set
+         */
+        public void setStandardErr(String standardErr)
+        {
+            this.standardErr = standardErr;
+        }
+
+        /**
+         * @param resultsFiles the resultsFiles to set
+         */
+        public void setResultsFiles(List<String> resultsFiles)
+        {
+            this.resultsFiles = resultsFiles;
         }
     }
     

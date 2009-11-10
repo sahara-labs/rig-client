@@ -87,8 +87,8 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         }
         
         this.runner = this.instantiateBatchRunner(fileName, userName);
-        this.logger.debug("Performing batch control using a batch runner of type " + this.runner.getClass().getName() + 
-                "with uploaded instruction file "+ fileName);
+        this.logger.debug("Performing batch control using a batch runner of type " + 
+                this.runner.getClass().getSimpleName() + " with uploaded instruction file "+ fileName);
         
         /* Start the batch runner. */
         Thread thr = new Thread(this.runner);
@@ -171,7 +171,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         if (!this.isBatchRunning()) return 100;
         
         /* Batch invocation is running, so try and give a progression number. */
-        /* DODGY This makes the assuption that the batch process prints an 
+        /* DODGY This makes the assumption that the batch process prints an 
          * integer to standard out specifying the percentage complete and if 
          * this integer is updated, it should print a number on a new line. So
          * the standard output should look like:
@@ -191,7 +191,8 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         String words[] = lines[lines.length - 1].split(" ", 2);
         try
         {
-            return Integer.parseInt(words[0]);
+            final int progress = Integer.parseInt(words[0]);
+            return progress > 1 && progress < 100 ? progress : -1;
         }
         catch (NumberFormatException nfe)
         {
@@ -206,8 +207,12 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     @Override
     public BatchResults getBatchResults()
     {
-        // TODO Auto-generated method stub
-        return null;
+        BatchResults results = new BatchResults();
+        results.setState(this.getBatchState());
+        results.setInstructionFile(this.runner.getInstructionFilePath());
+        results.setStandardOut(this.runner.getAllStandardOut());
+        results.setStandardErr(this.runner.getAllStandardErr());
+        return results;
     }
 
     /* 
@@ -216,17 +221,27 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     @Override
     public BatchState getBatchState()
     {
-        // TODO Auto-generated method stub
-        return null;
+        /* Not started. */
+        if (this.runner == null || !this.runner.isStarted()) return BatchState.CLEAR;
+        
+        /* Running - in progress. */
+        if (this.runner.isRunning()) return BatchState.IN_PROGRESS;
+        
+        /* Failed. */
+        if (this.runner.isFailed()) return BatchState.FAILED;
+        
+        /* Must have completed successfully. */
+        return BatchState.COMPLETE;
     }
     
     /**
-     * /**
-     * Creates an instance of <code>AbstractBatchRunner</code>.
+     * Creates and returns an instance of <code>AbstractBatchRunner</code>.
+     * This method is not guarded so should not return <code>null</code> or 
+     * through an exception unless you intend to crash the Rig Client.
      * 
-     * @param fileName
-     * @param userName
-     * @return
+     * @param fileName uploaded instruction file path
+     * @param userName initiating users name
+     * @return {@link AbstractBatchRunner} instance
      */
     protected abstract AbstractBatchRunner instantiateBatchRunner(final String fileName, final String userName);
 }
