@@ -83,7 +83,7 @@ public class AbstractControlledRigTester extends TestCase
         expect(this.mockConfig.getProperty("Logger_Type"))
             .andReturn("SystemErr");
         expect(this.mockConfig.getProperty("Log_Level"))
-            .andReturn("DEBUG");
+            .andReturn("WARN");
         expect(this.mockConfig.getProperty("Action_Failure_Threshold"))
             .andReturn("2");
         replay(this.mockConfig);
@@ -142,9 +142,14 @@ public class AbstractControlledRigTester extends TestCase
             this.rig.setArgs(args);
             this.rig.setEnv(new HashMap<String, String>());
            
+            /* Pre batch state. */
             assertTrue(this.rig.getBatchState() == BatchState.CLEAR);
             assertFalse(this.rig.isBatchRunning());
             assertEquals(0, this.rig.getBatchProgress());
+            BatchResults results = this.rig.getBatchResults();
+            assertEquals(BatchState.CLEAR, results.getState());
+            
+            /* Run the batch process. */
             assertTrue(this.rig.performBatch(worldDominiationInstr, "Inner_Party_Tania_Machet"));
             assertTrue(this.rig.isBatchRunning());
             assertTrue(this.rig.getBatchState() == BatchState.IN_PROGRESS);
@@ -155,23 +160,26 @@ public class AbstractControlledRigTester extends TestCase
                 Thread.sleep(3000);
                 assertFalse(progress == this.rig.getBatchProgress()); // This should progess
                 progress = this.rig.getBatchProgress();
-                //assertTrue(progress >= 0 && progress <= 100);
+                System.out.println("Progress " + progress);
+              //  assertTrue(progress > 0 && progress <= 100);
             }
             
             assertFalse(this.rig.isBatchRunning());
             assertEquals(100, this.rig.getBatchProgress());
             assertTrue(BatchState.COMPLETE == this.rig.getBatchState());
-            BatchResults results = this.rig.getBatchResults();
+            results = this.rig.getBatchResults();
             assertNotNull(results);
             assertTrue(BatchState.COMPLETE == results.getState());
-            assertEquals(1, results.getResultsFiles().length);
+            assertEquals(0, results.getResultsFiles().length);
             assertEquals(worldDominiationInstr, results.getInstructionFile());
             
             String stdout = results.getStandardOut();
             assertNotNull(stdout);
             String lines[] = stdout.split("\n");
             assertEquals(40, lines.length);
-            assertEquals("Ignorance is Strength", lines[0].trim()); // !!!
+            assertEquals("Ignorance is Strength", lines[0].substring(2).trim()); // !!!
+            
+            assertEquals(0, results.getExitCode());
             
             verify(this.mockConfig);
         }

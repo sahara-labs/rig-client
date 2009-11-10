@@ -208,10 +208,20 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     public BatchResults getBatchResults()
     {
         BatchResults results = new BatchResults();
-        results.setState(this.getBatchState());
-        results.setInstructionFile(this.runner.getInstructionFilePath());
-        results.setStandardOut(this.runner.getAllStandardOut());
-        results.setStandardErr(this.runner.getAllStandardErr());
+        if (this.runner == null)
+        {
+            /* No batch process has been run. */
+            results.setState(BatchState.CLEAR);
+        }
+        else
+        {
+            /* Results from the batch process run. */
+            results.setState(this.getBatchState());
+            results.setInstructionFile(this.runner.getInstructionFilePath());
+            results.setStandardOut(this.runner.getAllStandardOut());
+            results.setStandardErr(this.runner.getAllStandardErr());
+            results.setExitCode(this.runner.getExitCode());
+        }
         return results;
     }
 

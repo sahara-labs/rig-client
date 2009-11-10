@@ -175,6 +175,12 @@ public interface IRigControl
         /** Standard error output of the batch process. */
         private String standardErr;
         
+        /** Batch process exit code. */
+        private int exitCode;
+        
+        /**
+         * Constructor.
+         */
         public BatchResults()
         {
             this.resultsFiles = new ArrayList<String>();
@@ -189,11 +195,11 @@ public interface IRigControl
         }
 
         /**
-         * @param state the state to set
+         * @param st the state to set
          */
-        public void setState(BatchState state)
+        public void setState(BatchState st)
         {
-            this.state = state;
+            this.state = st;
         }
 
         /**
@@ -205,11 +211,11 @@ public interface IRigControl
         }
 
         /**
-         * @param instructionFile the instructionFile to set
+         * @param instructions the instructionFile to set
          */
-        public void setInstructionFile(String instructionFile)
+        public void setInstructionFile(String instructions)
         {
-            this.instructionFile = instructionFile;
+            this.instructionFile = instructions;
         }
 
         /**
@@ -217,7 +223,7 @@ public interface IRigControl
          */
         public String[] getResultsFiles()
         {
-            return this.resultsFiles.toArray(new String[1]);
+            return this.resultsFiles.toArray(new String[0]);
         }
 
         /**
@@ -233,15 +239,15 @@ public interface IRigControl
          */
         public String getStandardOut()
         {
-            return standardOut;
+            return this.standardOut;
         }
 
         /**
-         * @param standardOut the standardOut to set
+         * @param stdout the standardOut to set
          */
-        public void setStandardOut(String standardOut)
+        public void setStandardOut(String stdout)
         {
-            this.standardOut = standardOut;
+            this.standardOut = stdout;
         }
 
         /**
@@ -249,23 +255,39 @@ public interface IRigControl
          */
         public String getStandardErr()
         {
-            return standardErr;
+            return this.standardErr;
         }
 
         /**
-         * @param standardErr the standardErr to set
+         * @param stderr the standardErr to set
          */
-        public void setStandardErr(String standardErr)
+        public void setStandardErr(String stderr)
         {
-            this.standardErr = standardErr;
+            this.standardErr = stderr;
         }
 
         /**
-         * @param resultsFiles the resultsFiles to set
+         * @param results the resultsFiles to set
          */
-        public void setResultsFiles(List<String> resultsFiles)
+        public void setResultsFiles(List<String> results)
         {
-            this.resultsFiles = resultsFiles;
+            this.resultsFiles = results;
+        }
+
+        /**
+         * @return the exitCode
+         */
+        public int getExitCode()
+        {
+            return this.exitCode;
+        }
+
+        /**
+         * @param code the exitCode to set
+         */
+        public void setExitCode(int code)
+        {
+            this.exitCode = code;
         }
     }
     
