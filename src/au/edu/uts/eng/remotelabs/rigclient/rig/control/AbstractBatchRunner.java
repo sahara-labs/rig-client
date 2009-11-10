@@ -94,10 +94,10 @@ public abstract class AbstractBatchRunner implements Runnable
     private BufferedReader batchStdErr;
     
     /** Buffer containing all captured batch process standard out. */
-    private StringBuffer stdOutBuffer;
+    private final StringBuffer stdOutBuffer;
     
     /** Buffer containing all captured batch process standard err. */
-    private StringBuffer stdErrBuffer;
+    private final StringBuffer stdErrBuffer;
     
     /** Command line argument to invoke. */
     protected String command;
@@ -143,7 +143,7 @@ public abstract class AbstractBatchRunner implements Runnable
      * Constructor.
      * 
      * @param file uploaded instruction file
-     * @throws NullPointerException if the <code>file</code> or \
+     * @throws IllegalArgumentException if the <code>file</code> or \
      *         </code>user>/code> parameters are <code>null</code>
      */
     public AbstractBatchRunner(final String file, final String user)
@@ -154,13 +154,13 @@ public abstract class AbstractBatchRunner implements Runnable
         if (file == null)
         {
             this.logger.error("An null parameter was passed as the uploaded instruction file path.");
-            throw new NullPointerException("file parameter must not be null.");
+            throw new IllegalArgumentException("file parameter must not be null.");
         }
         
         if (user == null)
         {
             this.logger.error("An null parameter was passed as the batch initating username.");
-            throw new NullPointerException("user parameter must not be null.");
+            throw new IllegalArgumentException("user parameter must not be null.");
         }
         
         
@@ -517,9 +517,10 @@ public abstract class AbstractBatchRunner implements Runnable
             
             /* Delete instruction file. */
             final File file = new File(this.fileName);
-            if (Boolean.parseBoolean(conf.getProperty("Batch_Instruct_File_Delete", "true")) && file.isFile())
+            if (Boolean.parseBoolean(conf.getProperty("Batch_Instruct_File_Delete", "true")) && file.isFile()
+                    && !file.delete())
             {
-                if (!file.delete()) this.logger.warn("Failed to delete file " + file.getAbsolutePath());
+                this.logger.warn("Failed to delete file " + file.getAbsolutePath());
             }
         }
         catch (IOException ex)

@@ -71,10 +71,10 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     public static final int MAGIC_NUMBER_LEN = 8;
     
     /** Macro substituter. */
-    private MacroSubstituter substiter;
+    private final MacroSubstituter substiter;
     
     /** Batch configuration. */
-    private IConfig batchConfig;
+    private final IConfig batchConfig;
     
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#init()
@@ -123,7 +123,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
      * @param file reference to uploaded instruction file
      * @param user name of user who invoked batch control
      */
-    public ConfiguredBatchRunner(final String file, String user)
+    public ConfiguredBatchRunner(final String file, final String user)
     {
         super(file, user);
         
@@ -193,8 +193,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
         try
         {
             input = new FileInputStream(file);
-            int i, c;
-            byte fileBuf[] = new byte[ConfiguredBatchRunner.MAGIC_NUMBER_LEN];
+            final byte fileBuf[] = new byte[ConfiguredBatchRunner.MAGIC_NUMBER_LEN];
             byte magicBuf[] = new byte[ConfiguredBatchRunner.MAGIC_NUMBER_LEN];
             
             /* Read the first 8 bytes of the file. */
@@ -207,6 +206,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
             }
             
             /* Populate the array with the long bytes. */
+            int i, c;
             for (i = 0; i < magicBuf.length; i++) magicBuf[7 - i] = (byte) ((magicNumber >> (8 * i)) & 0xFF);
             
             /* Count left empty cells. */

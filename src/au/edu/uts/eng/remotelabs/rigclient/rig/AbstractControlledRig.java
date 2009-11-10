@@ -56,7 +56,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#performPrimitive(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)
      */
     @Override
-    public PrimitiveResponse performPrimitive(PrimitiveRequest req)
+    public PrimitiveResponse performPrimitive(final PrimitiveRequest req)
     {
         // TODO Auto-generated method stub
         return null;
@@ -76,7 +76,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#performBatch(java.lang.String)
      */
     @Override
-    public boolean performBatch(String fileName, String userName)
+    public boolean performBatch(final String fileName, final String userName)
     {
         /* Make sure no batch control is currently running. */
         if (this.isBatchRunning())
@@ -91,12 +91,12 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
                 this.runner.getClass().getSimpleName() + " with uploaded instruction file "+ fileName);
         
         /* Start the batch runner. */
-        Thread thr = new Thread(this.runner);
+        final Thread thr = new Thread(this.runner);
         thr.start();
         
         /* Wait until it has been started. */
         int timeCount = 0;
-        int timeOut = Integer.parseInt(this.configuration.getProperty("Batch_Timeout", "60"));
+        final int timeOut = Integer.parseInt(this.configuration.getProperty("Batch_Timeout", "60"));
         this.logger.debug("Loaded batch start up timeout as " + timeOut + " seconds.");
         while (!(this.runner.isStarted() || this.runner.isFailed()))
         {
@@ -147,7 +147,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         
         this.runner.terminate();
         
-        int termTimeOut = Integer.parseInt(this.configuration.getProperty("Batch_Termination_TimeOut", "10"));
+        final int termTimeOut = Integer.parseInt(this.configuration.getProperty("Batch_Termination_TimeOut", "10"));
         int termTimeCount = 0;
         while (this.runner.isRunning() && (termTimeCount < termTimeOut))
         {
@@ -186,9 +186,9 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
          * 100 <optional junk>\n
          * mdiponio@eng047151~$ 
          */
-        String stdOutRead = this.runner.getBatchStandardOut();
-        String lines[] = stdOutRead.split("line.separator");
-        String words[] = lines[lines.length - 1].split(" ", 2);
+        final String stdOutRead = this.runner.getBatchStandardOut();
+        final String lines[] = stdOutRead.split("line.separator");
+        final String words[] = lines[lines.length - 1].split(" ", 2);
         try
         {
             final int progress = Integer.parseInt(words[0]);
@@ -207,7 +207,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     @Override
     public BatchResults getBatchResults()
     {
-        BatchResults results = new BatchResults();
+        final BatchResults results = new BatchResults();
         if (this.runner == null)
         {
             /* No batch process has been run. */

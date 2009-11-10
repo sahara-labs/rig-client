@@ -148,10 +148,6 @@
             <ruleset>Braces Rules</ruleset>
         </rule>
         <rule>
-            <name>IfStmtsMustUseBraces</name>
-            <ruleset>Braces Rules</ruleset>
-        </rule>
-        <rule>
             <name>WhileLoopsMustUseBraces</name>
             <ruleset>Braces Rules</ruleset>
         </rule>
@@ -518,42 +514,6 @@
         <rule>
             <name>TooManyStaticImports</name>
             <ruleset>Import Statement Rules</ruleset>
-        </rule>
-        <rule>
-            <name>DoNotCallSystemExit</name>
-            <ruleset>J2EE Rules</ruleset>
-        </rule>
-        <rule>
-            <name>DoNotUseThreads</name>
-            <ruleset>J2EE Rules</ruleset>
-        </rule>
-        <rule>
-            <name>LocalHomeNamingConvention</name>
-            <ruleset>J2EE Rules</ruleset>
-        </rule>
-        <rule>
-            <name>LocalInterfaceSessionNamingConvention</name>
-            <ruleset>J2EE Rules</ruleset>
-        </rule>
-        <rule>
-            <name>MDBAndSessionBeanNamingConvention</name>
-            <ruleset>J2EE Rules</ruleset>
-        </rule>
-        <rule>
-            <name>RemoteInterfaceNamingConvention</name>
-            <ruleset>J2EE Rules</ruleset>
-        </rule>
-        <rule>
-            <name>RemoteSessionInterfaceNamingConvention</name>
-            <ruleset>J2EE Rules</ruleset>
-        </rule>
-        <rule>
-            <name>StaticEJBFieldShouldBeFinal</name>
-            <ruleset>J2EE Rules</ruleset>
-        </rule>
-        <rule>
-            <name>UseProperClassLoader</name>
-            <ruleset>J2EE Rules</ruleset>
         </rule>
         <rule>
             <name>ProperLogger</name>

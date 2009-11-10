@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <wsdl:definitions xmlns:rc="http://remotelabs.eng.uts.edu.au/rc" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="RigClientService" targetNamespace="http://remotelabs.eng.uts.edu.au/rc">
   <wsdl:types>
     <xsd:schema targetNamespace="http://remotelabs.eng.uts.edu.au/rc">
