@@ -11,7 +11,7 @@
 
 if [ $# -lt 3 ]; then
     echo "Incorrect number of arguments, should be <file reference> <sleep time> [stdout|stderr]"
-    exit 1
+    exit 10
 fi
 
 FILE=$1
@@ -40,6 +40,11 @@ case "$3" in
 	;;
 esac
 
+if [ $4 == "output" ]; then
+    OUTPUT="true"
+    OUTFILE=`pwd`/results-`date +%s`.txt
+fi
+
 RUNTIME=`wc -l $FILE | cut -d ' ' -f1`
 I=1
 let TOTAL=$SLEEP*$RUNTIME
@@ -50,6 +55,10 @@ while [ $I -lt $RUNTIME ] ; do
     echo "$PERCENTAGE `head -n $I $FILE | tail -n 1`" >&$FD
     if [ $FD -eq 2 ]; then
 	echo "$PERCENTAGE <Random Junk>"
+    fi
+
+    if [ $OUTPUT == "true" ]; then
+	echo "`head -n $I $FILE | tail -n 1`" > $OUTFILE
     fi
 
     sleep $SLEEP

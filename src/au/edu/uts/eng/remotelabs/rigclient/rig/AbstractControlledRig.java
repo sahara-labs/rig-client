@@ -153,8 +153,8 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         {
             ++termTimeCount;
         }
-             
-        return this.runner.isRunning();
+        
+        return this.runner.isRunning() && this.runner.isKilled();
     }
 
     /* 
@@ -187,12 +187,12 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
          * mdiponio@eng047151~$ 
          */
         final String stdOutRead = this.runner.getBatchStandardOut();
-        final String lines[] = stdOutRead.split("line.separator");
+        final String lines[] = stdOutRead.split(System.getProperty("line.separator"));
         final String words[] = lines[lines.length - 1].split(" ", 2);
         try
         {
             final int progress = Integer.parseInt(words[0]);
-            return progress > 1 && progress < 100 ? progress : -1;
+            return progress > 1 && progress <= 100 ? progress : -1;
         }
         catch (NumberFormatException nfe)
         {
@@ -221,6 +221,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
             results.setStandardOut(this.runner.getAllStandardOut());
             results.setStandardErr(this.runner.getAllStandardErr());
             results.setExitCode(this.runner.getExitCode());
+            results.setResultsFiles(this.runner.getResultsFiles());
         }
         return results;
     }
@@ -232,13 +233,19 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     public BatchState getBatchState()
     {
         /* Not started. */
-        if (this.runner == null || !this.runner.isStarted()) return BatchState.CLEAR;
+        if (this.runner == null) return BatchState.CLEAR;
         
         /* Running - in progress. */
         if (this.runner.isRunning()) return BatchState.IN_PROGRESS;
         
         /* Failed. */
         if (this.runner.isFailed()) return BatchState.FAILED;
+        
+        /* Aborted. */
+        if (this.runner.isKilled()) return BatchState.ABORTED;
+        
+        /* Not started. */
+        if (!this.runner.isStarted()) return BatchState.CLEAR;
         
         /* Must have completed successfully. */
         return BatchState.COMPLETE;

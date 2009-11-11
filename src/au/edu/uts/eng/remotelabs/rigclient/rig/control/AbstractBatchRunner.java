@@ -130,6 +130,9 @@ public abstract class AbstractBatchRunner implements Runnable
     /** Flag to specify if batch execution failed. */
     protected boolean failed;
     
+    /** Flag to specify if the batch execution was killed. */
+    protected boolean killed;
+    
     /** Batch process exit code. */
     protected int exitCode;
     
@@ -314,9 +317,19 @@ public abstract class AbstractBatchRunner implements Runnable
         
         final List<String> invocation = new ArrayList<String>();
         invocation.add(this.command);
-        invocation.addAll(this.commandArgs);
         this.logger.info("Batch command that will be invoked is " + this.command);
-        this.logger.info("Batch command arguments are " + this.commandArgs.toString());
+        
+        if (this.commandArgs == null)
+        {
+            this.logger.warn("Not providing any arguments for the batch control process. This is highly abnormal, " +
+            		"so please email mdiponio@eng.uts.ed.au with your use case for not having arguments as this " +
+            		"sort of breaks the premise of batch control!");
+        }
+        else
+        {
+            invocation.addAll(this.commandArgs);
+            this.logger.info("Batch command arguments are " + this.commandArgs.toString());
+        }
         
         final ProcessBuilder builder = new ProcessBuilder(invocation);
         
@@ -483,7 +496,13 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     public void terminate()
     {
+        /* Do a read as the input streams may not be readable after 
+         * termination. */
+        this.getBatchStandardOut();
+        this.getBatchStandardError();
+        
         this.logger.info("Terminating batch process.");
+        this.killed = true;
         this.batchProc.destroy();
     }
     
@@ -656,6 +675,16 @@ public abstract class AbstractBatchRunner implements Runnable
     public boolean isFailed()
     {
        return this.failed; 
+    }
+    
+    /**
+     * Returns <code>true</code> if the batch invocation attempt has been killed.
+     * 
+     * @return true if batch killed
+     */
+    public boolean isKilled()
+    {
+        return this.killed;
     }
     
     /**

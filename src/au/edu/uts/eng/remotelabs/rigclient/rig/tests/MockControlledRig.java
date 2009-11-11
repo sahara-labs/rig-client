@@ -41,6 +41,8 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.tests;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +64,14 @@ public class MockControlledRig extends AbstractControlledRig
     /** Runner environment variables. */
     private Map<String, String> env;
 
+    /**
+     * Constructor.
+     */
+    public MockControlledRig()
+    {
+        this.args = new ArrayList<String>();
+        this.env = new HashMap<String, String>();        
+    }
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#instantiateBatchRunner(java.lang.String, java.lang.String)
      */

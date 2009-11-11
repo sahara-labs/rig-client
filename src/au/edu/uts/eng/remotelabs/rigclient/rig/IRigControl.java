@@ -77,11 +77,11 @@ public interface IRigControl
         COMPLETE,
         /** Invocation failed. */
         FAILED,
+        /** Invocation killed. */
+        ABORTED,
         /** Rig type not supporting batch. */
         NOT_SUPPORTED
     }
-    
-    
     
     /**
      * Starts a batch control invocation with the provided file reference.
