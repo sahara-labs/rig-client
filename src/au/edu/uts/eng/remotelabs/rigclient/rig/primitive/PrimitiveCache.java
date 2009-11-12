@@ -42,11 +42,9 @@
 package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
 
 /**
- * Front controller for the primitive control. Routes a primitive control 
- * requests to the specified controller (a <code>IPrimitiveController</code>
- * instance) and action 
+ * Cache for <code>PrimitiveCache</code> instances.
  */
-public class PrimitiveFront
+public class PrimitiveCache
 {
-
+    
 }

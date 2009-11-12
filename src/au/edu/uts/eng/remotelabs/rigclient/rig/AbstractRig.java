@@ -947,32 +947,27 @@ public abstract class AbstractRig implements IRig
      */
     protected void setMaintenanceFromActionFailure(final IAction action, final ActionType type)
     {
-        String ac = null, errCode = null;
+        String ac = null;
         switch (type)
         {
             case ACCESS:
                 ac = "Session access";
-                errCode = "RC7_Failed_Alloc_Action";
                 break;
             case SLAVE_ACCESS:
                 ac = "Slave access";
-                errCode = ""; // TODO slave access failure error code
                 break;
             case NOTIFY:
                 ac = "Notification";
-                errCode = "RC10_Failed_Notif_Action";
                 break;
             case RESET:
                 ac = "Device reset";
-                errCode = "RC9_Failed_Reset_Action";
                 break;
             case TEST:
                 ac = "Exerciser test";
-                errCode = ""; // TODO exerciser test failure error code
                 break;
         }
         this.logger.error(ac + " action of type " + action.getActionType() + " failed with reason " + 
-                action.getFailureReason() + ". (" + errCode + ")");
+                action.getFailureReason() + ".");
         
         if (this.actionFailureCount.containsKey(action))
         {

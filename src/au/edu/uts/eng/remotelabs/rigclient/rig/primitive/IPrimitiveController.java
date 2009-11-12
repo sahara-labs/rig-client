@@ -42,11 +42,30 @@
 package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
 
 /**
- * Front controller for the primitive control. Routes a primitive control 
- * requests to the specified controller (a <code>IPrimitiveController</code>
- * instance) and action 
+ * Interface for primitive controller classes. Primitive control classes must 
+ * extend this class and provide public methods which may be requested as 
+ * 'actions'. The declaration of these methods must have the following 
+ * signature:
+ * <br />
+ *  &nbsp;&nbsp;&nbsp;&nbsp;<strong>public</strong> <em>PrimitiveResponse</em> 
+ *  <span style="color:red;font-weight:bolder">name</span>Action(<em>PrimitiveRequest</em>)
+ * <br />
+ * Where 'name' is what is requested as the action parameter of a primitive 
+ * control request. If the actions do not follow this signature, then routing
+ * to them will fail.
+ * <br />
+ * The following methods should be implemented in controller class:
+ * <ul>
+ *     <li><strong><code>init</code></strong> - </li>
+ *     <li><strong><code>preRoute</code></strong> - </li>
+ *     <li><strong><code>cleanup</code></strong> - </li>
+ * </ul>
  */
-public class PrimitiveFront
+public interface IPrimitiveController
 {
-
+    public boolean init();
+    
+    public boolean preRoute();
+   
+    public boolean cleanup();
 }

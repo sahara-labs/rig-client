@@ -54,7 +54,7 @@ import java.util.Map;
  *      parameter.</li>
  *      <li><code>__USER__</code> - User name provided as a construction
  *      parameter.</li>
- *      <li>__DAY_OF_MONTH__<code></code> - Day of the month in two digit 
+ *      <li><code>__DAY_OF_MONTH__</code> - Day of the month in two digit 
  *      numerical format.</li>
  *      <li><code>__MONTH__</code> - Month in two digit numerical format.</li>
  *      <li><code>__YEAR__</code> - ISO-8601 year number.</li>

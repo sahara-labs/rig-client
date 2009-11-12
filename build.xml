@@ -211,6 +211,7 @@ Changelog:
 				<include name="**/*.java"/>
 				<exclude name="**/*Tester.java" />
 				<exclude name="**/*TestSuite.java" />
+				<exclude name="**/Mock*.java" />
 			</fileset>
 		</javadoc>
 	</target>
