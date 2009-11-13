@@ -52,20 +52,46 @@ package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
  * <br />
  * Where 'name' is what is requested as the action parameter of a primitive 
  * control request. If the actions do not follow this signature, then routing
- * to them will fail.
+ * to them will fail. Action methods may be either instance or static methods.
  * <br />
  * The following methods should be implemented in controller class:
  * <ul>
- *     <li><strong><code>init</code></strong> - </li>
- *     <li><strong><code>preRoute</code></strong> - </li>
- *     <li><strong><code>cleanup</code></strong> - </li>
+ *     <li><strong><code>initController</code></strong> - Method that is 
+ *     called during instantiation of the controller.</li>
+ *     <li><strong><code>preRoute</code></strong> - Method that is called 
+ *     before routing to an action of this class.</li>
+ *     <li><strong><code>postRoute</code></strong> - Method that is called
+ *     after the completion of the routed action.</li>
+ *     <li><strong><code>cleanup</code></strong> - Method that is called
+ *     when the controller is cleanup up (generally at the termination
+ *     of sessions).</li>
  * </ul>
+ * 
+ * Controller classes have the following life-cycle:
+ * <ol>
+ *     <li>On first request of a controller instance action method, the 
+ *     controller is instantiated and added to the controller cache.</li>
+ *     <li>On the next and subsequent requests of a controller instance 
+ *     action method, the controller instance is recalled and reused to
+ *     run action.</li>
+ *     <li>On termination of the masters rig session, clean up is called
+ *     and the controller instance is discarded.</li>
+ * </ol> 
+ * It is safe to have resources (open files, handles...) as instance fields
+ * provided they are cleaned in the <code>cleanup</code>.
  */
 public interface IPrimitiveController
 {
-    public boolean init();
+    /**
+     * Initialise the controller. 
+     * 
+     * @return
+     */
+    public boolean initController();
     
     public boolean preRoute();
+    
+    public boolean postRoute();
    
     public boolean cleanup();
 }

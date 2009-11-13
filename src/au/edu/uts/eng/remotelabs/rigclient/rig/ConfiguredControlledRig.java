@@ -45,7 +45,9 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner;
 
 /**
- * 
+ * An controlled rig that uses a configured batch runner (i.e. configuration
+ * may be used to specified at run time what to run, what arguments to provide
+ * and what environment variables to set.)
  */
 public class ConfiguredControlledRig extends AbstractControlledRig
 {
@@ -66,7 +68,7 @@ public class ConfiguredControlledRig extends AbstractControlledRig
     {
        // TODO Add action instances using run time configuration. */
        /* DODGY, this should possibly actually Actions using configured class 
-        * of respective classes to add. */
+        * names of respective classes to add. */
     }
 
 }

@@ -42,7 +42,7 @@
 package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
 
 /**
- * Cache for <code>PrimitiveCache</code> instances.
+ * Cache for <code>IPrimitiveController</code> instances.
  */
 public class PrimitiveCache
 {
