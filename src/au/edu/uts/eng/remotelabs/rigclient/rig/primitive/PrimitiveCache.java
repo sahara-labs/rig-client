@@ -41,10 +41,12 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
 
+import java.util.List;
+
 /**
  * Cache for <code>IPrimitiveController</code> instances.
  */
 public class PrimitiveCache
 {
-    
+    private List<IPrimitiveController> cache;
 }

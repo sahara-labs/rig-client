@@ -54,7 +54,8 @@ package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
  * control request. If the actions do not follow this signature, then routing
  * to them will fail. Action methods may be either instance or static methods.
  * <br />
- * The following methods should be implemented in controller class:
+ * The following methods should be implemented in controller classes in
+ * addition to action methods:
  * <ul>
  *     <li><strong><code>initController</code></strong> - Method that is 
  *     called during instantiation of the controller.</li>
@@ -83,15 +84,35 @@ package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
 public interface IPrimitiveController
 {
     /**
-     * Initialise the controller. 
+     * Initialise the controller. This method is run once at instantiation
+     * of the controller. If the return is <code>false</code>, the 
+     * controller is discarded and the primitive control request
+     * fails. The controller instance will not be cached.
      * 
-     * @return
+     * @return true if successful, false otherwise
      */
     public boolean initController();
-    
+
+    /**
+     * Runs before routing of a primitive control request to an action method.
+     * If the return is <code>false</code>, the primitive control request 
+     * fails and the cached controller is discarded.
+     *  
+     * @return true if successful, false otherwise 
+     */
     public boolean preRoute();
     
+    /**
+     * Runs after the completion of an action method. If the return is 
+     * <code>false</code>, the cached controlled is discarded.
+     * 
+     * @return true if successful, false otherwise
+     */
     public boolean postRoute();
    
-    public boolean cleanup();
+    /**
+     * Cleans up the controller. This is run when the cached controller 
+     * instance is discarded.
+     */
+    public void cleanup();
 }
