@@ -79,7 +79,7 @@ package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
  *     and the controller instance is discarded.</li>
  * </ol> 
  * It is safe to have resources (open files, handles...) as instance fields
- * provided they are cleaned in the <code>cleanup</code>.
+ * provided they are cleaned in the <code>cleanup</code> method.
  */
 public interface IPrimitiveController
 {

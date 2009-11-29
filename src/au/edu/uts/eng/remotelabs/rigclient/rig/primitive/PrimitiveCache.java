@@ -41,12 +41,199 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * Cache for <code>IPrimitiveController</code> instances.
  */
 public class PrimitiveCache
 {
-    private List<IPrimitiveController> cache;
+    /** The list of loaded primitive controller instances. */
+    private final Map<String, IPrimitiveController> cache;
+
+    /** Packages where the the primitive controller may reside. */
+    private final List<String> packages;
+
+    /** Logger. */
+    private final ILogger logger;
+
+    /**
+     * Constructor.
+     */
+    public PrimitiveCache()
+    {
+        this.logger = LoggerFactory.getLoggerInstance();
+        this.logger.debug("Created a primitive control cache.");
+        this.cache = new HashMap<String, IPrimitiveController>();
+
+        this.packages = new ArrayList<String>();
+        final String confPrefixes = ConfigFactory.getInstance().getProperty("Package_Prefixes");
+        if (confPrefixes == null)
+        {
+            this.logger.info("No primitive control package prefixes have been loaded from configuration " +
+            "(property Package_Prefixes).");
+        }
+        else
+        {
+            final String[] prefixes = confPrefixes.split(";");
+            for (String prefix : prefixes)
+            {
+                this.logger.info("Loaded primitive controller prefix: " + prefix + ".");
+                this.packages.add(prefix);
+            }
+        }
+    }
+
+    /**
+     * Gets an instance a <code>IPrimitiveController</code> based on the 
+     * provided <code>className</code> parameter. On first request, the 
+     * class is resolved, an instance is created and the 
+     * <code>IPrimitiveController.initController</code> method is called
+     * to initialise the controller. For resolution to succeed:
+     * <ol>
+     *  <li>The provide <code>className</code> is a fully qualified 
+     *  class name or be a class resident in one of the configured 
+     *  packages.</li>
+     *  <li>The class must implement the <code>IPrimitiveController</code>
+     *  interface<li>
+     *  <li>The <code>initController</code> method must succeed, that is 
+     *  return <code>true</code>.
+     * </ol>
+     * 
+     * @param className class to get an instance of
+     * @return instance or null if the name cannot be resolved
+     */
+    public IPrimitiveController getInstance(final String className)
+    {
+        /* First try and find a previously loaded instance. */
+        if (this.cache.containsKey(className))
+        {
+            this.logger.debug("Returning cached primitive controller " + className + ".");
+            return this.cache.get(className);
+        }
+
+        /* Try all the configured packages. */
+        for (String packagePrefix : this.packages)
+        {
+            if (this.cache.containsKey(packagePrefix + className))
+            {
+                this.logger.debug("Returning cached primitive controller " + packagePrefix + className + ".");
+                return this.cache.get(className);
+            }
+        }
+        
+        synchronized (this)
+        {
+            /* Try again in case another thread has loaded the class. */
+            if (this.cache.containsKey(className))
+            {
+                this.logger.debug("Returning cached primitive controller " + className + ".");
+                return this.cache.get(className);
+            }
+            for (String packagePrefix : this.packages)
+            {
+                if (this.cache.containsKey(packagePrefix + className))
+                {
+                    this.logger.debug("Returning cached primitive controller " + packagePrefix + className + ".");
+                    return this.cache.get(className);
+                }
+            }
+             
+            /* Create the controller class, and check if it is the correct type. */
+            IPrimitiveController controller = null;
+            Class<?> controllerClass = null;
+            String controllerName = null;
+
+            /* This is pretty ugly... */
+            try
+            {
+                controllerName = className;
+                controllerClass = Class.forName(controllerName);
+            }
+            catch (ClassNotFoundException e)
+            {
+                this.logger.debug("Class " + className + " not found.");
+                for (String prefix : this.packages)
+                {
+                    try
+                    {
+                        controllerName = prefix + className;
+                        controllerClass = Class.forName(controllerName);
+                        break;
+                    }
+                    catch (ClassNotFoundException ex)
+                    {
+                        this.logger.debug("Class " + prefix + className + " not found.");
+                    }
+                }
+            }
+
+            /* Check if a class was found. */
+            if (controllerClass == null)
+            {
+                this.logger.warn("Unable to load primitive controller " + className + ".");
+                return null;
+            }
+
+            try
+            {
+                final Object obj = controllerClass.newInstance();
+                if (!(obj instanceof IPrimitiveController))
+                {
+                    this.logger.warn("Instantiated class " + controllerClass.getName() + " not an instance of "
+                            + " IPrimitiveController interface. Failing primitive controller resolution.");
+                    return null;
+                }
+
+                controller = (IPrimitiveController)obj;
+                if (!controller.initController())
+                {
+                    this.logger.warn("Primitive controller " + controllerName + " failed initialisation (initController"
+                            + " failed).");
+                    return null;
+                }
+            }
+            catch (InstantiationException e)
+            {
+                this.logger.warn("Failed to create a primitive controller instance of " + controllerClass.getName() 
+                        + " with error " + e.getMessage());
+                return null;
+            }
+            catch (IllegalAccessException e)
+            {
+                this.logger.warn("Failed to create a primitive controller instance of " + controllerClass.getName() +
+                        " due to illegal access exception with message " + e.getMessage() + ".");
+                return null;
+            }
+
+            this.logger.debug("Caching primitive controller " + controllerName + ".");
+            this.cache.put(controllerName, controller);
+            return controller;
+        }
+    }
+
+    /**
+     * Expunges the primitive controller cache. 
+     */
+    public void expungeCache()
+    {
+        this.logger.debug("Expunging the primitive controller cache.");
+        synchronized (this)
+        {
+            for (Entry<String, IPrimitiveController> e : this.cache.entrySet())
+            {
+                this.logger.debug("Cleaning up controller " + e.getKey() + ".");
+                e.getValue().cleanup();
+            }
+            this.cache.clear();
+        }
+    }
 }

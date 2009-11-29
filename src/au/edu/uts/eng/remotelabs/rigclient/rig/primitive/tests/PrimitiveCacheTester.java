@@ -33,20 +33,76 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @author Michael Diponio (mdiponio)
- * @date 12th November 2009
+ * @author <First name> <Last name> (mdiponio)
+ * @date <day> <month> 2009
  *
  * Changelog:
- * - 12/11/2009 - mdiponio - Initial file creation.
+ * - 29/11/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
+package au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+
+import java.lang.reflect.Field;
+
+import junit.framework.TestCase;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveCache;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
 /**
- * Front controller for the primitive control. Routes a primitive control 
- * requests to the specified controller (a <code>IPrimitiveController</code>
- * instance) and action 
+ * Tests the <code>PrimitiveCache</code> class.
  */
-public class PrimitiveFront
+public class PrimitiveCacheTester extends TestCase
 {
-    // TODO
+    /** Object of class under test. */
+    private PrimitiveCache cache;
+    
+    /** Configuration. */
+    private IConfig mockConfig;
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @Override
+    @Before
+    public void setUp() throws Exception
+    {
+        Field field = ConfigFactory.class.getField("instance");
+        this.mockConfig = createMock(IConfig.class);
+        field.set(null, this.mockConfig);
+        
+        this.mockConfig = createMock(IConfig.class);
+        expect(this.mockConfig.getProperty("Logger_Type"))
+            .andReturn("SystemErr");
+        expect(this.mockConfig.getProperty("Log_Level"))
+            .andReturn("INFO");
+        expect(this.mockConfig.getProperty(""))
+            .andReturn("");
+        this.cache = new PrimitiveCache();
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveCache#getInstance(java.lang.String)}.
+     */
+    @Test
+    public void testGetInstance()
+    {
+        fail("Fail!");
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveCache#expungeCache()}.
+     */
+    @Test
+    public void testExpungeCache()
+    {
+        fail("Not yet implemented");
+    }
+
 }
