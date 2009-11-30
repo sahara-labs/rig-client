@@ -121,12 +121,14 @@ public class PrimitiveCache
         }
 
         /* Try all the configured packages. */
+        String controllerName;
         for (String packagePrefix : this.packages)
         {
-            if (this.cache.containsKey(packagePrefix + className))
+            controllerName = this.prependPackage(packagePrefix, className);
+            if (this.cache.containsKey(this.prependPackage(packagePrefix, className)))
             {
                 this.logger.debug("Returning cached primitive controller " + packagePrefix + className + ".");
-                return this.cache.get(className);
+                return this.cache.get(controllerName);
             }
         }
         
@@ -140,17 +142,18 @@ public class PrimitiveCache
             }
             for (String packagePrefix : this.packages)
             {
-                if (this.cache.containsKey(packagePrefix + className))
+                controllerName = this.prependPackage(packagePrefix, className);
+                if (this.cache.containsKey(controllerName))
                 {
                     this.logger.debug("Returning cached primitive controller " + packagePrefix + className + ".");
-                    return this.cache.get(className);
+                    return this.cache.get(controllerName);
                 }
             }
              
             /* Create the controller class, and check if it is the correct type. */
             IPrimitiveController controller = null;
             Class<?> controllerClass = null;
-            String controllerName = null;
+            controllerName = null;
 
             /* This is pretty ugly... */
             try
@@ -165,13 +168,13 @@ public class PrimitiveCache
                 {
                     try
                     {
-                        controllerName = prefix + className;
+                        controllerName = this.prependPackage(prefix, className);
                         controllerClass = Class.forName(controllerName);
                         break;
                     }
                     catch (ClassNotFoundException ex)
                     {
-                        this.logger.debug("Class " + prefix + className + " not found.");
+                        this.logger.debug("Class " + controllerName + " not found.");
                     }
                 }
             }
@@ -235,5 +238,34 @@ public class PrimitiveCache
             }
             this.cache.clear();
         }
+    }
+    
+    /**
+     * Prepends a package to a class to form a valid fully qualified string. 
+     *  
+     * @param pack package 
+     * @param clazz class 
+     * @return valid qualified name
+     */
+    private String prependPackage(String pack, String clazz)
+    {
+        StringBuilder name = new StringBuilder();
+        
+        name.append(pack);
+        if (name.charAt(name.length() - 1) != '.')
+        {
+            name.append('.');
+        }
+        
+        if (clazz.startsWith("."))
+        {
+            name.append(clazz.substring(1));
+        }
+        else
+        {
+            name.append(clazz);
+        }
+        
+        return name.toString();
     }
 }

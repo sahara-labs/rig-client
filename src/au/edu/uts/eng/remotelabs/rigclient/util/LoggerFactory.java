@@ -135,6 +135,15 @@ public class LoggerFactory
     {
         final String type = ConfigFactory.getInstance().getProperty("Logger_Type");
         
+        if (type == null)
+        {
+            System.err.println("FATAL: Failed loading configuration of logger type (Logger_Type).");
+            System.err.println("This specifies the destination of logging messages and is needed for correct" +
+            		" operation of the rig client.");
+            System.err.println("Shutting down...");
+            System.exit(-1);            
+        }
+        
         if (type.equalsIgnoreCase("SystemErr")) return LoggerType.SYSTEM_ERROR;
         else if (type.equalsIgnoreCase("File")) return LoggerType.FILE;
         else if (type.equalsIgnoreCase("RolledFile")) return LoggerType.ROLLED_FILE;
@@ -152,6 +161,15 @@ public class LoggerFactory
     static short getLoggingLevel()
     {
         final String type = ConfigFactory.getInstance().getProperty("Log_Level");
+        if (type == null)
+        {
+            System.err.println("FATAL: Failed loading configuration of logging level (Log_Level).");
+            System.err.println("This specifies the level of logging messages to provide and is needed for correct" +
+            		" operation of the rig client.");
+            System.err.println("Shutting down...");
+            System.exit(-1);
+        }
+            
         
         if (type.equalsIgnoreCase("ERROR")) return ILogger.ERROR;
         else if (type.equalsIgnoreCase("WARN")) return ILogger.WARN;
