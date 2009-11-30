@@ -222,6 +222,40 @@ public class PrimitiveCache
             return controller;
         }
     }
+    
+    /**
+     * Removes a cached instance from the cache.
+     * 
+     * @param className name of the class to remove
+     */
+    public void removeCachedInstance(String className)
+    {
+        this.logger.debug("Removing " + className + " instance from the primitive control cache.");
+        String controllerName;
+        
+        synchronized (this)
+        {
+            /* Try again in case another thread has loaded the class. */
+            if (this.cache.containsKey(className))
+            {
+                this.cache.get(className).cleanup();
+                this.cache.remove(className);                
+            }
+            else
+            {
+                for (String packagePrefix : this.packages)
+                {
+                    controllerName = this.prependPackage(packagePrefix, className);
+                    if (this.cache.containsKey(controllerName))
+                    {
+                        this.cache.get(controllerName).cleanup();
+                        this.cache.remove(controllerName);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Expunges the primitive controller cache. 

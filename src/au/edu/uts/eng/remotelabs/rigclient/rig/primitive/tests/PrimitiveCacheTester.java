@@ -216,6 +216,9 @@ public class PrimitiveCacheTester extends TestCase
        assertEquals(2, newMock.callCount());
     }
     
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveCache#getInstance()}.
+     */
     public void testGetInstanceDifferent()
     {
         IPrimitiveController controller = this.cache.getInstance("MockController");
@@ -237,6 +240,50 @@ public class PrimitiveCacheTester extends TestCase
         assertEquals(3, mock.callCount());
         assertEquals(1, deMock.callCount());
         assertEquals(2, deMock.callCount());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveCache#removeCachedInstance(String)}.
+     */
+    public void testRemoveCachedInstance()
+    {
+        IPrimitiveController controller = this.cache.getInstance("MockController");
+        assertNotNull(controller);
+        
+        IPrimitiveController derived = this.cache.getInstance("DerivedMockController");
+        assertNotNull(derived);
+        
+        assertFalse(controller == derived);
+        assertFalse(derived.equals(controller));
+        assertTrue(controller instanceof MockController);
+        assertTrue(derived instanceof DerivedMockController);
+        
+        MockController mock = (MockController)controller;
+        DerivedMockController deMock = (DerivedMockController)derived;
+        
+        assertEquals(1, mock.callCount());
+        assertEquals(2, mock.callCount());
+        assertEquals(3, mock.callCount());
+        assertEquals(1, deMock.callCount());
+        assertEquals(2, deMock.callCount());
+        
+        this.cache.removeCachedInstance("MockController");
+        IPrimitiveController newController = this.cache.getInstance("MockController");
+        assertNotNull(newController);
+        assertFalse(newController.equals(controller));
+        assertFalse(newController == controller);
+        
+        mock = (MockController)newController;
+        assertEquals(1, mock.callCount());
+        assertEquals(2, mock.callCount());
+        
+        IPrimitiveController sameDerived = this.cache.getInstance("DerivedMockController");
+        assertNotNull(derived);
+        assertTrue(sameDerived.equals(derived));
+        assertTrue(sameDerived == derived);
+        
+        deMock = (DerivedMockController)sameDerived;
+        assertEquals(3, deMock.callCount());
     }
 
     /**

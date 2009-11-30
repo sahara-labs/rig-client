@@ -83,7 +83,7 @@ public class PrimitiveFront
      */
     public PrimitiveResponse routeRequest(final PrimitiveRequest request)
     {
-        final PrimitiveResponse error = new PrimitiveResponse();
+        PrimitiveResponse response = new PrimitiveResponse();
         
         /* --------------------------------------------------------------------
          * ---- 1. Get the requested controller instance. ---------------------
@@ -94,18 +94,18 @@ public class PrimitiveFront
         {
             this.logger.warn("The primitive control requested controller is null. Failing primitive control " +
             		"with signature: " + request.toString() + ".");
-            error.setErrorCode(-1);
-            error.setErrorReason("The requested controller argument is null.");
-            error.setWasSuccessful(false);
-            return error;
+            response.setErrorCode(-1);
+            response.setErrorReason("The requested controller argument is null.");
+            response.setSuccessful(false);
+            return response;
         }
         final IPrimitiveController controller = this.cache.getInstance(controllerName);
         if (controller == null)
         {
-            error.setErrorCode(-2);
-            error.setErrorReason("The requested controller " + controllerName + " not found.");
-            error.setWasSuccessful(false);
-            return error;
+            response.setErrorCode(-2);
+            response.setErrorReason("The requested controller " + controllerName + " not found.");
+            response.setSuccessful(false);
+            return response;
         }
         
         /* --------------------------------------------------------------------
@@ -115,13 +115,27 @@ public class PrimitiveFront
         {
             this.logger.warn("The primitive control requested action is null. Failing primitive control " +
                     "with signature: " + request.toString() + ".");
-            error.setErrorCode(-1);
-            error.setErrorReason("The requested action argument is null.");
-            error.setWasSuccessful(false);
-            return error;
+            response.setErrorCode(-1);
+            response.setErrorReason("The requested action argument is null.");
+            response.setSuccessful(false);
+            return response;
         }
         final String actionName = request.getAction() + "Action";
         this.logger.debug("Requested action is " + actionName + ".");
+        
+        /* --------------------------------------------------------------------
+         * ---- 3. Invoke the preRoute method. --------------------------------
+         * ------------------------------------------------------------------*/
+        if (!controller.preRoute())
+        {
+            this.logger.warn("Calling the pre-routing (preRoute) method on controller " + controllerName + 
+                    " method failed. It's cache instance will be removed.");
+            this.cache.removeCachedInstance(controllerName);
+            response.setErrorCode(-8);
+            response.setErrorReason("preRoute failed.");
+            response.setSuccessful(false);
+            return response;
+        }
         
         try
         {
@@ -129,7 +143,7 @@ public class PrimitiveFront
             this.logger.debug("Found action method has the signature: " + meth.toGenericString());
             
             /* ----------------------------------------------------------------
-             * ---- 3. Invoke the action method. ------------------------------
+             * ---- 4. Invoke the action method. ------------------------------
              * --------------------------------------------------------------*/
             /* Works for both static and instance methods. If it is a static 
              * method the instance parameter is ignored. */
@@ -138,60 +152,72 @@ public class PrimitiveFront
             {
                 /* Success response! */
                 this.logger.debug("Successfully routed and invoked " + actionName + " on " + controllerName + ".");
-                return (PrimitiveResponse)obj;
+                response = (PrimitiveResponse)obj;
             }
-            
-            this.logger.warn("The action " + actionName + " on " + controllerName + " did not provide a " +
-            		"PrimitiveResponse instance as the invocation return.");
-            error.setErrorCode(-6);
-            error.setErrorReason(actionName + " on " + controllerName + " has an invalid signature (must return" +
-            		"a PrimitiveResponse instance).");
-            error.setWasSuccessful(false);
+            else
+            {
+                this.logger.warn("The action " + actionName + " on " + controllerName + " did not provide a " +
+                		"PrimitiveResponse instance as the invocation return.");
+                response.setErrorCode(-6);
+                response.setErrorReason(actionName + " on " + controllerName + " has an invalid signature (must return" +
+                		"a PrimitiveResponse instance).");
+                response.setSuccessful(false);
+            }
         }
         catch (SecurityException e) // Either method not public or no access to the package with which the class resides
         {
             this.logger.warn("Security exception accessing action " + actionName + " on " + controllerName + ".");   
-            error.setErrorCode(-4);
-            error.setErrorReason("Security execption attempting to access " + actionName + " on " + controllerName + ".");
-            error.setWasSuccessful(false);
+            response.setErrorCode(-4);
+            response.setErrorReason("Security execption attempting to access " + actionName + " on " + controllerName + ".");
+            response.setSuccessful(false);
         }
         catch (NoSuchMethodException e) // Method not found
         {
             this.logger.warn("The action " + actionName + " on " + controllerName + " does not exist.");
-            error.setErrorCode(-3);
-            error.setErrorReason("Action method " + actionName + " not found on " + controllerName + ".");
-            error.setWasSuccessful(false);
+            response.setErrorCode(-3);
+            response.setErrorReason("Action method " + actionName + " not found on " + controllerName + ".");
+            response.setSuccessful(false);
         }
         catch (IllegalArgumentException e) // Method does not take a PrimitiveRequest parameter
         {
             this.logger.warn("The action " + actionName + " on " + controllerName + " has an invalid signature." +
             		" Must only take a PrimitiveRequest instance as a parameter.");
-            error.setErrorCode(-6);
-            error.setErrorReason(actionName + " on " + controllerName + " has an invalid signature (must only take" +
+            response.setErrorCode(-6);
+            response.setErrorReason(actionName + " on " + controllerName + " has an invalid signature (must only take" +
             		"a PrimitiveRequest parameter).");
-            error.setWasSuccessful(false);
+            response.setSuccessful(false);
          }
         catch (IllegalAccessException e) // Method not public
         {
             this.logger.warn("Illegally accesing " + actionName + " on " + controllerName + " (" + actionName +
             		" not public).");
-            error.setErrorCode(-5);
-            error.setErrorReason("Illegally accesing " + actionName + " on " + controllerName + " (" + actionName +
+            response.setErrorCode(-5);
+            response.setErrorReason("Illegally accesing " + actionName + " on " + controllerName + " (" + actionName +
             		" not public).");
-            error.setWasSuccessful(false);
+            response.setSuccessful(false);
         }
         catch (InvocationTargetException e) // Method threw an exception
         {
             final Throwable cause = e.getCause();
             this.logger.warn("Action " + actionName + " on " + controllerName + " threw an exception of type: " + 
                     cause.getClass().getName() + " with message: " + cause.getMessage());
-            error.setErrorCode(-7);
-            error.setErrorReason("Action " + actionName + " on " + controllerName + " threw an exception of type " + 
+            response.setErrorCode(-7);
+            response.setErrorReason("Action " + actionName + " on " + controllerName + " threw an exception of type " + 
                     cause.getClass().getName() + " with message: " + cause.getMessage());
-            error.setWasSuccessful(false);
+            response.setSuccessful(false);
         }
+        
+        /* --------------------------------------------------------------------
+         * ---- 5. Invoke postRoute on the controller. ------------------------
+         * ------------------------------------------------------------------*/
+         if (!controller.postRoute())
+         {
+             this.logger.warn("Calling the post-routing (postRoute) method on controller " + controllerName + 
+                     " method failed. It's cache instance will be removed.");
+             this.cache.removeCachedInstance(controllerName);
+         }
             
-        return error;
+        return response;
     }
     
     

@@ -41,19 +41,24 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests;
 
-import static org.junit.Assert.*;
+import java.util.Map;
+
+import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront;
 
 /**
  * Tests the {@link PrimitiveFront} class.
  */
-public class PrimitiveFrontTester
+public class PrimitiveFrontTester extends TestCase
 {
-    
+    /** Object of class under test. */
+    private PrimitiveFront front;
 
     /**
      * @throws java.lang.Exception
@@ -61,6 +66,7 @@ public class PrimitiveFrontTester
     @Before
     public void setUp() throws Exception
     {
+        this.front = new PrimitiveFront();
     }
 
     /**
@@ -69,7 +75,26 @@ public class PrimitiveFrontTester
     @Test
     public void testRouteRequest()
     {
-        fail("Not yet implemented"); // TODO
+       PrimitiveRequest request = new PrimitiveRequest();
+       request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+       request.setAction("test");
+       request.addParameter("param1", "val1");
+       request.addParameter("param2", "val2");
+       request.addParameter("param3", "val3");
+       
+       PrimitiveResponse resp = this.front.routeRequest(request);
+       assertNotNull(resp);
+       assertTrue(resp.wasSuccessful());
+       assertEquals(0, resp.getErrorCode());
+       assertNull(resp.getErrorReason());
+       
+       Map<String, String> res = resp.getResults();
+       assertTrue(res.containsKey("param1"));
+       assertEquals("val1", res.get("param1"));
+       assertTrue(res.containsKey("param1"));
+       assertEquals("val2", res.get("param2"));
+       assertTrue(res.containsKey("param1"));
+       assertEquals("val3", res.get("param3"));
     }
 
     /**

@@ -39,6 +39,7 @@
  * Changelog:
  * - 05/10/2009 - mdiponio - Initial file creation.
  * - 22/10/2009 - mdiponio - Fixed BatchState enum Javadoc.
+ * - 30/11/2009 - mdiponio - Doc fixes and error code list.
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
@@ -50,17 +51,19 @@ import java.util.Map;
 /**
  * Interface for rig client control. Rig client provide control takes
  * two forms:
- *   - Batch control - invocation of a background process with an unloaded
- *          instruction file. Batch control is singular and may be polled for 
- *          run status and aborted once started.  A previously started batch
- *          invocation will block subsequent batch requests until it is 
- *          finished.
- *   - Primitive control - synchronous control of rig devices. Primitive 
- *          control uses the <em>Front Controller</em> pattern to call a
- *          method (the request action) on class (the request controller).
- *          If the requested method is an instance method (instance based), the
- *          controller is <em>lazy loaded</em> on first request and cleaned up
- *          at the end of the master users session.  
+ * <ul>
+ *   <li><strong>Batch control</strong> - invocation of a background process
+ *   with an transmitted instruction file. Batch control is singular and may  
+ *   be polled for run status and aborted once started.  A previously started
+ *   batch invocation will block subsequent batch requests until it is 
+ *   finished.</li>
+ *   <li><strong>Primitive control</strong> - synchronous control of rig 
+ *   devices. Primitive control uses the <em>Front Controller</em> pattern 
+ *   to call a method (the request action) on class (the request controller).
+ *   If the requested method is an instance method (instance based), the
+ *   controller is <em>lazy loaded</em> on first request and cleaned up
+ *   at the end of the master users session.</li>  
+ *<ul>
  */
 public interface IRigControl
 {
@@ -310,7 +313,7 @@ public interface IRigControl
          */
         public PrimitiveRequest () 
         { 
-            /* Does nothing. */
+            this.parameters = new HashMap<String, String>();
         }
         
         /**
@@ -402,8 +405,11 @@ public interface IRigControl
     }
     
     /**
-     * Primitive control response. Reserved error codes are:
+     * Primitive control response. Generally <code>0</code> should be used for
+     * no error, negative error codes for routing errors and positive error
+     * codes for action method errors. Formally reserved error codes are:
      * <ul>
+     *  <li><code>0</code>: No error</li>
      *  <li><code>-1</code>: Illegal controller or action argument.</li>
      *  <li><code>-2</code>: Controller class not found.</li>
      *  <li><code>-3</code>: Action method not found.<li>
@@ -413,6 +419,7 @@ public interface IRigControl
      *  <li><code>-6</code>: Invalid action signature (does not take, and only 
      *  take a <code>PrimitiveRequest</code> parameter.</li>
      *  <li><code>-7</code>: Action has thrown an exception.</li>
+     *  <li><code>-8</code>: The <code>preRoute</code> method failed.</li>
      * <ul>
      */
     public class PrimitiveResponse
@@ -437,7 +444,7 @@ public interface IRigControl
         /**
          * @return the wasSuccessful
          */
-        public boolean isWasSuccessful()
+        public boolean wasSuccessful()
         {
             return this.wasSuccessful;
         }
@@ -445,7 +452,7 @@ public interface IRigControl
         /**
          * @param wasSuccessful the wasSuccessful to set
          */
-        public void setWasSuccessful(boolean wasSuccessful)
+        public void setSuccessful(boolean wasSuccessful)
         {
             this.wasSuccessful = wasSuccessful;
         }
@@ -473,6 +480,15 @@ public interface IRigControl
         public void addResult(String name, String value)
         {
             this.results.put(name, value);
+        }
+        
+        /**
+         * @param name the name of the value to get
+         * @return the value
+         */
+        public String getResult(String name)
+        {
+            return this.results.get(name);
         }
 
         /**

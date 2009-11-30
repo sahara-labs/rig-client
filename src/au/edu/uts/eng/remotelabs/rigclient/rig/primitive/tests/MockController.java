@@ -41,6 +41,8 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.IPrimitiveController;
 
 /**
@@ -92,6 +94,21 @@ public class MockController implements IPrimitiveController
     public boolean preRoute()
     {
         return true;
+    }
+    
+    /**
+     * Test action.
+     * 
+     * @param req request
+     * @return response
+     */
+    public PrimitiveResponse testAction(PrimitiveRequest req)
+    {
+        PrimitiveResponse response = new PrimitiveResponse();
+        response.setErrorCode(0);
+        response.setSuccessful(true);
+        response.setResults(req.getParameters()); 
+        return response;
     }
     
     /**
