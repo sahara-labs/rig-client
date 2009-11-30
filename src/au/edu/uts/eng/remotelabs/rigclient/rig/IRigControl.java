@@ -383,10 +383,37 @@ public interface IRigControl
         {
             this.parameters.put(param, val);
         }
+        
+        /**
+         * String representation of this class.
+         */
+        @Override
+        public String toString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Controller:");
+            builder.append(this.controller);
+            builder.append(", Action:");
+            builder.append(this.action);
+            builder.append(", Params:");
+            builder.append(this.parameters.toString());
+            return builder.toString();
+        }
     }
     
     /**
-     * Primitive control response.
+     * Primitive control response. Reserved error codes are:
+     * <ul>
+     *  <li><code>-1</code>: Illegal controller or action argument.</li>
+     *  <li><code>-2</code>: Controller class not found.</li>
+     *  <li><code>-3</code>: Action method not found.<li>
+     *  <li><code>-4</code>: Security exception accessing action.<li>
+     *  <li><code>-5</code>: Illegal access to the action (the action 
+     *  method is not public).</li>
+     *  <li><code>-6</code>: Invalid action signature (does not take, and only 
+     *  take a <code>PrimitiveRequest</code> parameter.</li>
+     *  <li><code>-7</code>: Action has thrown an exception.</li>
+     * <ul>
      */
     public class PrimitiveResponse
     {
@@ -478,6 +505,24 @@ public interface IRigControl
         public void setErrorReason(String errorReason)
         {
             this.errorReason = errorReason;
+        }
+        
+        /**
+         * String representation of this class.
+         */
+        @Override
+        public String toString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Successful:");
+            builder.append(this.wasSuccessful ? "true" : "false");
+            builder.append(", Results:");
+            builder.append(this.results.toString());
+            builder.append(", Error Code:");
+            builder.append(this.errorCode);
+            builder.append(", Error reason:");
+            builder.append(this.errorReason);
+            return builder.toString();
         }
     }
 }

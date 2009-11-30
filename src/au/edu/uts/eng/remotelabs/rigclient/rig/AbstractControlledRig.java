@@ -42,6 +42,7 @@
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
+import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront;
 
 /**
  * Abstract rig type class for rigs which provide direct control of the 
@@ -52,14 +53,26 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     /** Batch runner. */
     private AbstractBatchRunner runner;
     
+    /** Primitive front controller. */
+    private PrimitiveFront front;
+    
+    /**
+     * Constructor.
+     */
+    public AbstractControlledRig()
+    {
+        this.front = new PrimitiveFront();
+    }
+    
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#performPrimitive(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)
      */
     @Override
     public PrimitiveResponse performPrimitive(final PrimitiveRequest req)
     {
-        // TODO Auto-generated method stub
-        return null;
+        this.logger.debug("Performing a primitive control operation with the following signature: controller:" + 
+                req.getController() + ", method: " + req.getAction() + ".");
+        return this.front.routeRequest(req);
     }
     
     /* 
@@ -68,8 +81,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     @Override
     public void expungePrimitiveControllerCache()
     {
-        // TODO Auto-generated method stub
-        
+        this.front.expungeCache();
     }
     
     /* 
