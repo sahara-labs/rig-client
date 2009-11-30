@@ -99,7 +99,7 @@ public class PrimitiveFront
             error.setWasSuccessful(false);
             return error;
         }
-        IPrimitiveController controller = this.cache.getInstance(controllerName);
+        final IPrimitiveController controller = this.cache.getInstance(controllerName);
         if (controller == null)
         {
             error.setErrorCode(-2);
@@ -125,7 +125,7 @@ public class PrimitiveFront
         
         try
         {
-            Method meth = controller.getClass().getMethod(actionName, PrimitiveRequest.class);
+            final Method meth = controller.getClass().getMethod(actionName, PrimitiveRequest.class);
             this.logger.debug("Found action method has the signature: " + meth.toGenericString());
             
             /* ----------------------------------------------------------------
@@ -133,7 +133,7 @@ public class PrimitiveFront
              * --------------------------------------------------------------*/
             /* Works for both static and instance methods. If it is a static 
              * method the instance parameter is ignored. */
-            Object obj = meth.invoke(controller, request);
+            final Object obj = meth.invoke(controller, request);
             if (obj instanceof PrimitiveResponse)
             {
                 /* Success response! */
@@ -173,16 +173,16 @@ public class PrimitiveFront
          }
         catch (IllegalAccessException e) // Method not public
         {
-            this.logger.warn("Illegally accesing " + actionName + " on " + controllerName + " (" + actionName + "" +
+            this.logger.warn("Illegally accesing " + actionName + " on " + controllerName + " (" + actionName +
             		" not public).");
             error.setErrorCode(-5);
-            error.setErrorReason("Illegally accesing " + actionName + " on " + controllerName + " (" + actionName + "" +
+            error.setErrorReason("Illegally accesing " + actionName + " on " + controllerName + " (" + actionName +
             		" not public).");
             error.setWasSuccessful(false);
         }
         catch (InvocationTargetException e) // Method threw an exception
         {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             this.logger.warn("Action " + actionName + " on " + controllerName + " threw an exception of type: " + 
                     cause.getClass().getName() + " with message: " + cause.getMessage());
             error.setErrorCode(-7);
