@@ -179,7 +179,7 @@ public class PrimitiveFront
             response.setSuccessful(false);
         }
         catch (IllegalArgumentException e) // Method does not take a PrimitiveRequest parameter
-        {
+        {                                  // Unlikely because resolution should fail
             this.logger.warn("The action " + actionName + " on " + controllerName + " has an invalid signature." +
             		" Must only take a PrimitiveRequest instance as a parameter.");
             response.setErrorCode(-6);

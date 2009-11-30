@@ -112,12 +112,70 @@ public class MockController implements IPrimitiveController
     }
     
     /**
+     * Test static action.
+     * 
+     * @param req
+     * @return
+     */
+    public static PrimitiveResponse testStaticAction(PrimitiveRequest req)
+    {
+        PrimitiveResponse resp = new PrimitiveResponse();
+        resp.setErrorCode(0);
+        resp.setSuccessful(true);
+        resp.setResults(req.getParameters());
+        return resp;
+    }
+    
+    /**
+     * Throws exception 
+     * 
+     * @return
+     * @throws Exception
+     */
+    public PrimitiveResponse exceptionAction(PrimitiveRequest req) throws Exception
+    {
+        throw new Exception("An exception.");
+    }
+    
+    /**
+     * Wrong sig action
+     * 
+     * @param req request
+     * @return response
+     */
+    public PrimitiveRequest wrongSigAction(PrimitiveRequest req)
+    {
+        return req;
+    }
+
+    
+    /**
+     * Test action with wrong signature - wrong parameter.
+     * 
+     * @param wrong *wrong*!
+     * @return wrong...
+     */
+    public PrimitiveResponse wrongParamSigAction(PrimitiveResponse wrong)
+    {
+        return wrong;
+    }
+    
+    /**
      * Count to ensure the instance is the same instance.
      * @return
      */
     public int callCount()
     {
-        return ++count;
+        return ++this.count;
+    }
+    
+    public PrimitiveResponse callCountAction(PrimitiveRequest req)
+    {
+        PrimitiveResponse resp = new PrimitiveResponse();
+        resp.setErrorCode(0);
+        resp.setSuccessful(true);
+        resp.addResult("count", String.valueOf(++this.count));
+        return resp;
     }
 
     /**

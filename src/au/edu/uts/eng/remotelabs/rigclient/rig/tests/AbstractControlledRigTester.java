@@ -51,6 +51,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -60,6 +61,8 @@ import org.junit.Test;
 import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchResults;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
@@ -82,6 +85,8 @@ public class AbstractControlledRigTester extends TestCase
     public void setUp() throws Exception
     {
         this.mockConfig = createMock(IConfig.class);
+        expect(this.mockConfig.getProperty("Package_Prefixes"))
+            .andReturn("");
         expect(this.mockConfig.getProperty("Logger_Type"))
             .andReturn("SystemErr");
         expect(this.mockConfig.getProperty("Log_Level"))
@@ -104,7 +109,26 @@ public class AbstractControlledRigTester extends TestCase
     @Test
     public void testPerformPrimitive()
     {
-        fail("Not yet implemented"); // TODO
+        PrimitiveRequest request = new PrimitiveRequest();
+        request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        request.setAction("test");
+        request.addParameter("param1", "val1");
+        request.addParameter("param2", "val2");
+        request.addParameter("param3", "val3");
+        
+        PrimitiveResponse resp = this.rig.performPrimitive(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        
+        Map<String, String> res = resp.getResults();
+        assertTrue(res.containsKey("param1"));
+        assertEquals("val1", res.get("param1"));
+        assertTrue(res.containsKey("param1"));
+        assertEquals("val2", res.get("param2"));
+        assertTrue(res.containsKey("param1"));
+        assertEquals("val3", res.get("param3"));
     }
     
     /**
@@ -113,7 +137,39 @@ public class AbstractControlledRigTester extends TestCase
     @Test
     public void testExpungePrimitiveControllerCache()
     {
-        fail("Not yet implemented"); // TODO
+        PrimitiveRequest request = new PrimitiveRequest();
+        request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        request.setAction("callCount");
+
+        PrimitiveResponse resp = this.rig.performPrimitive(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(1, Integer.parseInt(resp.getResult("count")));
+        
+        resp = this.rig.performPrimitive(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(2, Integer.parseInt(resp.getResult("count")));
+        
+        resp = this.rig.performPrimitive(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(3, Integer.parseInt(resp.getResult("count")));
+        
+        this.rig.expungePrimitiveControllerCache();
+        
+        resp = this.rig.performPrimitive(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(1, Integer.parseInt(resp.getResult("count")));
     }
 
     /**

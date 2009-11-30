@@ -76,7 +76,7 @@ public class PrimitiveCache
 
         this.packages = new ArrayList<String>();
         final String confPrefixes = ConfigFactory.getInstance().getProperty("Package_Prefixes");
-        if (confPrefixes == null)
+        if (confPrefixes == null || confPrefixes.equals(""))
         {
             this.logger.info("No primitive control package prefixes have been loaded from configuration " +
             "(property Package_Prefixes).");

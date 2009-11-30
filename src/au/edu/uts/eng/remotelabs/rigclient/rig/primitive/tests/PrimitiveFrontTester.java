@@ -63,6 +63,7 @@ public class PrimitiveFrontTester extends TestCase
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -96,14 +97,172 @@ public class PrimitiveFrontTester extends TestCase
        assertTrue(res.containsKey("param1"));
        assertEquals("val3", res.get("param3"));
     }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront#routeRequest(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)}.
+     */
+    @Test
+    public void testRouteRequestStatic()
+    {
+       PrimitiveRequest request = new PrimitiveRequest();
+       request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+       request.setAction("testStatic");
+       request.addParameter("param1", "val1");
+       request.addParameter("param2", "val2");
+       request.addParameter("param3", "val3");
+       
+       PrimitiveResponse resp = this.front.routeRequest(request);
+       assertNotNull(resp);
+       assertTrue(resp.wasSuccessful());
+       assertEquals(0, resp.getErrorCode());
+       assertNull(resp.getErrorReason());
+       
+       Map<String, String> res = resp.getResults();
+       assertTrue(res.containsKey("param1"));
+       assertEquals("val1", res.get("param1"));
+       assertTrue(res.containsKey("param1"));
+       assertEquals("val2", res.get("param2"));
+       assertTrue(res.containsKey("param1"));
+       assertEquals("val3", res.get("param3"));
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront#routeRequest(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)}.
+     */
+    @Test
+    public void testRouteRequestException()
+    {
+       PrimitiveRequest request = new PrimitiveRequest();
+       request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+       request.setAction("exception");
+       
+       PrimitiveResponse resp = this.front.routeRequest(request);
+       assertNotNull(resp);
+       assertFalse(resp.wasSuccessful());
+       assertEquals(-7, resp.getErrorCode());
+       assertNotNull(resp.getErrorReason());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront#routeRequest(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)}.
+     */
+    @Test
+    public void testRouteRequestNotExistentController()
+    {
+       PrimitiveRequest request = new PrimitiveRequest();
+       request.setController("FooController");
+       request.setAction("test");
+       request.addParameter("param1", "val1");
+       request.addParameter("param2", "val2");
+       request.addParameter("param3", "val3");
+       
+       PrimitiveResponse resp = this.front.routeRequest(request);
+       assertNotNull(resp);
+       assertFalse(resp.wasSuccessful());
+       assertEquals(-2, resp.getErrorCode());
+       assertNotNull(resp.getErrorReason());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront#routeRequest(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)}.
+     */
+    @Test
+    public void testRouteRequestNotExistentAction()
+    {
+       PrimitiveRequest request = new PrimitiveRequest();
+       request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+       request.setAction("foo");
+       request.addParameter("param1", "val1");
+       request.addParameter("param2", "val2");
+       request.addParameter("param3", "val3");
+       
+       PrimitiveResponse resp = this.front.routeRequest(request);
+       assertNotNull(resp);
+       assertFalse(resp.wasSuccessful());
+       assertEquals(-3, resp.getErrorCode());
+       assertNotNull(resp.getErrorReason());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront#routeRequest(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)}.
+     */
+    @Test
+    public void testRouteRequestWrongParamSigAction()
+    {
+       PrimitiveRequest request = new PrimitiveRequest();
+       request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+       request.setAction("wrongParamSig");
+       request.addParameter("param1", "val1");
+       request.addParameter("param2", "val2");
+       request.addParameter("param3", "val3");
+       
+       PrimitiveResponse resp = this.front.routeRequest(request);
+       assertNotNull(resp);
+       assertFalse(resp.wasSuccessful());
+       assertEquals(-3, resp.getErrorCode()); //Not found because invalid sig
+       assertNotNull(resp.getErrorReason());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront#routeRequest(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)}.
+     */
+    @Test
+    public void testRouteRequestWrongResponseSigAction()
+    {
+       PrimitiveRequest request = new PrimitiveRequest();
+       request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+       request.setAction("wrongSig");
+       request.addParameter("param1", "val1");
+       request.addParameter("param2", "val2");
+       request.addParameter("param3", "val3");
+       
+       PrimitiveResponse resp = this.front.routeRequest(request);
+       assertNotNull(resp);
+       assertFalse(resp.wasSuccessful());
+       assertEquals(-6, resp.getErrorCode());
+       assertNotNull(resp.getErrorReason());
+    }
 
+    
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront#expungeCache()}.
      */
     @Test
     public void testExpungeCache()
     {
-        fail("Not yet implemented"); // TODO
+        PrimitiveRequest request = new PrimitiveRequest();
+        request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        request.setAction("callCount");
+
+        PrimitiveResponse resp = this.front.routeRequest(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(1, Integer.parseInt(resp.getResult("count")));
+        
+        resp = this.front.routeRequest(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(2, Integer.parseInt(resp.getResult("count")));
+        
+        resp = this.front.routeRequest(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(3, Integer.parseInt(resp.getResult("count")));
+        
+        this.front.expungeCache();
+        
+        resp = this.front.routeRequest(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(1, Integer.parseInt(resp.getResult("count")));
     }
 
 }
