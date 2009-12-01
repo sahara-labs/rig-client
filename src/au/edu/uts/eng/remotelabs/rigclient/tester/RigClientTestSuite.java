@@ -53,6 +53,8 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.PrimitiveCacheTes
 import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.PrimitiveFrontTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractControlledRigTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractRigTester;
+import au.edu.uts.eng.remotelabs.rigclient.rig.tests.ConfiguredControlledRigTester;
+import au.edu.uts.eng.remotelabs.rigclient.rig.tests.ConfiguredRigTester;
 import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
 
 /**
@@ -60,6 +62,8 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    ConfiguredRigTester.class,
+    ConfiguredControlledRigTester.class,
     ConfiguredBatchRunnerTester.class,
     PrimitiveFrontTester.class,
     PrimitiveCacheTester.class,
