@@ -39,7 +39,7 @@
  * Changelog:
  * - 08/11/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.rig.control.tests;
+package au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests;
 
 
 import java.io.File;
@@ -55,7 +55,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.rig.control.DirectoryZipper;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryZipper;
 
 /**
  * Tests the <code>DirectoryZipper</code> class.
@@ -76,7 +76,7 @@ public class DirectoryZipperTester extends TestCase
     }
 
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.DirectoryZipper#compressDirectory(String, String)}
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryZipper#compressDirectory(String, String)}
      */
     @Test
     public void testCompressDirectory()
@@ -121,7 +121,7 @@ public class DirectoryZipperTester extends TestCase
     }
     
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.DirectoryZipper#compressDirectory(String, String)}
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryZipper#compressDirectory(String, String)}
      */
     @Test
     public void testCompressDirectoryNoZip()

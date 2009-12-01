@@ -53,14 +53,14 @@ package au.edu.uts.eng.remotelabs.rigclient.rig;
  *              support the operating needs of the rig.</li>
  *    <li>Hardware (pistons, actuators, solenoids, motors) - can be the hardware
  *              be commanded to be perform its desired actions.</li>
- *    <li>ensor (LVDS, magnetostrictive, temperature, time) - does a movement 
- *              of the hardware generated the desired measurable result
- *              with the tolerance of the sensors.</li>
+ *    <li>Sensor (LVDS, magnetostrictive, temperature, time) - does a movement 
+ *              of the hardware generate the desired measurable results
+ *              within a tolerance of the expected results.</li>
  * </ul>
  *  
  * The <code>setInterval</code> method provides an indication of how often the
- * test should run, but the test implementor has discretion to either honour
- * or ignore the test interval. It is suggested tests which provide a noticeable
+ * test should run and the test implementor has discretion to either honour
+ * or ignore the test interval. It is suggested, tests which provide a noticeable
  * affect or yield the rig should run at the test interval period, tests which
  * do not, should run often to detect errors and problems at the earliest
  * possible time.

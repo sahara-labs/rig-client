@@ -47,6 +47,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryCopier;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryZipper;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.MacroSubstituter;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
 

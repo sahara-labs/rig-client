@@ -114,4 +114,33 @@ public class RigClientDefines
         System.out.println();
         System.out.println("################################################################################");
     }
+    
+    /**
+     * Prepends a package to a class to form a valid fully qualified string. 
+     *  
+     * @param pack package 
+     * @param clazz class 
+     * @return valid qualified name
+     */
+    public static String prependPackage(String pack, String clazz)
+    {
+        StringBuilder name = new StringBuilder();
+        
+        name.append(pack);
+        if (name.charAt(name.length() - 1) != '.')
+        {
+            name.append('.');
+        }
+        
+        if (clazz.startsWith("."))
+        {
+            name.append(clazz.substring(1));
+        }
+        else
+        {
+            name.append(clazz);
+        }
+        
+        return name.toString();
+    }
 }

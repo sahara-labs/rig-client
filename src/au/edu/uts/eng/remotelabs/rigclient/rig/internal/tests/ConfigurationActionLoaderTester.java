@@ -34,45 +34,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date 16th October 2009
+ * @date <day> <month> 2009
  *
  * Changelog:
- * - 16/10/2009 - mdiponio - Initial file creation.
+ * - 01/12/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.tester;
+package au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import junit.framework.TestCase;
 
-import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.DirectoryCopierTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.DirectoryZipperTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.MacroSubstituerTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.PrimitiveCacheTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.PrimitiveFrontTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractControlledRigTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractRigTester;
-import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
+import org.junit.Before;
+import org.junit.Test;
+
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.ConfigurationActionLoader;
 
 /**
- * Runs all the Rig Client unit tests.
+ * Tests the {@link ConfigurationActionLoader} class.
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    ConfiguredBatchRunnerTester.class,
-    PrimitiveFrontTester.class,
-    PrimitiveCacheTester.class,
-    DirectoryCopierTester.class,
-    DirectoryZipperTester.class,
-    MacroSubstituerTester.class,
-    AbstractBatchRunnerTester.class,
-    AbstractControlledRigTester.class,
-    AbstractRigTester.class,
-    ConfiguredBatchRunnerTester.class,
-    PropertiesConfigTester.class
-})
-public class RigClientTestSuite
+public class ConfigurationActionLoaderTester extends TestCase
 {
-    // Does nothing...
+    /** Object of class under test. */
+    private ConfigurationActionLoader loader;
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @Before
+    public void setUp() throws Exception
+    {
+        /* Replace the default configuration class. */
+        
+        this.loader = new ConfigurationActionLoader();
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.ConfigurationActionLoader#getConfiguredActions(au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType)}.
+     */
+    @Test
+    public void testGetConfiguredActions()
+    {
+        fail("Not yet implemented"); // TODO
+    }
+
 }

@@ -39,7 +39,7 @@
  * Changelog:
  * - 08/11/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.rig.control.tests;
+package au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +49,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.rig.control.DirectoryCopier;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryCopier;
 
 /**
  * Tests the <code>DirectoryCopier</code> class.
@@ -70,7 +70,7 @@ public class DirectoryCopierTester extends TestCase
     }
 
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.DirectoryCopier#copyDirectory(java.lang.String, java.lang.String)}.
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryCopier#copyDirectory(java.lang.String, java.lang.String)}.
      */
     @Test
     public void testCopyDirectory() throws IOException
@@ -90,7 +90,7 @@ public class DirectoryCopierTester extends TestCase
     }
     
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.DirectoryCopier#recursiveCopy(String, String)}
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryCopier#recursiveCopy(String, String)}
      */
     @Test
     public void testRecursiveCopy()
@@ -117,7 +117,7 @@ public class DirectoryCopierTester extends TestCase
     }
 
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.DirectoryCopier#copyFile(java.io.File, java.io.File)}.
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryCopier#copyFile(java.io.File, java.io.File)}.
      */
     @Test
     public void testCopyFile()

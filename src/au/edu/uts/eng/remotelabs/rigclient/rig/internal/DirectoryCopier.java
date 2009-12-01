@@ -39,7 +39,7 @@
  * Changelog:
  * - 08/11/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.rig.control;
+package au.edu.uts.eng.remotelabs.rigclient.rig.internal;
 
 import java.io.File;
 import java.io.FileInputStream;

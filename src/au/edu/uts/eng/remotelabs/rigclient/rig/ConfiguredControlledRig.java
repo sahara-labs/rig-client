@@ -43,6 +43,7 @@ package au.edu.uts.eng.remotelabs.rigclient.rig;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.ConfigurationActionLoader;
 
 /**
  * An controlled rig that uses a configured batch runner (i.e. configuration
@@ -66,9 +67,44 @@ public class ConfiguredControlledRig extends AbstractControlledRig
     @Override
     protected void init()
     {
-       // TODO Add action instances using run time configuration. */
-       /* DODGY, this should possibly actually Actions using configured class 
-        * names of respective classes to add. */
+        /* DODGY This is unfortunately a copy/paste job from ConfiguredControlledRig.init. */
+        final ConfigurationActionLoader loader = new ConfigurationActionLoader();
+
+        /* Access actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.ACCESS))
+        {
+            this.registerAction(action, ActionType.ACCESS);
+        }
+
+        /* Slave access actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.SLAVE_ACCESS))
+        {
+            this.registerAction(action, ActionType.SLAVE_ACCESS);
+        }
+
+        /* Notification actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.NOTIFY))
+        {
+            this.registerAction(action, ActionType.NOTIFY);
+        }
+
+        /* Reset actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.RESET))
+        {
+            this.registerAction(action, ActionType.RESET);
+        }
+
+        /* Test actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.TEST))
+        {
+            this.registerAction(action, ActionType.TEST);
+        }
+
+        /* Activity detection actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.DETECT))
+        {
+            this.registerAction(action, ActionType.DETECT);
+        }
     }
 
 }

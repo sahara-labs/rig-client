@@ -39,7 +39,7 @@
  * Changelog:
  * - 05/11/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.rig.control;
+package au.edu.uts.eng.remotelabs.rigclient.rig.internal;
 
 import java.util.Calendar;
 import java.util.HashMap;

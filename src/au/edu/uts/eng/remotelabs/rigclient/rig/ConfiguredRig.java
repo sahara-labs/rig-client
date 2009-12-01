@@ -34,45 +34,65 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date 16th October 2009
+ * @date 1st December 2009
  *
  * Changelog:
- * - 16/10/2009 - mdiponio - Initial file creation.
+ * - 01/12/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.tester;
+package au.edu.uts.eng.remotelabs.rigclient.rig;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
-import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.DirectoryCopierTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.DirectoryZipperTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.MacroSubstituerTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.PrimitiveCacheTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.PrimitiveFrontTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractControlledRigTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractRigTester;
-import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.ConfigurationActionLoader;
 
 /**
- * Runs all the Rig Client unit tests.
+ * Rig type which loads action classes from configuration.
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    ConfiguredBatchRunnerTester.class,
-    PrimitiveFrontTester.class,
-    PrimitiveCacheTester.class,
-    DirectoryCopierTester.class,
-    DirectoryZipperTester.class,
-    MacroSubstituerTester.class,
-    AbstractBatchRunnerTester.class,
-    AbstractControlledRigTester.class,
-    AbstractRigTester.class,
-    ConfiguredBatchRunnerTester.class,
-    PropertiesConfigTester.class
-})
-public class RigClientTestSuite
+public class ConfiguredRig extends AbstractRig
 {
-    // Does nothing...
+
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig#init()
+     */
+    @Override
+    protected void init()
+    {
+        /* DODGY Unfortunately this is replicated in ConfiguredControlledRig.init. */
+        final ConfigurationActionLoader loader = new ConfigurationActionLoader();
+        
+        /* Access actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.ACCESS))
+        {
+            this.registerAction(action, ActionType.ACCESS);
+        }
+        
+        /* Slave access actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.SLAVE_ACCESS))
+        {
+            this.registerAction(action, ActionType.SLAVE_ACCESS);
+        }
+        
+        /* Notification actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.NOTIFY))
+        {
+            this.registerAction(action, ActionType.NOTIFY);
+        }
+        
+        /* Reset actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.RESET))
+        {
+            this.registerAction(action, ActionType.RESET);
+        }
+        
+        /* Test actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.TEST))
+        {
+            this.registerAction(action, ActionType.TEST);
+        }
+        
+        /* Activity detection actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.DETECT))
+        {
+            this.registerAction(action, ActionType.DETECT);
+        }
+    }
+
 }

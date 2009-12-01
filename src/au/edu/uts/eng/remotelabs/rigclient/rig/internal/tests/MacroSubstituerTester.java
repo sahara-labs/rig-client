@@ -39,7 +39,7 @@
  * Changelog:
  * - 06/11/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.rig.control.tests;
+package au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests;
 
 import java.lang.reflect.Method;
 import java.util.Calendar;
@@ -48,7 +48,7 @@ import junit.framework.TestCase;
 
 import org.junit.Before;
 
-import au.edu.uts.eng.remotelabs.rigclient.rig.control.MacroSubstituter;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.MacroSubstituter;
 
 /**
  * Tests the macro substituter class.
@@ -87,7 +87,7 @@ public class MacroSubstituerTester extends TestCase
     }
     
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.MacroSubstituter#addLeadingZeros}
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.MacroSubstituter#addLeadingZeros}
      */
     public void testAddLeadingZeros()
     {
@@ -111,7 +111,7 @@ public class MacroSubstituerTester extends TestCase
     }
     
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.MacroSubstituter#substituteMacros(String)}
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.MacroSubstituter#substituteMacros(String)}
      */
     public void testSubstitute()
     {

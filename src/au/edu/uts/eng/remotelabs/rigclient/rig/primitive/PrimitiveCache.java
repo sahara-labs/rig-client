@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import au.edu.uts.eng.remotelabs.rigclient.main.RigClientDefines;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
@@ -124,8 +125,8 @@ public class PrimitiveCache
         String controllerName;
         for (String packagePrefix : this.packages)
         {
-            controllerName = this.prependPackage(packagePrefix, className);
-            if (this.cache.containsKey(this.prependPackage(packagePrefix, className)))
+            controllerName = RigClientDefines.prependPackage(packagePrefix, className);
+            if (this.cache.containsKey(RigClientDefines.prependPackage(packagePrefix, className)))
             {
                 this.logger.debug("Returning cached primitive controller " + packagePrefix + className + ".");
                 return this.cache.get(controllerName);
@@ -142,7 +143,7 @@ public class PrimitiveCache
             }
             for (String packagePrefix : this.packages)
             {
-                controllerName = this.prependPackage(packagePrefix, className);
+                controllerName = RigClientDefines.prependPackage(packagePrefix, className);
                 if (this.cache.containsKey(controllerName))
                 {
                     this.logger.debug("Returning cached primitive controller " + packagePrefix + className + ".");
@@ -168,7 +169,7 @@ public class PrimitiveCache
                 {
                     try
                     {
-                        controllerName = this.prependPackage(prefix, className);
+                        controllerName = RigClientDefines.prependPackage(prefix, className);
                         controllerClass = Class.forName(controllerName);
                         break;
                     }
@@ -245,7 +246,7 @@ public class PrimitiveCache
             {
                 for (String packagePrefix : this.packages)
                 {
-                    controllerName = this.prependPackage(packagePrefix, className);
+                    controllerName = RigClientDefines.prependPackage(packagePrefix, className);
                     if (this.cache.containsKey(controllerName))
                     {
                         this.cache.get(controllerName).cleanup();
@@ -272,34 +273,5 @@ public class PrimitiveCache
             }
             this.cache.clear();
         }
-    }
-    
-    /**
-     * Prepends a package to a class to form a valid fully qualified string. 
-     *  
-     * @param pack package 
-     * @param clazz class 
-     * @return valid qualified name
-     */
-    private String prependPackage(String pack, String clazz)
-    {
-        StringBuilder name = new StringBuilder();
-        
-        name.append(pack);
-        if (name.charAt(name.length() - 1) != '.')
-        {
-            name.append('.');
-        }
-        
-        if (clazz.startsWith("."))
-        {
-            name.append(clazz.substring(1));
-        }
-        else
-        {
-            name.append(clazz);
-        }
-        
-        return name.toString();
     }
 }
