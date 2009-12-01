@@ -177,14 +177,18 @@ public abstract class AbstractRig implements IRig
                     "(RC1_Configuration_Failure");
         }
         this.actionFailureCount = new HashMap<IAction, Integer>();
+        
+        /* Call initialisation. */
+        this.logger.debug("Calling derived class implementing init.");
+        this.init();
     }
     
     /**
      * Initialise method which derived classes should implement to register rig type
      * specific actions.
      * 
-     * This method is called by the <code>RigFactory</code> to complete the
-     * initialisation of the rig type class.
+     * This method is called by the <code>AbstractRig</code> constructor to 
+     * complete the initialisation of the rig type class.
      */
     protected abstract void init();
 

@@ -41,12 +41,24 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+
+import java.lang.reflect.Field;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IAction;
+import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.ConfigurationActionLoader;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
 /**
  * Tests the {@link ConfigurationActionLoader} class.
@@ -55,25 +67,117 @@ public class ConfigurationActionLoaderTester extends TestCase
 {
     /** Object of class under test. */
     private ConfigurationActionLoader loader;
+    
+    /** Mock configuration. */
+    private IConfig mockConfig;
 
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @Before
     public void setUp() throws Exception
     {
         /* Replace the default configuration class. */
+        this.mockConfig = createMock(IConfig.class);
+        expect(this.mockConfig.getProperty("Logger_Type"))
+            .andReturn("SystemErr");
+        expect(this.mockConfig.getProperty("Log_Level"))
+            .andReturn("DEBUG");
+        expect(this.mockConfig.getProperty("Action_Package_Prefixes", ""))
+            .andReturn("au.edu.uts.eng.remotelabs;au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests;" +
+            		"au.edu.uts.eng.remotelabs.rigclient.rig.internal");
+        replay(this.mockConfig);
+        
+        ConfigFactory.getInstance();
+        Field field = ConfigFactory.class.getDeclaredField("instance");        
+        field.setAccessible(true);
+        field.set(null, this.mockConfig);
         
         this.loader = new ConfigurationActionLoader();
     }
+    
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.ConfigurationActionLoader#getConfiguredActions(au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType)}.
      */
     @Test
-    public void testGetConfiguredActions()
+    public void testGetConfiguredActionsAccess()
     {
-        fail("Not yet implemented"); // TODO
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Access_Actions"))
+                .andReturn("MockAccessActionOne;.tests.MockAccessActionTwo");
+        replay(this.mockConfig);
+        IAction[] actions = this.loader.getConfiguredActions(ActionType.ACCESS);
+        assertEquals(2, actions.length);
+        assertTrue(actions[0] instanceof MockAccessActionOne);
+        assertTrue(actions[1] instanceof MockAccessActionTwo);
     }
-
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.ConfigurationActionLoader#getConfiguredActions(au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType)}.
+     */
+    @Test
+    public void testGetConfiguredActionsAccessNullConf()
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Access_Actions"))
+                .andReturn(null);
+        replay(this.mockConfig);
+        IAction[] actions = this.loader.getConfiguredActions(ActionType.ACCESS);
+        assertEquals(0, actions.length);
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.ConfigurationActionLoader#getConfiguredActions(au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType)}.
+     */
+    @Test
+    public void testGetConfiguredActionsAccessEmptyConf()
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Access_Actions"))
+                .andReturn("");
+        replay(this.mockConfig);
+        IAction[] actions = this.loader.getConfiguredActions(ActionType.ACCESS);
+        assertEquals(0, actions.length);
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.ConfigurationActionLoader#getConfiguredActions(au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType)}.
+     */
+    @Test
+    public void testGetConfiguredActionsAccessWrongType()
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Access_Actions"))
+                .andReturn("NotAccessAction");
+        replay(this.mockConfig);
+        IAction[] actions = this.loader.getConfiguredActions(ActionType.ACCESS);
+        assertEquals(0, actions.length);
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.ConfigurationActionLoader#getConfiguredActions(au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType)}.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testloadedPackPrefixes()
+    {
+        try
+        {
+            Field field = ConfigurationActionLoader.class.getDeclaredField("packagePrefixes");
+            field.setAccessible(true);
+            
+            Object obj = field.get(this.loader);
+            assertTrue(obj instanceof List);
+            List<String> list = (List<String>)obj;
+            assertTrue(list.contains("au.edu.uts.eng.remotelabs"));
+            assertTrue(list.contains("au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests"));
+            assertTrue(list.contains("au.edu.uts.eng.remotelabs.rigclient.rig.internal"));
+        }
+        catch (Exception e)
+        {
+            fail("Field packagePrefixes not found.");
+        }
+    }
 }

@@ -62,13 +62,13 @@ public class ConfigurationActionLoader
     public static final String SPLIT_CHAR = ";";
     
     /** Configuration. */
-    private IConfig config;
+    private final IConfig config;
     
     /** Package prefixes to attempt to resolve class from. */
-    private List<String> packagePrefixes;
+    private final List<String> packagePrefixes;
     
     /** Logger. */
-    private ILogger logger;
+    private final ILogger logger;
     
     /**
      * Constructor.
@@ -89,38 +89,38 @@ public class ConfigurationActionLoader
      * @param type action type
      * @return configured action type instances
      */
-    public IAction[] getConfiguredActions(ActionType type)
+    public IAction[] getConfiguredActions(final ActionType type)
     {
         String conf = null;
         switch (type)
         {
             case ACCESS:
-                this.logger.debug("Loading the Access action type configured instances.");
+                this.logger.debug("Loading the access action type configured instances.");
                 conf = this.config.getProperty("Access_Actions");
                 break;
             case SLAVE_ACCESS:
-                this.logger.debug("Loading the Slave Access action type configured instances.");
-                conf = this.config.getProperty("Access_Actions");
+                this.logger.debug("Loading the slave Access action type configured instances.");
+                conf = this.config.getProperty("Slave_Access_Actions");
                 break;
             case DETECT:
                 this.logger.debug("Loading the activity detection action type configured instances.");
-                conf = this.config.getProperty("Access_Actions");
+                conf = this.config.getProperty("Detection_Actions");
                 break;
             case NOTIFY:
                 this.logger.debug("Loading the notification action type configured instances.");
-                conf = this.config.getProperty("Access_Actions");
+                conf = this.config.getProperty("Notify_Actions");
                 break;
             case RESET:
                 this.logger.debug("Loading the reset action type configured instances.");
-                conf = this.config.getProperty("Access_Actions");
+                conf = this.config.getProperty("Reset_Actions");
                 break;
             case TEST:
                 this.logger.debug("Loading the test action type configured instances.");
-                conf = this.config.getProperty("Access_Actions");
+                conf = this.config.getProperty("Test_Actions");
                 break;
             default:
                 throw new IllegalStateException("This shouldn't happen and is probably bug. Initially thrown " +
-                		"in ConfigurationActionLoader.");
+                		"in ConfigurationActionLoader->getConfiguredActions.");
         }
         
         return this.loadActions(conf, type);
@@ -135,18 +135,18 @@ public class ConfigurationActionLoader
      * @param type action type to print errors
      * @return list of action classes, empty list of none found
      */
-    private IAction[] loadActions(String conf, ActionType type)
+    private IAction[] loadActions(final String conf, final ActionType type)
     {
         final List<IAction> actions = new ArrayList<IAction>();
         
         if (conf == null || conf.equals(""))
         {
-            this.logger.info("No configured actions of type" + type + ".");
-            return actions.toArray(new IAction[0]);
+            this.logger.info("No configured actions of type " + type + ".");
+            return new IAction[0];
         }
         this.logger.debug(type + " actions configuration string is " + conf + ".");
         
-        String classes[] = conf.split(ConfigurationActionLoader.SPLIT_CHAR);
+        final String classes[] = conf.split(ConfigurationActionLoader.SPLIT_CHAR);
         Class<?> foundClazz = null;
         for (String clazz : classes)
         {
@@ -179,11 +179,12 @@ public class ConfigurationActionLoader
                     continue;
                 }
                 
-                Object obj = foundClazz.newInstance();
+                final Object obj = foundClazz.newInstance();
                 if (obj instanceof IAction)
                 {
+                    this.logger.info("Successfully found class " + foundClazz.getCanonicalName() + ", adding it as a " +
+                    		type + " class.");
                     actions.add((IAction)obj);
-                    break;
                 }
                 else
                 {
@@ -202,6 +203,6 @@ public class ConfigurationActionLoader
             }
         }
         
-        return actions.toArray(new IAction[0]);
+        return actions.toArray(new IAction[actions.size()]);
     }
 }
