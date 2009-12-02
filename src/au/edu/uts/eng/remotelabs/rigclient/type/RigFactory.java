@@ -42,6 +42,10 @@
 package au.edu.uts.eng.remotelabs.rigclient.type;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * Factory class for the rig type class whose type is loaded from
@@ -53,6 +57,11 @@ public class RigFactory
     /** Rig type class. */
     private static IRig rig;
     
+    static 
+    {
+        RigFactory.rig = RigFactory.loadInstance();
+    }
+    
     /**
      * Returns an instance of the rig type class.
      * 
@@ -63,13 +72,62 @@ public class RigFactory
         return RigFactory.rig;
     }
     
-    static 
+    /**
+     * Loads the rig type class instance using the configured rig type class
+     * name loaded from configuration. If the class cannot be resolved or
+     * instantiated <code>null</code> is returned.
+     * 
+     * @return rig type class instance or null if not found
+     */
+    private static IRig loadInstance()
     {
-        RigFactory.rig = RigFactory.loadInnerInstance();
-    }
-    
-    private static IRig loadInnerInstance()
-    {
+        ILogger logger = LoggerFactory.getLoggerInstance();
+        logger.debug("Attempting to load the rig type class.");
+        IConfig config = ConfigFactory.getInstance();
+        
+        final String rigClassStr = config.getProperty("Rig_Class");
+        if (rigClassStr == null || rigClassStr == "")
+        {
+            logger.fatal("Unable to find configuration value of the rig type class. Check the property 'Rig_Class'" +
+            		" exists and has a value set.");
+            return null;
+        }
+        logger.debug("Rig type class configuration is " + rigClassStr + ".");
+
+        try
+        {
+            final Class<?> rigClass = Class.forName(rigClassStr);
+            final Object rigObj = rigClass.newInstance();
+            if (rigObj instanceof IRig)
+            {
+                logger.info("Loaded rig type class as " + rigClass.getCanonicalName() + ".");
+                return (IRig)rigObj;
+            }
+            else
+            {
+                logger.fatal("Loaded rig type class " + rigClass.getCanonicalName() + " does not implement the" +
+                		"IRig interface.");
+            }
+        }
+        catch (ClassNotFoundException e)
+        {
+            logger.fatal("Unable to find rig type class " + rigClassStr + ". Ensure the configured class " +
+            		"(Rig_Type) exists.");
+        }
+        catch (InstantiationException e)
+        {
+            Throwable cause = e.getCause();
+            logger.fatal("Unable to instantiate the rig type class " + rigClassStr + " because of its constructor" +
+            		" threw an exception of type " + cause.getClass().getCanonicalName() + " with message " +
+            		cause.getMessage() + ".");
+        }
+        catch (IllegalAccessException e)
+        {
+            logger.fatal("Unable to access rig type class " + rigClassStr + " with exception message " + 
+                    e.getMessage());
+        }
+        
+        logger.fatal("Failed loading rig type class. This is ominous and unrecoverable.");
         return null;
     }
 }
