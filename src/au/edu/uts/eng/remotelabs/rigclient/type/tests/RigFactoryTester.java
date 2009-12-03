@@ -41,14 +41,14 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.type.tests;
 
-import static org.easymock.EasyMock.*;
-
-import static org.junit.Assert.fail;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
 /**
@@ -67,7 +67,12 @@ public class RigFactoryTester extends TestCase
     public void setUp() throws Exception
     {
         this.mockConfig = createMock(IConfig.class);
+        expect(this.mockConfig.getProperty("Log_Level"))
+        	.andReturn("DEBUG");
+        expect(this.mockConfig.getProperty("Logger_Type"))
+            .andReturn("SystemErr");
         
+        ConfigFactory.getInstance();
     }
 
     /**
@@ -76,6 +81,7 @@ public class RigFactoryTester extends TestCase
     @Test
     public void testGetRigInstance()
     {
+        
         fail("Not yet implemented");
     }
 
