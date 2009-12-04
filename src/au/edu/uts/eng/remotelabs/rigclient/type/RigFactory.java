@@ -106,7 +106,7 @@ public class RigFactory
             else
             {
                 logger.fatal("Loaded rig type class " + rigClass.getCanonicalName() + " does not implement the" +
-                		"IRig interface.");
+                		" IRig interface.");
             }
         }
         catch (ClassNotFoundException e)

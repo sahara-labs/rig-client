@@ -43,13 +43,23 @@ package au.edu.uts.eng.remotelabs.rigclient.type.tests;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
+import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * Tests the rig factory class.
@@ -71,8 +81,15 @@ public class RigFactoryTester extends TestCase
         	.andReturn("DEBUG");
         expect(this.mockConfig.getProperty("Logger_Type"))
             .andReturn("SystemErr");
+        replay(this.mockConfig);
         
         ConfigFactory.getInstance();
+        Field f = ConfigFactory.class.getDeclaredField("instance");
+        f.setAccessible(true);
+        f.set(null, this.mockConfig);
+        
+        /* Force reading of logger config. */
+        LoggerFactory.getLoggerInstance();
     }
 
     /**
@@ -81,8 +98,67 @@ public class RigFactoryTester extends TestCase
     @Test
     public void testGetRigInstance()
     {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Rig_Class"))
+            .andReturn("au.edu.uts.eng.remotelabs.rigclient.type.tests.MockIRig");
+        replay(this.mockConfig);
         
-        fail("Not yet implemented");
+        Object rig = RigFactory.getRigInstance();
+        assertNotNull(rig);
+        assertTrue(rig instanceof IRig);
+        
+        verify(this.mockConfig);
     }
 
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.type.RigFactory#getRigInstance()}.
+     */
+    @Test
+    public void testGetRigInstanceNotFound()
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Rig_Class"))
+            .andReturn("au.edu.uts.eng.remotelabs.rigclient.type.tests.DoesNotExist");
+        replay(this.mockConfig);
+        
+        try
+        {
+            Method meth = RigFactory.class.getDeclaredMethod("loadInstance");
+            meth.setAccessible(true);
+            Object obj  = meth.invoke(null);
+            assertNull(obj);
+        }
+        catch (Exception e)
+        {
+            fail("Exception: " + e.getClass().getCanonicalName() + ", Message: " + e.getMessage());
+        }
+
+        verify(this.mockConfig);
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.type.RigFactory#getRigInstance()}.
+     */
+    @Test
+    public void testGetRigInstanceWrongType()
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Rig_Class"))
+            .andReturn("au.edu.uts.eng.remotelabs.rigclient.type.tests.WrongType");
+        replay(this.mockConfig);
+        
+        try
+        {
+            Method meth = RigFactory.class.getDeclaredMethod("loadInstance");
+            meth.setAccessible(true);
+            Object obj  = meth.invoke(null);
+            assertNull(obj);
+        }
+        catch (Exception e)
+        {
+            fail("Exception: " + e.getClass().getCanonicalName() + ", Message: " + e.getMessage());
+        }
+
+        verify(this.mockConfig);
+    }
 }

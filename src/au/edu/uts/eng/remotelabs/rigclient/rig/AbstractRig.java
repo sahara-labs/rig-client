@@ -98,25 +98,25 @@ public abstract class AbstractRig implements IRig
     protected Map<String, Session> sessionUsers;
     
     /** Access action list. */
-    private List<IAccessAction> accessActions;
+    private final List<IAccessAction> accessActions;
     
     /** Slave access action list. */
-    private List<ISlaveAccessAction> slaveActions;
+    private final List<ISlaveAccessAction> slaveActions;
     
     /** Notify action list. */
-    private List<INotifyAction> notifyActions;
+    private final List<INotifyAction> notifyActions;
     
     /** Reset action list. */
-    private List<IResetAction> resetActions;
+    private final List<IResetAction> resetActions;
     
     /** Test action list. */
-    private List<ITestAction> testActions;
+    private final List<ITestAction> testActions;
     
     /** Activity detector action list. */
-    private List<IActivityDetectorAction> detectionActions;
+    private final List<IActivityDetectorAction> detectionActions;
     
     /** Test actions thread group. */
-    private ThreadGroup testThreads;
+    private final ThreadGroup testThreads;
     
     /** Maintenance flag. */
     private boolean inMaintenance;
@@ -126,13 +126,13 @@ public abstract class AbstractRig implements IRig
     
     /** Threshold for number of action failures before maintenance mode
      *  is set. */
-    private int actionFailureThreshold;
+    private int failureThreshold;
     
     /** Count for action failures which is incremented after a each action
      *  failure. <strong>NOTE:</strong> the failure count is only ever 
      *  cleared when maintenance is cleared, not after a subsequent
      *  successful action. */
-    private Map<IAction, Integer> actionFailureCount;
+    private final Map<IAction, Integer> actionFailures;
     
     /** Rig client configuration. */
     protected IConfig configuration;
@@ -164,19 +164,18 @@ public abstract class AbstractRig implements IRig
 
         try
         {
-            this.actionFailureThreshold = Integer.parseInt(this.configuration.getProperty("Action_Failure_Threshold"));
-            this.logger.info("Loaded action fail threshold as " + this.actionFailureThreshold);
+            this.failureThreshold = Integer.parseInt(this.configuration.getProperty("Action_Failure_Threshold"));
+            this.logger.info("Loaded action fail threshold as " + this.failureThreshold);
         }
         catch (NumberFormatException nfe)
         {
-            this.actionFailureThreshold = 3;
+            this.failureThreshold = 3;
             this.logger.error("Failed to load the action failure threshold configuration item, so using " + 
-                    this.actionFailureThreshold +  "as the default. Please check the configuration " +
+                    this.failureThreshold +  "as the default. Please check the configuration " +
             		this.configuration.getConfigurationInfomation() + " and ensure the property " +
-                    "'Action_Failure_Threshold' is present and populated with a valide integer. " +
-                    "(RC1_Configuration_Failure");
+                    "'Action_Failure_Threshold' is present and populated with a valide integer.");
         }
-        this.actionFailureCount = new HashMap<IAction, Integer>();
+        this.actionFailures = new HashMap<IAction, Integer>();
         
         /* Call initialisation. */
         this.logger.debug("Calling derived class implementing init.");
@@ -215,25 +214,29 @@ public abstract class AbstractRig implements IRig
                     this.logger.error("Provided action type instance with class name " + 
                             action.getClass().getCanonicalName() + "is not an access action type (must be derived " +
                             "from au.edu.uts.edu.remotelabs.rigclient.rig.IAccessAction. Action type registration" +
-                            "has failed. (RC24_Failed_Action_Reg");
+                            "has failed.");
                     return false;
                 }
                 
-                for (IAccessAction a : this.accessActions)
+                synchronized (this.accessActions)
                 {
-                    /* Only the instance is checked not the type. This is to 
-                     * support multiple uses of the same type. It is assumed
-                     * using the same instance is a bug. */
-                    if (a == action)
+                    for (IAccessAction a : this.accessActions)
                     {
-                        this.logger.error("Cannot register the same action instance twice. (RC24_Failed_Action_Reg)");
-                        return false;
+                        /* Only the instance is checked not the type. This is to 
+                         * support multiple uses of the same type. It is assumed
+                         * using the same instance is a bug. */
+                        if (a == action)
+                        {
+                            this.logger.error("Cannot register the same action instance twice.");
+                            return false;
+                        }
                     }
+                    /* Looks good so actually register the action. */
+                    final IAccessAction access = (IAccessAction)action;
+                    this.logger.info("Registering an access action with provided type of " + access.getActionType()
+                            + ".");
+                    return this.accessActions.add(access);
                 }
-                /* Looks good so actually register the action. */
-                final IAccessAction access = (IAccessAction)action;
-                this.logger.info("Registering an access action with provided type of " + access.getActionType());
-                return this.accessActions.add(access);
                 
             case SLAVE_ACCESS: /* Adding a slave access action. */
                 this.logger.debug("Requested to register an slave access action type.");
@@ -242,25 +245,29 @@ public abstract class AbstractRig implements IRig
                     this.logger.error("Provided action type instance with class name " + 
                             action.getClass().getCanonicalName() + "is not a slave access action type (must be " +
                             "derived from au.edu.uts.edu.remotelabs.rigclient.rig.ISlaveAccessAction. " +
-                            "Action type registration has failed. (RC24_Failed_Action_Reg");
+                            "Action type registration has failed.");
                     return false;
                 }
                 
-                for (ISlaveAccessAction a : this.slaveActions)
+                synchronized(this.slaveActions)
                 {
-                    /* Only the instance is checked not the type. This is to 
-                     * support multiple uses of the same type. It is assumed
-                     * using the same instance is a bug. */
-                    if (a == action)
+                    for (ISlaveAccessAction a : this.slaveActions)
                     {
-                        this.logger.error("Cannot register the same action instance twice. (RC24_Failed_Action_Reg)");
-                        return false;
+                        /* Only the instance is checked not the type. This is to 
+                         * support multiple uses of the same type. It is assumed
+                         * using the same instance is a bug. */
+                        if (a == action)
+                        {
+                            this.logger.error("Cannot register the same action instance twice.");
+                            return false;
+                        }
                     }
+                    /* Looks good so actually register the action. */
+                    final ISlaveAccessAction slave = (ISlaveAccessAction)action;
+                    this.logger.info("Registering a slave access action with provided type of " + 
+                            slave.getActionType() + ".");
+                    return this.slaveActions.add(slave);
                 }
-                /* Looks good so actually register the action. */
-                final ISlaveAccessAction slave = (ISlaveAccessAction)action;
-                this.logger.info("Registering a slave access action with provided type of " + slave.getActionType());
-                return this.slaveActions.add(slave);
                 
             case NOTIFY: /* Adding a notify action. */
                 this.logger.debug("Requested to register an notify access action type.");
@@ -269,25 +276,29 @@ public abstract class AbstractRig implements IRig
                     this.logger.error("Provided action type instance with class name " + 
                             action.getClass().getCanonicalName() + "is not a notify action type (must be " +
                             "derived from au.edu.uts.edu.remotelabs.rigclient.rig.INotifyAction. " +
-                            "Action type registration has failed. (RC24_Failed_Action_Reg");
+                            "Action type registration has failed.");
                     return false;
                 }
                 
-                for (INotifyAction a : this.notifyActions)
+                synchronized (this.notifyActions)
                 {
-                    /* Only the instance is checked not the type. This is to 
-                     * support multiple uses of the same type. It is assumed
-                     * using the same instance is a bug. */
-                    if (a == action)
+                    for (INotifyAction a : this.notifyActions)
                     {
-                        this.logger.error("Cannot register the same action instance twice. (RC24_Failed_Action_Reg)");
-                        return false;
+                        /* Only the instance is checked not the type. This is to 
+                         * support multiple uses of the same type. It is assumed
+                         * using the same instance is a bug. */
+                        if (a == action)
+                        {
+                            this.logger.error("Cannot register the same action instance twice.");
+                            return false;
+                        }
                     }
+                    /* Looks good so actually register the action. */
+                    final INotifyAction notify = (INotifyAction)action;
+                    this.logger.info("Registering a notify access action with provided type of " + 
+                            notify.getActionType() + ".");
+                    return this.notifyActions.add(notify);
                 }
-                /* Looks good so actually register the action. */
-                final INotifyAction notify = (INotifyAction)action;
-                this.logger.info("Registering a notify access action with provided type of " + notify.getActionType());
-                return this.notifyActions.add(notify);
                 
             case RESET: /* Adding a reset action. */
                 this.logger.debug("Requested to register an reset access action type.");
@@ -296,25 +307,29 @@ public abstract class AbstractRig implements IRig
                     this.logger.error("Provided action type instance with class name " + 
                             action.getClass().getCanonicalName() + "is not a reset action type (must be " +
                             "derived from au.edu.uts.edu.remotelabs.rigclient.rig.IResetAction. " +
-                            "Action type registration has failed. (RC24_Failed_Action_Reg");
+                            "Action type registration has failed.");
                     return false;
                 }
                 
-                for (IResetAction a : this.resetActions)
+                synchronized (this.resetActions)
                 {
-                    /* Only the instance is checked not the type. This is to 
-                     * support multiple uses of the same type. It is assumed
-                     * using the same instance is a bug. */
-                    if (a == action)
+                    for (IResetAction a : this.resetActions)
                     {
-                        this.logger.error("Cannot register the same action instance twice. (RC24_Failed_Action_Reg)");
-                        return false;
+                        /* Only the instance is checked not the type. This is to 
+                         * support multiple uses of the same type. It is assumed
+                         * using the same instance is a bug. */
+                        if (a == action)
+                        {
+                            this.logger.error("Cannot register the same action instance twice.");
+                            return false;
+                        }
                     }
+                    /* Looks good so actually register the action. */
+                    final IResetAction reset = (IResetAction)action;
+                    this.logger.info("Registering a reset access action with provided type of " +
+                            reset.getActionType() + ".");
+                    return this.resetActions.add(reset);
                 }
-                /* Looks good so actually register the action. */
-                final IResetAction reset = (IResetAction)action;
-                this.logger.info("Registering a reset access action with provided type of " + reset.getActionType());
-                return this.resetActions.add(reset);
                 
             case TEST: /* Adding a test action. */
                 this.logger.debug("Requested to register a test access action type.");
@@ -323,28 +338,32 @@ public abstract class AbstractRig implements IRig
                     this.logger.error("Provided action type instance with class name " + 
                             action.getClass().getCanonicalName() + "is not a test action type (must be " +
                             "derived from au.edu.uts.edu.remotelabs.rigclient.rig.ITestAction. " +
-                            "Action type registration has failed. (RC24_Failed_Action_Reg");
+                            "Action type registration has failed.");
                     return false;
                 }
                 
-                for (ITestAction a : this.testActions)
+                synchronized (this.testActions)
                 {
-                    /* Only the instance is checked not the type. This is to 
-                     * support multiple uses of the same type. It is assumed
-                     * using the same instance is a bug. */
-                    if (a == action)
+                    for (ITestAction a : this.testActions)
                     {
-                        this.logger.error("Cannot register the same action instance twice. (RC24_Failed_Action_Reg)");
-                        return false;
+                        /* Only the instance is checked not the type. This is to 
+                         * support multiple uses of the same type. It is assumed
+                         * using the same instance is a bug. */
+                        if (a == action)
+                        {
+                            this.logger.error("Cannot register the same action instance twice.");
+                            return false;
+                        }
                     }
+                    /* Looks good so actually register the action. */
+                    final ITestAction test = (ITestAction)action;
+                    this.logger.info("Registering a test access action with provided type of " + 
+                            test.getActionType() + ".");
+                    
+                    /* Test actions run it their own thread, so create one and start it. */
+                    new Thread(this.testThreads, test).start();
+                    return this.testActions.add(test);
                 }
-                /* Looks good so actually register the action. */
-                final ITestAction test = (ITestAction)action;
-                this.logger.info("Registering a test access action with provided type of " + test.getActionType());
-                
-                /* Test actions run it their own thread, so create one and start it. */
-                new Thread(this.testThreads, test).start();
-                return this.testActions.add(test);
                 
             case DETECT: /* Adding an activity detector type. */
                 this.logger.debug("Requested to register an activity detector type.");
@@ -353,13 +372,26 @@ public abstract class AbstractRig implements IRig
                     this.logger.error("Provided action type instance with class name " + 
                             action.getClass().getCanonicalName() + "is not a activity detector action type (must be " +
                             "derived from au.edu.uts.edu.remotelabs.rigclient.rig.IActivityDetectorAction. " +
-                            "Action type registration has failed. (RC24_Failed_Action_Reg");
+                            "Action type registration has failed.");
                     return false;
                 }
-                final IActivityDetectorAction detector = (IActivityDetectorAction)action;
-                this.logger.info("Registering an activity detector action with provided type of " + 
-                        detector.getActionType());
-                return this.detectionActions.add(detector);
+                
+                synchronized (this.detectionActions)
+                {
+                    for (IActivityDetectorAction a : this.detectionActions)
+                    {
+                        if (a == action)
+                        {
+                            this.logger.error("Cannot register the same action instance twice.");
+                            return false;
+                        }
+                    }
+                    
+                    final IActivityDetectorAction detector = (IActivityDetectorAction)action;
+                    this.logger.info("Registering an activity detector action with provided type of " + 
+                            detector.getActionType() + ".");
+                    return this.detectionActions.add(detector);
+                }
                 
             default:
                 /* DODGY This is an impossible situation that _should_ never be hit. 
@@ -385,20 +417,20 @@ public abstract class AbstractRig implements IRig
     public String[] getCapabilities()
     {
         final String cap = this.configuration.getProperty("Rig_Capabilites");
-        this.logger.debug("Loaded Rig_Capabilites configuration item as " + cap);
+        this.logger.debug("Loaded Rig_Capabilites configuration item as " + cap + ".");
         
         if (cap == null)
         {
             this.logger.error("Rig client capabilities configuration item not found. Please check configuration" +
             		"at " + this.configuration.getConfigurationInfomation() + " and ensure the field " +
             		"'Rig_Capabilites' is present and populated with a comma seperated list of rig client " +
-            		"capability tokens. (RC1_Configuration_Failure)");
+            		"capability tokens.");
             return null;
         }
         
         /* Extract tokens from configuration string. */
         String tokens[] = cap.split(",");
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder(40);
         buf.append("Rig client capabilites are ");
         for (int i = 0; i < tokens.length; i++)
         {
@@ -425,11 +457,11 @@ public abstract class AbstractRig implements IRig
         {
             this.logger.error("Rig client name configuration item not found. Please check configuration" +
                     "at " + this.configuration.getConfigurationInfomation() + " and ensure the field " +
-                    "'Rig_Name' is present and populated with a rig name string. (RC1_Configuration_Failure)");
+                    "'Rig_Name' is present and populated with a rig name string.");
         }
         else
         {
-            this.logger.info("Rig name is " + name);
+            this.logger.info("Rig name is " + name + ".");
         }
         return name;
     }
@@ -448,13 +480,13 @@ public abstract class AbstractRig implements IRig
         }
         
         final String value = this.configuration.getProperty(key);
-        if (value != null)
+        if (value == null)
         {
-            this.logger.info("Found rig attribute value, value of " + key + " is " + value);
+            this.logger.info("Rig attribute value for " + key + " not found.");
         }
         else
         {
-            this.logger.info("Rig attribute value for " + key + " not found.");
+            this.logger.info("Found rig attribute value, value of " + key + " is " + value + ".");
         }
         return value;
     }
@@ -465,19 +497,19 @@ public abstract class AbstractRig implements IRig
     @Override
     public String getType()
     {
-        final String name = this.configuration.getProperty("Rig_Type");
-        this.logger.debug("Loaded Rig_Type configuration item as " + name);
-        if (name == null)
+        final String type = this.configuration.getProperty("Rig_Type");
+        this.logger.debug("Loaded Rig_Type configuration item as " + type);
+        if (type == null)
         {
             this.logger.error("Rig client type configuration item not found. Please check configuration" +
                     "at " + this.configuration.getConfigurationInfomation() + " and ensure the field " +
-                    "'Rig_Type' is present and populated with a rig type string. (RC1_Configuration_Failure)");
+                    "'Rig_Type' is present and populated with a rig type string.");
         }
         else
         {
-            this.logger.info("Rig type is " + name);
+            this.logger.info("Rig type is " + type + ".");
         }
-        return name;
+        return type;
     }
 
     /* 
@@ -495,7 +527,7 @@ public abstract class AbstractRig implements IRig
     @Override
     public String getMonitorReason()
     {
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
         for (ITestAction test : this.testActions)
         {
             if (test == null) continue;
@@ -518,7 +550,7 @@ public abstract class AbstractRig implements IRig
             return null;
         }
         
-        this.logger.info("Monitor bad reason:" + buf.toString());
+        this.logger.info("Monitor bad reason:" + buf.toString() + ".");
         return buf.toString();
     }
 
@@ -553,10 +585,14 @@ public abstract class AbstractRig implements IRig
     public boolean setInterval(final int interval)
     {
         this.logger.info("Setting test interval to " + interval + " minutes.");
-        for (ITestAction test : this.testActions)
+        
+        synchronized (this.testActions)
         {
-            if (test == null) continue;
-            test.setInterval(interval);                
+            for (ITestAction test : this.testActions)
+            {
+                if (test == null) continue;
+                test.setInterval(interval);                
+            }
         }
         
         /* DODGY In hindsight, the interface of setInterval shouldn't return
@@ -578,27 +614,27 @@ public abstract class AbstractRig implements IRig
                 		"mode is being set.");
                 this.revoke();
             }
-            this.logger.warn("Putting the rig into maintenance mode. Provided reason " + reason);
+            this.logger.warn("Putting the rig into maintenance mode. Provided reason is " + reason + ".");
             this.inMaintenance = true;
             this.maintenanceReason = reason;
             
             if (runTests)
             {
-                this.logger.info("Monitor tests will be run in maintenance mode.");
+                this.logger.debug("Monitor tests will be run in maintenance mode.");
                 this.startTests();
             }
             else
             {
-                this.logger.info("Monitor tests will not be run in maintenance mode.");
+                this.logger.debug("Monitor tests will not be run in maintenance mode.");
                 this.stopTests();
             }
         }
         else
         {
-            this.logger.info("Taking the rig out of maintenance mode.");
+            this.logger.debug("Taking the rig out of maintenance mode.");
             this.inMaintenance = false;
             this.maintenanceReason = null;
-            this.logger.info("Monitor tests are going to be started.");
+            this.logger.debug("Monitor tests are going to be started.");
             this.startTests();
         }
         
@@ -612,10 +648,14 @@ public abstract class AbstractRig implements IRig
     public void startTests()
     {
         this.logger.debug("Starting exerciser tests.");
-        for (ITestAction test : this.testActions)
+        
+        synchronized (this.testActions)
         {
-            if (test == null) continue;
-            test.startTest();
+            for (ITestAction test : this.testActions)
+            {
+                if (test == null) continue;
+                test.startTest();
+            }
         }
     }
 
@@ -626,10 +666,14 @@ public abstract class AbstractRig implements IRig
     public void stopTests()
     {
         this.logger.debug("Stopping exerciser tests.");
-        for (ITestAction test : this.testActions)
+        
+        synchronized (this.testActions)
         {
-            if (test == null) continue;
-            test.stopTest();
+            for (ITestAction test : this.testActions)
+            {
+                if (test == null) continue;
+                test.stopTest();
+            }
         }
     }
 
@@ -642,46 +686,54 @@ public abstract class AbstractRig implements IRig
         this.logger.debug("Adding slave user " + name + " with " + (passive ? "passive" : "active") + " access.");
         
         /* Slaves can't be assigned if there is no session. */
-        if (!this.isSessionActive()) return false;
-        
-        if (this.sessionUsers.containsKey(name))
+        synchronized (this.sessionUsers)
         {
-            final Session currentPerm = this.sessionUsers.get(name);
-            if (passive && currentPerm == Session.SLAVE_PASSIVE) // Requested passive, already a passive user
+            if (!this.isSessionActive()) return false;
+
+            if (this.sessionUsers.containsKey(name))
             {
-                this.logger.warn("User " + name + " is already a passive slave user, nothing to do. " +
-                		"(RC22_Failed_Slave_Alloc_Already_Slave)");
-                return false;
-            }
-            else if (!passive && currentPerm == Session.SLAVE_ACTIVE) // Requested active, already an active user
-            {
-                this.logger.warn("User " + name + " is already an active slave user, nothing to do. " +
-                		"(RC22_Failed_Slave_Alloc_Already_Slave)");
-                return false;
-            }
-            else if (currentPerm == Session.SLAVE_ACTIVE || currentPerm == Session.SLAVE_PASSIVE)
-            {
-                this.logger.info("Revoking slave user (" + name + ") to change their permission.");
-                if (!this.revokeSlave(name))
+                final Session currentPerm = this.sessionUsers.get(name);
+                if (passive && currentPerm == Session.SLAVE_PASSIVE) // Requested passive, already a passive user
                 {
-                    this.logger.warn("Failed changing slave permission because revocation of previous slave " +
-                    		"permission failed revocation (RC23_Failed_Slave_Revoke_Action");
+                    this.logger.warn("User " + name + " is already a passive slave user, nothing to do.");
                     return false;
-                }    
+                }
+                else if (!passive && currentPerm == Session.SLAVE_ACTIVE) // Requested active, already an active user
+                {
+                    this.logger.warn("User " + name + " is already an active slave user, nothing to do.");
+                    return false;
+                }
+                else if (currentPerm == Session.SLAVE_ACTIVE || currentPerm == Session.SLAVE_PASSIVE)
+                {
+                    this.logger.info("Revoking slave user (" + name + ") to change their permission.");
+                    if (!this.revokeSlave(name))
+                    {
+                        this.logger.warn("Failed changing slave permission because revocation of previous slave " +
+                        "permission failed revocation.");
+                        return false;
+                    }    
+                }
             }
         }
         
-        for (ISlaveAccessAction action : this.slaveActions)
+        synchronized (this.slaveActions)
         {
-            if (action == null) continue;
-            if (!action.assign(name, passive))
+            for (ISlaveAccessAction action : this.slaveActions)
             {
-                this.setMaintenanceFromActionFailure(action, ActionType.SLAVE_ACCESS);
-                return false;
+                if (action == null) continue;
+                if (!action.assign(name, passive))
+                {
+                    this.setMaintenanceFromActionFailure(action, ActionType.SLAVE_ACCESS);
+                    return false;
+                }
             }
         }
         
-        this.sessionUsers.put(name, passive ? Session.SLAVE_PASSIVE : Session.SLAVE_ACTIVE);
+        synchronized (this.sessionUsers)
+        {
+            this.sessionUsers.put(name, passive ? Session.SLAVE_PASSIVE : Session.SLAVE_ACTIVE);
+        }
+        
         return true;
     }
 
@@ -693,45 +745,48 @@ public abstract class AbstractRig implements IRig
     {
         this.logger.debug("Assigning master access to " + name);
         
-        /* Check there isn't an existing session (master user). */
-        if (this.sessionUsers.containsValue(Session.MASTER))
+        synchronized (this.sessionUsers)
         {
-            this.logger.warn("Failed allocation, the rig is already in session with another user. " +
-            		"(RC6_Failed_Alloc_In_Session)");
-            return false;
-        }
-        
-        /* Check the rig is in a state to be assigned. */
-        if (!(this.isMonitorStatusGood() && this.isNotInMaintenance()))
-        {
-            String message = "Failed allocation, the rig is not in an operable state.";
-            if (this.getMaintenanceReason() != null)
+            /* Check there isn't an existing session (master user). */
+            if (this.sessionUsers.containsValue(Session.MASTER))
             {
-                message += " The rig is in maintenance with reason " + this.getMaintenanceReason() + "."; 
-            }
-            if (this.getMonitorReason() != null)
-            {
-                message += " The rig is detected to be bad with reason " + this.getMonitorReason() + ".";
-            }
-            this.logger.warn(message);
-            return false;
-        }
-        
-        /* Stop tests. */
-        this.stopTests();
-         
-        for (IAccessAction action : this.accessActions)
-        {
-            if (action == null) continue;            
-            if (!action.assign(name))
-            {
-                this.setMaintenanceFromActionFailure(action, ActionType.ACCESS);
-                this.startTests();
+                this.logger.warn("Failed allocation, the rig is already in session with another user.");
                 return false;
             }
+
+            /* Check the rig is in a state to be assigned. */
+            if (!(this.isMonitorStatusGood() && this.isNotInMaintenance()))
+            {
+                final StringBuilder builder = new StringBuilder(50);
+                builder.append("Failed allocation, the rig is not in an operable state.");
+                if (this.getMaintenanceReason() != null)
+                {
+                    builder.append(" The rig is in maintenance with reason " + this.getMaintenanceReason() + "."); 
+                }
+                if (this.getMonitorReason() != null)
+                {
+                    builder.append(" The rig is detected to be bad with reason " + this.getMonitorReason() + ".");
+                }
+                this.logger.warn(builder.toString());
+                return false;
+            }
+
+            /* Stop tests. */
+            this.stopTests();
+
+            for (IAccessAction action : this.accessActions)
+            {
+                if (action == null) continue;            
+                if (!action.assign(name))
+                {
+                    this.setMaintenanceFromActionFailure(action, ActionType.ACCESS);
+                    this.startTests();
+                    return false;
+                }
+            }
+
+            this.sessionUsers.put(name, Session.MASTER);
         }
-        
-        this.sessionUsers.put(name, Session.MASTER);
         return true;
     }
 
@@ -758,8 +813,8 @@ public abstract class AbstractRig implements IRig
         }
         
         this.logger.error("All permission states unaccounted for, someone has been been naughty" +
-        		"and put a Session.NOT_IN user as a session user. Please file bug report. (RC22_Unexpected_Error)");
-        throw new RuntimeException("Error in AbstractRig->hasPermission");
+        		"and put a Session.NOT_IN user as a session user. Please file bug report.");
+        throw new IllegalStateException("Error in AbstractRig->hasPermission");
     }
 
     /* 
@@ -787,13 +842,17 @@ public abstract class AbstractRig implements IRig
         boolean ret = true;
         final String typeSafe[] = new String[0];
         this.logger.debug("Running notification for all users with message " + message);
-        for (INotifyAction action : this.notifyActions)
+        
+        synchronized (this.notifyActions)
         {
-            if (action == null) continue;
-            if (!action.notify(message, this.sessionUsers.keySet().toArray(typeSafe)))
+            for (INotifyAction action : this.notifyActions)
             {
-                this.setMaintenanceFromActionFailure(action, ActionType.NOTIFY);
-                ret = false;
+                if (action == null) continue;
+                if (!action.notify(message, this.sessionUsers.keySet().toArray(typeSafe)))
+                {
+                    this.setMaintenanceFromActionFailure(action, ActionType.NOTIFY);
+                    ret = false;
+                }
             }
         }
         return ret;
@@ -811,50 +870,55 @@ public abstract class AbstractRig implements IRig
         /* First check there is a master user. */
         if (!this.isSessionActive())
         {
-            this.logger.warn("Unable to terminate a session as there is no currently running session. " +
-            		"(RC11_Failed_Success_Req_Wrong_User)");
+            this.logger.warn("Unable to terminate a session as there is no currently running session.");
             return false;
         }
 
         String user = null;
         Session perm;
-        for (Entry<String, Session> entry : this.getSessionUsersClone().entrySet())
+        synchronized (this.sessionUsers)
         {
-            user = entry.getKey();
-            perm = entry.getValue();
-            
-            if (perm == Session.MASTER) // If master, run revoke actions  
+            for (Entry<String, Session> entry : this.getSessionUsersClone().entrySet())
             {
-                this.logger.info("Terminating and revoking master session user: " + user); 
-                for (IAccessAction action : this.accessActions)
+                user = entry.getKey();
+                perm = entry.getValue();
+
+                if (perm == Session.MASTER) // If master, run revoke actions  
                 {
-                    if (action == null) continue;
-                    if (!action.revoke(user))
+                    this.logger.info("Terminating and revoking master session user: " + user + "."); 
+                    for (IAccessAction action : this.accessActions)
                     {
-                        this.setMaintenanceFromActionFailure(action, ActionType.ACCESS);
-                        ret = false;
+                        if (action == null) continue;
+                        if (!action.revoke(user))
+                        {
+                            this.setMaintenanceFromActionFailure(action, ActionType.ACCESS);
+                            ret = false;
+                        }
                     }
                 }
+                else if ((perm == Session.SLAVE_ACTIVE || perm == Session.SLAVE_PASSIVE) && !this.revokeSlave(user))
+                {
+                    // If slave, invoke slave revoke
+                    ret = false;
+                }
             }
-            else if ((perm == Session.SLAVE_ACTIVE || perm == Session.SLAVE_PASSIVE) && !this.revokeSlave(user))
-            {
-                // If slave, invoke slave revoke
-                ret = false;
-            }
-        }        
-        
-        /* Remove the session users. */
-        this.sessionUsers.clear();
+
+            /* Remove the session users. */
+            this.sessionUsers.clear();
+        }
         
         /* Reset the rig. */
-        this.logger.debug("Running the rig reset actions.");
-        for (IResetAction action : this.resetActions)
+        synchronized (this.resetActions)
         {
-            if (action == null) continue;
-            if (!action.reset())
+            this.logger.debug("Running the rig reset actions.");
+            for (IResetAction action : this.resetActions)
             {
-                this.setMaintenanceFromActionFailure(action, ActionType.RESET);
-                ret = false;
+                if (action == null) continue;
+                if (!action.reset())
+                {
+                    this.setMaintenanceFromActionFailure(action, ActionType.RESET);
+                    ret = false;
+                }
             }
         }
         
@@ -875,7 +939,7 @@ public abstract class AbstractRig implements IRig
             if (ses == Session.MASTER) isMaster = true;            
         }
         
-        this.logger.debug("Session check providing: " + (isMaster ? "Session is active." : "Session is not active"));
+        this.logger.debug("Session check providing: " + (isMaster ? "Session is active." : "Session is not active."));
         return isMaster;
     }
     
@@ -908,26 +972,32 @@ public abstract class AbstractRig implements IRig
         boolean ret = true;
         this.logger.debug("Attempting to revoke slave access from: " + name);
         
-        /* First check the user is actually a slave user. */
-        final Session perm = this.isInSession(name);
-        if (perm != Session.SLAVE_ACTIVE && perm != Session.SLAVE_PASSIVE)
+        Session perm = Session.NOT_IN;
+        synchronized (this.sessionUsers)
         {
-            this.logger.warn("Failed revoking slave access, provided user " + name + " is not a slave user. " +
-            		"(RC22_Unexpected_Error)");
-            return false;
+            /* First check the user is actually a slave user. */
+            perm = this.isInSession(name);
+            if (perm != Session.SLAVE_ACTIVE && perm != Session.SLAVE_PASSIVE)
+            {
+                this.logger.warn("Failed revoking slave access, provided user " + name + " is not a slave user.");
+                return false;
+            }
         }
         
         /* Remove user from being a slave user. */
         this.sessionUsers.remove(name);
         
         /* Run the slave revocation actions. */
-        for (ISlaveAccessAction action : this.slaveActions)
+        synchronized (this.slaveActions)
         {
-            if (action == null) continue;
-            if (!action.revoke(name, perm == Session.SLAVE_PASSIVE ? true : false))
+            for (ISlaveAccessAction action : this.slaveActions)
             {
-                this.setMaintenanceFromActionFailure(action, ActionType.SLAVE_ACCESS);
-                ret = false;
+                if (action == null) continue;
+                if (!action.revoke(name, perm == Session.SLAVE_PASSIVE ? true : false))
+                {
+                    this.setMaintenanceFromActionFailure(action, ActionType.SLAVE_ACCESS);
+                    ret = false;
+                }
             }
         }
         
@@ -951,49 +1021,56 @@ public abstract class AbstractRig implements IRig
      */
     protected void setMaintenanceFromActionFailure(final IAction action, final ActionType type)
     {
-        String ac = null;
+        String typeStr = null;
         switch (type)
         {
             case ACCESS:
-                ac = "Session access";
+                typeStr = "Session access";
                 break;
             case SLAVE_ACCESS:
-                ac = "Slave access";
+                typeStr = "Slave access";
                 break;
             case NOTIFY:
-                ac = "Notification";
+                typeStr = "Notification";
                 break;
             case RESET:
-                ac = "Device reset";
+                typeStr = "Device reset";
                 break;
             case TEST:
-                ac = "Exerciser test";
+                typeStr = "Exerciser test";
                 break;
+            case DETECT:
+                typeStr = "Activity detector";
+                break;
+            default:
+                throw new IllegalStateException("Unknown action type, this is a bug.");
         }
-        this.logger.error(ac + " action of type " + action.getActionType() + " failed with reason " + 
+        this.logger.error(typeStr + " action of type " + action.getActionType() + " failed with reason " + 
                 action.getFailureReason() + ".");
-        
-        if (this.actionFailureCount.containsKey(action))
+
+        synchronized (this.actionFailures)
         {
-            this.actionFailureCount.put(action, (this.actionFailureCount.get(action)) + 1);
-            this.logger.info("Incrementing action failure for " + action.getActionType() + ". Current value is " +
-            		+ this.actionFailureCount.get(action) + ". Threshold for action failues is " + 
-            		this.actionFailureThreshold + ".");
-        }
-        else
-        {
-            this.actionFailureCount.put(action, 1);
-            this.logger.info("First action failure for " + action.getActionType() + "Threshold for action failures" +
-            		" is " + this.actionFailureThreshold + ".");
-        }
-        
-        if (this.actionFailureCount.get(action) >= this.actionFailureThreshold)
-        {
-            this.logger.error("Rig has been put into maintenance mode because an action failure " + 
-                    action.getActionType() + " count has reached the failure threshold. " +
-                    "(RC25_Action_Failure_Thres_Exceeded)");
-            this.inMaintenance = true;
-            this.maintenanceReason = ac + " action failed with reason " + action.getFailureReason(); 
+            if (this.actionFailures.containsKey(action))
+            {
+                this.actionFailures.put(action, (this.actionFailures.get(action)) + 1);
+                this.logger.info("Incrementing action failure for " + action.getActionType() + ". Current value is " +
+                        + this.actionFailures.get(action) + ". Threshold for action failues is " + 
+                        this.failureThreshold + ".");
+            }
+            else
+            {
+                this.actionFailures.put(action, 1);
+                this.logger.info("First action failure for " + action.getActionType() + "Threshold for action failures" +
+                        " is " + this.failureThreshold + ".");
+            }
+
+            if (this.actionFailures.get(action) >= this.failureThreshold)
+            {
+                this.logger.error("Rig has been put into maintenance mode because an action failure " + 
+                        action.getActionType() + " count has reached the failure threshold.");
+                this.inMaintenance = true;
+                this.maintenanceReason = typeStr + " action failed with reason " + action.getFailureReason(); 
+            }
         }
     }
     
