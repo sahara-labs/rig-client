@@ -7,13 +7,6 @@
       <xsd:element name="allocateResponse"
       	type="rc:OperationResponseType">
       </xsd:element>
-      <xsd:element name="NewOperationResponse1">
-      	<xsd:complexType>
-      		<xsd:sequence>
-      			<xsd:element name="out" type="xsd:string"></xsd:element>
-      		</xsd:sequence>
-      	</xsd:complexType>
-      </xsd:element>
       <xsd:element name="release" type="rc:UserType"></xsd:element>
       <xsd:element name="releaseResponse"
       	type="rc:OperationResponseType">
@@ -321,9 +314,6 @@
   <wsdl:message name="allocateResponse">
     <wsdl:part element="rc:allocateResponse" name="parameters"/>
   </wsdl:message>
-  <wsdl:message name="NewOperationResponse1">
-  	<wsdl:part name="parameters" element="rc:NewOperationResponse1"></wsdl:part>
-  </wsdl:message>
   <wsdl:message name="releaseRequest">
   	<wsdl:part name="parameters" element="rc:release"></wsdl:part>
   </wsdl:message>
@@ -468,6 +458,26 @@
   	<wsdl:operation name="release">
   		<soap:operation
   			soapAction="http://remotelabs.eng.uts.edu.au/rc/release" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="slaveAllocate">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/slaveAllocate" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="slaveRelease">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rc/slaveRelease" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
