@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file was auto-generated from WSDL -->
+<!-- by the Apache Axis2 version: 1.4.1  Built on : Aug 19, 2008 (10:13:39 LKT) -->
+<serviceGroup>
+    <service name="RigClientService">
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceMessageReceiverInOut"/>
+        </messageReceivers>
+        <parameter name="ServiceClass">au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeleton</parameter>
+        <parameter name="useOriginalwsdl">true</parameter>
+        <parameter name="modifyUserWSDLPortAddress">true</parameter>
+        <operation name="performPrimitiveControl" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/primitiveControl</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/performPrimitiveControlResponse</outputActionMapping>
+        </operation>
+        <operation name="getBatchControlStatus" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/batchStatus</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/getBatchControlStatusResponse</outputActionMapping>
+        </operation>
+        <operation name="getAttribute" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/getAttribute</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/getAttributeResponse</outputActionMapping>
+        </operation>
+        <operation name="slaveRelease" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/slaveRelease</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/slaveReleaseResponse</outputActionMapping>
+        </operation>
+        <operation name="release" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/release</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/releaseResponse</outputActionMapping>
+        </operation>
+        <operation name="notify" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/notify</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/notifyResponse</outputActionMapping>
+        </operation>
+        <operation name="setTestInterval" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/testInterval</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/setTestIntervalResponse</outputActionMapping>
+        </operation>
+        <operation name="setMaintenance" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/maintenance</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/setMaintenanceResponse</outputActionMapping>
+        </operation>
+        <operation name="performBatchControl" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/batch</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/performBatchControlResponse</outputActionMapping>
+        </operation>
+        <operation name="getStatus" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/getStatus</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/getStatusResponse</outputActionMapping>
+        </operation>
+        <operation name="allocate" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/allocate</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/allocateResponse</outputActionMapping>
+        </operation>
+        <operation name="slaveAllocate" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/slaveAllocate</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/slaveAllocateResponse</outputActionMapping>
+        </operation>
+        <operation name="abortBatchControl" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/batchAbort</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/abortBatchControlResponse</outputActionMapping>
+        </operation>
+    </service>
+</serviceGroup>

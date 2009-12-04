@@ -1,53 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions xmlns:rc="http://remotelabs.eng.uts.edu.au/rc" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="RigClientService" targetNamespace="http://remotelabs.eng.uts.edu.au/rc">
+<wsdl:definitions xmlns:rigclient="http://remotelabs.eng.uts.edu.au/rigclient/protocol" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="RigClientService" targetNamespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
   <wsdl:types>
-    <xsd:schema targetNamespace="http://remotelabs.eng.uts.edu.au/rc">
-      <xsd:element name="allocate" type="rc:UserType">
+    <xsd:schema targetNamespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+      <xsd:element name="allocate" type="rigclient:UserType">
       </xsd:element>
       <xsd:element name="allocateResponse"
-      	type="rc:OperationResponseType">
+      	type="rigclient:OperationResponseType">
       </xsd:element>
-      <xsd:element name="release" type="rc:UserType"></xsd:element>
+      <xsd:element name="release" type="rigclient:UserType"></xsd:element>
       <xsd:element name="releaseResponse"
-      	type="rc:OperationResponseType">
+      	type="rigclient:OperationResponseType">
       </xsd:element>
-      <xsd:element name="notify" type="rc:NotificationRequestType">
+      <xsd:element name="notify" type="rigclient:NotificationRequestType">
       </xsd:element>
       <xsd:element name="notifyResponse"
-      	type="rc:OperationResponseType">
+      	type="rigclient:OperationResponseType">
       </xsd:element>
       <xsd:element name="performBatchControl"
-      	type="rc:BatchRequestType">
+      	type="rigclient:BatchRequestType">
       </xsd:element>
       <xsd:element name="performBatchControlResponse"
-      	type="rc:OperationResponseType">
+      	type="rigclient:OperationResponseType">
       </xsd:element>
       <xsd:element name="performPrimitiveControl"
-      	type="rc:PrimitiveControlRequestType">
+      	type="rigclient:PrimitiveControlRequestType">
       </xsd:element>
       <xsd:element name="performPrimitiveControlResponse"
-      	type="rc:PrimitiveControlResponseType">
+      	type="rigclient:PrimitiveControlResponseType">
       </xsd:element>
-      <xsd:element name="getAttribute" type="rc:AttributeRequestType">
+      <xsd:element name="getAttribute" type="rigclient:AttributeRequestType">
       </xsd:element>
       <xsd:element name="getAttributeResponse"
-      	type="rc:AttributeResponseType">
+      	type="rigclient:AttributeResponseType">
       </xsd:element>
-      <xsd:element name="getStatus" type="rc:NullType"></xsd:element>
+      <xsd:element name="getStatus" type="rigclient:NullType"></xsd:element>
       <xsd:element name="getStatusResponse"
-      	type="rc:StatusResponseType">
+      	type="rigclient:StatusResponseType">
       </xsd:element>
       <xsd:element name="setMaintenance"
-      	type="rc:MaintenanceRequestType">
+      	type="rigclient:MaintenanceRequestType">
       </xsd:element>
       <xsd:element name="setMaintenanceResponse"
-      	type="rc:OperationResponseType">
+      	type="rigclient:OperationResponseType">
       </xsd:element>
       <xsd:element name="setTestInterval"
-      	type="rc:TestIntervalRequestType">
+      	type="rigclient:TestIntervalRequestType">
       </xsd:element>
       <xsd:element name="setTestIntervalResponse"
-      	type="rc:OperationResponseType">
+      	type="rigclient:OperationResponseType">
       </xsd:element>
 
       <xsd:complexType name="UserType">
@@ -61,7 +61,7 @@
       		<xsd:element name="user" type="xsd:string"></xsd:element>
       	</xsd:sequence>
       </xsd:complexType>
-      <xsd:element name="in" type="rc:UserType"></xsd:element>
+      <xsd:element name="in" type="rigclient:UserType"></xsd:element>
     
             <xsd:complexType name="OperationResponseType">
                 <xsd:annotation>
@@ -76,7 +76,7 @@
                 		</xsd:annotation>
                 	</xsd:element>
                 	<xsd:element maxOccurs="1" minOccurs="0"
-                		ref="rc:error">
+                		ref="rigclient:error">
                 		<xsd:annotation>
                 			<xsd:documentation>
                 				If the operation success was false
@@ -109,7 +109,7 @@
             			</xsd:annotation></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
-            <xsd:element name="error" type="rc:ErrorType">
+            <xsd:element name="error" type="rigclient:ErrorType">
             	<xsd:annotation></xsd:annotation>
             </xsd:element>
         
@@ -121,7 +121,7 @@
     
             <xsd:complexType name="BatchRequestType">
             	<xsd:complexContent>
-            		<xsd:extension base="rc:UserType">
+            		<xsd:extension base="rigclient:UserType">
             			<xsd:sequence>
             				<xsd:element name="batchFile"
             					type="xsd:base64Binary">
@@ -130,10 +130,10 @@
             		</xsd:extension>
             	</xsd:complexContent>
             </xsd:complexType>
-            <xsd:element name="abortBatchControl" type="rc:UserType">
+            <xsd:element name="abortBatchControl" type="rigclient:UserType">
             </xsd:element>
             <xsd:element name="abortBatchControlResponse"
-            	type="rc:OperationResponseType">
+            	type="rigclient:OperationResponseType">
             </xsd:element>
     
             <xsd:complexType name="PrimitiveControlRequestType">
@@ -143,7 +143,7 @@
             		</xsd:documentation>
             	</xsd:annotation>
             	<xsd:complexContent>
-            		<xsd:extension base="rc:UserType">
+            		<xsd:extension base="rigclient:UserType">
             			<xsd:sequence>
             				<xsd:element name="controller"
             					type="xsd:string">
@@ -152,7 +152,7 @@
             					type="xsd:string">
             				</xsd:element>
             				<xsd:element name="param"
-            					type="rc:ParamType" maxOccurs="unbounded" minOccurs="0">
+            					type="rigclient:ParamType" maxOccurs="unbounded" minOccurs="0">
             				</xsd:element>
             			</xsd:sequence>
             		</xsd:extension>
@@ -169,34 +169,34 @@
             	</xsd:sequence>
             </xsd:complexType>
             <xsd:element name="getBatchControlStatus"
-            	type="rc:UserType">
+            	type="rigclient:UserType">
             </xsd:element>
             <xsd:element name="getBatchControlStatusResponse"
-            	type="rc:BatchStatusResponseType">
+            	type="rigclient:BatchStatusResponseType">
             </xsd:element>
-            <xsd:element name="slaveAllocate" type="rc:SlaveUserType">
+            <xsd:element name="slaveAllocate" type="rigclient:SlaveUserType">
             </xsd:element>
             <xsd:element name="slaveAllocateResponse"
-            	type="rc:OperationResponseType">
+            	type="rigclient:OperationResponseType">
             </xsd:element>
-            <xsd:element name="slaveRelease" type="rc:UserType">
+            <xsd:element name="slaveRelease" type="rigclient:UserType">
             </xsd:element>
             <xsd:element name="slaveReleaseResponse"
-            	type="rc:OperationResponseType">
+            	type="rigclient:OperationResponseType">
             </xsd:element>
     
             <xsd:complexType name="PrimitiveControlResponseType">
             	<xsd:complexContent>
-            		<xsd:extension base="rc:OperationResponseType">
+            		<xsd:extension base="rigclient:OperationResponseType">
             			<xsd:sequence>
                             <xsd:element name="wasSuccessful" type="xsd:string">
             				</xsd:element>
                             <xsd:element name="result"
-            					type="rc:ParamType" maxOccurs="unbounded"
+            					type="rigclient:ParamType" maxOccurs="unbounded"
             					minOccurs="0">
             				</xsd:element>
             				<xsd:element name="error"
-            					type="rc:ErrorType" maxOccurs="1" minOccurs="0">
+            					type="rigclient:ErrorType" maxOccurs="1" minOccurs="0">
             				</xsd:element>
             			</xsd:sequence>
             		</xsd:extension>
@@ -205,7 +205,7 @@
     
             <xsd:complexType name="SlaveUserType">
             	<xsd:complexContent>
-            		<xsd:extension base="rc:UserType">
+            		<xsd:extension base="rigclient:UserType">
             			<xsd:sequence>
             				<xsd:element name="type">
             					<xsd:simpleType>
@@ -240,12 +240,12 @@
             		</xsd:element>
                     <xsd:element name="progress" type="xsd:string"></xsd:element>
                     <xsd:element name="resultFilePath" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-            	</xsd:sequence>
+            	</xsd:sequence>NewOperation
             </xsd:complexType>
     
             <xsd:complexType name="AttributeRequestType">
             	<xsd:complexContent>
-            		<xsd:extension base="rc:UserType">
+            		<xsd:extension base="rigclient:UserType">
             			<xsd:sequence>
             				<xsd:element name="attribute"
             					type="xsd:string">
@@ -262,7 +262,7 @@
             			<xsd:element name="value" type="xsd:string">
             			</xsd:element>
             			<xsd:element name="error"
-            				type="rc:ErrorType">
+            				type="rigclient:ErrorType">
             			</xsd:element>
             		</xsd:choice>
             	</xsd:sequence>
@@ -309,145 +309,145 @@
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="allocateRequest">
-  	<wsdl:part name="parameters" element="rc:allocate"/>
+  	<wsdl:part name="parameters" element="rigclient:allocate"/>
   </wsdl:message>
   <wsdl:message name="allocateResponse">
-    <wsdl:part element="rc:allocateResponse" name="parameters"/>
+    <wsdl:part element="rigclient:allocateResponse" name="parameters"/>
   </wsdl:message>
   <wsdl:message name="releaseRequest">
-  	<wsdl:part name="parameters" element="rc:release"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:release"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="releaseResponse">
-  	<wsdl:part name="parameters" element="rc:releaseResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:releaseResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="notifyRequest">
-  	<wsdl:part name="parameters" element="rc:notify"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:notify"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="notifyResponse">
-  	<wsdl:part name="parameters" element="rc:notifyResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:notifyResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="performBatchControlRequest">
-  	<wsdl:part name="parameters" element="rc:performBatchControl"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:performBatchControl"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="performBatchControlResponse">
-  	<wsdl:part name="parameters" element="rc:performBatchControlResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:performBatchControlResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="performPrimitiveControlRequest">
-  	<wsdl:part name="parameters" element="rc:performPrimitiveControl"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:performPrimitiveControl"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="performPrimitiveControlResponse">
-  	<wsdl:part name="parameters" element="rc:performPrimitiveControlResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:performPrimitiveControlResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="getAttributeRequest">
-  	<wsdl:part name="parameters" element="rc:getAttribute"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:getAttribute"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="getAttributeResponse">
-  	<wsdl:part name="parameters" element="rc:getAttributeResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:getAttributeResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="getStatusRequest">
-  	<wsdl:part name="parameters" element="rc:getStatus"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:getStatus"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="getStatusResponse">
-  	<wsdl:part name="parameters" element="rc:getStatusResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:getStatusResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="setMaintenanceRequest">
-  	<wsdl:part name="parameters" element="rc:setMaintenance"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:setMaintenance"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="setMaintenanceResponse">
-  	<wsdl:part name="parameters" element="rc:setMaintenanceResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:setMaintenanceResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="setTestIntervalRequest">
-  	<wsdl:part name="parameters" element="rc:setTestInterval"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:setTestInterval"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="setTestIntervalResponse">
-  	<wsdl:part name="parameters" element="rc:setTestIntervalResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:setTestIntervalResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="abortBatchControlRequest">
-  	<wsdl:part name="parameters" element="rc:abortBatchControl"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:abortBatchControl"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="abortBatchControlResponse">
-  	<wsdl:part name="parameters" element="rc:abortBatchControlResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:abortBatchControlResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="getBatchControlStatusRequest">
-  	<wsdl:part name="parameters" element="rc:getBatchControlStatus"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:getBatchControlStatus"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="getBatchControlStatusResponse">
-  	<wsdl:part name="parameters" element="rc:getBatchControlStatusResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:getBatchControlStatusResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="slaveAllocateRequest">
-  	<wsdl:part name="parameters" element="rc:slaveAllocate"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:slaveAllocate"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="slaveAllocateResponse">
-  	<wsdl:part name="parameters" element="rc:slaveAllocateResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:slaveAllocateResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="slaveReleaseRequest">
-  	<wsdl:part name="parameters" element="rc:slaveRelease"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:slaveRelease"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="slaveReleaseResponse">
-  	<wsdl:part name="parameters" element="rc:slaveReleaseResponse"></wsdl:part>
+  	<wsdl:part name="parameters" element="rigclient:slaveReleaseResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:portType name="RigClientService">
     <wsdl:operation name="allocate">
       <wsdl:documentation>Allocates a user to a rig (i.e. this starts a session)</wsdl:documentation>
-      <wsdl:input message="rc:allocateRequest"/>
-      <wsdl:output message="rc:allocateResponse"/>
+      <wsdl:input message="rigclient:allocateRequest"/>
+      <wsdl:output message="rigclient:allocateResponse"/>
     </wsdl:operation>
     <wsdl:operation name="release">
-    	<wsdl:input message="rc:releaseRequest"></wsdl:input>
-    	<wsdl:output message="rc:releaseResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:releaseRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:releaseResponse"></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="slaveAllocate">
-    	<wsdl:input message="rc:slaveAllocateRequest"></wsdl:input>
-    	<wsdl:output message="rc:slaveAllocateResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:slaveAllocateRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:slaveAllocateResponse"></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="slaveRelease">
-    	<wsdl:input message="rc:slaveReleaseRequest"></wsdl:input>
-    	<wsdl:output message="rc:slaveReleaseResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:slaveReleaseRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:slaveReleaseResponse"></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="notify">
-    	<wsdl:input message="rc:notifyRequest"></wsdl:input>
-    	<wsdl:output message="rc:notifyResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:notifyRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:notifyResponse"></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="performBatchControl">
-    	<wsdl:input message="rc:performBatchControlRequest"></wsdl:input>
-    	<wsdl:output message="rc:performBatchControlResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:performBatchControlRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:performBatchControlResponse"></wsdl:output>
     </wsdl:operation>
         <wsdl:operation name="abortBatchControl">
-    	<wsdl:input message="rc:abortBatchControlRequest"></wsdl:input>
-    	<wsdl:output message="rc:abortBatchControlResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:abortBatchControlRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:abortBatchControlResponse"></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getBatchControlStatus">
-    	<wsdl:input message="rc:getBatchControlStatusRequest"></wsdl:input>
-    	<wsdl:output message="rc:getBatchControlStatusResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:getBatchControlStatusRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:getBatchControlStatusResponse"></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="performPrimitiveControl">
-    	<wsdl:input message="rc:performPrimitiveControlRequest"></wsdl:input>
-    	<wsdl:output message="rc:performPrimitiveControlResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:performPrimitiveControlRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:performPrimitiveControlResponse"></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getAttribute">
-    	<wsdl:input message="rc:getAttributeRequest"></wsdl:input>
-    	<wsdl:output message="rc:getAttributeResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:getAttributeRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:getAttributeResponse"></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getStatus">
-    	<wsdl:input message="rc:getStatusRequest"></wsdl:input>
-    	<wsdl:output message="rc:getStatusResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:getStatusRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:getStatusResponse"></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="setMaintenance">
-    	<wsdl:input message="rc:setMaintenanceRequest"></wsdl:input>
-    	<wsdl:output message="rc:setMaintenanceResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:setMaintenanceRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:setMaintenanceResponse"></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="setTestInterval">
-    	<wsdl:input message="rc:setTestIntervalRequest"></wsdl:input>
-    	<wsdl:output message="rc:setTestIntervalResponse"></wsdl:output>
+    	<wsdl:input message="rigclient:setTestIntervalRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:setTestIntervalResponse"></wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="RigClientServiceSOAP"
-  	type="rc:RigClientService">
+  	type="rigclient:RigClientService">
   	<soap:binding style="document"
   		transport="http://schemas.xmlsoap.org/soap/http" />
   	<wsdl:operation name="allocate">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/NewOperation" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/allocate" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -457,7 +457,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="release">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/release" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/release" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -467,7 +467,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="slaveAllocate">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/slaveAllocate" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/slaveAllocate" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -477,7 +477,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="slaveRelease">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/slaveRelease" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/slaveRelease" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -487,7 +487,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="notify">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/notify" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/notify" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -497,7 +497,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="performBatchControl">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/batch" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/batch" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -507,7 +507,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="performPrimitiveControl">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/primitiveControl" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/primitiveControl" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -517,7 +517,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="getAttribute">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/getAttribute" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/getAttribute" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -527,7 +527,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="getStatus">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/getStatus" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/getStatus" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -537,7 +537,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="setMaintenance">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/maintenance" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/maintenance" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -547,7 +547,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="setTestInterval">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/testInterval" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/testInterval" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -557,7 +557,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="abortBatchControl">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/batchAbort" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/batchAbort" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -567,7 +567,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="getBatchControlStatus">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rc/batchStatus" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/batchStatus" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -577,7 +577,7 @@
   	</wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="RigClientService">
-    <wsdl:port binding="rc:RigClientServiceSOAP" name="RigClientServiceSOAP">
+    <wsdl:port binding="rigclient:RigClientServiceSOAP" name="RigClientServiceSOAP">
       <soap:address location="http://remotelabs.eng.uts.edu.au:8080/rigclient"/>
     </wsdl:port>
   </wsdl:service>
