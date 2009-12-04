@@ -55,6 +55,7 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractControlledRigTester
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractRigTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.ConfiguredControlledRigTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.ConfiguredRigTester;
+import au.edu.uts.eng.remotelabs.rigclient.type.tests.RigFactoryTester;
 import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
 
 /**
@@ -62,6 +63,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    RigFactoryTester.class,
     ConfiguredRigTester.class,
     ConfiguredControlledRigTester.class,
     ConfiguredBatchRunnerTester.class,

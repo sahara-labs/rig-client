@@ -63,7 +63,7 @@ import java.util.Map;
  *   If the requested method is an instance method (instance based), the
  *   controller is <em>lazy loaded</em> on first request and cleaned up
  *   at the end of the master users session.</li>  
- *<ul>
+ *</ul>
  */
 public interface IRigControl
 {
@@ -420,7 +420,7 @@ public interface IRigControl
      *  take a <code>PrimitiveRequest</code> parameter.</li>
      *  <li><code>-7</code>: Action has thrown an exception.</li>
      *  <li><code>-8</code>: The <code>preRoute</code> method failed.</li>
-     * <ul>
+     * </ul>
      */
     public class PrimitiveResponse
     {

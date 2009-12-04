@@ -125,7 +125,7 @@ public interface IRigExerciser
      * <code>offline</code> flag is true, the rig is put into maintenance, 
      * otherwise the rig is taken out of maintenance mode and
      * the rig maintenance reason is cleared if it set.
-     * 
+     * <p>
      * If the rig is to be put into maintenance, the <code>stopTests</code>
      * flag specifies if the exerciser tests should be run in maintenance mode.
      * If the rig is being taken out of maintenance mode, the

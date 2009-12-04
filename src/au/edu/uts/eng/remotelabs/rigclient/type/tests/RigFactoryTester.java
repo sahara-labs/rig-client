@@ -33,8 +33,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @author <First name> <Last name> (mdiponio)
- * @date <day> <month> 2009
+ * @author Michael Diponio (mdiponio)
+ * @date 3rd December 2009
  *
  * Changelog:
  * - 02/12/2009 - mdiponio - Initial file creation.
