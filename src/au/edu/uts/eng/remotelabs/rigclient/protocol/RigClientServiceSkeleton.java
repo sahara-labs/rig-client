@@ -50,18 +50,23 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControl;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AllocateResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.MaintenanceRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotifyResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformBatchControl;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformBatchControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControlResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance;
@@ -131,114 +136,95 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
         this.logger.info("Notify operation called with params: Message=" + notify.getNotify().getMessage() + ".");
         throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName() + "#notify.");
     }
+    
+    @Override
+    public PerformBatchControlResponse performBatchControl(final PerformBatchControl perfBatch)
+    {
+        final BatchRequestType request = perfBatch.getPerformBatchControl();
+        this.logger.info("Perform batch control operation called with params: User=" + request.getUser() + 
+                ", FileData=" + request.getBatchFile().toString() + ".");
+        throw new UnsupportedOperationException("Skeletopn implementation of " + this.getClass().getName() +
+                "#performBatchControl");
+    }
 
     @Override
     public AbortBatchControlResponse abortBatchControl(final AbortBatchControl abc)
     {
-        this.logger.info("Abort batch control called with params:" + abc.getAbortBatchControl().getUser() + ".");
-        throw new UnsupportedOperationException("Please implement " + this.getClass().getName() + "#abortBatchControl");
+        this.logger.info("Abort batch control operation called with params: User=" + 
+                abc.getAbortBatchControl().getUser() + ".");
+        throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName() + 
+                "#abortBatchControl");
+    }
+    
+    @Override
+    public GetBatchControlStatusResponse getBatchControlStatus(final GetBatchControlStatus batchStatus)
+    {
+        this.logger.info("Get batch control status operation called with params: User=" + 
+                batchStatus.getGetBatchControlStatus().getUser() + ".");
+        throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName() +
+                "#getBatchControlStatus");
     }
 
-    
-    /**
-     * Auto generated method signature
-     * 
-     * @param getAttribute4
-     */
-
-    public GetAttributeResponse getAttribute(
-            GetAttribute getAttribute4)
+    @Override
+    public PerformPrimitiveControlResponse performPrimitiveControl(final PerformPrimitiveControl perfPrim)
     {
-        // TODO : fill this with the necessary business logic
-        throw new UnsupportedOperationException("Please implement " + this.getClass().getName()
+        final PrimitiveControlRequestType request = perfPrim.getPerformPrimitiveControl();
+        final StringBuilder builder = new StringBuilder(50);
+        builder.append("Perform primitive control operation called with params: User=");
+        builder.append(request.getUser());
+        builder.append(", Controller=");
+        builder.append(request.getController());
+        builder.append(", Action=");
+        builder.append(request.getAction());
+        builder.append(", Params=(");
+        for (ParamType param : request.getParam())
+        {
+            builder.append(param.getName());
+            builder.append('=');
+            builder.append(param.getValue());
+            builder.append(',');
+        }
+        builder.append(").");
+        
+        this.logger.info(builder.toString());
+        throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
+                + "#performPrimitiveControl");
+    }
+
+    @Override
+    public GetAttributeResponse getAttribute(final GetAttribute attr)
+    {
+        final AttributeRequestType request = attr.getGetAttribute();
+        this.logger.info("Get attribute operation called with params: User=" + request.getUser() + ", Attribute=" +
+                request.getAttribute() + ".");
+        throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
                 + "#getAttribute");
     }
-
-    /**
-     * Auto generated method signature
-     * 
-     * @param getBatchControlStatus2
-     */
-
-    public GetBatchControlStatusResponse getBatchControlStatus(
-            GetBatchControlStatus getBatchControlStatus2)
+    
+    @Override 
+    public GetStatusResponse getStatus(final GetStatus status)
     {
-        // TODO : fill this with the necessary business logic
-        throw new UnsupportedOperationException("Please implement " + this.getClass().getName()
-                + "#getBatchControlStatus");
-    }
-
-    /**
-     * Auto generated method signature
-     * 
-     * @param getStatus18
-     */
-
-    public GetStatusResponse getStatus(
-            GetStatus getStatus18)
-    {
-        // TODO : fill this with the necessary business logic
-        throw new UnsupportedOperationException("Please implement " + this.getClass().getName()
+        this.logger.info("Get status attribute operation called.");
+        throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
                 + "#getStatus");
     }
 
-   
-
-    /**
-     * Auto generated method signature
-     * 
-     * @param performBatchControl16
-     */
-
-    public PerformBatchControlResponse performBatchControl(
-            PerformBatchControl performBatchControl16)
+    @Override
+    public SetMaintenanceResponse setMaintenance(final SetMaintenance set)
     {
-        // TODO : fill this with the necessary business logic
-        throw new UnsupportedOperationException("Please implement " + this.getClass().getName()
-                + "#performBatchControl");
-    }
-
-    /**
-     * Auto generated method signature
-     * 
-     * @param performPrimitiveControl0
-     */
-
-    public PerformPrimitiveControlResponse performPrimitiveControl(
-            PerformPrimitiveControl performPrimitiveControl0)
-    {
-        // TODO : fill this with the necessary business logic
-        throw new UnsupportedOperationException("Please implement " + this.getClass().getName()
-                + "#performPrimitiveControl");
-    }
-    
-    
-
-    /**
-     * Auto generated method signature
-     * 
-     * @param setMaintenance14
-     */
-
-    public SetMaintenanceResponse setMaintenance(
-            SetMaintenance setMaintenance14)
-    {
-        // TODO : fill this with the necessary business logic
-        throw new UnsupportedOperationException("Please implement " + this.getClass().getName()
+        final MaintenanceRequestType request = set.getSetMaintenance();
+        this.logger.info("Set maintenance operation called with params: Offline=" +
+                request.getPutOffline() + ", RunTests=" + request.getRunTests() + ".");
+        throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
                 + "#setMaintenance");
     }
 
-    /**
-     * Auto generated method signature
-     * 
-     * @param setTestInterval12
-     */
-
-    public SetTestIntervalResponse setTestInterval(
-            SetTestInterval setTestInterval12)
+    @Override
+    public SetTestIntervalResponse setTestInterval(final SetTestInterval set)
     {
-        // TODO : fill this with the necessary business logic
-        throw new UnsupportedOperationException("Please implement " + this.getClass().getName()
+        this.logger.info("Set test interval operation called with params: Test interval=" + 
+                set.getSetTestInterval().getInterval() + ".");
+        throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
                 + "#setTestInterval");
     }
 }
