@@ -63,6 +63,9 @@ public class RigClientDefines
     /** Rig Client version. */
     public static final String RC_VERSION = "0.0.1 Pre-Alpha";
     
+    /** Rig client SOAP interface name space. */
+    public static final String NAME_SPACE = "http://remotelabs.eng.uts.edu.au/rigclient/protocol";
+    
     /**
      * Report a bug.
      * 

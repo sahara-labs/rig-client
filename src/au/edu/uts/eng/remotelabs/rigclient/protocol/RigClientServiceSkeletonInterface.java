@@ -83,35 +83,35 @@ public interface RigClientServiceSkeletonInterface
     /**
      * Request to allocate a specified user to the rig.
      * 
-     * @param allocate request parameters
+     * @param allocRequest request parameters
      * @return operation response
      */
-    public AllocateResponse allocate(Allocate allocate);
+    public AllocateResponse allocate(Allocate allocRequest);
     
     /**
      * Request to remove a specified user from the rig.
      * 
-     * @param release request parameters
+     * @param relRequest request parameters
      * @return operation response
      */
-    public ReleaseResponse release(Release release);
+    public ReleaseResponse release(Release relRequest);
     
     /**
      * Request to allocate a specified slave user to the rig. Allocate 
      * may be active slave or passive slave.
      * 
-     * @param slaveAllocate request parameters
+     * @param slaveAllocRequest request parameters
      * @return operation response
      */
-    public SlaveAllocateResponse slaveAllocate(SlaveAllocate slaveAllocate);
+    public SlaveAllocateResponse slaveAllocate(SlaveAllocate slaveAllocRequest);
 
     /**
      * Request to remove a specified slave user from the rig.
      * 
-     * @param slaveRelease request parameters
+     * @param slaveRelRequest request parameters
      * @return operation response
      */
-    public SlaveReleaseResponse slaveRelease(SlaveRelease slaveRelease);
+    public SlaveReleaseResponse slaveRelease(SlaveRelease slaveRelRequest);
     
      /**
      * Request to display a notification for the user to see.
@@ -125,68 +125,68 @@ public interface RigClientServiceSkeletonInterface
      * Request for the rig client to provide control of the hardware 
      * using a provided instruction file.
      * 
-     * @param performBatchControl request parameters
+     * @param batchRequest request parameters
      * @return operation response
      */
-    public PerformBatchControlResponse performBatchControl(PerformBatchControl performBatchControl);
+    public PerformBatchControlResponse performBatchControl(PerformBatchControl batchRequest);
 
     /**
      * Request for the rig client to abort a previously started batch control
      * invocation.
      * 
-     * @param abortBatchControl request parameters
+     * @param abortRequest request parameters
      * @return operation response
      */
-    public AbortBatchControlResponse abortBatchControl(AbortBatchControl abortBatchControl);
+    public AbortBatchControlResponse abortBatchControl(AbortBatchControl abortRequest);
 
     /**
      * Request for the rig client to provide information about a previously 
      * started batch control invocation.
      * 
-     * @param getBatchControlStatus request parameters
+     * @param statusRequest request parameters
      * @return batch status response
      */
-    public GetBatchControlStatusResponse getBatchControlStatus(GetBatchControlStatus getBatchControlStatus);
+    public GetBatchControlStatusResponse getBatchControlStatus(GetBatchControlStatus statusRequest);
     
     /**
      * Request for the rig client to perform primitive control on a rig device.
      * 
-     * @param performPrimitiveControl request parameters
+     * @param orimRequest request parameters
      * @return primitive control response
      */
-    public PerformPrimitiveControlResponse performPrimitiveControl(PerformPrimitiveControl performPrimitiveControl);
+    public PerformPrimitiveControlResponse performPrimitiveControl(PerformPrimitiveControl orimRequest);
     
     /**
      * Request for the rig client to provide information about the rig.
      * 
-     * @param getAttribute request parameters
+     * @param attrRequest request parameters
      * @return attribute response
      */
-    public GetAttributeResponse getAttribute(GetAttribute getAttribute);
+    public GetAttributeResponse getAttribute(GetAttribute attrRequest);
 
     /**
      * Request for the rig client to provide status information about the rig 
      * client.
      * 
-     * @param getStatus request parameters
+     * @param statusRequest request parameters
      * @return status response
      */
-    public GetStatusResponse getStatus(GetStatus getStatus);
+    public GetStatusResponse getStatus(GetStatus statusRequest);
 
     /**
      * Request to either put the rig client into maintenance mode or remove 
      * it from maintenance mode.
      * 
-     * @param setMaintenance request parameters
+     * @param maintenRequest request parameters
      * @return operation response
      */
-    public SetMaintenanceResponse setMaintenance(SetMaintenance setMaintenance);
+    public SetMaintenanceResponse setMaintenance(SetMaintenance maintenRequest);
 
     /**
      * Request to change the rig client interval
      * 
-     * @param setTestInterval request parameters
+     * @param interRequest request parameters
      * @return operation response
      */
-    public SetTestIntervalResponse setTestInterval(SetTestInterval setTestInterval);
+    public SetTestIntervalResponse setTestInterval(SetTestInterval interRequest);
 }

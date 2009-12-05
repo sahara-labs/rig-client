@@ -87,7 +87,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterface
 {
     /** Logger. */
-    private ILogger logger;
+    private final ILogger logger;
     
     /**
      * Logger.
@@ -114,7 +114,7 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
     @Override
     public SlaveAllocateResponse slaveAllocate(final SlaveAllocate slaveAlloc)
     {
-        SlaveUserType slave = slaveAlloc.getSlaveAllocate();
+        final SlaveUserType slave = slaveAlloc.getSlaveAllocate();
         this.logger.info("Slave allocation operation called with params: User=" + 
                 slave.getUser() + ", Type=" + slave.getType().getValue() + ".");
         throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName() 

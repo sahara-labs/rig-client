@@ -11,7 +11,7 @@
 	<classpathentry kind="lib" path="lib/Axis2/axiom-api-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/Axis2/axiom-dom-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/Axis2/axiom-impl-1.2.8.jar"/>
-	<classpathentry kind="lib" path="lib/Axis2/axis2-adb-1.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/Axis2/axis2-adb-1.5.1.jar" sourcepath="/home/mdiponio/lib/axis2-1.5.1-src.zip"/>
 	<classpathentry kind="lib" path="lib/Axis2/axis2-adb-codegen-1.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/Axis2/axis2-ant-plugin-1.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/Axis2/axis2-clustering-1.5.1.jar"/>
@@ -67,5 +67,8 @@
 	<classpathentry kind="lib" path="lib/Axis2/xml-resolver-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/Axis2/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/Axis2/XmlSchema-1.4.3.jar"/>
+	<classpathentry kind="lib" path="lib/Jetty/jetty-6.1.22.jar"/>
+	<classpathentry kind="lib" path="lib/Jetty/jetty-util-6.1.22.jar"/>
+	<classpathentry kind="lib" path="lib/Jetty/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
