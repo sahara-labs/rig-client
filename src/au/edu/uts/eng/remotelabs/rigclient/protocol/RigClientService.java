@@ -41,6 +41,10 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.protocol;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControl;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate;
@@ -517,25 +521,44 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         error.setOperation("Primitive control on controller " + request.getController() + " and action " + 
                 request.getAction() + ".");
         error.setReason("");
+        control.setError(error);
         
-        if (this.rig.hasPermission(user, Session.SLAVE_ACTIVE))
+        if (!this.rig.hasPermission(user, Session.SLAVE_ACTIVE) && !this.isSourceAuthenticated())
         {
-            
+            /* Requestor does not have permission to request primitive control. */
+            this.logger.warn("Requestor " + user + " does not have permission to request primitive control.");
+            control.setSuccess(false);
+            error.setCode(3);
+            error.setReason("Invalid permission.");
         }
-        if (this.rig instanceof IRigControl)
+        else if (this.rig instanceof IRigControl)
         {
             IRigControl controlledRig = (IRigControl)this.rig;
             PrimitiveResponse primitiveResponse = controlledRig.performPrimitive(primitiveRequest);
-            // TODO
+            control.setSuccess(primitiveResponse.wasSuccessful());
+            error.setCode(primitiveResponse.getErrorCode());
+            error.setReason(primitiveResponse.getErrorReason() != null ? primitiveResponse.getErrorReason() : "");
+            control.setWasSuccessful(String.valueOf(primitiveResponse.wasSuccessful()));
+            
+            /* Results. */            
+            List<ParamType> results = new ArrayList<ParamType>();
+            for (Entry<String, String> result : primitiveResponse.getResults().entrySet())
+            {
+                ParamType resultParam = new ParamType();
+                resultParam.setName(result.getKey());
+                resultParam.setValue(result.getValue());
+                results.add(resultParam);
+            }
+            control.setResult(results.toArray(new ParamType[results.size()]));
         }
         else
         {
             /* Controlling a rig not supported. */
+            this.logger.warn("Primitive control not supported on this rig type.");
             control.setSuccess(false);
             error.setCode(14);
             error.setReason("Primitive control not supported.");
         }
-        
         
         return response;
     }

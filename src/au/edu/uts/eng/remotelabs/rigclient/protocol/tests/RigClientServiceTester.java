@@ -43,6 +43,8 @@ package au.edu.uts.eng.remotelabs.rigclient.protocol.tests;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -57,6 +59,11 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotificationRequestTyp
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotifyResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.OperationResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControlResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveAllocate;
@@ -88,7 +95,9 @@ public class RigClientServiceTester extends TestCase
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @Before
+    @SuppressWarnings("cast")
     public void setUp() throws Exception
     {
         IConfig config = new PropertiesConfig("test/resources/servicetest.properties");
@@ -616,6 +625,66 @@ public class RigClientServiceTester extends TestCase
     }
 
     /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#getBatchControlStatus(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus)}.
+     */
+    @Test
+    public void testGetBatchControlStatus()
+    {
+        fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)}.
+     */
+    @Test
+    public void testPerformPrimitiveControl()
+    {
+        assertTrue(this.rig.assign("mdiponio"));
+        
+        PerformPrimitiveControl performControl = new PerformPrimitiveControl();
+        PrimitiveControlRequestType controlRequest = new PrimitiveControlRequestType();
+        performControl.setPerformPrimitiveControl(controlRequest);
+        
+        controlRequest.setUser("mdiponio");
+        controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        controlRequest.setAction("test");
+        ParamType params[] = new ParamType[5];
+        for (int i = 0; i < params.length; i++)
+        {
+            params[i] = new ParamType();
+            params[i].setName("param_" + i);
+            params[i].setValue("Value_" + i);
+        }
+        controlRequest.setParam(params);
+        
+        PerformPrimitiveControlResponse response = this.service.performPrimitiveControl(performControl);
+        PrimitiveControlResponseType cr = response.getPerformPrimitiveControlResponse();
+        assertNotNull(cr);
+        assertTrue(cr.getSuccess());
+        assertTrue(Boolean.valueOf(cr.getWasSuccessful()));
+        
+        ErrorType err = cr.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        
+        ParamType resParams[] = cr.getResult();
+        assertEquals(5, resParams.length);
+        Map<String, String> res = new HashMap<String, String>();
+        for (ParamType p : resParams)
+        {
+            res.put(p.getName(), p.getValue());
+        }
+        
+       for (int i = 0; i < params.length; i++)
+       {
+           assertTrue(res.containsKey(params[i].getName()));
+           assertEquals(params[i].getValue(), res.get(params[i].getName()));
+       }   
+    }
+    
+    /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#getAttribute(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute)}.
      */
     @Test
@@ -625,28 +694,10 @@ public class RigClientServiceTester extends TestCase
     }
 
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#getBatchControlStatus(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus)}.
-     */
-    @Test
-    public void testGetBatchControlStatus()
-    {
-        fail("Not yet implemented"); // TODO
-    }
-
-    /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#getStatus(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus)}.
      */
     @Test
     public void testGetStatus()
-    {
-        fail("Not yet implemented"); // TODO
-    }
-
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)}.
-     */
-    @Test
-    public void testPerformPrimitiveControl()
     {
         fail("Not yet implemented"); // TODO
     }
