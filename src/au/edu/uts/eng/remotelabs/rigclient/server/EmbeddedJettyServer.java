@@ -41,6 +41,9 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.server;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.axis2.transport.http.AxisServlet;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
@@ -86,7 +89,6 @@ public class EmbeddedJettyServer implements IServer
         this.logger.debug("Creating a new embedded Jetty server.");
                         
         this.config = ConfigFactory.getInstance();        
-
     }
     
     
@@ -94,8 +96,9 @@ public class EmbeddedJettyServer implements IServer
      * Initialise the server.
      * 
      * @throws ServerException error setting up server
+     * @throws IOException 
      */
-    private void init() throws ServerException
+    private void init() throws ServerException, IOException
     {
         /* --------------------------------------------------------------------
          * ---- 1. Create the server. -----------------------------------------
@@ -163,9 +166,40 @@ public class EmbeddedJettyServer implements IServer
         /* --------------------------------------------------------------------
          * --- 4. Create and configure the handler. ---------------------------
          * ------------------------------------------------------------------*/
-        this.context = new Context(this.server, "/", Context.SESSIONS);
+        /* The handler routes the requests to the Apache Axis 2 servlet. */
+        this.context = new Context(this.server, "/", Context.SESSIONS);        
         ServletHolder holder = new ServletHolder(new AxisServlet());
         
+        File repoPath = new File("./repository");
+        this.logger.debug("Axis repository " + repoPath.getCanonicalPath() + ".");
+        holder.setInitParameter("axis2.repository.path", "/home/mdiponio/lib/axis2-1.5.1/repository");//repoPath.getCanonicalPath());        
+        this.context.addServlet(holder, "/");
+        
+    }
+    
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.server.IServer#startListening()
+     */
+    @Override
+    public boolean startListening()
+    {
+        try
+        {
+            this.init();
+            this.server.start();
+            return true;
+        }
+        catch (ServerException e)
+        {
+            this.logger.fatal("Unable to initalise server with error message: " + e.getMessage() + ".");
+            return false;
+        }
+        catch (Exception e)
+        {
+            this.logger.fatal("Unable to start server because of exception of type " + e.getClass().getName() + ", " +
+            		"with error message " + e.getMessage() + ".");
+            return false;
+        }
     }
 
     /* 
@@ -174,18 +208,23 @@ public class EmbeddedJettyServer implements IServer
     @Override
     public boolean shutdownServer()
     {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.server.IServer#startListening()
-     */
-    @Override
-    public boolean startListening()
-    {
-        // TODO Auto-generated method stub
-        return false;
+        if (this.server == null)
+        {
+            this.logger.error("Unable to stop server which has not previously been started.");
+            return false;
+        }
+        
+        try
+        {
+            this.server.stop();
+            return true;
+        }
+        catch (Exception e)
+        {
+            this.logger.fatal("Unable to stop server because of exception of type " + e.getClass().getName() + ", " +
+            		"with error message " + e.getMessage() + ".");
+            return false;
+        }
     }
     
     /*

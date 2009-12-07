@@ -80,7 +80,7 @@ public class ExtensionMapper
             return au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlRequestType.Factory.parse(reader);
 
         if ("http://remotelabs.eng.uts.edu.au/rigclient/protocol".equals(namespaceURI) && "type_type1".equals(typeName))
-            return au.edu.uts.eng.remotelabs.rigclient.protocol.types.Type_type1.Factory.parse(reader);
+            return au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser.Factory.parse(reader);
 
         if ("http://remotelabs.eng.uts.edu.au/rigclient/protocol".equals(namespaceURI) && "NullType".equals(typeName))
             return au.edu.uts.eng.remotelabs.rigclient.protocol.types.NullType.Factory.parse(reader);

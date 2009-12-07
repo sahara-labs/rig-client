@@ -1,15 +1,15 @@
 /**
- * Type_type1.java This file was auto-generated from WSDL by the Apache Axis2
+ * TypeSlaveUser.java This file was auto-generated from WSDL by the Apache Axis2
  * version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
  */
 
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types;
 
 /**
- * Type_type1 bean class
+ * TypeSlaveUser bean class
  */
 
-public class Type_type1 implements org.apache.axis2.databinding.ADBBean
+public class TypeSlaveUser implements org.apache.axis2.databinding.ADBBean
 {
 
     /**
@@ -18,7 +18,7 @@ public class Type_type1 implements org.apache.axis2.databinding.ADBBean
     public static class Factory
     {
 
-        public static Type_type1 fromString(java.lang.String value, java.lang.String namespaceURI)
+        public static TypeSlaveUser fromString(java.lang.String value, java.lang.String namespaceURI)
                 throws java.lang.IllegalArgumentException
         {
             try
@@ -33,23 +33,23 @@ public class Type_type1 implements org.apache.axis2.databinding.ADBBean
             }
         }
 
-        public static Type_type1 fromString(javax.xml.stream.XMLStreamReader xmlStreamReader, java.lang.String content)
+        public static TypeSlaveUser fromString(javax.xml.stream.XMLStreamReader xmlStreamReader, java.lang.String content)
         {
             if (content.indexOf(":") > -1)
             {
                 java.lang.String prefix = content.substring(0, content.indexOf(":"));
                 java.lang.String namespaceUri = xmlStreamReader.getNamespaceContext().getNamespaceURI(prefix);
-                return Type_type1.Factory.fromString(content, namespaceUri);
+                return TypeSlaveUser.Factory.fromString(content, namespaceUri);
             }
             else
-                return Type_type1.Factory.fromString(content, "");
+                return TypeSlaveUser.Factory.fromString(content, "");
         }
 
-        public static Type_type1 fromValue(java.lang.String value) throws java.lang.IllegalArgumentException
+        public static TypeSlaveUser fromValue(java.lang.String value) throws java.lang.IllegalArgumentException
         {
-            Type_type1 enumeration = (Type_type1)
+            TypeSlaveUser enumeration = (TypeSlaveUser)
 
-            Type_type1._table_.get(value);
+            TypeSlaveUser._table_.get(value);
 
             if (enumeration == null) throw new java.lang.IllegalArgumentException();
             return enumeration;
@@ -65,9 +65,9 @@ public class Type_type1 implements org.apache.axis2.databinding.ADBBean
          * is a complex type, the reader is positioned at the end element of its
          * outer element
          */
-        public static Type_type1 parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception
+        public static TypeSlaveUser parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception
         {
-            Type_type1 object = null;
+            TypeSlaveUser object = null;
             new java.util.HashMap();
             new java.util.ArrayList();
 
@@ -96,14 +96,14 @@ public class Type_type1 implements org.apache.axis2.databinding.ADBBean
                             // and send
                             prefix = content.substring(0, content.indexOf(":"));
                             namespaceuri = reader.getNamespaceURI(prefix);
-                            object = Type_type1.Factory.fromString(content, namespaceuri);
+                            object = TypeSlaveUser.Factory.fromString(content, namespaceuri);
                         }
                         else
                         {
                             // this seems to be not a qname send and empty
                             // namespace incase of it is
                             // check is done in fromString method
-                            object = Type_type1.Factory.fromString(content, "");
+                            object = TypeSlaveUser.Factory.fromString(content, "");
                         }
 
                     }
@@ -175,21 +175,27 @@ public class Type_type1 implements org.apache.axis2.databinding.ADBBean
     public static final java.lang.String _Passive = org.apache.axis2.databinding.utils.ConverterUtil
             .convertToString("Passive");
 
-    public static final Type_type1 Active = new Type_type1(Type_type1._Active, true);
+    public static final TypeSlaveUser Active = new TypeSlaveUser(TypeSlaveUser._Active, true);
 
-    public static final Type_type1 Passive = new Type_type1(Type_type1._Passive, true);
+    public static final TypeSlaveUser Passive = new TypeSlaveUser(TypeSlaveUser._Passive, true);
 
-    protected Type_type1(java.lang.String value, boolean isRegisterValue)
+    protected TypeSlaveUser(java.lang.String value, boolean isRegisterValue)
     {
         this.localType_type0 = value;
         if (isRegisterValue)
         {
 
-            Type_type1._table_.put(this.localType_type0, this);
+            TypeSlaveUser._table_.put(this.localType_type0, this);
 
         }
 
     }
+    
+    public TypeSlaveUser(String value)
+    {
+        this(value, false);
+    }
+    
 
     @Override
     public boolean equals(java.lang.Object obj)
@@ -207,17 +213,17 @@ public class Type_type1 implements org.apache.axis2.databinding.ADBBean
     {
 
         org.apache.axiom.om.OMDataSource dataSource = new org.apache.axis2.databinding.ADBDataSource(this,
-                Type_type1.MY_QNAME)
+                TypeSlaveUser.MY_QNAME)
         {
 
             @Override
             public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
                     throws javax.xml.stream.XMLStreamException
             {
-                Type_type1.this.serialize(Type_type1.MY_QNAME, factory, xmlWriter);
+                TypeSlaveUser.this.serialize(TypeSlaveUser.MY_QNAME, factory, xmlWriter);
             }
         };
-        return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(Type_type1.MY_QNAME, factory, dataSource);
+        return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(TypeSlaveUser.MY_QNAME, factory, dataSource);
 
     }
 
@@ -229,7 +235,7 @@ public class Type_type1 implements org.apache.axis2.databinding.ADBBean
     {
 
         // We can safely assume an element has only one type associated with it
-        return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(Type_type1.MY_QNAME,
+        return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(TypeSlaveUser.MY_QNAME,
                 new java.lang.Object[] { org.apache.axis2.databinding.utils.reader.ADBXMLStreamReader.ELEMENT_TEXT,
                         org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localType_type0) }, null);
 
@@ -256,7 +262,7 @@ public class Type_type1 implements org.apache.axis2.databinding.ADBBean
 
         if (prefix == null)
         {
-            prefix = Type_type1.generatePrefix(namespace);
+            prefix = TypeSlaveUser.generatePrefix(namespace);
 
             while (xmlWriter.getNamespaceContext().getNamespaceURI(prefix) != null)
             {
@@ -293,7 +299,7 @@ public class Type_type1 implements org.apache.axis2.databinding.ADBBean
 
             if (prefix == null)
             {
-                prefix = Type_type1.generatePrefix(namespace);
+                prefix = TypeSlaveUser.generatePrefix(namespace);
 
                 xmlWriter.writeStartElement(prefix, localName, namespace);
                 xmlWriter.writeNamespace(prefix, namespace);

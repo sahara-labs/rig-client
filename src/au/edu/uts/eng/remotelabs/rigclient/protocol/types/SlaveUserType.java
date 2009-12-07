@@ -107,7 +107,7 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
                 if (reader.isStartElement() && new javax.xml.namespace.QName("", "type").equals(reader.getName()))
                 {
 
-                    object.setType(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Type_type1.Factory.parse(reader));
+                    object.setType(au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser.Factory.parse(reader));
 
                     reader.next();
 
@@ -176,7 +176,7 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
      * field for Type
      */
 
-    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.Type_type1 localType;
+    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser localType;
 
     /**
      * @param parentQName
@@ -239,9 +239,9 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
     /**
      * Auto generated getter method
      * 
-     * @return au.edu.uts.eng.remotelabs.rigclient.protocol.types.Type_type1
+     * @return au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser
      */
-    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.Type_type1 getType()
+    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser getType()
     {
         return this.localType;
     }
@@ -374,7 +374,7 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
      * 
      * @param param Type
      */
-    public void setType(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Type_type1 param)
+    public void setType(au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser param)
     {
 
         this.localType = param;

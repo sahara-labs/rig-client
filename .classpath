@@ -67,7 +67,7 @@
 	<classpathentry kind="lib" path="lib/Axis2/xml-resolver-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/Axis2/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/Axis2/XmlSchema-1.4.3.jar"/>
-	<classpathentry kind="lib" path="lib/Jetty/jetty-6.1.22.jar"/>
+	<classpathentry kind="lib" path="lib/Jetty/jetty-6.1.22.jar" sourcepath="/home/mdiponio/lib/jetty-6.1.22-src.zip"/>
 	<classpathentry kind="lib" path="lib/Jetty/jetty-util-6.1.22.jar"/>
 	<classpathentry kind="lib" path="lib/Jetty/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="output" path="bin"/>
