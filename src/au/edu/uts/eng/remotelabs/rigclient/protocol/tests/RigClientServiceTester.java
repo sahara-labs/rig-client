@@ -53,6 +53,9 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AllocateResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ErrorType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotificationRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotifyResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.OperationResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
@@ -64,6 +67,7 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveUserType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
@@ -539,14 +543,76 @@ public class RigClientServiceTester extends TestCase
         assertFalse(this.rig.hasPermission("mdiponio", Session.SLAVE_PASSIVE));
         assertTrue(this.rig.hasPermission("tmachet", Session.MASTER));
     }
-
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#notify(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify)}.
+     */
+    @Test
+    public void testNotify()
+    {
+        assertTrue(this.rig.assign("mdiponio"));
+        
+        Notify notify = new Notify();
+        NotificationRequestType request = new NotificationRequestType();
+        notify.setNotify(request);
+        request.setMessage("This is a very important message");
+        
+        NotifyResponse response = this.service.notify(notify);
+        OperationResponseType op = response.getNotifyResponse();
+        assertNotNull(op);
+        assertTrue(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#notify(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify)}.
+     */
+    @Test
+    public void testNotifyNoSession()
+    {
+        Notify notify = new Notify();
+        NotificationRequestType request = new NotificationRequestType();
+        notify.setNotify(request);
+        request.setMessage("This is a very important message");
+        
+        NotifyResponse response = this.service.notify(notify);
+        OperationResponseType op = response.getNotifyResponse();
+        assertNotNull(op);
+        assertFalse(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(6, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        assertEquals("Not in session.", err.getReason());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performBatchControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformBatchControl)}.
+     */
+    @Test
+    public void testPerformBatchControl()
+    {
+        fail("Not yet implemented"); // TODO
+    }
+ 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#abortBatchControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControl)}.
      */
     @Test
     public void testAbortBatchControl()
     {
-        fail("Not yet implemented"); // TODO
+        assertTrue(this.rig.assign("mdiponio"));
+        assertTrue(this.rig instanceof IRigControl);
+        
+       
+        fail("Not yet implemented.");
     }
 
     /**
@@ -572,24 +638,6 @@ public class RigClientServiceTester extends TestCase
      */
     @Test
     public void testGetStatus()
-    {
-        fail("Not yet implemented"); // TODO
-    }
-
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#notify(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify)}.
-     */
-    @Test
-    public void testNotifyNotify()
-    {
-        fail("Not yet implemented"); // TODO
-    }
-
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performBatchControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformBatchControl)}.
-     */
-    @Test
-    public void testPerformBatchControl()
     {
         fail("Not yet implemented"); // TODO
     }

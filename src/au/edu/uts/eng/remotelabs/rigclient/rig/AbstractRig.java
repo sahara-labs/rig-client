@@ -171,7 +171,7 @@ public abstract class AbstractRig implements IRig
         {
             this.failureThreshold = 3;
             this.logger.error("Failed to load the action failure threshold configuration item, so using " + 
-                    this.failureThreshold +  "as the default. Please check the configuration " +
+                    this.failureThreshold +  " as the default. Please check the configuration " +
             		this.configuration.getConfigurationInfomation() + " and ensure the property " +
                     "'Action_Failure_Threshold' is present and populated with a valide integer.");
         }

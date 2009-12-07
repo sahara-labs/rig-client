@@ -55,10 +55,13 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotifyResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.OperationResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformBatchControl;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformBatchControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControlResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance;
@@ -71,6 +74,9 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveRelease;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveUserType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -347,34 +353,198 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         
         return response;
     }
-
+    
     /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#abortBatchControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControl)
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#notify(Notify)
      */
     @Override
-    public AbortBatchControlResponse abortBatchControl(AbortBatchControl abortRequest)
+    public NotifyResponse notify(Notify notify)
+    {
+        /* Request parameters. */
+        final String message = notify.getNotify().getMessage();
+        this.logger.debug("Received notify request with parameter: message=" + message + ".");
+        
+        /* Response parameters. */
+        NotifyResponse response = new NotifyResponse();
+        OperationResponseType operation = new OperationResponseType();
+        response.setNotifyResponse(operation);
+        ErrorType error = new ErrorType();
+        error.setCode(0);
+        error.setOperation("Notify with message " + message + ".");
+        error.setReason("");
+        operation.setError(error);
+        
+        if (!this.rig.isSessionActive())
+        {
+            this.logger.warn("Failed notification because there are no sessions active.");
+            operation.setSuccess(false);
+            error.setCode(6);
+            error.setReason("Not in session.");
+        }
+        else if (this.rig.notify(message))
+        {
+            this.logger.info("Successfully sent out notification of message " + message + ".");
+            operation.setSuccess(true);
+        }
+        else 
+        {
+            this.logger.warn("Failed notification because of some unknown error (possibly a bug).");
+            operation.setSuccess(false);
+            error.setCode(16);
+            error.setReason("Unknown error.");
+        }
+
+        return response;
+    }
+    
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#performBatchControl(PerformBatchControl)
+     */
+    @Override
+    public PerformBatchControlResponse performBatchControl(PerformBatchControl batchRequest)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#abortBatchControl(AbortBatchControl)
+     */
+    @Override
+    public AbortBatchControlResponse abortBatchControl(final AbortBatchControl abortRequest)
+    {
+        /* Request parameters. */
+        final String requestor = abortRequest.getAbortBatchControl().getUser();
+        this.logger.debug("Received abort batch control request with parameter: requestor=" + requestor + ".");
+        
+        /* Response parameters. */
+        final AbortBatchControlResponse response = new AbortBatchControlResponse();
+        final OperationResponseType operation = new OperationResponseType();
+        response.setAbortBatchControlResponse(operation);
+        final ErrorType error = new ErrorType();
+        error.setCode(0);
+        error.setOperation("Abort batch control.");
+        error.setReason("");
+        operation.setError(error);
+        
+        if (!(this.rig instanceof IRigControl))
+        {
+            IRigControl controlRig = (IRigControl)this.rig;
+            if (!this.rig.hasPermission(requestor, Session.SLAVE_ACTIVE)) // Does the requestor have permission
+            {
+                this.logger.warn("Requestor " + requestor + " does not have permission to abort batch control.");
+                operation.setSuccess(false);
+                error.setCode(3);
+                error.setReason("Invalid permission.");
+            }
+            else if (controlRig.abortBatch())
+            {
+                this.logger.info("Requestor " + requestor + " successfully aborted a batch control invocation.");
+                operation.setSuccess(true);
+            }
+            else
+            {
+                this.logger.warn("Failed aborting batch control invocation. Perhaps the batch " +
+                		"control abort wait timed out.");
+                operation.setSuccess(false);
+                error.setCode(16);
+                error.setReason("Unknown reason, perhaps timeout.");
+            }
+        }
+        else
+        {
+            this.logger.warn("Attempting to abort a batch invocation on a rig that does not support batch control.");
+            operation.setSuccess(false);
+            error.setCode(10);
+            error.setReason("Batch control not supported.");
+        }
+        
+        return response;
+    }
+    
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getBatchControlStatus(GetBatchControlStatus)
+     */
+    @Override
+    public GetBatchControlStatusResponse getBatchControlStatus(GetBatchControlStatus statusRequest)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
-    
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#performPrimitiveControl(PerformPrimitiveControl)
+     */
+    @Override
+    public PerformPrimitiveControlResponse performPrimitiveControl(final PerformPrimitiveControl primRequest)
+    {
+        /* Request parameters. */
+        PrimitiveControlRequestType request = primRequest.getPerformPrimitiveControl();
+        String user = request.getUser();
+        StringBuilder builder = new StringBuilder();
+        builder.append("Recevied primitive control request with params: user=");
+        builder.append(user);
+        
+        PrimitiveRequest primitiveRequest = new PrimitiveRequest();
+        
+        /* Controller - action. */
+        builder.append(", controller=");
+        builder.append(request.getController());
+        primitiveRequest.setController(request.getController());
+        builder.append(", action=");
+        builder.append(request.getAction());
+        primitiveRequest.setAction(request.getAction());
+        
+        /* Parameter list. */
+        int i = 1;
+        for (ParamType param : request.getParam())
+        {
+            builder.append(", param");
+            builder.append(i);
+            builder.append('=');
+            builder.append(param.getName());
+            builder.append(':');
+            builder.append(param.getValue());
+            primitiveRequest.addParameter(param.getName(), param.getValue());
+        }
+
+        /* Response parameters. */
+        PerformPrimitiveControlResponse response = new PerformPrimitiveControlResponse();
+        PrimitiveControlResponseType control = new PrimitiveControlResponseType();
+        response.setPerformPrimitiveControlResponse(control);
+        ErrorType error = new ErrorType();
+        error.setCode(0);
+        error.setOperation("Primitive control on controller " + request.getController() + " and action " + 
+                request.getAction() + ".");
+        error.setReason("");
+        
+        if (this.rig.hasPermission(user, Session.SLAVE_ACTIVE))
+        {
+            
+        }
+        if (this.rig instanceof IRigControl)
+        {
+            IRigControl controlledRig = (IRigControl)this.rig;
+            PrimitiveResponse primitiveResponse = controlledRig.performPrimitive(primitiveRequest);
+            // TODO
+        }
+        else
+        {
+            /* Controlling a rig not supported. */
+            control.setSuccess(false);
+            error.setCode(14);
+            error.setReason("Primitive control not supported.");
+        }
+        
+        
+        return response;
+    }
 
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getAttribute(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute)
      */
     @Override
     public GetAttributeResponse getAttribute(GetAttribute attrRequest)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getBatchControlStatus(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus)
-     */
-    @Override
-    public GetBatchControlStatusResponse getBatchControlStatus(GetBatchControlStatus statusRequest)
     {
         // TODO Auto-generated method stub
         return null;
@@ -389,38 +559,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         // TODO Auto-generated method stub
         return null;
     }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#notify(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify)
-     */
-    @Override
-    public NotifyResponse notify(Notify notify)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#performBatchControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformBatchControl)
-     */
-    @Override
-    public PerformBatchControlResponse performBatchControl(PerformBatchControl batchRequest)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)
-     */
-    @Override
-    public PerformPrimitiveControlResponse performPrimitiveControl(PerformPrimitiveControl orimRequest)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    
 
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#setMaintenance(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance)
