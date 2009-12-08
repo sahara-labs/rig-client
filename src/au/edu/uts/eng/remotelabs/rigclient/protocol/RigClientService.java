@@ -49,6 +49,9 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControl;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AllocateResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ErrorType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
@@ -135,8 +138,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             error.setReason("Not authorised to allocate a user.");
 
         }
-        /* Try to allocate rig. */
-        if (this.rig.isSessionActive()) // Cannot allocate a rig who is already in-use
+        else if (this.rig.isSessionActive()) // Cannot allocate a rig who is already in-use
         {
             this.logger.warn("Failed allocating user " + user + " because there is an existing session.");
             operation.setSuccess(false);
@@ -260,7 +262,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         final SlaveAllocateResponse response = new SlaveAllocateResponse();
         response.setSlaveAllocateResponse(operation);
         
-        if (!(this.isSourceAuthenticated(slave.getIdentityToken()) &&
+        if (!(this.isSourceAuthenticated(slave.getIdentityToken()) ||
                 this.rig.hasPermission(slave.getRequestor(), Session.MASTER)))
         {
             this.logger.warn("Failed allocating slave user " + user + " because of invalid permission.");
@@ -328,7 +330,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         error.setReason("");
         
         if (!(this.isSourceAuthenticated(slaveRequest.getSlaveRelease().getIdentityToken()) || 
-                this.rig.hasPermission(slaveRequest.getSlaveRelease().getIdentityToken(), Session.MASTER)))
+                this.rig.hasPermission(slaveRequest.getSlaveRelease().getRequestor(), Session.MASTER)))
         {
             this.logger.warn("Failed releasing slave user " + slave + " because of invalid permission.");
             operation.setSuccess(false);
@@ -367,6 +369,8 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     {
         /* Request parameters. */
         final String message = notify.getNotify().getMessage();
+        final String requestor = notify.getNotify().getRequestor();
+        final String ident = notify.getNotify().getIdentityToken();
         this.logger.debug("Received notify request with parameter: message=" + message + ".");
         
         /* Response parameters. */
@@ -379,7 +383,14 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         error.setReason("");
         operation.setError(error);
         
-        if (!this.rig.isSessionActive())
+        if (!(this.isSourceAuthenticated(ident) || this.rig.hasPermission(requestor, Session.SLAVE_PASSIVE)))
+        {
+            this.logger.warn("Failed sending notification message " + message + " because of invalid permission.");
+            operation.setSuccess(false);
+            error.setCode(3);
+            error.setReason("Invalid permission.");
+        }
+        else if (!this.rig.isSessionActive())
         {
             this.logger.warn("Failed notification because there are no sessions active.");
             operation.setSuccess(false);
@@ -486,10 +497,10 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     {
         /* Request parameters. */
         PrimitiveControlRequestType request = primRequest.getPerformPrimitiveControl();
-        String user = request.getRequestor();
+        String requestor = request.getRequestor();
         StringBuilder builder = new StringBuilder();
-        builder.append("Recevied primitive control request with params: user=");
-        builder.append(user);
+        builder.append("Recevied primitive control request with params: requestor=");
+        builder.append(requestor);
         
         PrimitiveRequest primitiveRequest = new PrimitiveRequest();
         
@@ -525,10 +536,11 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         error.setReason("");
         control.setError(error);
         
-        if (!this.rig.hasPermission(user, Session.SLAVE_ACTIVE))
+        if (!(this.isSourceAuthenticated(request.getIdentityToken()) || 
+                this.rig.hasPermission(requestor, Session.SLAVE_ACTIVE)))
         {
             /* Requestor does not have permission to request primitive control. */
-            this.logger.warn("Requestor " + user + " does not have permission to request primitive control.");
+            this.logger.warn("Requestor " + requestor + " does not have permission to request primitive control.");
             control.setSuccess(false);
             error.setCode(3);
             error.setReason("Invalid permission.");
@@ -566,13 +578,53 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     }
 
     /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getAttribute(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute)
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getAttribute(GetAttribute)
      */
     @Override
-    public GetAttributeResponse getAttribute(GetAttribute attrRequest)
+    public GetAttributeResponse getAttribute(final GetAttribute attrRequest)
     {
-        // TODO Auto-generated method stub
-        return null;
+        /* Request parameters. */
+        final AttributeRequestType request = attrRequest.getGetAttribute();
+        final String attrName = request.getAttribute();
+        final String requestor = request.getRequestor();
+        final String ident = request.getIdentityToken();
+        this.logger.debug("Receive get attribute request with parameters: requestor=" + requestor + ", attribute=" +
+                attrName + ".");
+        
+        /* Response parameters. */
+        final GetAttributeResponse response = new GetAttributeResponse();
+        final AttributeResponseType attrResponse = new AttributeResponseType();
+        response.setGetAttributeResponse(attrResponse);
+        attrResponse.setAttribute(attrName);
+        final AttributeResponseTypeChoice choice = new AttributeResponseTypeChoice();
+        attrResponse.setAttributeResponseTypeChoice(choice);
+
+        
+        String attrValue;
+        final ErrorType error = new ErrorType();
+        error.setOperation("Finding attribute " + attrName + '.');
+        if (!(this.isSourceAuthenticated(ident) || this.rig.hasPermission(requestor, Session.SLAVE_PASSIVE)))
+        {
+            this.logger.warn("Unable to provide attribute value for " + attrName + " because of invalid permission.");
+            
+            choice.setError(error);
+            error.setCode(3);
+            error.setReason("Invalid permission.");
+        }
+        else if ((attrValue = this.rig.getRigAttribute(attrName)) == null) // Check if the attribute was found
+        {
+            this.logger.warn("Unable to provide attribute value for " + attrName + " because it is not found.");
+            choice.setError(error);
+            error.setCode(9);
+            error.setReason("Attribute " + attrName + " not found.");
+        }
+        else // All good!
+        {
+            this.logger.info("Found attribute value " + attrValue + " for request attribute " + attrName + ".");
+            choice.setValue(attrValue);
+        }
+                
+        return response;
     }
 
     /* 
@@ -623,6 +675,17 @@ public class RigClientService implements RigClientServiceSkeletonInterface
      */
     private boolean isSourceAuthenticated(final String identTok)
     {
-        return true;
+        if (identTok == null)
+        {
+            return false;
+        }
+        
+        // TODO Authentication implementation
+        if (identTok.equals("abc123"))
+        {
+            return true;
+        }
+        
+        return false;
     }
 }

@@ -53,18 +53,18 @@ public class AttributeResponseType implements org.apache.axis2.databinding.ADBBe
     }
 
     /**
-     * field for AttributeResponseTypeChoice_type0
+     * field for AttributeResponseTypeChoice
      */
 
-    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice_type0 localAttributeResponseTypeChoice_type0;
+    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice localAttributeResponseTypeChoice_type0;
 
     /**
      * Auto generated getter method
      * 
      * @return au.edu.uts.eng.remotelabs.rigclient.protocol.types.
-     *         AttributeResponseTypeChoice_type0
+     *         AttributeResponseTypeChoice
      */
-    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice_type0 getAttributeResponseTypeChoice_type0()
+    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice getAttributeResponseTypeChoice()
     {
         return localAttributeResponseTypeChoice_type0;
     }
@@ -72,10 +72,10 @@ public class AttributeResponseType implements org.apache.axis2.databinding.ADBBe
     /**
      * Auto generated setter method
      * 
-     * @param param AttributeResponseTypeChoice_type0
+     * @param param AttributeResponseTypeChoice
      */
-    public void setAttributeResponseTypeChoice_type0(
-            au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice_type0 param)
+    public void setAttributeResponseTypeChoice(
+            au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice param)
     {
 
         this.localAttributeResponseTypeChoice_type0 = param;
@@ -227,7 +227,7 @@ public class AttributeResponseType implements org.apache.axis2.databinding.ADBBe
         xmlWriter.writeEndElement();
 
         if (localAttributeResponseTypeChoice_type0 == null) { throw new org.apache.axis2.databinding.ADBException(
-                "AttributeResponseTypeChoice_type0 cannot be null!!"); }
+                "AttributeResponseTypeChoice cannot be null!!"); }
         localAttributeResponseTypeChoice_type0.serialize(null, factory, xmlWriter);
 
         xmlWriter.writeEndElement();
@@ -437,10 +437,10 @@ public class AttributeResponseType implements org.apache.axis2.databinding.ADBBe
         }
 
         elementList.add(new javax.xml.namespace.QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
-                "AttributeResponseTypeChoice_type0"));
+                "AttributeResponseTypeChoice"));
 
         if (localAttributeResponseTypeChoice_type0 == null) { throw new org.apache.axis2.databinding.ADBException(
-                "AttributeResponseTypeChoice_type0 cannot be null!!"); }
+                "AttributeResponseTypeChoice cannot be null!!"); }
         elementList.add(localAttributeResponseTypeChoice_type0);
 
         return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(),
@@ -541,7 +541,7 @@ public class AttributeResponseType implements org.apache.axis2.databinding.ADBBe
                 {
 
                     object
-                            .setAttributeResponseTypeChoice_type0(au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice_type0.Factory
+                            .setAttributeResponseTypeChoice(au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice.Factory
                                     .parse(reader));
 
                 } // End of if for expected property start element

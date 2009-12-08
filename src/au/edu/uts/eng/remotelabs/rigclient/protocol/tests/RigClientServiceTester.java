@@ -54,7 +54,12 @@ import org.junit.Test;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AllocateResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ErrorType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotificationRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotifyResponse;
@@ -130,6 +135,7 @@ public class RigClientServiceTester extends TestCase
         Allocate alloc = new Allocate();
         UserType user = new UserType();
         user.setUser("mdiponio");
+        user.setIdentityToken("abc123");
         alloc.setAllocate(user);
         
         AllocateResponse resp = this.service.allocate(alloc);
@@ -154,6 +160,36 @@ public class RigClientServiceTester extends TestCase
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#allocate(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate)}.
      */
     @Test
+    public void testAllocateAuthFail()
+    {
+        Allocate alloc = new Allocate();
+        UserType user = new UserType();
+        user.setUser("mdiponio");
+        user.setIdentityToken("NOT_CORRECT");
+        alloc.setAllocate(user);
+        
+        AllocateResponse resp = this.service.allocate(alloc);
+        assertNotNull(resp);
+        
+        OperationResponseType op = resp.getAllocateResponse();
+        assertNotNull(op);
+        assertFalse(op.getSuccess());
+        
+        ErrorType error = op.getError();
+        assertNotNull(error);
+        assertEquals(3, error.getCode());
+        assertNotNull(error.getOperation());
+        assertNotNull(error.getReason());
+        assertEquals("Not authorised to allocate a user.", error.getReason());
+        
+        assertFalse(this.rig.isSessionActive());
+        assertEquals(Session.NOT_IN, this.rig.isInSession("mdiponio"));
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#allocate(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate)}.
+     */
+    @Test
     public void testAllocateInSession()
     {
         assertTrue(this.rig.assign("tmachet"));
@@ -161,6 +197,7 @@ public class RigClientServiceTester extends TestCase
         Allocate alloc = new Allocate();
         UserType user = new UserType();
         user.setUser("mdiponio");
+        user.setIdentityToken("abc123");
         alloc.setAllocate(user);
         
         AllocateResponse resp = this.service.allocate(alloc);
@@ -193,6 +230,7 @@ public class RigClientServiceTester extends TestCase
         Allocate alloc = new Allocate();
         UserType user = new UserType();
         user.setUser("mdiponio");
+        user.setIdentityToken("abc123");
         alloc.setAllocate(user);
         
         AllocateResponse resp = this.service.allocate(alloc);
@@ -225,6 +263,7 @@ public class RigClientServiceTester extends TestCase
         Release rel = new Release();
         UserType user = new UserType();
         user.setUser("mdiponio");
+        user.setIdentityToken("abc123");
         rel.setRelease(user);
         
         ReleaseResponse res = this.service.release(rel);
@@ -249,11 +288,45 @@ public class RigClientServiceTester extends TestCase
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#release(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release)}.
      */
     @Test
+    public void testReleaseAuthFailed()
+    {
+        assertTrue(this.rig.assign("mdiponio"));
+        assertTrue(this.rig.isSessionActive());
+        
+        Release rel = new Release();
+        UserType user = new UserType();
+        user.setIdentityToken("NOT_CORRECT");
+        user.setUser("mdiponio");
+        rel.setRelease(user);
+        
+        ReleaseResponse res = this.service.release(rel);
+        assertNotNull(res);
+        
+        OperationResponseType op = res.getReleaseResponse();
+        assertNotNull(res);
+        assertFalse(op.getSuccess());
+        
+        ErrorType error = op.getError();
+        assertNotNull(error);
+        assertEquals(3, error.getCode());
+        assertNotNull(error.getOperation());
+        assertNotNull(error.getReason());
+        assertEquals("Not authorised to release a user.", error.getReason());
+        
+        assertTrue(this.rig.isSessionActive());
+        assertEquals(Session.MASTER, this.rig.isInSession("mdiponio"));
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#release(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release)}.
+     */
+    @Test
     public void testReleaseNoSession()
     {               
         Release rel = new Release();
         UserType user = new UserType();
         user.setUser("mdiponio");
+        user.setIdentityToken("abc123");
         rel.setRelease(user);
         
         ReleaseResponse res = this.service.release(rel);
@@ -281,6 +354,7 @@ public class RigClientServiceTester extends TestCase
         Release rel = new Release();
         UserType user = new UserType();
         user.setUser("mdiponio");
+        user.setIdentityToken("abc123");        
         rel.setRelease(user);
         
         ReleaseResponse res = this.service.release(rel);
@@ -311,6 +385,40 @@ public class RigClientServiceTester extends TestCase
         SlaveAllocate request = new SlaveAllocate();
         SlaveUserType slave = new SlaveUserType();
         slave.setUser("mdiponio"); /* Always the slave... */
+        slave.setType(new TypeSlaveUser("Active"));
+        slave.setIdentityToken("abc123");
+        request.setSlaveAllocate(slave);
+        
+        SlaveAllocateResponse resp = this.service.slaveAllocate(request);
+        assertNotNull(resp);
+        
+        OperationResponseType op = resp.getSlaveAllocateResponse();
+        assertNotNull(op);
+        assertTrue(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getOperation());
+        assertNotNull(err.getReason());
+        
+        assertTrue(this.rig.hasPermission("mdiponio", Session.SLAVE_ACTIVE));
+        assertEquals(Session.SLAVE_ACTIVE, this.rig.isInSession("mdiponio"));	         
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#slaveAllocate(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveAllocate)}.
+     */
+    @Test
+    public void testSlaveAllocateByMaster()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        
+        SlaveAllocate request = new SlaveAllocate();
+        SlaveUserType slave = new SlaveUserType();
+        slave.setUser("mdiponio"); /* Always the slave... */
+        slave.setIdentityToken("NOT_CORRECT");
+        slave.setRequestor("tmachet");
         slave.setType(new TypeSlaveUser("Active"));
         request.setSlaveAllocate(slave);
         
@@ -343,6 +451,7 @@ public class RigClientServiceTester extends TestCase
         SlaveUserType slave = new SlaveUserType();
         slave.setUser("mdiponio"); /* Always the slave... */
         slave.setType(new TypeSlaveUser("Passive"));
+        slave.setIdentityToken("abc123");
         request.setSlaveAllocate(slave);
         
         SlaveAllocateResponse resp = this.service.slaveAllocate(request);
@@ -373,7 +482,8 @@ public class RigClientServiceTester extends TestCase
         SlaveAllocate request = new SlaveAllocate();
         SlaveUserType slave = new SlaveUserType();
         slave.setUser("mdiponio"); 
-        slave.setType(new TypeSlaveUser("God_Mode")); /* Not the slave no more. */
+        slave.setType(new TypeSlaveUser("King_Maker")); /* Not the slave no more. */
+        slave.setIdentityToken("abc123");
         request.setSlaveAllocate(slave);
         
         SlaveAllocateResponse resp = this.service.slaveAllocate(request);
@@ -381,7 +491,7 @@ public class RigClientServiceTester extends TestCase
         
         OperationResponseType op = resp.getSlaveAllocateResponse();
         assertNotNull(op);
-        assertFalse(op.getSuccess());
+        assertFalse(op.getSuccess()); /* Oh well, I can only dream... */
         
         ErrorType err = op.getError();
         assertNotNull(err);
@@ -399,6 +509,40 @@ public class RigClientServiceTester extends TestCase
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#slaveAllocate(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveAllocate)}.
      */
     @Test
+    public void testSlaveAllocateWrongAuth()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        
+        SlaveAllocate request = new SlaveAllocate();
+        SlaveUserType slave = new SlaveUserType();
+        slave.setUser("mdiponio"); 
+        slave.setIdentityToken("NOT_CORRECT");
+        slave.setType(new TypeSlaveUser("Active")); /* Not the slave no more. */
+        request.setSlaveAllocate(slave);
+        
+        SlaveAllocateResponse resp = this.service.slaveAllocate(request);
+        assertNotNull(resp);
+        
+        OperationResponseType op = resp.getSlaveAllocateResponse();
+        assertNotNull(op);
+        assertFalse(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(3, err.getCode());
+        assertNotNull(err.getOperation());
+        assertNotNull(err.getReason());
+        assertEquals("Not authorised to allocate a slave user.", err.getReason());
+        
+        assertFalse(this.rig.hasPermission("mdiponio", Session.SLAVE_ACTIVE));
+        assertFalse(this.rig.hasPermission("mdiponio", Session.SLAVE_PASSIVE));
+        assertEquals(Session.NOT_IN, this.rig.isInSession("mdiponio"));	         
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#slaveAllocate(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveAllocate)}.
+     */
+    @Test
     public void testSlaveAllocateNoSession()
     {
         
@@ -406,6 +550,7 @@ public class RigClientServiceTester extends TestCase
         SlaveUserType slave = new SlaveUserType();
         slave.setUser("mdiponio"); 
         slave.setType(new TypeSlaveUser("Active"));
+        slave.setIdentityToken("abc123");
         request.setSlaveAllocate(slave);
         
         SlaveAllocateResponse resp = this.service.slaveAllocate(request);
@@ -438,6 +583,7 @@ public class RigClientServiceTester extends TestCase
         SlaveUserType slave = new SlaveUserType();
         slave.setUser("mdiponio"); 
         slave.setType(new TypeSlaveUser("Active")); /* Trying to demote me... */
+        slave.setIdentityToken("abc123");
         request.setSlaveAllocate(slave);
         
         SlaveAllocateResponse resp = this.service.slaveAllocate(request);
@@ -470,6 +616,7 @@ public class RigClientServiceTester extends TestCase
         SlaveRelease request = new SlaveRelease();
         UserType slave = new UserType();
         slave.setUser("mdiponio");
+        slave.setIdentityToken("abc123");
         request.setSlaveRelease(slave);
         
         SlaveReleaseResponse resp = this.service.slaveRelease(request);
@@ -494,14 +641,16 @@ public class RigClientServiceTester extends TestCase
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#slaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveRelease)}.
      */
     @Test
-    public void testSlaveReleasePassive()
+    public void testSlaveReleaseByMaster()
     {
         assertTrue(this.rig.assign("tmachet"));
-        assertTrue(this.rig.addSlave("mdiponio", true));
+        assertTrue(this.rig.addSlave("mdiponio", false));
         
         SlaveRelease request = new SlaveRelease();
         UserType slave = new UserType();
         slave.setUser("mdiponio");
+        slave.setIdentityToken("Not correct");        
+        slave.setRequestor("tmachet");
         request.setSlaveRelease(slave);
         
         SlaveReleaseResponse resp = this.service.slaveRelease(request);
@@ -518,10 +667,79 @@ public class RigClientServiceTester extends TestCase
         assertNotNull(err.getReason());
         
         assertEquals(Session.NOT_IN, this.rig.isInSession("mdiponio"));
-        assertFalse(this.rig.hasPermission("mdiponio", Session.SLAVE_PASSIVE));
+        assertFalse(this.rig.hasPermission("mdiponio", Session.SLAVE_ACTIVE));
         assertTrue(this.rig.hasPermission("tmachet", Session.MASTER));
     }
     
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#slaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveRelease)}.
+     */
+    @Test
+    public void testSlaveReleaseWrongAuth()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", false));
+        
+        SlaveRelease request = new SlaveRelease();
+        UserType slave = new UserType();
+        slave.setUser("mdiponio");
+        slave.setIdentityToken("FOO BAR");
+        request.setSlaveRelease(slave);
+        
+        SlaveReleaseResponse resp = this.service.slaveRelease(request);
+        assertNotNull(resp);
+        
+        OperationResponseType op = resp.getSlaveReleaseResponse();
+        assertNotNull(resp);
+        assertFalse(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(3, err.getCode());
+        assertNotNull(err.getOperation());
+        assertNotNull(err.getReason());
+        assertEquals("Not authorised to release slave user.", err.getReason());
+        
+        assertEquals(Session.SLAVE_ACTIVE, this.rig.isInSession("mdiponio"));
+        assertTrue(this.rig.hasPermission("mdiponio", Session.SLAVE_ACTIVE));
+        assertTrue(this.rig.hasPermission("tmachet", Session.MASTER));
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#slaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveRelease)}.
+     */
+    @Test
+    public void testSlaveReleaseWrongMaster()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", false));
+        
+        SlaveRelease request = new SlaveRelease();
+        UserType slave = new UserType();
+        slave.setUser("mdiponio");
+        slave.setIdentityToken("FOO BAR");
+        slave.setRequestor("!tmachet");
+        request.setSlaveRelease(slave);
+        
+        SlaveReleaseResponse resp = this.service.slaveRelease(request);
+        assertNotNull(resp);
+        
+        OperationResponseType op = resp.getSlaveReleaseResponse();
+        assertNotNull(resp);
+        assertFalse(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(3, err.getCode());
+        assertNotNull(err.getOperation());
+        assertNotNull(err.getReason());
+        assertEquals("Not authorised to release slave user.", err.getReason());
+        
+        assertEquals(Session.SLAVE_ACTIVE, this.rig.isInSession("mdiponio"));
+        assertTrue(this.rig.hasPermission("mdiponio", Session.SLAVE_ACTIVE));
+        assertTrue(this.rig.hasPermission("tmachet", Session.MASTER));
+    }
+
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#slaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveRelease)}.
      */
@@ -533,6 +751,7 @@ public class RigClientServiceTester extends TestCase
         SlaveRelease request = new SlaveRelease();
         UserType slave = new UserType();
         slave.setUser("mdiponio");
+        slave.setIdentityToken("abc123");
         request.setSlaveRelease(slave);
         
         SlaveReleaseResponse resp = this.service.slaveRelease(request);
@@ -566,6 +785,90 @@ public class RigClientServiceTester extends TestCase
         NotificationRequestType request = new NotificationRequestType();
         notify.setNotify(request);
         request.setMessage("This is a very important message");
+        request.setIdentityToken("abc123");
+        
+        NotifyResponse response = this.service.notify(notify);
+        OperationResponseType op = response.getNotifyResponse();
+        assertNotNull(op);
+        assertTrue(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#notify(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify)}.
+     */
+    @Test
+    public void testNotifyMaster()
+    {
+        assertTrue(this.rig.assign("mdiponio"));
+        
+        Notify notify = new Notify();
+        NotificationRequestType request = new NotificationRequestType();
+        notify.setNotify(request);
+        request.setMessage("This is a very important message");
+        request.setIdentityToken("Wrong...");
+        request.setRequestor("mdiponio");
+        
+        NotifyResponse response = this.service.notify(notify);
+        OperationResponseType op = response.getNotifyResponse();
+        assertNotNull(op);
+        assertTrue(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#notify(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify)}.
+     */
+    @Test
+    public void testNotifySlaveActive()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", false));
+        
+        Notify notify = new Notify();
+        NotificationRequestType request = new NotificationRequestType();
+        notify.setNotify(request);
+        request.setMessage("This is a very important message");
+        request.setIdentityToken("Wrong...");
+        request.setRequestor("mdiponio");
+        
+        NotifyResponse response = this.service.notify(notify);
+        OperationResponseType op = response.getNotifyResponse();
+        assertNotNull(op);
+        assertTrue(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#notify(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify)}.
+     */
+    @Test
+    public void testNotifySlavePassive()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", true));
+        
+        Notify notify = new Notify();
+        NotificationRequestType request = new NotificationRequestType();
+        notify.setNotify(request);
+        request.setMessage("This is a very important message");
+        request.setIdentityToken("Wrong...");
+        request.setRequestor("mdiponio");
         
         NotifyResponse response = this.service.notify(notify);
         OperationResponseType op = response.getNotifyResponse();
@@ -589,6 +892,7 @@ public class RigClientServiceTester extends TestCase
         NotificationRequestType request = new NotificationRequestType();
         notify.setNotify(request);
         request.setMessage("This is a very important message");
+        request.setIdentityToken("abc123");
         
         NotifyResponse response = this.service.notify(notify);
         OperationResponseType op = response.getNotifyResponse();
@@ -601,6 +905,31 @@ public class RigClientServiceTester extends TestCase
         assertNotNull(err.getReason());
         assertNotNull(err.getOperation());
         assertEquals("Not in session.", err.getReason());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#notify(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify)}.
+     */
+    @Test
+    public void testNotifyNoAuth()
+    {
+        Notify notify = new Notify();
+        NotificationRequestType request = new NotificationRequestType();
+        notify.setNotify(request);
+        request.setMessage("This is a very important message");
+        request.setIdentityToken("Wrong...");
+        
+        NotifyResponse response = this.service.notify(notify);
+        OperationResponseType op = response.getNotifyResponse();
+        assertNotNull(op);
+        assertFalse(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(3, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        assertEquals("Invalid permission.", err.getReason());
     }
     
     /**
@@ -737,6 +1066,59 @@ public class RigClientServiceTester extends TestCase
        }   
     }
     
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)}.
+     */
+    @Test
+    public void testPerformPrimitiveControlAuth()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", false));
+        
+        PerformPrimitiveControl performControl = new PerformPrimitiveControl();
+        PrimitiveControlRequestType controlRequest = new PrimitiveControlRequestType();
+        performControl.setPerformPrimitiveControl(controlRequest);
+        
+        controlRequest.setRequestor("foobar");
+        controlRequest.setIdentityToken("abc123");
+        controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        controlRequest.setAction("test");
+        ParamType params[] = new ParamType[5];
+        for (int i = 0; i < params.length; i++)
+        {
+            params[i] = new ParamType();
+            params[i].setName("param_" + i);
+            params[i].setValue("Value_" + i);
+        }
+        controlRequest.setParam(params);
+        
+        PerformPrimitiveControlResponse response = this.service.performPrimitiveControl(performControl);
+        PrimitiveControlResponseType controlResponse = response.getPerformPrimitiveControlResponse();
+        assertNotNull(controlResponse);
+        assertTrue(controlResponse.getSuccess());
+        assertTrue(Boolean.valueOf(controlResponse.getWasSuccessful()));
+        
+        ErrorType err = controlResponse.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        
+        ParamType resParams[] = controlResponse.getResult();
+        assertEquals(5, resParams.length);
+        Map<String, String> res = new HashMap<String, String>();
+        for (ParamType p : resParams)
+        {
+            res.put(p.getName(), p.getValue());
+        }
+        
+       for (int i = 0; i < params.length; i++)
+       {
+           assertTrue(res.containsKey(params[i].getName()));
+           assertEquals(params[i].getValue(), res.get(params[i].getName()));
+       }   
+    }
+    
      /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)}.
      */
@@ -749,7 +1131,7 @@ public class RigClientServiceTester extends TestCase
         PerformPrimitiveControl performControl = new PerformPrimitiveControl();
         PrimitiveControlRequestType controlRequest = new PrimitiveControlRequestType();
         performControl.setPerformPrimitiveControl(controlRequest);
-        
+        controlRequest.setIdentityToken("Wrong...");
         controlRequest.setRequestor("mdiponio");
         controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
         controlRequest.setAction("test");
@@ -789,6 +1171,7 @@ public class RigClientServiceTester extends TestCase
         performControl.setPerformPrimitiveControl(controlRequest);
         
         controlRequest.setRequestor("mdiponio");
+        controlRequest.setIdentityToken("Wrong...");
         controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
         controlRequest.setAction("test");
         ParamType params[] = new ParamType[5];
@@ -864,7 +1247,141 @@ public class RigClientServiceTester extends TestCase
     @Test
     public void testGetAttribute()
     {
-        fail("Not yet implemented"); // TODO
+        GetAttribute attrRequest = new GetAttribute();
+        AttributeRequestType request = new AttributeRequestType();
+        attrRequest.setGetAttribute(request);
+        request.setAttribute("Rig_Type");
+        request.setIdentityToken("abc123");
+                
+        GetAttributeResponse attrResponse = this.service.getAttribute(attrRequest);
+        assertNotNull(attrResponse);
+        AttributeResponseType response = attrResponse.getGetAttributeResponse();
+        assertNotNull(response);
+       
+        assertEquals("Rig_Type", request.getAttribute());
+        AttributeResponseTypeChoice choice = response.getAttributeResponseTypeChoice();
+        assertNotNull(choice);
+        assertNull(choice.getError());
+        assertNotNull(choice.getValue());
+        assertEquals("fpga", choice.getValue());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#getAttribute(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute)}.
+     */
+    @Test
+    public void testGetAttributeMaster()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", true));
+        
+        GetAttribute attrRequest = new GetAttribute();
+        AttributeRequestType request = new AttributeRequestType();
+        attrRequest.setGetAttribute(request);
+        request.setAttribute("Rig_Type");
+        request.setIdentityToken("Wrong...");
+        request.setRequestor("tmachet");
+                
+        GetAttributeResponse attrResponse = this.service.getAttribute(attrRequest);
+        assertNotNull(attrResponse);
+        AttributeResponseType response = attrResponse.getGetAttributeResponse();
+        assertNotNull(response);
+       
+        assertEquals("Rig_Type", request.getAttribute());
+        AttributeResponseTypeChoice choice = response.getAttributeResponseTypeChoice();
+        assertNotNull(choice);
+        assertNull(choice.getError());
+        assertNotNull(choice.getValue());
+        assertEquals("fpga", choice.getValue());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#getAttribute(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute)}.
+     */
+    @Test
+    public void testGetAttributeSlaveActive()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", false));
+        
+        GetAttribute attrRequest = new GetAttribute();
+        AttributeRequestType request = new AttributeRequestType();
+        attrRequest.setGetAttribute(request);
+        request.setAttribute("Rig_Type");
+        request.setIdentityToken("Wrong...");
+        request.setRequestor("mdiponio");
+                
+        GetAttributeResponse attrResponse = this.service.getAttribute(attrRequest);
+        assertNotNull(attrResponse);
+        AttributeResponseType response = attrResponse.getGetAttributeResponse();
+        assertNotNull(response);
+       
+        assertEquals("Rig_Type", request.getAttribute());
+        AttributeResponseTypeChoice choice = response.getAttributeResponseTypeChoice();
+        assertNotNull(choice);
+        assertNull(choice.getError());
+        assertNotNull(choice.getValue());
+        assertEquals("fpga", choice.getValue());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#getAttribute(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute)}.
+     */
+    @Test
+    public void testGetAttributeSlavePassive()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", true));
+        
+        GetAttribute attrRequest = new GetAttribute();
+        AttributeRequestType request = new AttributeRequestType();
+        attrRequest.setGetAttribute(request);
+        request.setAttribute("Rig_Type");
+        request.setIdentityToken("Wrong...");
+        request.setRequestor("mdiponio");
+                
+        GetAttributeResponse attrResponse = this.service.getAttribute(attrRequest);
+        assertNotNull(attrResponse);
+        AttributeResponseType response = attrResponse.getGetAttributeResponse();
+        assertNotNull(response);
+       
+        assertEquals("Rig_Type", request.getAttribute());
+        AttributeResponseTypeChoice choice = response.getAttributeResponseTypeChoice();
+        assertNotNull(choice);
+        assertNull(choice.getError());
+        assertNotNull(choice.getValue());
+        assertEquals("fpga", choice.getValue());
+    }
+    
+        /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#getAttribute(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute)}.
+     */
+    @Test
+    public void testGetAttributeNoAuth()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", true));
+        
+        GetAttribute attrRequest = new GetAttribute();
+        AttributeRequestType request = new AttributeRequestType();
+        attrRequest.setGetAttribute(request);
+        request.setAttribute("Rig_Type");
+
+        GetAttributeResponse attrResponse = this.service.getAttribute(attrRequest);
+        assertNotNull(attrResponse);
+        AttributeResponseType response = attrResponse.getGetAttributeResponse();
+        assertNotNull(response);
+       
+        assertEquals("Rig_Type", request.getAttribute());
+        AttributeResponseTypeChoice choice = response.getAttributeResponseTypeChoice();
+        assertNotNull(choice);
+        assertNotNull(choice.getError());
+        assertNull(choice.getValue());
+        
+        ErrorType err = choice.getError();
+        assertEquals(3, err.getCode());
+        assertNotNull(err.getOperation());
+        assertEquals("Invalid permission.", err.getReason());
     }
 
     /**
