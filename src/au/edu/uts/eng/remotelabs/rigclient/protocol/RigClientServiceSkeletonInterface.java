@@ -56,6 +56,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectableResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotifyResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformBatchControl;
@@ -77,9 +79,7 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveReleaseResponse;
  * RigClientServiceSkeletonInterface skeleton interface for the Axis service.
  */
 public interface RigClientServiceSkeletonInterface
-{
-    // TODO Activity detection
-    
+{    
     /**
      * Request to allocate a specified user to the rig.
      * 
@@ -189,4 +189,12 @@ public interface RigClientServiceSkeletonInterface
      * @return operation response
      */
     public SetTestIntervalResponse setTestInterval(SetTestInterval interRequest);
+    
+    /**
+     * Request to determine if their is activity detected from in session users.
+     * 
+     * @param isActivityDetectable request parameters
+     * @return operation response
+     */
+    public IsActivityDetectableResponse isActivityDetectable(IsActivityDetectable isActivityDetectable);
 }

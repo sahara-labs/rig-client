@@ -1,74 +1,53 @@
 /**
- * SAHARA Rig Client
- * 
- * Software abstraction of physical rig to provide rig session control
- * and rig device control. Automatically tests rig hardware and reports
- * the rig status to ensure rig goodness.
- *
- * @license See LICENSE in the top level directory for complete license terms.
- *
- * Copyright (c) 2009, University of Technology, Sydney
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met:
- *
- *  * Redistributions of source code must retain the above copyright notice, 
- *    this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the distribution.
- *  * Neither the name of the University of Technology, Sydney nor the names 
- *    of its contributors may be used to endorse or promote products derived from 
- *    this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * @author Michael Diponio (mdiponio)
- * @date 5th December 2009
- *
- * Changelog:
- * - 05/12/2009 - mdiponio - Initial file creation.
- */
-
-/**
  * AbortBatchControl.java This file was auto-generated from WSDL by the Apache
  * Axis2 version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
  */
 
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
-
-import au.edu.uts.eng.remotelabs.rigclient.main.RigClientDefines;
-
 /**
- * AbortBatchControl bean class.
+ * AbortBatchControl bean class
  */
+
 public class AbortBatchControl implements org.apache.axis2.databinding.ADBBean
 {
-    /** Operation for type. */
-
-    /** Serializable class. */
-    private static final long serialVersionUID = -2547770682701716415L;
 
     public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
-            RigClientDefines.NAME_SPACE, "abortBatchControl", "ns2");
+            "http://remotelabs.eng.uts.edu.au/rigclient/protocol", "abortBatchControl", "ns1");
 
     private static java.lang.String generatePrefix(java.lang.String namespace)
     {
-        if (namespace.equals(RigClientDefines.NAME_SPACE)) return "ns2";
+        if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) { return "ns1"; }
         return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+    }
+
+    /**
+     * field for AbortBatchControl
+     */
+
+    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.AuthRequiredRequestType localAbortBatchControl;
+
+    /**
+     * Auto generated getter method
+     * 
+     * @return au.edu.uts.eng.remotelabs.rigclient.protocol.types.
+     *         AuthRequiredRequestType
+     */
+    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.AuthRequiredRequestType getAbortBatchControl()
+    {
+        return localAbortBatchControl;
+    }
+
+    /**
+     * Auto generated setter method
+     * 
+     * @param param AbortBatchControl
+     */
+    public void setAbortBatchControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.AuthRequiredRequestType param)
+    {
+
+        this.localAbortBatchControl = param;
+
     }
 
     /**
@@ -93,22 +72,6 @@ public class AbortBatchControl implements org.apache.axis2.databinding.ADBBean
     }
 
     /**
-     * field for AbortBatchControl
-     */
-
-    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType localAbortBatchControl;
-
-    /**
-     * Auto generated getter method
-     * 
-     * @return au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType
-     */
-    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType getAbortBatchControl()
-    {
-        return this.localAbortBatchControl;
-    }
-
-    /**
      * @param parentQName
      * @param factory
      * @return org.apache.axiom.om.OMElement
@@ -117,30 +80,193 @@ public class AbortBatchControl implements org.apache.axis2.databinding.ADBBean
             final org.apache.axiom.om.OMFactory factory) throws org.apache.axis2.databinding.ADBException
     {
 
-        org.apache.axiom.om.OMDataSource dataSource = new org.apache.axis2.databinding.ADBDataSource(this,
-                AbortBatchControl.MY_QNAME)
+        org.apache.axiom.om.OMDataSource dataSource = new org.apache.axis2.databinding.ADBDataSource(this, MY_QNAME)
         {
 
-            @Override
             public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
                     throws javax.xml.stream.XMLStreamException
             {
-                AbortBatchControl.this.serialize(AbortBatchControl.MY_QNAME, factory, xmlWriter);
+                AbortBatchControl.this.serialize(MY_QNAME, factory, xmlWriter);
             }
         };
-        return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(AbortBatchControl.MY_QNAME, factory, dataSource);
+        return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(MY_QNAME, factory, dataSource);
+
+    }
+
+    public void serialize(final javax.xml.namespace.QName parentQName, final org.apache.axiom.om.OMFactory factory,
+            org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
+            throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
+    {
+        serialize(parentQName, factory, xmlWriter, false);
+    }
+
+    public void serialize(final javax.xml.namespace.QName parentQName, final org.apache.axiom.om.OMFactory factory,
+            org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter, boolean serializeType)
+            throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
+    {
+
+        // We can safely assume an element has only one type associated with it
+
+        if (localAbortBatchControl == null) { throw new org.apache.axis2.databinding.ADBException(
+                "Property cannot be null!"); }
+        localAbortBatchControl.serialize(MY_QNAME, factory, xmlWriter);
 
     }
 
     /**
-     * databinding method to get an XML representation of this object
+     * Util method to write an attribute with the ns prefix
      */
-    public javax.xml.stream.XMLStreamReader getPullParser(javax.xml.namespace.QName qName)
-            throws org.apache.axis2.databinding.ADBException
+    private void writeAttribute(java.lang.String prefix, java.lang.String namespace, java.lang.String attName,
+            java.lang.String attValue, javax.xml.stream.XMLStreamWriter xmlWriter)
+            throws javax.xml.stream.XMLStreamException
+    {
+        if (xmlWriter.getPrefix(namespace) == null)
+        {
+            xmlWriter.writeNamespace(prefix, namespace);
+            xmlWriter.setPrefix(prefix, namespace);
+
+        }
+
+        xmlWriter.writeAttribute(namespace, attName, attValue);
+
+    }
+
+    /**
+     * Util method to write an attribute without the ns prefix
+     */
+    private void writeAttribute(java.lang.String namespace, java.lang.String attName, java.lang.String attValue,
+            javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException
+    {
+        if (namespace.equals(""))
+        {
+            xmlWriter.writeAttribute(attName, attValue);
+        }
+        else
+        {
+            registerPrefix(xmlWriter, namespace);
+            xmlWriter.writeAttribute(namespace, attName, attValue);
+        }
+    }
+
+    /**
+     * Util method to write an attribute without the ns prefix
+     */
+    private void writeQNameAttribute(java.lang.String namespace, java.lang.String attName,
+            javax.xml.namespace.QName qname, javax.xml.stream.XMLStreamWriter xmlWriter)
+            throws javax.xml.stream.XMLStreamException
     {
 
-        // We can safely assume an element has only one type associated with it
-        return this.localAbortBatchControl.getPullParser(AbortBatchControl.MY_QNAME);
+        java.lang.String attributeNamespace = qname.getNamespaceURI();
+        java.lang.String attributePrefix = xmlWriter.getPrefix(attributeNamespace);
+        if (attributePrefix == null)
+        {
+            attributePrefix = registerPrefix(xmlWriter, attributeNamespace);
+        }
+        java.lang.String attributeValue;
+        if (attributePrefix.trim().length() > 0)
+        {
+            attributeValue = attributePrefix + ":" + qname.getLocalPart();
+        }
+        else
+        {
+            attributeValue = qname.getLocalPart();
+        }
+
+        if (namespace.equals(""))
+        {
+            xmlWriter.writeAttribute(attName, attributeValue);
+        }
+        else
+        {
+            registerPrefix(xmlWriter, namespace);
+            xmlWriter.writeAttribute(namespace, attName, attributeValue);
+        }
+    }
+
+    /**
+     * method to handle Qnames
+     */
+
+    private void writeQName(javax.xml.namespace.QName qname, javax.xml.stream.XMLStreamWriter xmlWriter)
+            throws javax.xml.stream.XMLStreamException
+    {
+        java.lang.String namespaceURI = qname.getNamespaceURI();
+        if (namespaceURI != null)
+        {
+            java.lang.String prefix = xmlWriter.getPrefix(namespaceURI);
+            if (prefix == null)
+            {
+                prefix = generatePrefix(namespaceURI);
+                xmlWriter.writeNamespace(prefix, namespaceURI);
+                xmlWriter.setPrefix(prefix, namespaceURI);
+            }
+
+            if (prefix.trim().length() > 0)
+            {
+                xmlWriter.writeCharacters(prefix + ":"
+                        + org.apache.axis2.databinding.utils.ConverterUtil.convertToString(qname));
+            }
+            else
+            {
+                // i.e this is the default namespace
+                xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(qname));
+            }
+
+        }
+        else
+        {
+            xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(qname));
+        }
+    }
+
+    private void writeQNames(javax.xml.namespace.QName[] qnames, javax.xml.stream.XMLStreamWriter xmlWriter)
+            throws javax.xml.stream.XMLStreamException
+    {
+
+        if (qnames != null)
+        {
+            // we have to store this data until last moment since it is not
+            // possible to write any
+            // namespace data after writing the charactor data
+            java.lang.StringBuffer stringToWrite = new java.lang.StringBuffer();
+            java.lang.String namespaceURI = null;
+            java.lang.String prefix = null;
+
+            for (int i = 0; i < qnames.length; i++)
+            {
+                if (i > 0)
+                {
+                    stringToWrite.append(" ");
+                }
+                namespaceURI = qnames[i].getNamespaceURI();
+                if (namespaceURI != null)
+                {
+                    prefix = xmlWriter.getPrefix(namespaceURI);
+                    if ((prefix == null) || (prefix.length() == 0))
+                    {
+                        prefix = generatePrefix(namespaceURI);
+                        xmlWriter.writeNamespace(prefix, namespaceURI);
+                        xmlWriter.setPrefix(prefix, namespaceURI);
+                    }
+
+                    if (prefix.trim().length() > 0)
+                    {
+                        stringToWrite.append(prefix).append(":").append(
+                                org.apache.axis2.databinding.utils.ConverterUtil.convertToString(qnames[i]));
+                    }
+                    else
+                    {
+                        stringToWrite.append(org.apache.axis2.databinding.utils.ConverterUtil
+                                .convertToString(qnames[i]));
+                    }
+                }
+                else
+                {
+                    stringToWrite.append(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(qnames[i]));
+                }
+            }
+            xmlWriter.writeCharacters(stringToWrite.toString());
+        }
 
     }
 
@@ -154,7 +280,7 @@ public class AbortBatchControl implements org.apache.axis2.databinding.ADBBean
 
         if (prefix == null)
         {
-            prefix = AbortBatchControl.generatePrefix(namespace);
+            prefix = generatePrefix(namespace);
 
             while (xmlWriter.getNamespaceContext().getNamespaceURI(prefix) != null)
             {
@@ -168,38 +294,18 @@ public class AbortBatchControl implements org.apache.axis2.databinding.ADBBean
         return prefix;
     }
 
-    public void serialize(final javax.xml.namespace.QName parentQName, final org.apache.axiom.om.OMFactory factory,
-            org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
-            throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
-    {
-        this.serialize(parentQName, factory, xmlWriter, false);
-    }
-
-    public void serialize(final javax.xml.namespace.QName parentQName, final org.apache.axiom.om.OMFactory factory,
-            org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter, boolean serializeType)
-            throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
+    /**
+     * databinding method to get an XML representation of this object
+     */
+    public javax.xml.stream.XMLStreamReader getPullParser(javax.xml.namespace.QName qName)
+            throws org.apache.axis2.databinding.ADBException
     {
 
         // We can safely assume an element has only one type associated with it
-
-        if (this.localAbortBatchControl == null)
-            throw new org.apache.axis2.databinding.ADBException("Property cannot be null!");
-        this.localAbortBatchControl.serialize(AbortBatchControl.MY_QNAME, factory, xmlWriter);
+        return localAbortBatchControl.getPullParser(MY_QNAME);
 
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param AbortBatchControl
-     */
-    public void setAbortBatchControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType param)
-    {
-
-        this.localAbortBatchControl = param;
-
-    }
-    
     /**
      * Factory class that keeps the parse method
      */
@@ -216,35 +322,48 @@ public class AbortBatchControl implements org.apache.axis2.databinding.ADBBean
          * is a complex type, the reader is positioned at the end element of its
          * outer element
          */
-        public static AbortBatchControl parse(XMLStreamReader reader) throws Exception
+        public static AbortBatchControl parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception
         {
-            AbortBatchControl abc = new AbortBatchControl();
+            AbortBatchControl object = new AbortBatchControl();
 
+            int event;
+            java.lang.String nillableValue = null;
+            java.lang.String prefix = "";
+            java.lang.String namespaceuri = "";
             try
             {
+
                 while (!reader.isStartElement() && !reader.isEndElement())
-                {
                     reader.next();
-                }
+
+                // Note all attributes that were handled. Used to differ normal
+                // attributes
+                // from anyAttributes.
+                java.util.Vector handledAttributes = new java.util.Vector();
 
                 while (!reader.isEndElement())
                 {
                     if (reader.isStartElement())
                     {
 
-                        if (reader.isStartElement() && new QName(RigClientDefines.NAME_SPACE, "abortBatchControl").equals(reader.getName()))
+                        if (reader.isStartElement()
+                                && new javax.xml.namespace.QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
+                                        "abortBatchControl").equals(reader.getName()))
                         {
 
-                            abc
-                                    .setAbortBatchControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType.Factory
+                            object
+                                    .setAbortBatchControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.AuthRequiredRequestType.Factory
                                             .parse(reader));
 
                         } // End of if for expected property start element
+
                         else
+                        {
                             // A start element we are not expecting indicates an
                             // invalid parameter was passed
                             throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
                                     + reader.getLocalName());
+                        }
 
                     }
                     else
@@ -259,7 +378,7 @@ public class AbortBatchControl implements org.apache.axis2.databinding.ADBBean
                 throw new java.lang.Exception(e);
             }
 
-            return abc;
+            return object;
         }
 
     }// end of factory class

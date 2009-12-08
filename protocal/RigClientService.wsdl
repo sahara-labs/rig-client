@@ -1,4 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+                         ## Sahara Rig Client ##
+
+Copyright (c) 2009, University of Technology, Sydney
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, 
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright 
+      notice, this list of conditions and the following disclaimer in the 
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the University of Technology, Sydney nor the names 
+      of its contributors may be used to endorse or promote products derived from 
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Author: Michael Diponio (mdiponio)
+Date: 12th October 2009
+
+Changelog:
+  - 12/10/2009 - mdiponio - Initial file creation
+  - 08/12/2009 - mdiponio - Addition of AuthRequiredRequestType and base class changes to multiple 
+                            elements. 
+-->
 <wsdl:definitions xmlns:rigclient="http://remotelabs.eng.uts.edu.au/rigclient/protocol" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="RigClientService" targetNamespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
   <wsdl:types>
     <xsd:schema targetNamespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
@@ -57,9 +94,15 @@
       			release.
       		</xsd:documentation>
       	</xsd:annotation>
-      	<xsd:sequence>
-      		<xsd:element name="user" type="xsd:string"></xsd:element>
-      	</xsd:sequence>
+      	<xsd:complexContent>
+      		<xsd:extension base="rigclient:AuthRequiredRequestType">
+      			<xsd:sequence>
+      				<xsd:element name="user"
+      					type="xsd:string">
+      				</xsd:element>
+      			</xsd:sequence>
+      		</xsd:extension>
+      	</xsd:complexContent>
       </xsd:complexType>
       <xsd:element name="in" type="rigclient:UserType"></xsd:element>
     
@@ -114,14 +157,22 @@
             </xsd:element>
         
             <xsd:complexType name="NotificationRequestType">
-            	<xsd:sequence>
-            		<xsd:element name="message" type="xsd:string"></xsd:element>
-            	</xsd:sequence>
+            	<xsd:complexContent>
+            		<xsd:extension
+            			base="rigclient:AuthRequiredRequestType">
+            			<xsd:sequence>
+            				<xsd:element name="message"
+            					type="xsd:string">
+            				</xsd:element>
+            			</xsd:sequence>
+            		</xsd:extension>
+            	</xsd:complexContent>
             </xsd:complexType>
-    
+
             <xsd:complexType name="BatchRequestType">
             	<xsd:complexContent>
-            		<xsd:extension base="rigclient:UserType">
+            		<xsd:extension
+            			base="rigclient:AuthRequiredRequestType">
             			<xsd:sequence>
             				<xsd:element name="batchFile"
             					type="xsd:base64Binary">
@@ -130,7 +181,8 @@
             		</xsd:extension>
             	</xsd:complexContent>
             </xsd:complexType>
-            <xsd:element name="abortBatchControl" type="rigclient:UserType">
+            <xsd:element name="abortBatchControl"
+            	type="rigclient:AuthRequiredRequestType">
             </xsd:element>
             <xsd:element name="abortBatchControlResponse"
             	type="rigclient:OperationResponseType">
@@ -143,7 +195,8 @@
             		</xsd:documentation>
             	</xsd:annotation>
             	<xsd:complexContent>
-            		<xsd:extension base="rigclient:UserType">
+            		<xsd:extension
+            			base="rigclient:AuthRequiredRequestType">
             			<xsd:sequence>
             				<xsd:element name="controller"
             					type="xsd:string">
@@ -169,7 +222,7 @@
             	</xsd:sequence>
             </xsd:complexType>
             <xsd:element name="getBatchControlStatus"
-            	type="rigclient:UserType">
+            	type="rigclient:AuthRequiredRequestType">
             </xsd:element>
             <xsd:element name="getBatchControlStatusResponse"
             	type="rigclient:BatchStatusResponseType">
@@ -245,7 +298,8 @@
     
             <xsd:complexType name="AttributeRequestType">
             	<xsd:complexContent>
-            		<xsd:extension base="rigclient:UserType">
+            		<xsd:extension
+            			base="rigclient:AuthRequiredRequestType">
             			<xsd:sequence>
             				<xsd:element name="attribute"
             					type="xsd:string">
@@ -254,7 +308,7 @@
             		</xsd:extension>
             	</xsd:complexContent>
             </xsd:complexType>
-    
+
             <xsd:complexType name="AttributeResponseType">
             	<xsd:sequence>
             		<xsd:element name="attribute" type="xsd:string"></xsd:element>
@@ -295,15 +349,52 @@
             </xsd:complexType>
     
             <xsd:complexType name="MaintenanceRequestType">
+            	<xsd:complexContent>
+            		<xsd:extension
+            			base="rigclient:AuthRequiredRequestType">
+            			<xsd:sequence>
+            				<xsd:element name="putOffine"
+            					type="xsd:boolean">
+            				</xsd:element>
+            				<xsd:element name="runTests"
+            					type="xsd:boolean">
+            				</xsd:element>
+            			</xsd:sequence>
+            		</xsd:extension>
+            	</xsd:complexContent>
+            </xsd:complexType>
+
+            <xsd:complexType name="TestIntervalRequestType">
+            	<xsd:complexContent>
+            		<xsd:extension
+            			base="rigclient:AuthRequiredRequestType">
+            			<xsd:sequence>
+            				<xsd:element name="interval"
+            					type="xsd:int">
+            				</xsd:element>
+            			</xsd:sequence>
+            		</xsd:extension>
+            	</xsd:complexContent>
+            </xsd:complexType>
+
+            <xsd:complexType name="AuthRequiredRequestType">
             	<xsd:sequence>
-            		<xsd:element name="putOffline" type="xsd:boolean"></xsd:element>
-            		<xsd:element name="runTests" type="xsd:boolean"></xsd:element>
+            		<xsd:element name="identityToken"
+            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="requestor" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
-    
-            <xsd:complexType name="TestIntervalRequestType">
+            <xsd:element name="isActivityDetectable"
+            	type="rigclient:NullType">
+            </xsd:element>
+            <xsd:element name="isActivityDetectableResponse"
+            	type="rigclient:ActivityDetectableType">
+            </xsd:element>
+            
+            <xsd:complexType name="ActivityDetectableType">
             	<xsd:sequence>
-            		<xsd:element name="interval" type="xsd:int"></xsd:element>
+            		<xsd:element name="activity" type="xsd:boolean"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
     </xsd:schema>
@@ -386,6 +477,12 @@
   <wsdl:message name="slaveReleaseResponse">
   	<wsdl:part name="parameters" element="rigclient:slaveReleaseResponse"></wsdl:part>
   </wsdl:message>
+  <wsdl:message name="isActivityDetectableRequest">
+  	<wsdl:part name="parameters" element="rigclient:isActivityDetectable"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="isActivityDetectableResponse">
+  	<wsdl:part name="parameters" element="rigclient:isActivityDetectableResponse"></wsdl:part>
+  </wsdl:message>
   <wsdl:portType name="RigClientService">
     <wsdl:operation name="allocate">
       <wsdl:documentation>Allocates a user to a rig (i.e. this starts a session)</wsdl:documentation>
@@ -439,6 +536,10 @@
     <wsdl:operation name="setTestInterval">
     	<wsdl:input message="rigclient:setTestIntervalRequest"></wsdl:input>
     	<wsdl:output message="rigclient:setTestIntervalResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="isActivityDetectable">
+    	<wsdl:input message="rigclient:isActivityDetectableRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:isActivityDetectableResponse"></wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="RigClientServiceSOAP"
@@ -568,6 +669,15 @@
   	<wsdl:operation name="getBatchControlStatus">
   		<soap:operation
   			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/batchStatus" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="isActivityDetectable">
+  		<soap:operation soapAction="http://remotelabs.eng.uts.edu.au/rigclient/isActivityDetectable"/>
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>

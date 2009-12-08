@@ -1,19 +1,19 @@
 /**
- * SlaveRelease.java This file was auto-generated from WSDL by the Apache Axis2
- * version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
+ * IsActivityDetectableResponse.java This file was auto-generated from WSDL by
+ * the Apache Axis2 version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
  */
 
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types;
 
 /**
- * SlaveRelease bean class
+ * IsActivityDetectableResponse bean class
  */
 
-public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
+public class IsActivityDetectableResponse implements org.apache.axis2.databinding.ADBBean
 {
 
     public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
-            "http://remotelabs.eng.uts.edu.au/rigclient/protocol", "slaveRelease", "ns1");
+            "http://remotelabs.eng.uts.edu.au/rigclient/protocol", "isActivityDetectableResponse", "ns1");
 
     private static java.lang.String generatePrefix(java.lang.String namespace)
     {
@@ -22,30 +22,32 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
     }
 
     /**
-     * field for SlaveRelease
+     * field for IsActivityDetectableResponse
      */
 
-    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType localSlaveRelease;
+    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.ActivityDetectableType localIsActivityDetectableResponse;
 
     /**
      * Auto generated getter method
      * 
-     * @return au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType
+     * @return au.edu.uts.eng.remotelabs.rigclient.protocol.types.
+     *         ActivityDetectableType
      */
-    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType getSlaveRelease()
+    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.ActivityDetectableType getIsActivityDetectableResponse()
     {
-        return localSlaveRelease;
+        return localIsActivityDetectableResponse;
     }
 
     /**
      * Auto generated setter method
      * 
-     * @param param SlaveRelease
+     * @param param IsActivityDetectableResponse
      */
-    public void setSlaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType param)
+    public void setIsActivityDetectableResponse(
+            au.edu.uts.eng.remotelabs.rigclient.protocol.types.ActivityDetectableType param)
     {
 
-        this.localSlaveRelease = param;
+        this.localIsActivityDetectableResponse = param;
 
     }
 
@@ -85,7 +87,7 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
             public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
                     throws javax.xml.stream.XMLStreamException
             {
-                SlaveRelease.this.serialize(MY_QNAME, factory, xmlWriter);
+                IsActivityDetectableResponse.this.serialize(MY_QNAME, factory, xmlWriter);
             }
         };
         return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(MY_QNAME, factory, dataSource);
@@ -106,8 +108,9 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
 
         // We can safely assume an element has only one type associated with it
 
-        if (localSlaveRelease == null) { throw new org.apache.axis2.databinding.ADBException("Property cannot be null!"); }
-        localSlaveRelease.serialize(MY_QNAME, factory, xmlWriter);
+        if (localIsActivityDetectableResponse == null) { throw new org.apache.axis2.databinding.ADBException(
+                "Property cannot be null!"); }
+        localIsActivityDetectableResponse.serialize(MY_QNAME, factory, xmlWriter);
 
     }
 
@@ -300,7 +303,7 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
     {
 
         // We can safely assume an element has only one type associated with it
-        return localSlaveRelease.getPullParser(MY_QNAME);
+        return localIsActivityDetectableResponse.getPullParser(MY_QNAME);
 
     }
 
@@ -320,9 +323,10 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
          * is a complex type, the reader is positioned at the end element of its
          * outer element
          */
-        public static SlaveRelease parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception
+        public static IsActivityDetectableResponse parse(javax.xml.stream.XMLStreamReader reader)
+                throws java.lang.Exception
         {
-            SlaveRelease object = new SlaveRelease();
+            IsActivityDetectableResponse object = new IsActivityDetectableResponse();
 
             int event;
             java.lang.String nillableValue = null;
@@ -346,11 +350,12 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
 
                         if (reader.isStartElement()
                                 && new javax.xml.namespace.QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
-                                        "slaveRelease").equals(reader.getName()))
+                                        "isActivityDetectableResponse").equals(reader.getName()))
                         {
 
-                            object.setSlaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType.Factory
-                                    .parse(reader));
+                            object
+                                    .setIsActivityDetectableResponse(au.edu.uts.eng.remotelabs.rigclient.protocol.types.ActivityDetectableType.Factory
+                                            .parse(reader));
 
                         } // End of if for expected property start element
 

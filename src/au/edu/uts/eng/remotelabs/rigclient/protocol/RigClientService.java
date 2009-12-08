@@ -56,6 +56,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectableResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotifyResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.OperationResponseType;
@@ -125,7 +127,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         final AllocateResponse response = new AllocateResponse();
         response.setAllocateResponse(operation);
 
-        if (!this.isSourceAuthenticated())
+        if (!this.isSourceAuthenticated(allocRequest.getAllocate().getIdentityToken()))
         {
             this.logger.warn("Failed allocating user " + user + " because of invalid permission.");
             operation.setSuccess(false);
@@ -187,7 +189,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         final ReleaseResponse response = new ReleaseResponse();
         response.setReleaseResponse(operation);
         
-        if (!this.isSourceAuthenticated())
+        if (!this.isSourceAuthenticated(relRequest.getRelease().getIdentityToken()))
         {
             this.logger.warn("Failed releasing user " + user + " because of invalid permission.");
             operation.setSuccess(false);
@@ -258,9 +260,8 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         final SlaveAllocateResponse response = new SlaveAllocateResponse();
         response.setSlaveAllocateResponse(operation);
         
-        
-        // TODO Master user slave user assignment
-        if (!this.isSourceAuthenticated())
+        if (!(this.isSourceAuthenticated(slave.getIdentityToken()) &&
+                this.rig.hasPermission(slave.getRequestor(), Session.MASTER)))
         {
             this.logger.warn("Failed allocating slave user " + user + " because of invalid permission.");
             operation.setSuccess(false);
@@ -326,8 +327,8 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         error.setOperation("Release slave " + slave + ".");
         error.setReason("");
         
-        // TODO Master user slave release
-        if (!this.isSourceAuthenticated())
+        if (!(this.isSourceAuthenticated(slaveRequest.getSlaveRelease().getIdentityToken()) || 
+                this.rig.hasPermission(slaveRequest.getSlaveRelease().getIdentityToken(), Session.MASTER)))
         {
             this.logger.warn("Failed releasing slave user " + slave + " because of invalid permission.");
             operation.setSuccess(false);
@@ -418,7 +419,8 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     public AbortBatchControlResponse abortBatchControl(final AbortBatchControl abortRequest)
     {
         /* Request parameters. */
-        final String requestor = abortRequest.getAbortBatchControl().getUser();
+        final String requestor = abortRequest.getAbortBatchControl().getRequestor();
+
         this.logger.debug("Received abort batch control request with parameter: requestor=" + requestor + ".");
         
         /* Response parameters. */
@@ -484,7 +486,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     {
         /* Request parameters. */
         PrimitiveControlRequestType request = primRequest.getPerformPrimitiveControl();
-        String user = request.getUser();
+        String user = request.getRequestor();
         StringBuilder builder = new StringBuilder();
         builder.append("Recevied primitive control request with params: user=");
         builder.append(user);
@@ -523,7 +525,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         error.setReason("");
         control.setError(error);
         
-        if (!this.rig.hasPermission(user, Session.SLAVE_ACTIVE) && !this.isSourceAuthenticated())
+        if (!this.rig.hasPermission(user, Session.SLAVE_ACTIVE))
         {
             /* Requestor does not have permission to request primitive control. */
             this.logger.warn("Requestor " + user + " does not have permission to request primitive control.");
@@ -603,16 +605,24 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         return null;
     }
 
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#isActivityDetectable(au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable)
+     */
+    @Override
+    public IsActivityDetectableResponse isActivityDetectable(IsActivityDetectable isActivityDetectable)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     /**
      * If the source is the requested scheduling server.
      * 
-     * @param source
+     * @param identTok identity token of requestor
      * @return
      */
-    private boolean isSourceAuthenticated()
+    private boolean isSourceAuthenticated(final String identTok)
     {
         return true;
     }
-
 }

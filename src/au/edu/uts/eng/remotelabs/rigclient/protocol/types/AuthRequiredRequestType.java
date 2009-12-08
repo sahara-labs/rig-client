@@ -1,19 +1,19 @@
 /**
- * ParamType.java This file was auto-generated from WSDL by the Apache Axis2
- * version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
+ * AuthRequiredRequestType.java This file was auto-generated from WSDL by the
+ * Apache Axis2 version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
  */
 
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types;
 
 /**
- * ParamType bean class
+ * AuthRequiredRequestType bean class
  */
 
-public class ParamType implements org.apache.axis2.databinding.ADBBean
+public class AuthRequiredRequestType implements org.apache.axis2.databinding.ADBBean
 {
     /*
      * This type was generated from the piece of schema that had name =
-     * ParamType Namespace URI =
+     * AuthRequiredRequestType Namespace URI =
      * http://remotelabs.eng.uts.edu.au/rigclient/protocol Namespace Prefix =
      * ns1
      */
@@ -25,58 +25,94 @@ public class ParamType implements org.apache.axis2.databinding.ADBBean
     }
 
     /**
-     * field for Name
+     * field for IdentityToken
      */
 
-    protected java.lang.String localName;
+    protected java.lang.String localIdentityToken;
+
+    /*
+     * This tracker boolean wil be used to detect whether the user called the
+     * set method for this attribute. It will be used to determine whether to
+     * include this field in the serialized XML
+     */
+    protected boolean localIdentityTokenTracker = false;
 
     /**
      * Auto generated getter method
      * 
      * @return java.lang.String
      */
-    public java.lang.String getName()
+    public java.lang.String getIdentityToken()
     {
-        return localName;
+        return localIdentityToken;
     }
 
     /**
      * Auto generated setter method
      * 
-     * @param param Name
+     * @param param IdentityToken
      */
-    public void setName(java.lang.String param)
+    public void setIdentityToken(java.lang.String param)
     {
 
-        this.localName = param;
+        if (param != null)
+        {
+            // update the setting tracker
+            localIdentityTokenTracker = true;
+        }
+        else
+        {
+            localIdentityTokenTracker = false;
+
+        }
+
+        this.localIdentityToken = param;
 
     }
 
     /**
-     * field for Value
+     * field for Requestor
      */
 
-    protected java.lang.String localValue;
+    protected java.lang.String localRequestor;
+
+    /*
+     * This tracker boolean wil be used to detect whether the user called the
+     * set method for this attribute. It will be used to determine whether to
+     * include this field in the serialized XML
+     */
+    protected boolean localRequestorTracker = false;
 
     /**
      * Auto generated getter method
      * 
      * @return java.lang.String
      */
-    public java.lang.String getValue()
+    public java.lang.String getRequestor()
     {
-        return localValue;
+        return localRequestor;
     }
 
     /**
      * Auto generated setter method
      * 
-     * @param param Value
+     * @param param Requestor
      */
-    public void setValue(java.lang.String param)
+    public void setRequestor(java.lang.String param)
     {
 
-        this.localValue = param;
+        if (param != null)
+        {
+            // update the setting tracker
+            localRequestorTracker = true;
+        }
+        else
+        {
+            localRequestorTracker = false;
+
+        }
+
+        this.localRequestor = param;
 
     }
 
@@ -116,7 +152,7 @@ public class ParamType implements org.apache.axis2.databinding.ADBBean
             public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
                     throws javax.xml.stream.XMLStreamException
             {
-                ParamType.this.serialize(parentQName, factory, xmlWriter);
+                AuthRequiredRequestType.this.serialize(parentQName, factory, xmlWriter);
             }
         };
         return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(parentQName, factory, dataSource);
@@ -173,97 +209,101 @@ public class ParamType implements org.apache.axis2.databinding.ADBBean
             if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0))
             {
                 writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", namespacePrefix
-                        + ":ParamType", xmlWriter);
+                        + ":AuthRequiredRequestType", xmlWriter);
             }
             else
             {
-                writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", "ParamType", xmlWriter);
+                writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", "AuthRequiredRequestType",
+                        xmlWriter);
             }
 
         }
-
-        namespace = "";
-        if (!namespace.equals(""))
+        if (localIdentityTokenTracker)
         {
-            prefix = xmlWriter.getPrefix(namespace);
-
-            if (prefix == null)
+            namespace = "";
+            if (!namespace.equals(""))
             {
-                prefix = generatePrefix(namespace);
+                prefix = xmlWriter.getPrefix(namespace);
 
-                xmlWriter.writeStartElement(prefix, "name", namespace);
-                xmlWriter.writeNamespace(prefix, namespace);
-                xmlWriter.setPrefix(prefix, namespace);
+                if (prefix == null)
+                {
+                    prefix = generatePrefix(namespace);
 
-            }
-            else
-            {
-                xmlWriter.writeStartElement(namespace, "name");
-            }
+                    xmlWriter.writeStartElement(prefix, "identityToken", namespace);
+                    xmlWriter.writeNamespace(prefix, namespace);
+                    xmlWriter.setPrefix(prefix, namespace);
 
-        }
-        else
-        {
-            xmlWriter.writeStartElement("name");
-        }
-
-        if (localName == null)
-        {
-            // write the nil attribute
-
-            throw new org.apache.axis2.databinding.ADBException("name cannot be null!!");
-
-        }
-        else
-        {
-
-            xmlWriter.writeCharacters(localName);
-
-        }
-
-        xmlWriter.writeEndElement();
-
-        namespace = "";
-        if (!namespace.equals(""))
-        {
-            prefix = xmlWriter.getPrefix(namespace);
-
-            if (prefix == null)
-            {
-                prefix = generatePrefix(namespace);
-
-                xmlWriter.writeStartElement(prefix, "value", namespace);
-                xmlWriter.writeNamespace(prefix, namespace);
-                xmlWriter.setPrefix(prefix, namespace);
+                }
+                else
+                {
+                    xmlWriter.writeStartElement(namespace, "identityToken");
+                }
 
             }
             else
             {
-                xmlWriter.writeStartElement(namespace, "value");
+                xmlWriter.writeStartElement("identityToken");
             }
 
+            if (localIdentityToken == null)
+            {
+                // write the nil attribute
+
+                throw new org.apache.axis2.databinding.ADBException("identityToken cannot be null!!");
+
+            }
+            else
+            {
+
+                xmlWriter.writeCharacters(localIdentityToken);
+
+            }
+
+            xmlWriter.writeEndElement();
         }
-        else
+        if (localRequestorTracker)
         {
-            xmlWriter.writeStartElement("value");
+            namespace = "";
+            if (!namespace.equals(""))
+            {
+                prefix = xmlWriter.getPrefix(namespace);
+
+                if (prefix == null)
+                {
+                    prefix = generatePrefix(namespace);
+
+                    xmlWriter.writeStartElement(prefix, "requestor", namespace);
+                    xmlWriter.writeNamespace(prefix, namespace);
+                    xmlWriter.setPrefix(prefix, namespace);
+
+                }
+                else
+                {
+                    xmlWriter.writeStartElement(namespace, "requestor");
+                }
+
+            }
+            else
+            {
+                xmlWriter.writeStartElement("requestor");
+            }
+
+            if (localRequestor == null)
+            {
+                // write the nil attribute
+
+                throw new org.apache.axis2.databinding.ADBException("requestor cannot be null!!");
+
+            }
+            else
+            {
+
+                xmlWriter.writeCharacters(localRequestor);
+
+            }
+
+            xmlWriter.writeEndElement();
         }
-
-        if (localValue == null)
-        {
-            // write the nil attribute
-
-            throw new org.apache.axis2.databinding.ADBException("value cannot be null!!");
-
-        }
-        else
-        {
-
-            xmlWriter.writeCharacters(localValue);
-
-        }
-
-        xmlWriter.writeEndElement();
-
         xmlWriter.writeEndElement();
 
     }
@@ -459,26 +499,31 @@ public class ParamType implements org.apache.axis2.databinding.ADBBean
         java.util.ArrayList elementList = new java.util.ArrayList();
         java.util.ArrayList attribList = new java.util.ArrayList();
 
-        elementList.add(new javax.xml.namespace.QName("", "name"));
+        if (localIdentityTokenTracker)
+        {
+            elementList.add(new javax.xml.namespace.QName("", "identityToken"));
 
-        if (localName != null)
-        {
-            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localName));
+            if (localIdentityToken != null)
+            {
+                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localIdentityToken));
+            }
+            else
+            {
+                throw new org.apache.axis2.databinding.ADBException("identityToken cannot be null!!");
+            }
         }
-        else
+        if (localRequestorTracker)
         {
-            throw new org.apache.axis2.databinding.ADBException("name cannot be null!!");
-        }
+            elementList.add(new javax.xml.namespace.QName("", "requestor"));
 
-        elementList.add(new javax.xml.namespace.QName("", "value"));
-
-        if (localValue != null)
-        {
-            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localValue));
-        }
-        else
-        {
-            throw new org.apache.axis2.databinding.ADBException("value cannot be null!!");
+            if (localRequestor != null)
+            {
+                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localRequestor));
+            }
+            else
+            {
+                throw new org.apache.axis2.databinding.ADBException("requestor cannot be null!!");
+            }
         }
 
         return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(),
@@ -502,9 +547,9 @@ public class ParamType implements org.apache.axis2.databinding.ADBBean
          * is a complex type, the reader is positioned at the end element of its
          * outer element
          */
-        public static ParamType parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception
+        public static AuthRequiredRequestType parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception
         {
-            ParamType object = new ParamType();
+            AuthRequiredRequestType object = new AuthRequiredRequestType();
 
             int event;
             java.lang.String nillableValue = null;
@@ -531,11 +576,11 @@ public class ParamType implements org.apache.axis2.databinding.ADBBean
 
                         java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
 
-                        if (!"ParamType".equals(type))
+                        if (!"AuthRequiredRequestType".equals(type))
                         {
                             // find namespace for the prefix
                             java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                            return (ParamType) au.edu.uts.eng.remotelabs.rigclient.protocol.types.ExtensionMapper
+                            return (AuthRequiredRequestType) au.edu.uts.eng.remotelabs.rigclient.protocol.types.ExtensionMapper
                                     .getTypeObject(nsUri, type, reader);
                         }
 
@@ -553,12 +598,13 @@ public class ParamType implements org.apache.axis2.databinding.ADBBean
                 while (!reader.isStartElement() && !reader.isEndElement())
                     reader.next();
 
-                if (reader.isStartElement() && new javax.xml.namespace.QName("", "name").equals(reader.getName()))
+                if (reader.isStartElement()
+                        && new javax.xml.namespace.QName("", "identityToken").equals(reader.getName()))
                 {
 
                     java.lang.String content = reader.getElementText();
 
-                    object.setName(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
+                    object.setIdentityToken(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
 
                     reader.next();
 
@@ -566,21 +612,18 @@ public class ParamType implements org.apache.axis2.databinding.ADBBean
 
                 else
                 {
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
+
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
                     reader.next();
 
-                if (reader.isStartElement() && new javax.xml.namespace.QName("", "value").equals(reader.getName()))
+                if (reader.isStartElement() && new javax.xml.namespace.QName("", "requestor").equals(reader.getName()))
                 {
 
                     java.lang.String content = reader.getElementText();
 
-                    object.setValue(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
+                    object.setRequestor(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
 
                     reader.next();
 
@@ -588,10 +631,7 @@ public class ParamType implements org.apache.axis2.databinding.ADBBean
 
                 else
                 {
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
+
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())

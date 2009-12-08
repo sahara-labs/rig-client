@@ -58,6 +58,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectableResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.MaintenanceRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotifyResponse;
@@ -141,8 +143,8 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
     public PerformBatchControlResponse performBatchControl(final PerformBatchControl perfBatch)
     {
         final BatchRequestType request = perfBatch.getPerformBatchControl();
-        this.logger.info("Perform batch control operation called with params: User=" + request.getUser() + 
-                ", FileData=" + request.getBatchFile().toString() + ".");
+        this.logger.info("Perform batch control operation called with params: User=" + request.getRequestor() + 
+                ", Identify=" + request.getIdentityToken() + ",FileData=" + request.getBatchFile().toString() + ".");
         throw new UnsupportedOperationException("Skeletopn implementation of " + this.getClass().getName() +
                 "#performBatchControl");
     }
@@ -151,7 +153,8 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
     public AbortBatchControlResponse abortBatchControl(final AbortBatchControl abc)
     {
         this.logger.info("Abort batch control operation called with params: User=" + 
-                abc.getAbortBatchControl().getUser() + ".");
+                abc.getAbortBatchControl().getRequestor() + 
+                ", Identity=" + abc.getAbortBatchControl().getIdentityToken() + ".");
         throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName() + 
                 "#abortBatchControl");
     }
@@ -160,7 +163,8 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
     public GetBatchControlStatusResponse getBatchControlStatus(final GetBatchControlStatus batchStatus)
     {
         this.logger.info("Get batch control status operation called with params: User=" + 
-                batchStatus.getGetBatchControlStatus().getUser() + ".");
+                batchStatus.getGetBatchControlStatus().getRequestor() + 
+                ", Identity=" + batchStatus.getGetBatchControlStatus().getIdentityToken() + ".");
         throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName() +
                 "#getBatchControlStatus");
     }
@@ -171,7 +175,9 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
         final PrimitiveControlRequestType request = perfPrim.getPerformPrimitiveControl();
         final StringBuilder builder = new StringBuilder(50);
         builder.append("Perform primitive control operation called with params: User=");
-        builder.append(request.getUser());
+        builder.append(request.getIdentityToken());
+        builder.append(", Identity=");
+        builder.append(request.getIdentityToken());
         builder.append(", Controller=");
         builder.append(request.getController());
         builder.append(", Action=");
@@ -195,7 +201,8 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
     public GetAttributeResponse getAttribute(final GetAttribute attr)
     {
         final AttributeRequestType request = attr.getGetAttribute();
-        this.logger.info("Get attribute operation called with params: User=" + request.getUser() + ", Attribute=" +
+        this.logger.info("Get attribute operation called with params: User=" + request.getRequestor() +
+                ", Identity=" + request.getIdentityToken() + ", Attribute=" +
                 request.getAttribute() + ".");
         throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
                 + "#getAttribute");
@@ -214,7 +221,8 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
     {
         final MaintenanceRequestType request = set.getSetMaintenance();
         this.logger.info("Set maintenance operation called with params: Offline=" +
-                request.getPutOffline() + ", RunTests=" + request.getRunTests() + ".");
+                request.getPutOffine() + ", RunTests=" + request.getRunTests() + 
+                ", Identity=" + request.getIdentityToken() + ".");
         throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
                 + "#setMaintenance");
     }
@@ -223,8 +231,17 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
     public SetTestIntervalResponse setTestInterval(final SetTestInterval set)
     {
         this.logger.info("Set test interval operation called with params: Test interval=" + 
-                set.getSetTestInterval().getInterval() + ".");
+                set.getSetTestInterval().getInterval() + ", Identity=" + 
+                set.getSetTestInterval().getIdentityToken() + ".");
         throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
                 + "#setTestInterval");
+    }
+
+    @Override
+    public IsActivityDetectableResponse isActivityDetectable(IsActivityDetectable isActivityDetectable)
+    {
+        this.logger.info("Activity detection operation called.");
+        throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
+                + "#isActivityDectectable");
     }
 }

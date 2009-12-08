@@ -1,19 +1,22 @@
 /**
- * SlaveRelease.java This file was auto-generated from WSDL by the Apache Axis2
- * version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
+ * ActivityDetectableType.java This file was auto-generated from WSDL by the
+ * Apache Axis2 version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
  */
 
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types;
 
 /**
- * SlaveRelease bean class
+ * ActivityDetectableType bean class
  */
 
-public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
+public class ActivityDetectableType implements org.apache.axis2.databinding.ADBBean
 {
-
-    public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
-            "http://remotelabs.eng.uts.edu.au/rigclient/protocol", "slaveRelease", "ns1");
+    /*
+     * This type was generated from the piece of schema that had name =
+     * ActivityDetectableType Namespace URI =
+     * http://remotelabs.eng.uts.edu.au/rigclient/protocol Namespace Prefix =
+     * ns1
+     */
 
     private static java.lang.String generatePrefix(java.lang.String namespace)
     {
@@ -22,30 +25,30 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
     }
 
     /**
-     * field for SlaveRelease
+     * field for Activity
      */
 
-    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType localSlaveRelease;
+    protected boolean localActivity;
 
     /**
      * Auto generated getter method
      * 
-     * @return au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType
+     * @return boolean
      */
-    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType getSlaveRelease()
+    public boolean getActivity()
     {
-        return localSlaveRelease;
+        return localActivity;
     }
 
     /**
      * Auto generated setter method
      * 
-     * @param param SlaveRelease
+     * @param param Activity
      */
-    public void setSlaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType param)
+    public void setActivity(boolean param)
     {
 
-        this.localSlaveRelease = param;
+        this.localActivity = param;
 
     }
 
@@ -79,16 +82,16 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
             final org.apache.axiom.om.OMFactory factory) throws org.apache.axis2.databinding.ADBException
     {
 
-        org.apache.axiom.om.OMDataSource dataSource = new org.apache.axis2.databinding.ADBDataSource(this, MY_QNAME)
+        org.apache.axiom.om.OMDataSource dataSource = new org.apache.axis2.databinding.ADBDataSource(this, parentQName)
         {
 
             public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
                     throws javax.xml.stream.XMLStreamException
             {
-                SlaveRelease.this.serialize(MY_QNAME, factory, xmlWriter);
+                ActivityDetectableType.this.serialize(parentQName, factory, xmlWriter);
             }
         };
-        return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(MY_QNAME, factory, dataSource);
+        return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(parentQName, factory, dataSource);
 
     }
 
@@ -104,10 +107,93 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
             throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
     {
 
-        // We can safely assume an element has only one type associated with it
+        java.lang.String prefix = null;
+        java.lang.String namespace = null;
 
-        if (localSlaveRelease == null) { throw new org.apache.axis2.databinding.ADBException("Property cannot be null!"); }
-        localSlaveRelease.serialize(MY_QNAME, factory, xmlWriter);
+        prefix = parentQName.getPrefix();
+        namespace = parentQName.getNamespaceURI();
+
+        if ((namespace != null) && (namespace.trim().length() > 0))
+        {
+            java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
+            if (writerPrefix != null)
+            {
+                xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
+            }
+            else
+            {
+                if (prefix == null)
+                {
+                    prefix = generatePrefix(namespace);
+                }
+
+                xmlWriter.writeStartElement(prefix, parentQName.getLocalPart(), namespace);
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            }
+        }
+        else
+        {
+            xmlWriter.writeStartElement(parentQName.getLocalPart());
+        }
+
+        if (serializeType)
+        {
+
+            java.lang.String namespacePrefix = registerPrefix(xmlWriter,
+                    "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
+            if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0))
+            {
+                writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", namespacePrefix
+                        + ":ActivityDetectableType", xmlWriter);
+            }
+            else
+            {
+                writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", "ActivityDetectableType",
+                        xmlWriter);
+            }
+
+        }
+
+        namespace = "";
+        if (!namespace.equals(""))
+        {
+            prefix = xmlWriter.getPrefix(namespace);
+
+            if (prefix == null)
+            {
+                prefix = generatePrefix(namespace);
+
+                xmlWriter.writeStartElement(prefix, "activity", namespace);
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+
+            }
+            else
+            {
+                xmlWriter.writeStartElement(namespace, "activity");
+            }
+
+        }
+        else
+        {
+            xmlWriter.writeStartElement("activity");
+        }
+
+        if (false)
+        {
+
+            throw new org.apache.axis2.databinding.ADBException("activity cannot be null!!");
+
+        }
+        else
+        {
+            xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localActivity));
+        }
+
+        xmlWriter.writeEndElement();
+
+        xmlWriter.writeEndElement();
 
     }
 
@@ -299,8 +385,15 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
             throws org.apache.axis2.databinding.ADBException
     {
 
-        // We can safely assume an element has only one type associated with it
-        return localSlaveRelease.getPullParser(MY_QNAME);
+        java.util.ArrayList elementList = new java.util.ArrayList();
+        java.util.ArrayList attribList = new java.util.ArrayList();
+
+        elementList.add(new javax.xml.namespace.QName("", "activity"));
+
+        elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localActivity));
+
+        return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(),
+                attribList.toArray());
 
     }
 
@@ -320,9 +413,9 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
          * is a complex type, the reader is positioned at the end element of its
          * outer element
          */
-        public static SlaveRelease parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception
+        public static ActivityDetectableType parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception
         {
-            SlaveRelease object = new SlaveRelease();
+            ActivityDetectableType object = new ActivityDetectableType();
 
             int event;
             java.lang.String nillableValue = null;
@@ -334,40 +427,70 @@ public class SlaveRelease implements org.apache.axis2.databinding.ADBBean
                 while (!reader.isStartElement() && !reader.isEndElement())
                     reader.next();
 
+                if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
+                {
+                    java.lang.String fullTypeName = reader.getAttributeValue(
+                            "http://www.w3.org/2001/XMLSchema-instance", "type");
+                    if (fullTypeName != null)
+                    {
+                        java.lang.String nsPrefix = null;
+                        if (fullTypeName.indexOf(":") > -1)
+                        {
+                            nsPrefix = fullTypeName.substring(0, fullTypeName.indexOf(":"));
+                        }
+                        nsPrefix = nsPrefix == null ? "" : nsPrefix;
+
+                        java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+
+                        if (!"ActivityDetectableType".equals(type))
+                        {
+                            // find namespace for the prefix
+                            java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            return (ActivityDetectableType) au.edu.uts.eng.remotelabs.rigclient.protocol.types.ExtensionMapper
+                                    .getTypeObject(nsUri, type, reader);
+                        }
+
+                    }
+
+                }
+
                 // Note all attributes that were handled. Used to differ normal
                 // attributes
                 // from anyAttributes.
                 java.util.Vector handledAttributes = new java.util.Vector();
 
-                while (!reader.isEndElement())
+                reader.next();
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() && new javax.xml.namespace.QName("", "activity").equals(reader.getName()))
                 {
-                    if (reader.isStartElement())
-                    {
 
-                        if (reader.isStartElement()
-                                && new javax.xml.namespace.QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
-                                        "slaveRelease").equals(reader.getName()))
-                        {
+                    java.lang.String content = reader.getElementText();
 
-                            object.setSlaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType.Factory
-                                    .parse(reader));
+                    object.setActivity(org.apache.axis2.databinding.utils.ConverterUtil.convertToBoolean(content));
 
-                        } // End of if for expected property start element
+                    reader.next();
 
-                        else
-                        {
-                            // A start element we are not expecting indicates an
-                            // invalid parameter was passed
-                            throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                                    + reader.getLocalName());
-                        }
+                } // End of if for expected property start element
 
-                    }
-                    else
-                    {
-                        reader.next();
-                    }
-                } // end of while loop
+                else
+                {
+                    // A start element we are not expecting indicates an invalid
+                    // parameter was passed
+                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
+                            + reader.getLocalName());
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement())
+                // A start element we are not expecting indicates a trailing
+                // invalid property
+                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
+                            + reader.getLocalName());
 
             }
             catch (javax.xml.stream.XMLStreamException e)

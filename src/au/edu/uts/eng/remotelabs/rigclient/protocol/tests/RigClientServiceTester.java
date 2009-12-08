@@ -34,7 +34,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date <day> <month> 2009
+ * @date 7th December 2009
  *
  * Changelog:
  * - 07/12/2009 - mdiponio - Initial file creation.
@@ -73,6 +73,7 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveUserType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType;
+import au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
@@ -645,7 +646,111 @@ public class RigClientServiceTester extends TestCase
         PrimitiveControlRequestType controlRequest = new PrimitiveControlRequestType();
         performControl.setPerformPrimitiveControl(controlRequest);
         
-        controlRequest.setUser("mdiponio");
+        controlRequest.setRequestor("mdiponio");
+        controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        controlRequest.setAction("test");
+        ParamType params[] = new ParamType[5];
+        for (int i = 0; i < params.length; i++)
+        {
+            params[i] = new ParamType();
+            params[i].setName("param_" + i);
+            params[i].setValue("Value_" + i);
+        }
+        controlRequest.setParam(params);
+        
+        PerformPrimitiveControlResponse response = this.service.performPrimitiveControl(performControl);
+        PrimitiveControlResponseType controlResponse = response.getPerformPrimitiveControlResponse();
+        assertNotNull(controlResponse);
+        assertTrue(controlResponse.getSuccess());
+        assertTrue(Boolean.valueOf(controlResponse.getWasSuccessful()));
+        
+        ErrorType err = controlResponse.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        
+        ParamType resParams[] = controlResponse.getResult();
+        assertEquals(5, resParams.length);
+        Map<String, String> res = new HashMap<String, String>();
+        for (ParamType p : resParams)
+        {
+            res.put(p.getName(), p.getValue());
+        }
+        
+       for (int i = 0; i < params.length; i++)
+       {
+           assertTrue(res.containsKey(params[i].getName()));
+           assertEquals(params[i].getValue(), res.get(params[i].getName()));
+       }   
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)}.
+     */
+    @Test
+    public void testPerformPrimitiveControlSlaveActive()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", false));
+        
+        PerformPrimitiveControl performControl = new PerformPrimitiveControl();
+        PrimitiveControlRequestType controlRequest = new PrimitiveControlRequestType();
+        performControl.setPerformPrimitiveControl(controlRequest);
+        
+        controlRequest.setRequestor("mdiponio");
+        controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        controlRequest.setAction("test");
+        ParamType params[] = new ParamType[5];
+        for (int i = 0; i < params.length; i++)
+        {
+            params[i] = new ParamType();
+            params[i].setName("param_" + i);
+            params[i].setValue("Value_" + i);
+        }
+        controlRequest.setParam(params);
+        
+        PerformPrimitiveControlResponse response = this.service.performPrimitiveControl(performControl);
+        PrimitiveControlResponseType controlResponse = response.getPerformPrimitiveControlResponse();
+        assertNotNull(controlResponse);
+        assertTrue(controlResponse.getSuccess());
+        assertTrue(Boolean.valueOf(controlResponse.getWasSuccessful()));
+        
+        ErrorType err = controlResponse.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        
+        ParamType resParams[] = controlResponse.getResult();
+        assertEquals(5, resParams.length);
+        Map<String, String> res = new HashMap<String, String>();
+        for (ParamType p : resParams)
+        {
+            res.put(p.getName(), p.getValue());
+        }
+        
+       for (int i = 0; i < params.length; i++)
+       {
+           assertTrue(res.containsKey(params[i].getName()));
+           assertEquals(params[i].getValue(), res.get(params[i].getName()));
+       }   
+    }
+    
+     /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)}.
+     */
+    @Test
+    public void testPerformPrimitiveControlSlavePassive()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", true));
+        
+        PerformPrimitiveControl performControl = new PerformPrimitiveControl();
+        PrimitiveControlRequestType controlRequest = new PrimitiveControlRequestType();
+        performControl.setPerformPrimitiveControl(controlRequest);
+        
+        controlRequest.setRequestor("mdiponio");
         controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
         controlRequest.setAction("test");
         ParamType params[] = new ParamType[5];
@@ -660,28 +765,97 @@ public class RigClientServiceTester extends TestCase
         PerformPrimitiveControlResponse response = this.service.performPrimitiveControl(performControl);
         PrimitiveControlResponseType cr = response.getPerformPrimitiveControlResponse();
         assertNotNull(cr);
-        assertTrue(cr.getSuccess());
-        assertTrue(Boolean.valueOf(cr.getWasSuccessful()));
+        assertFalse(cr.getSuccess());
+        assertFalse(Boolean.valueOf(cr.getWasSuccessful()));
         
         ErrorType err = cr.getError();
         assertNotNull(err);
-        assertEquals(0, err.getCode());
+        assertEquals(3, err.getCode());
         assertNotNull(err.getReason());
         assertNotNull(err.getOperation());
+        assertEquals("Invalid permission.", err.getReason());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)}.
+     */
+    @Test
+    public void testPerformPrimitiveControlWrongUser()
+    {
+        assertTrue(this.rig.assign("tmachet"));
         
-        ParamType resParams[] = cr.getResult();
-        assertEquals(5, resParams.length);
-        Map<String, String> res = new HashMap<String, String>();
-        for (ParamType p : resParams)
+        PerformPrimitiveControl performControl = new PerformPrimitiveControl();
+        PrimitiveControlRequestType controlRequest = new PrimitiveControlRequestType();
+        performControl.setPerformPrimitiveControl(controlRequest);
+        
+        controlRequest.setRequestor("mdiponio");
+        controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        controlRequest.setAction("test");
+        ParamType params[] = new ParamType[5];
+        for (int i = 0; i < params.length; i++)
         {
-            res.put(p.getName(), p.getValue());
+            params[i] = new ParamType();
+            params[i].setName("param_" + i);
+            params[i].setValue("Value_" + i);
         }
+        controlRequest.setParam(params);
         
-       for (int i = 0; i < params.length; i++)
-       {
-           assertTrue(res.containsKey(params[i].getName()));
-           assertEquals(params[i].getValue(), res.get(params[i].getName()));
-       }   
+        PerformPrimitiveControlResponse response = this.service.performPrimitiveControl(performControl);
+        PrimitiveControlResponseType cr = response.getPerformPrimitiveControlResponse();
+        assertNotNull(cr);
+        assertFalse(cr.getSuccess());
+        assertFalse(Boolean.valueOf(cr.getWasSuccessful()));
+        
+        ErrorType err = cr.getError();
+        assertNotNull(err);
+        assertEquals(3, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        assertEquals("Invalid permission.", err.getReason());
+    }
+    
+     /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)}.
+     */
+    @Test
+    public void testPerformPrimitiveControlNotSupported() throws Exception
+    {
+        /* Set a rig type which is not controlled. */
+        IRig noControlRig = new ConfiguredRig();
+        Field f = RigClientService.class.getDeclaredField("rig");
+        f.setAccessible(true);
+        f.set(this.service, noControlRig);
+     
+        assertTrue(noControlRig.assign("mdiponio"));
+        
+        PerformPrimitiveControl performControl = new PerformPrimitiveControl();
+        PrimitiveControlRequestType controlRequest = new PrimitiveControlRequestType();
+        performControl.setPerformPrimitiveControl(controlRequest);
+        
+        controlRequest.setRequestor("mdiponio");
+        controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        controlRequest.setAction("test");
+        ParamType params[] = new ParamType[5];
+        for (int i = 0; i < params.length; i++)
+        {
+            params[i] = new ParamType();
+            params[i].setName("param_" + i);
+            params[i].setValue("Value_" + i);
+        }
+        controlRequest.setParam(params);
+        
+        PerformPrimitiveControlResponse response = this.service.performPrimitiveControl(performControl);
+        PrimitiveControlResponseType cr = response.getPerformPrimitiveControlResponse();
+        assertNotNull(cr);
+        assertFalse(cr.getSuccess());
+        assertFalse(Boolean.valueOf(cr.getWasSuccessful()));
+        
+        ErrorType err = cr.getError();
+        assertNotNull(err);
+        assertEquals(14, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        assertEquals("Primitive control not supported.", err.getReason());
     }
     
     /**
@@ -716,6 +890,14 @@ public class RigClientServiceTester extends TestCase
      */
     @Test
     public void testSetTestInterval()
+    {
+        fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#isActivityDetectable(au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable)}.
+     */
+    public void testIsActivityDetectable()
     {
         fail("Not yet implemented"); // TODO
     }
