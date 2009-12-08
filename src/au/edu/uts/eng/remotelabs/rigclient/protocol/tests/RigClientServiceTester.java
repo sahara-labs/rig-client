@@ -689,6 +689,40 @@ public class RigClientServiceTester extends TestCase
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#slaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveRelease)}.
      */
     @Test
+    public void testSlaveReleaseBySlave()
+    {
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", false));
+        
+        SlaveRelease request = new SlaveRelease();
+        UserType slave = new UserType();
+        slave.setUser("mdiponio");
+        slave.setIdentityToken("Not correct");        
+        slave.setRequestor("mdiponio");
+        request.setSlaveRelease(slave);
+        
+        SlaveReleaseResponse resp = this.service.slaveRelease(request);
+        assertNotNull(resp);
+        
+        OperationResponseType op = resp.getSlaveReleaseResponse();
+        assertNotNull(resp);
+        assertTrue(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getOperation());
+        assertNotNull(err.getReason());
+        
+        assertEquals(Session.NOT_IN, this.rig.isInSession("mdiponio"));
+        assertFalse(this.rig.hasPermission("mdiponio", Session.SLAVE_ACTIVE));
+        assertTrue(this.rig.hasPermission("tmachet", Session.MASTER));
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#slaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveRelease)}.
+     */
+    @Test
     public void testSlaveReleaseWrongAuth()
     {
         assertTrue(this.rig.assign("tmachet"));

@@ -53,6 +53,7 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AllocateResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ErrorType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
@@ -170,8 +171,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             error.setReason("Unknown.");
         }
 
-        
-        
         return response;
     }
     
@@ -232,7 +231,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         
         return response;
     }
-    
     
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#slaveAllocate(SlaveAllocate)
@@ -334,7 +332,8 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         error.setReason("");
         
         if (!(this.isSourceAuthenticated(slaveRequest.getSlaveRelease().getIdentityToken()) || 
-                this.rig.hasPermission(slaveRequest.getSlaveRelease().getRequestor(), Session.MASTER)))
+                this.rig.hasPermission(slaveRequest.getSlaveRelease().getRequestor(), Session.MASTER) ||
+                slave.equals(slaveRequest.getSlaveRelease().getRequestor()))) // The slave user remove themselves
         {
             this.logger.warn("Failed releasing slave user " + slave + " because of invalid permission.");
             operation.setSuccess(false);
@@ -369,7 +368,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
      * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#notify(Notify)
      */
     @Override
-    public NotifyResponse notify(Notify notify)
+    public NotifyResponse notify(final Notify notify)
     {
         /* Request parameters. */
         final String message = notify.getNotify().getMessage();
@@ -378,10 +377,10 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         this.logger.debug("Received notify request with parameter: message=" + message + ".");
         
         /* Response parameters. */
-        NotifyResponse response = new NotifyResponse();
-        OperationResponseType operation = new OperationResponseType();
+        final NotifyResponse response = new NotifyResponse();
+        final OperationResponseType operation = new OperationResponseType();
         response.setNotifyResponse(operation);
-        ErrorType error = new ErrorType();
+        final ErrorType error = new ErrorType();
         error.setCode(0);
         error.setOperation("Notify with message " + message + ".");
         error.setReason("");
@@ -421,11 +420,46 @@ public class RigClientService implements RigClientServiceSkeletonInterface
      * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#performBatchControl(PerformBatchControl)
      */
     @Override
-    public PerformBatchControlResponse performBatchControl(PerformBatchControl batchRequest)
+    public PerformBatchControlResponse performBatchControl(final PerformBatchControl batchRequest)
     {
-        // TODO 
+        /* Request parameters. */
+        final BatchRequestType request = batchRequest.getPerformBatchControl();
+        this.logger.debug("Received batch control invocation request.");
         
-        return null;
+        /* Response parameters. */
+        final PerformBatchControlResponse response = new PerformBatchControlResponse();
+        final OperationResponseType operation = new OperationResponseType();
+        response.setPerformBatchControlResponse(operation);
+        final ErrorType error = new ErrorType();
+        error.setOperation("Performing batch control.");
+        error.setReason("");
+        operation.setError(error);
+        
+        if (!(this.isSourceAuthenticated(request.getIdentityToken()) || 
+                this.rig.hasPermission(request.getRequestor(), Session.SLAVE_ACTIVE)))
+        {
+            this.logger.warn("Unable to perform batch control because the requestor does not have permission.");
+            operation.setSuccess(false);
+            error.setCode(3);
+            error.setReason("Invalid permission.");
+        }
+        else if (this.rig instanceof IRigControl)
+        {
+            final IRigControl controlledRig = (IRigControl)this.rig;
+            
+            /* First download the file. */
+            // TODO batch control
+            
+        }
+        else
+        {
+            this.logger.warn("Unable to perform batch control because the rig does not support it.");
+            operation.setSuccess(false);
+            error.setCode(10);
+            error.setReason("Batch not supported.");
+        }
+        
+        return response;
     }
     
     /* 
@@ -434,6 +468,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     @Override
     public AbortBatchControlResponse abortBatchControl(final AbortBatchControl abortRequest)
     {
+        // TODO
         /* Request parameters. */
         final String requestor = abortRequest.getAbortBatchControl().getRequestor();
 
@@ -451,7 +486,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         
         if (!(this.rig instanceof IRigControl))
         {
-            IRigControl controlRig = (IRigControl)this.rig;
+            final IRigControl controlRig = (IRigControl)this.rig;
             if (!this.rig.hasPermission(requestor, Session.SLAVE_ACTIVE)) // Does the requestor have permission
             {
                 this.logger.warn("Requestor " + requestor + " does not have permission to abort batch control.");
@@ -488,7 +523,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
      * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getBatchControlStatus(GetBatchControlStatus)
      */
     @Override
-    public GetBatchControlStatusResponse getBatchControlStatus(GetBatchControlStatus statusRequest)
+    public GetBatchControlStatusResponse getBatchControlStatus(final GetBatchControlStatus statusRequest)
     {
         // TODO Auto-generated method stub
         return null;
@@ -501,13 +536,13 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     public PerformPrimitiveControlResponse performPrimitiveControl(final PerformPrimitiveControl primRequest)
     {
         /* Request parameters. */
-        PrimitiveControlRequestType request = primRequest.getPerformPrimitiveControl();
-        String requestor = request.getRequestor();
-        StringBuilder builder = new StringBuilder();
+        final PrimitiveControlRequestType request = primRequest.getPerformPrimitiveControl();
+        final String requestor = request.getRequestor();
+        final StringBuilder builder = new StringBuilder();
         builder.append("Recevied primitive control request with params: requestor=");
         builder.append(requestor);
         
-        PrimitiveRequest primitiveRequest = new PrimitiveRequest();
+        final PrimitiveRequest primitiveRequest = new PrimitiveRequest();
         
         /* Controller - action. */
         builder.append(", controller=");
@@ -518,23 +553,24 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         primitiveRequest.setAction(request.getAction());
         
         /* Parameter list. */
-        int i = 1;
+        int pCount = 1;
         for (ParamType param : request.getParam())
         {
             builder.append(", param");
-            builder.append(i);
+            builder.append(pCount);
             builder.append('=');
             builder.append(param.getName());
             builder.append(':');
             builder.append(param.getValue());
             primitiveRequest.addParameter(param.getName(), param.getValue());
+            ++pCount;
         }
 
         /* Response parameters. */
-        PerformPrimitiveControlResponse response = new PerformPrimitiveControlResponse();
-        PrimitiveControlResponseType control = new PrimitiveControlResponseType();
+        final PerformPrimitiveControlResponse response = new PerformPrimitiveControlResponse();
+        final PrimitiveControlResponseType control = new PrimitiveControlResponseType();
         response.setPerformPrimitiveControlResponse(control);
-        ErrorType error = new ErrorType();
+        final ErrorType error = new ErrorType();
         error.setCode(0);
         error.setOperation("Primitive control on controller " + request.getController() + " and action " + 
                 request.getAction() + ".");
@@ -552,18 +588,19 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         else if (this.rig instanceof IRigControl)
         {
-            IRigControl controlledRig = (IRigControl)this.rig;
-            PrimitiveResponse primitiveResponse = controlledRig.performPrimitive(primitiveRequest);
+            final IRigControl controlledRig = (IRigControl)this.rig;
+            final PrimitiveResponse primitiveResponse = controlledRig.performPrimitive(primitiveRequest);
             control.setSuccess(primitiveResponse.wasSuccessful());
             error.setCode(primitiveResponse.getErrorCode());
             error.setReason(primitiveResponse.getErrorReason() != null ? primitiveResponse.getErrorReason() : "");
             control.setWasSuccessful(String.valueOf(primitiveResponse.wasSuccessful()));
             
             /* Results. */            
-            List<ParamType> results = new ArrayList<ParamType>();
+            final List<ParamType> results = new ArrayList<ParamType>();
+            ParamType resultParam;
             for (Entry<String, String> result : primitiveResponse.getResults().entrySet())
             {
-                ParamType resultParam = new ParamType();
+                resultParam = new ParamType();
                 resultParam.setName(result.getKey());
                 resultParam.setValue(result.getValue());
                 results.add(resultParam);
@@ -646,7 +683,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         statusResponse.setGetStatusResponse(status);
         
         /* Maintenance status. */
-        boolean isInMaintenance = !this.rig.isNotInMaintenance();
+        final boolean isInMaintenance = !this.rig.isNotInMaintenance();
         status.setIsInMaintenance(isInMaintenance);
         if (isInMaintenance)
         {
@@ -654,7 +691,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         
         /* Monitor status. */
-        boolean isMonitorFailed = !this.rig.isMonitorStatusGood();
+        final boolean isMonitorFailed = !this.rig.isMonitorStatusGood();
         status.setIsMonitorFailed(isMonitorFailed);
         if (isMonitorFailed)
         {
@@ -662,7 +699,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
 
         /* Session status. */
-        boolean inSession = this.rig.isSessionActive();
+        final boolean inSession = this.rig.isSessionActive();
         status.setIsInSession(inSession);
         if (inSession)
         {
@@ -690,9 +727,8 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     {
         /* Request parameters. */
         final MaintenanceRequestType request = maintenRequest.getSetMaintenance();
-        this.logger.debug("Received set maintenance request with parameters: run tests=" + 
-                String.valueOf(request.getRunTests()) + ", put offline=" + String.valueOf(request.getPutOffine()) +  
-                ".");
+        this.logger.debug("Received set maintenance request with parameters: run tests=" + request.getRunTests() + 
+                ", put offline=" + request.getPutOffine() + ".");
         
         /* Response parameters. */
         final SetMaintenanceResponse response = new SetMaintenanceResponse();
@@ -776,7 +812,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
      * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#isActivityDetectable(IsActivityDetectable)
      */
     @Override
-    public IsActivityDetectableResponse isActivityDetectable(IsActivityDetectable isActivityDetectable)
+    public IsActivityDetectableResponse isActivityDetectable(final IsActivityDetectable detectRequest)
     {
         this.logger.debug("Received detect activity request received.");
         
@@ -803,7 +839,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         
         // TODO Authentication implementation
-        if (identTok.equals("abc123"))
+        if ("abc123".equals(identTok))
         {
             return true;
         }
