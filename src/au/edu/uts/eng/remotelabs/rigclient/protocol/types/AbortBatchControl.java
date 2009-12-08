@@ -1,4 +1,46 @@
 /**
+ * SAHARA Rig Client
+ * 
+ * Software abstraction of physical rig to provide rig session control
+ * and rig device control. Automatically tests rig hardware and reports
+ * the rig status to ensure rig goodness.
+ *
+ * @license See LICENSE in the top level directory for complete license terms.
+ *
+ * Copyright (c) 2009, University of Technology, Sydney
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  * Redistributions of source code must retain the above copyright notice, 
+ *    this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright 
+ *    notice, this list of conditions and the following disclaimer in the 
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of the University of Technology, Sydney nor the names 
+ *    of its contributors may be used to endorse or promote products derived from 
+ *    this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @author Michael Diponio (mdiponio)
+ * @date 8th December 2009
+ *
+ * Changelog:
+ * - 08/12/2009 - mdiponio - Initial file creation.
+ */
+
+/**
  * AbortBatchControl.java This file was auto-generated from WSDL by the Apache
  * Axis2 version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
  */
@@ -26,17 +68,18 @@ import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
  */
 public class AbortBatchControl implements ADBBean
 {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 2577817300838449874L;
-
     public static final QName MY_QNAME = new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
             "abortBatchControl", "ns1");
+    
+     /** Serializable class.  */
+    private static final long serialVersionUID = 2577817300838449874L;
+    
+    /** Field for AbortBatchControl. */
+    protected AuthRequiredRequestType batchControl;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
-        if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
+        if ("http://remotelabs.eng.uts.edu.au/rigclient/protocol".equals(namespace)) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
@@ -45,7 +88,7 @@ public class AbortBatchControl implements ADBBean
      * 
      * @return true if the reader supports MTOM
      */
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
 
@@ -57,23 +100,16 @@ public class AbortBatchControl implements ADBBean
         {
             isReaderMTOMAware = false;
         }
+        
         return isReaderMTOMAware;
     }
 
     /**
-     * field for AbortBatchControl
-     */
-
-    protected AuthRequiredRequestType localAbortBatchControl;
-
-    /**
-     * Auto generated getter method
-     * 
      * @return AuthRequiredRequestType
      */
     public AuthRequiredRequestType getAbortBatchControl()
     {
-        return this.localAbortBatchControl;
+        return this.batchControl;
     }
 
     /**
@@ -81,12 +117,11 @@ public class AbortBatchControl implements ADBBean
      * @param factory
      * @return OMElement
      */
+    @SuppressWarnings("unused")
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-
-        OMDataSource dataSource = new ADBDataSource(this, AbortBatchControl.MY_QNAME)
+        final OMDataSource dataSource = new ADBDataSource(this, AbortBatchControl.MY_QNAME)
         {
-
             @Override
             public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
                     throws XMLStreamException
@@ -103,14 +138,12 @@ public class AbortBatchControl implements ADBBean
      */
     public XMLStreamReader getPullParser(QName qName) throws ADBException
     {
-
-        // We can safely assume an element has only one type associated with it
-        return this.localAbortBatchControl.getPullParser(AbortBatchControl.MY_QNAME);
-
+        /* We can safely assume an element has only one type associated with it. */
+        return this.batchControl.getPullParser(AbortBatchControl.MY_QNAME);
     }
 
     /**
-     * Register a namespace prefix
+     * Register a namespace prefix.
      */
     @SuppressWarnings("unused")
     private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
@@ -142,21 +175,17 @@ public class AbortBatchControl implements ADBBean
     public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter,
             boolean serializeType) throws XMLStreamException, ADBException
     {
-        if (this.localAbortBatchControl == null) throw new ADBException("Property cannot be null!");
-        this.localAbortBatchControl.serialize(AbortBatchControl.MY_QNAME, factory, xmlWriter);
+        if (this.batchControl == null) throw new ADBException("Property cannot be null.");
+        this.batchControl.serialize(AbortBatchControl.MY_QNAME, factory, xmlWriter);
 
     }
 
     /**
-     * Auto generated setter method
-     * 
      * @param param AbortBatchControl
      */
     public void setAbortBatchControl(AuthRequiredRequestType param)
     {
-
-        this.localAbortBatchControl = param;
-
+        this.batchControl = param;
     }
     
      /**
@@ -192,17 +221,14 @@ public class AbortBatchControl implements ADBBean
                                 && new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "abortBatchControl")
                                         .equals(reader.getName()))
                         {
-
                             object.setAbortBatchControl(AuthRequiredRequestType.Factory.parse(reader));
-
-                        } // End of if for expected property start element
+                        }
                         else
                         {
                             // A start element we are not expecting indicates an
                             // invalid parameter was passed
                             throw new ADBException("Unexpected subelement " + reader.getLocalName());
                         }
-
                     }
                     else
                     {

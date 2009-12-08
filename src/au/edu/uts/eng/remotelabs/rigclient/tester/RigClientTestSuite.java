@@ -44,6 +44,8 @@ package au.edu.uts.eng.remotelabs.rigclient.tester;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import au.edu.uts.eng.remotelabs.rigclient.protocol.tests.RigClientServiceTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.UserTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.DirectoryCopierTester;
@@ -63,6 +65,8 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    UserTypeTester.class,
+    RigClientServiceTester.class,
     RigFactoryTester.class,
     ConfiguredRigTester.class,
     ConfiguredControlledRigTester.class,
