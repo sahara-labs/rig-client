@@ -47,6 +47,7 @@ import java.util.Map.Entry;
 
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControl;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControlResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ActivityDetectableType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AllocateResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeRequestType;
@@ -61,6 +62,7 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectableResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.MaintenanceRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotifyResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.OperationResponseType;
@@ -82,6 +84,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveAllocateResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveRelease;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveUserType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.StatusResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.TestIntervalRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
@@ -419,7 +423,8 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     @Override
     public PerformBatchControlResponse performBatchControl(PerformBatchControl batchRequest)
     {
-        // TODO Auto-generated method stub
+        // TODO 
+        
         return null;
     }
     
@@ -588,7 +593,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         final String attrName = request.getAttribute();
         final String requestor = request.getRequestor();
         final String ident = request.getIdentityToken();
-        this.logger.debug("Receive get attribute request with parameters: requestor=" + requestor + ", attribute=" +
+        this.logger.debug("Received get attribute request with parameters: requestor=" + requestor + ", attribute=" +
                 attrName + ".");
         
         /* Response parameters. */
@@ -628,43 +633,160 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     }
 
     /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getStatus(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus)
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getStatus(GetStatus)
      */
     @Override
-    public GetStatusResponse getStatus(GetStatus statusRequest)
+    public GetStatusResponse getStatus(final GetStatus statusRequest)
     {
-        // TODO Auto-generated method stub
-        return null;
+        this.logger.debug("Received get status request.");
+        
+        /* Response parameters. */
+        final GetStatusResponse statusResponse = new GetStatusResponse();
+        final StatusResponseType status = new StatusResponseType();
+        statusResponse.setGetStatusResponse(status);
+        
+        /* Maintenance status. */
+        boolean isInMaintenance = !this.rig.isNotInMaintenance();
+        status.setIsInMaintenance(isInMaintenance);
+        if (isInMaintenance)
+        {
+            status.setMaintenanceReason(this.rig.getMaintenanceReason());
+        }
+        
+        /* Monitor status. */
+        boolean isMonitorFailed = !this.rig.isMonitorStatusGood();
+        status.setIsMonitorFailed(isMonitorFailed);
+        if (isMonitorFailed)
+        {
+            status.setMonitorReason(this.rig.getMonitorReason());
+        }
+
+        /* Session status. */
+        boolean inSession = this.rig.isSessionActive();
+        status.setIsInSession(inSession);
+        if (inSession)
+        {
+            for (Entry<String, Session> user : this.rig.getSessionUsers().entrySet())
+            {
+                if (user.getValue() == Session.MASTER)
+                {
+                    status.setSessionUser(user.getKey());
+                }
+                else if (user.getValue() == Session.SLAVE_ACTIVE || user.getValue() == Session.SLAVE_PASSIVE)
+                {
+                    status.addSlaveUsers(user.getKey());
+                }
+            }
+        }
+        
+        return statusResponse;
     }
 
     /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#setMaintenance(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance)
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#setMaintenance(SetMaintenance)
      */
     @Override
-    public SetMaintenanceResponse setMaintenance(SetMaintenance maintenRequest)
+    public SetMaintenanceResponse setMaintenance(final SetMaintenance maintenRequest)
     {
-        // TODO Auto-generated method stub
-        return null;
+        /* Request parameters. */
+        final MaintenanceRequestType request = maintenRequest.getSetMaintenance();
+        this.logger.debug("Received set maintenance request with parameters: run tests=" + 
+                String.valueOf(request.getRunTests()) + ", put offline=" + String.valueOf(request.getPutOffine()) +  
+                ".");
+        
+        /* Response parameters. */
+        final SetMaintenanceResponse response = new SetMaintenanceResponse();
+        final OperationResponseType operation = new OperationResponseType();
+        response.setSetMaintenanceResponse(operation);
+        final ErrorType error = new ErrorType();
+        error.setOperation("Setting maintenance to "  + (request.getPutOffine() ? "offline" : "online") + ".");
+        error.setReason("");
+        operation.setError(error);
+        
+        if (!this.isSourceAuthenticated(request.getIdentityToken()))
+        {
+            this.logger.warn("Unable to put the rig offline because of invalid permission.");
+            operation.setSuccess(false);
+            error.setCode(3);
+            error.setReason("Invalid permission.");
+        }
+        /* DODGY The reason why the rig is going into maintenance should be communicated at request.
+         * However, I'm far too lazy to fix this now. */
+        else if (this.rig.setMaintenance(request.getPutOffine(), "User request.", request.getRunTests()))
+        {
+            this.logger.info("Successfully put the rig to state " + (request.getPutOffine() ? "offline" : "online") +
+                ".");
+            operation.setSuccess(true);
+        }
+        else
+        {
+            this.logger.warn("Setting maintenance failed miserably for some unknown reason (perhaps a bug).");
+            operation.setSuccess(false);
+            error.setCode(16);
+            error.setReason("Unknown - check the source Luke.");
+        }
+        
+        return response;
     }
 
     /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#setTestInterval(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetTestInterval)
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#setTestInterval(SetTestInterval)
      */
     @Override
-    public SetTestIntervalResponse setTestInterval(SetTestInterval interRequest)
+    public SetTestIntervalResponse setTestInterval(final SetTestInterval interRequest)
     {
-        // TODO Auto-generated method stub
-        return null;
+        /* Request parameters. */
+        final TestIntervalRequestType request = interRequest.getSetTestInterval();
+        this.logger.debug("Set test interval request received with parameters: interval=" + request.getInterval() + 
+                ".");
+        
+        /* Response parameters. */
+        final SetTestIntervalResponse response = new SetTestIntervalResponse();
+        final OperationResponseType operation = new OperationResponseType();
+        response.setSetTestIntervalResponse(operation);
+        final ErrorType error = new ErrorType();
+        error.setOperation("Changing test interval to " + request.getInterval() + ".");
+        error.setReason("");
+        operation.setError(error);
+        
+        if (!this.isSourceAuthenticated(request.getIdentityToken()))
+        {
+            this.logger.warn("Failed to set test interval because of invalid permission.");
+            operation.setSuccess(false);
+            error.setCode(3);
+            error.setReason("Invalid permission.");
+        }
+        else if (this.rig.setInterval(request.getInterval()))
+        {
+            this.logger.info("Successfully set the test interval to " + request.getInterval() + ".");
+            operation.setSuccess(true);
+        }
+        else
+        {
+            this.logger.warn("Failed to set the test interval because of some unknown error (possibly a bug).");
+            operation.setSuccess(false);
+            error.setCode(16);
+            error.setReason("Unknown error.");
+        }
+        
+        return response;
     }
 
     /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#isActivityDetectable(au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable)
+     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#isActivityDetectable(IsActivityDetectable)
      */
     @Override
     public IsActivityDetectableResponse isActivityDetectable(IsActivityDetectable isActivityDetectable)
     {
-        // TODO Auto-generated method stub
-        return null;
+        this.logger.debug("Received detect activity request received.");
+        
+        /* Response parameters. */
+        final IsActivityDetectableResponse response = new IsActivityDetectableResponse();
+        final ActivityDetectableType detect = new ActivityDetectableType();
+        response.setIsActivityDetectableResponse(detect);
+        
+        detect.setActivity(this.rig.isActivityDetected());
+        return response;
     }
 
     /**

@@ -676,6 +676,15 @@ public abstract class AbstractRig implements IRig
             }
         }
     }
+    
+    /*
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#getSessionUsers()
+     */
+    @Override
+    public Map<String, Session> getSessionUsers()
+    {
+        return this.getSessionUsersClone();
+    }
 
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#addSlave(java.lang.String, boolean)
@@ -796,20 +805,23 @@ public abstract class AbstractRig implements IRig
     @Override
     public boolean hasPermission(final String name, final Session ses)
     {
-        if (!this.sessionUsers.containsKey(name))
+        synchronized (this.sessionUsers)
         {
-            return ses == Session.NOT_IN;
-        }
-        
-        switch (this.sessionUsers.get(name))
-        {
-            case MASTER:
-                return ses == Session.MASTER || ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE ||
-                        ses == Session.NOT_IN;
-            case SLAVE_ACTIVE:
-                return ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE || ses == Session.NOT_IN;
-            case SLAVE_PASSIVE:
-                return ses == Session.SLAVE_PASSIVE || ses == Session.NOT_IN;
+            if (!this.sessionUsers.containsKey(name))
+            {
+                return ses == Session.NOT_IN;
+            }
+
+            switch (this.sessionUsers.get(name))
+            {
+                case MASTER:
+                    return ses == Session.MASTER || ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE ||
+                    ses == Session.NOT_IN;
+                case SLAVE_ACTIVE:
+                    return ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE || ses == Session.NOT_IN;
+                case SLAVE_PASSIVE:
+                    return ses == Session.SLAVE_PASSIVE || ses == Session.NOT_IN;
+            }
         }
         
         this.logger.error("All permission states unaccounted for, someone has been been naughty" +
@@ -823,12 +835,15 @@ public abstract class AbstractRig implements IRig
     @Override
     public Session isInSession(final String name)
     {
-        if (!this.sessionUsers.containsKey(name))
+        synchronized (this.sessionUsers)
         {
-            return Session.NOT_IN;
+            if (!this.sessionUsers.containsKey(name))
+            {
+                return Session.NOT_IN;
+            }
+
+            return this.sessionUsers.get(name);
         }
-        
-        return this.sessionUsers.get(name);
     }
 
     /* 
@@ -934,9 +949,12 @@ public abstract class AbstractRig implements IRig
     public boolean isSessionActive()
     {
         boolean isMaster = false;
-        for (Session ses : this.sessionUsers.values())
+        synchronized (this.sessionUsers)
         {
-            if (ses == Session.MASTER) isMaster = true;            
+            for (Session ses : this.sessionUsers.values())
+            {
+                if (ses == Session.MASTER) isMaster = true;            
+            }
         }
         
         this.logger.debug("Session check providing: " + (isMaster ? "Session is active." : "Session is not active."));
@@ -949,6 +967,12 @@ public abstract class AbstractRig implements IRig
     @Override
     public boolean isActivityDetected()
     {
+        /* If not session, there is obviously not activity. */
+        if (!this.isSessionActive())
+        {
+            return false;
+        }
+        
         /* The default answer should be too report activity if activity cannot
          * be determined. */
         if (this.detectionActions.size() == 0)
@@ -982,10 +1006,10 @@ public abstract class AbstractRig implements IRig
                 this.logger.warn("Failed revoking slave access, provided user " + name + " is not a slave user.");
                 return false;
             }
+            
+            /* Remove user from being a slave user. */
+            this.sessionUsers.remove(name);
         }
-        
-        /* Remove user from being a slave user. */
-        this.sessionUsers.remove(name);
         
         /* Run the slave revocation actions. */
         synchronized (this.slaveActions)
@@ -1081,12 +1105,15 @@ public abstract class AbstractRig implements IRig
      */
     private Map<String, Session> getSessionUsersClone()
     {
-        final Map<String, Session> sessions = new HashMap<String, Session>(this.sessionUsers.size());
-        for (Entry<String, Session> entry : this.sessionUsers.entrySet())
+        synchronized (this.sessionUsers)
         {
-            sessions.put(entry.getKey(), entry.getValue());
+            final Map<String, Session> sessions = new HashMap<String, Session>(this.sessionUsers.size());
+            for (Entry<String, Session> entry : this.sessionUsers.entrySet())
+            {
+                sessions.put(entry.getKey(), entry.getValue());
+            }
+            return sessions;
         }
-        return sessions;
     }
 
 }

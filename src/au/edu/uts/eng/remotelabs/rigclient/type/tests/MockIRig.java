@@ -249,4 +249,13 @@ public class MockIRig implements IRig
         return false;
     }
 
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#getSessionUsers()
+     */
+    @Override
+    public Map<String, Session> getSessionUsers()
+    {
+        return null;
+    }
+
 }

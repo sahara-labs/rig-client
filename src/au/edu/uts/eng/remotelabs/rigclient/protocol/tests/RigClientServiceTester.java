@@ -43,7 +43,9 @@ package au.edu.uts.eng.remotelabs.rigclient.protocol.tests;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -60,9 +62,15 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeC
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ErrorType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectableResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.MaintenanceRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotificationRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Notify;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NotifyResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NullType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.OperationResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl;
@@ -71,11 +79,17 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlReques
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenanceResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetTestInterval;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetTestIntervalResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveAllocate;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveAllocateResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveRelease;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveUserType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.StatusResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.TestIntervalRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredRig;
@@ -1390,25 +1404,159 @@ public class RigClientServiceTester extends TestCase
     @Test
     public void testGetStatus()
     {
-        fail("Not yet implemented"); // TODO
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", false));
+        assertTrue(this.rig.addSlave("carlo", true));
+        
+        GetStatus request = new GetStatus();
+        request.setGetStatus(new NullType());
+        
+        GetStatusResponse response = this.service.getStatus(request);
+        assertNotNull(response);
+        
+        StatusResponseType status = response.getGetStatusResponse();
+        assertTrue(status.getIsInSession());
+        assertFalse(status.getIsInMaintenance());
+        assertFalse(status.getIsMonitorFailed());
+        assertNull(status.getMaintenanceReason());
+        assertNull(status.getMonitorReason());
+        assertEquals("tmachet", status.getSessionUser());
+        
+        String[] slavesArr = status.getSlaveUsers();
+        List<String> slaves = Arrays.asList(slavesArr);
+        assertEquals(2, slaves.size());
+        assertTrue(slaves.contains("mdiponio"));
+        assertTrue(slaves.contains("carlo"));
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#getStatus(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus)}.
+     */
+    @Test
+    public void testGetStatusMaintenance()
+    {
+        assertTrue(this.rig.setMaintenance(true, "Carlo is having a bludge!", true));
+        
+        GetStatus request = new GetStatus();
+        request.setGetStatus(new NullType());
+        
+        GetStatusResponse response = this.service.getStatus(request);
+        assertNotNull(response);
+        
+        StatusResponseType status = response.getGetStatusResponse();
+        assertFalse(status.getIsInSession());
+        assertTrue(status.getIsInMaintenance());
+        assertTrue(status.getIsMonitorFailed());
+        assertNotNull(status.getMaintenanceReason());
+        assertEquals("Carlo is having a bludge!", status.getMaintenanceReason());
+        assertNotNull(status.getMonitorReason());
+        assertEquals("Carlo is having a bludge!", status.getMonitorReason());
+        assertNull(status.getSessionUser());
+        assertNull(status.getSlaveUsers());
     }
 
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#setMaintenance(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance)}.
+     * test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#setMaintenance(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance)}.
      */
     @Test
     public void testSetMaintenance()
     {
-        fail("Not yet implemented"); // TODO
+        SetMaintenance request = new SetMaintenance();
+        MaintenanceRequestType main = new MaintenanceRequestType();
+        request.setSetMaintenance(main);
+        main.setIdentityToken("abc123");
+        main.setPutOffine(true);
+        main.setRunTests(true);
+        
+        SetMaintenanceResponse resp = this.service.setMaintenance(request);
+        assertNotNull(resp);
+        OperationResponseType op = resp.getSetMaintenanceResponse();
+        assertNotNull(op);
+        assertTrue(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getOperation());
+        assertNotNull(err.getReason());
+        
     }
-
+    
+    /**
+     * test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#setMaintenance(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance)}.
+     */
+    @Test
+    public void testSetMaintenanceWrongAuth()
+    {
+        SetMaintenance request = new SetMaintenance();
+        MaintenanceRequestType main = new MaintenanceRequestType();
+        request.setSetMaintenance(main);
+        main.setIdentityToken("wrong...");
+        main.setPutOffine(true);
+        main.setRunTests(true);
+        
+        SetMaintenanceResponse resp = this.service.setMaintenance(request);
+        assertNotNull(resp);
+        OperationResponseType op = resp.getSetMaintenanceResponse();
+        assertNotNull(op);
+        assertFalse(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertEquals(3, err.getCode());
+        assertNotNull(err.getOperation());
+        assertNotNull(err.getReason());
+        assertEquals("Invalid permission.", err.getReason());
+        
+    }
+    
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#setTestInterval(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetTestInterval)}.
      */
     @Test
     public void testSetTestInterval()
     {
-        fail("Not yet implemented"); // TODO
+        SetTestInterval request = new SetTestInterval();
+        TestIntervalRequestType inter = new TestIntervalRequestType();
+        inter.setIdentityToken("abc123");
+        inter.setInterval(100);
+        request.setSetTestInterval(inter);
+        
+        SetTestIntervalResponse resp = this.service.setTestInterval(request);
+        assertNotNull(resp);
+        OperationResponseType op = resp.getSetTestIntervalResponse();
+        assertNotNull(op);
+        assertTrue(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#setTestInterval(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetTestInterval)}.
+     */
+    @Test
+    public void testSetTestIntervalNoAuth()
+    {
+        SetTestInterval request = new SetTestInterval();
+        TestIntervalRequestType inter = new TestIntervalRequestType();
+        inter.setIdentityToken("wrong...");
+        inter.setInterval(100);
+        request.setSetTestInterval(inter);
+        
+        SetTestIntervalResponse resp = this.service.setTestInterval(request);
+        assertNotNull(resp);
+        OperationResponseType op = resp.getSetTestIntervalResponse();
+        assertNotNull(op);
+        assertFalse(op.getSuccess());
+        
+        ErrorType err = op.getError();
+        assertNotNull(err);
+        assertEquals(3, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        assertEquals("Invalid permission.", err.getReason());
     }
     
     /**
@@ -1416,7 +1564,25 @@ public class RigClientServiceTester extends TestCase
      */
     public void testIsActivityDetectable()
     {
-        fail("Not yet implemented"); // TODO
+        assertTrue(this.rig.assign("mdiponoio"));
+        IsActivityDetectable request = new IsActivityDetectable();
+        request.setIsActivityDetectable(new NullType());
+        
+        IsActivityDetectableResponse resp = this.service.isActivityDetectable(request);
+        assertNotNull(resp);
+        assertTrue(resp.getIsActivityDetectableResponse().getActivity());
     }
-
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#isActivityDetectable(au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable)}.
+     */
+    public void testIsActivityDetectableNoSession()
+    {
+        IsActivityDetectable request = new IsActivityDetectable();
+        request.setIsActivityDetectable(new NullType());
+        
+        IsActivityDetectableResponse resp = this.service.isActivityDetectable(request);
+        assertNotNull(resp);
+        assertFalse(resp.getIsActivityDetectableResponse().getActivity());
+    }
 }

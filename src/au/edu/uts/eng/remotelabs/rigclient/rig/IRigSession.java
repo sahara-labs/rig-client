@@ -42,6 +42,8 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
+import java.util.Map;
+
 /**
  * Interface for rig session operations.
  */
@@ -172,4 +174,11 @@ public interface IRigSession
      * @return <code>true</code> if activity is detected
      */
     public boolean isActivityDetected();
+    
+    /**
+     * Returns the list of session users with their associated types.
+     * 
+     * @return session user list
+     */
+    public Map<String, Session> getSessionUsers();
 }

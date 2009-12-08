@@ -855,6 +855,7 @@ public class AbstractRigTester extends TestCase
     @Test
     public void testActivityDetecion()
     {
+        assertTrue(this.rig.assign("mdiponio"));
         IActivityDetectorAction detectorMock = createMock(IActivityDetectorAction.class);
         expect(detectorMock.getActionType())
             .andReturn("Detector");
@@ -883,6 +884,7 @@ public class AbstractRigTester extends TestCase
     @Test
     public void testActivityDetectionFailed()
     {
+        assertTrue(this.rig.assign("mdiponio"));
         IActivityDetectorAction detectorMock = createMock(IActivityDetectorAction.class);
         expect(detectorMock.getActionType())
             .andReturn("Detector");
@@ -911,9 +913,19 @@ public class AbstractRigTester extends TestCase
     @Test
     public void testActivityDetectionNoAction()
     {
+        assertTrue(this.rig.assign("mdiponio"));
         assertTrue(this.rig.isActivityDetected());
     }
     
+    /**
+     * Tests the detecting activity success with no registered actions.
+     */
+    @Test
+    public void testActivityDetectionNoSession()
+    {
+        assertFalse(this.rig.isActivityDetected());
+    }
+
     /**
      * Returns true if the key is in the array.
      * 
