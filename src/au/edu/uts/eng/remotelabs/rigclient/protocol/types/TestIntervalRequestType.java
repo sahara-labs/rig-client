@@ -250,25 +250,25 @@ public class TestIntervalRequestType extends au.edu.uts.eng.remotelabs.rigclient
         attribList.add(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
         attribList.add(new javax.xml.namespace.QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
                 "TestIntervalRequestType"));
-        if (this.localIdentityTokenTracker)
+        if (this.identityTokenTracker)
         {
             elementList.add(new javax.xml.namespace.QName("", "identityToken"));
 
-            if (this.localIdentityToken != null)
+            if (this.identityToken != null)
             {
                 elementList.add(org.apache.axis2.databinding.utils.ConverterUtil
-                        .convertToString(this.localIdentityToken));
+                        .convertToString(this.identityToken));
             }
             else
                 throw new org.apache.axis2.databinding.ADBException("identityToken cannot be null!!");
         }
-        if (this.localRequestorTracker)
+        if (this.requestorTracker)
         {
             elementList.add(new javax.xml.namespace.QName("", "requestor"));
 
-            if (this.localRequestor != null)
+            if (this.requestor != null)
             {
-                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localRequestor));
+                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.requestor));
             }
             else
                 throw new org.apache.axis2.databinding.ADBException("requestor cannot be null!!");
@@ -363,7 +363,7 @@ public class TestIntervalRequestType extends au.edu.uts.eng.remotelabs.rigclient
                     xmlWriter);
         }
 
-        if (this.localIdentityTokenTracker)
+        if (this.identityTokenTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
@@ -390,18 +390,18 @@ public class TestIntervalRequestType extends au.edu.uts.eng.remotelabs.rigclient
                 xmlWriter.writeStartElement("identityToken");
             }
 
-            if (this.localIdentityToken == null)
+            if (this.identityToken == null)
                 throw new org.apache.axis2.databinding.ADBException("identityToken cannot be null!!");
             else
             {
 
-                xmlWriter.writeCharacters(this.localIdentityToken);
+                xmlWriter.writeCharacters(this.identityToken);
 
             }
 
             xmlWriter.writeEndElement();
         }
-        if (this.localRequestorTracker)
+        if (this.requestorTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
@@ -428,12 +428,12 @@ public class TestIntervalRequestType extends au.edu.uts.eng.remotelabs.rigclient
                 xmlWriter.writeStartElement("requestor");
             }
 
-            if (this.localRequestor == null)
+            if (this.requestor == null)
                 throw new org.apache.axis2.databinding.ADBException("requestor cannot be null!!");
             else
             {
 
-                xmlWriter.writeCharacters(this.localRequestor);
+                xmlWriter.writeCharacters(this.requestor);
 
             }
 

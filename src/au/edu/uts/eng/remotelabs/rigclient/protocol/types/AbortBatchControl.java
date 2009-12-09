@@ -70,11 +70,9 @@ public class AbortBatchControl implements ADBBean
 {
     public static final QName MY_QNAME = new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
             "abortBatchControl", "ns1");
-    
-     /** Serializable class.  */
+
     private static final long serialVersionUID = 2577817300838449874L;
-    
-    /** Field for AbortBatchControl. */
+
     protected AuthRequiredRequestType batchControl;
 
     private static String generatePrefix(final String namespace)
@@ -83,11 +81,6 @@ public class AbortBatchControl implements ADBBean
         return BeanUtil.getUniquePrefix();
     }
 
-    /**
-     * isReaderMTOMAware
-     * 
-     * @return true if the reader supports MTOM
-     */
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
@@ -104,20 +97,11 @@ public class AbortBatchControl implements ADBBean
         return isReaderMTOMAware;
     }
 
-    /**
-     * @return AuthRequiredRequestType
-     */
     public AuthRequiredRequestType getAbortBatchControl()
     {
         return this.batchControl;
     }
 
-    /**
-     * @param parentQName
-     * @param factory
-     * @return OMElement
-     */
-    @SuppressWarnings("unused")
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
         final OMDataSource dataSource = new ADBDataSource(this, AbortBatchControl.MY_QNAME)
@@ -133,18 +117,12 @@ public class AbortBatchControl implements ADBBean
 
     }
 
-    /**
-     * databinding method to get an XML representation of this object
-     */
     public XMLStreamReader getPullParser(QName qName) throws ADBException
     {
         /* We can safely assume an element has only one type associated with it. */
         return this.batchControl.getPullParser(AbortBatchControl.MY_QNAME);
     }
 
-    /**
-     * Register a namespace prefix.
-     */
     @SuppressWarnings("unused")
     private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
     {
@@ -180,29 +158,13 @@ public class AbortBatchControl implements ADBBean
 
     }
 
-    /**
-     * @param param AbortBatchControl
-     */
     public void setAbortBatchControl(AuthRequiredRequestType param)
     {
         this.batchControl = param;
     }
-    
-     /**
-     * Factory class that contains the parse method.
-     */
+
     public static class Factory
     {
-        /**
-         * static method to create the object Precondition: If this object is an
-         * element, the current or next start element starts this object and any
-         * intervening reader events are ignorable If this object is not an
-         * element, it is a complex type and the reader is at the event just
-         * after the outer start element Postcondition: If this object is an
-         * element, the reader is positioned at its end element If this object
-         * is a complex type, the reader is positioned at the end element of its
-         * outer element
-         */
         public static AbortBatchControl parse(XMLStreamReader reader) throws Exception
         {
             AbortBatchControl object = new AbortBatchControl();

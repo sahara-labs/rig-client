@@ -122,12 +122,12 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
         attribList.add(new QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
         attribList.add(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "UserType"));
         
-        if (this.localIdentityTokenTracker)
+        if (this.identityTokenTracker)
         {
             elementList.add(new QName("", "identityToken"));
-            if (this.localIdentityToken != null)
+            if (this.identityToken != null)
             {
-                elementList.add(ConverterUtil.convertToString(this.localIdentityToken));
+                elementList.add(ConverterUtil.convertToString(this.identityToken));
             }
             else
             {
@@ -135,13 +135,13 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
             }
         }
         
-        if (this.localRequestorTracker)
+        if (this.requestorTracker)
         {
             elementList.add(new QName("", "requestor"));
 
-            if (this.localRequestor != null)
+            if (this.requestor != null)
             {
-                elementList.add(ConverterUtil.convertToString(this.localRequestor));
+                elementList.add(ConverterUtil.convertToString(this.requestor));
             }
             else
             {
@@ -243,7 +243,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
             this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", "UserType", xmlWriter);
         }
 
-        if (this.localIdentityTokenTracker)
+        if (this.identityTokenTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
@@ -268,18 +268,18 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
                 xmlWriter.writeStartElement("identityToken");
             }
 
-            if (this.localIdentityToken == null)
+            if (this.identityToken == null)
             {
                 throw new ADBException("identityToken cannot be null.");
             }
             else
             {
-                xmlWriter.writeCharacters(this.localIdentityToken);
+                xmlWriter.writeCharacters(this.identityToken);
             }
             xmlWriter.writeEndElement();
         }
         
-        if (this.localRequestorTracker)
+        if (this.requestorTracker)
         {
             namespace = "";
             if (!"".equals(namespace))
@@ -302,13 +302,13 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
                 xmlWriter.writeStartElement("requestor");
             }
 
-            if (this.localRequestor == null)
+            if (this.requestor == null)
             {
                 throw new ADBException("requestor cannot be null.");
             }
             else
             {
-                xmlWriter.writeCharacters(this.localRequestor);
+                xmlWriter.writeCharacters(this.requestor);
             }
             xmlWriter.writeEndElement();
         }

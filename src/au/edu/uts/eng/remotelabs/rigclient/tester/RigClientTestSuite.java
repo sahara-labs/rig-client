@@ -45,6 +45,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import au.edu.uts.eng.remotelabs.rigclient.protocol.tests.RigClientServiceTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AbortBatchControlResponseTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AbortBatchControlTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.ActivityDetectableTypeTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AllocateTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.UserTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
@@ -65,6 +69,10 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    ActivityDetectableTypeTester.class,
+    AbortBatchControlResponseTester.class,
+    AbortBatchControlTester.class,
+    AllocateTester.class,
     UserTypeTester.class,
     RigClientServiceTester.class,
     RigFactoryTester.class,

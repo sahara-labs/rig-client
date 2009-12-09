@@ -67,66 +67,8 @@ import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
  */
 public class AbortBatchControlResponse implements ADBBean
 {
-    /**
-     * Factory class that keeps the parse method
-     */
-    public static class Factory
-    {
-        /**
-         * static method to create the object Precondition: If this object is an
-         * element, the current or next start element starts this object and any
-         * intervening reader events are ignorable If this object is not an
-         * element, it is a complex type and the reader is at the event just
-         * after the outer start element Postcondition: If this object is an
-         * element, the reader is positioned at its end element If this object
-         * is a complex type, the reader is positioned at the end element of its
-         * outer element
-         */
-        public static AbortBatchControlResponse parse(javax.xml.stream.XMLStreamReader reader)
-                throws Exception
-        {
-            AbortBatchControlResponse object = new AbortBatchControlResponse();
-            try
-            {
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-                while (!reader.isEndElement())
-                {
-                    if (reader.isStartElement())
-                    {
-                        if (reader.isStartElement()
-                                && new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
-                                        "abortBatchControlResponse").equals(reader.getName()))
-                        {
-                            object.setAbortBatchControlResponse(OperationResponseType.Factory.parse(reader));
-                        }
-                        else
-                        {
-                            throw new ADBException("Unexpected subelement " + reader.getLocalName());
-                        }
-                    }
-                    else
-                    {
-                        reader.next();
-                    }
-                }
-            }
-            catch (XMLStreamException e)
-            {
-                throw new Exception(e);
-            }
-
-            return object;
-        }
-
-    }
-
-    /** Serializable class. */
     private static final long serialVersionUID = -7631767787007427232L;
-    
-    /** Field for AbortBatchControlResponse. */
+
     protected OperationResponseType controlResponse;
 
     public static final QName MY_QNAME = new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", 
@@ -138,11 +80,6 @@ public class AbortBatchControlResponse implements ADBBean
         return BeanUtil.getUniquePrefix();
     }
 
-    /**
-     * isReaderMTOMAware
-     * 
-     * @return true if the reader supports MTOM
-     */
     public static boolean isReaderMTOMAware(XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
@@ -158,20 +95,11 @@ public class AbortBatchControlResponse implements ADBBean
         return isReaderMTOMAware;
     }
 
-    /**
-     * @return OperationResponseType
-     */
     public OperationResponseType getAbortBatchControlResponse()
     {
         return this.controlResponse;
     }
 
-    /**
-     * @param parentQName
-     * @param factory
-     * @return org.apache.axiom.om.OMElement
-     */
-    @SuppressWarnings("unused")
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
         OMDataSource dataSource = new ADBDataSource(this, AbortBatchControlResponse.MY_QNAME)
@@ -188,18 +116,12 @@ public class AbortBatchControlResponse implements ADBBean
 
     }
 
-    /**
-     * databinding method to get an XML representation of this object
-     */
     public XMLStreamReader getPullParser(QName qName)
             throws ADBException
     {
         return this.controlResponse.getPullParser(AbortBatchControlResponse.MY_QNAME);
     }
 
-    /**
-     * Register a namespace prefix
-     */
     @SuppressWarnings("unused")
     private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
     {
@@ -238,11 +160,50 @@ public class AbortBatchControlResponse implements ADBBean
         this.controlResponse.serialize(AbortBatchControlResponse.MY_QNAME, factory, xmlWriter);
     }
 
-    /**
-     * @param param AbortBatchControlResponse
-     */
     public void setAbortBatchControlResponse(OperationResponseType param)
     {
         this.controlResponse = param;
+    }
+
+    public static class Factory
+    {
+        public static AbortBatchControlResponse parse(javax.xml.stream.XMLStreamReader reader)
+                throws Exception
+        {
+            AbortBatchControlResponse object = new AbortBatchControlResponse();
+            try
+            {
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                while (!reader.isEndElement())
+                {
+                    if (reader.isStartElement())
+                    {
+                        if (reader.isStartElement()
+                                && new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
+                                        "abortBatchControlResponse").equals(reader.getName()))
+                        {
+                            object.setAbortBatchControlResponse(OperationResponseType.Factory.parse(reader));
+                        }
+                        else
+                        {
+                            throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                        }
+                    }
+                    else
+                    {
+                        reader.next();
+                    }
+                }
+            }
+            catch (XMLStreamException e)
+            {
+                throw new Exception(e);
+            }
+
+            return object;
+        }
     }
 }

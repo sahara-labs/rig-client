@@ -178,27 +178,27 @@ public class AuthRequiredRequestType implements org.apache.axis2.databinding.ADB
      * field for IdentityToken
      */
 
-    protected java.lang.String localIdentityToken;
+    protected java.lang.String identityToken;
 
     /*
      * This tracker boolean wil be used to detect whether the user called the
      * set method for this attribute. It will be used to determine whether to
      * include this field in the serialized XML
      */
-    protected boolean localIdentityTokenTracker = false;
+    protected boolean identityTokenTracker = false;
 
     /**
      * field for Requestor
      */
 
-    protected java.lang.String localRequestor;
+    protected java.lang.String requestor;
 
     /*
      * This tracker boolean wil be used to detect whether the user called the
      * set method for this attribute. It will be used to determine whether to
      * include this field in the serialized XML
      */
-    protected boolean localRequestorTracker = false;
+    protected boolean requestorTracker = false;
 
     /**
      * Auto generated getter method
@@ -207,7 +207,7 @@ public class AuthRequiredRequestType implements org.apache.axis2.databinding.ADB
      */
     public java.lang.String getIdentityToken()
     {
-        return this.localIdentityToken;
+        return this.identityToken;
     }
 
     /**
@@ -243,25 +243,25 @@ public class AuthRequiredRequestType implements org.apache.axis2.databinding.ADB
         java.util.ArrayList elementList = new java.util.ArrayList();
         java.util.ArrayList attribList = new java.util.ArrayList();
 
-        if (this.localIdentityTokenTracker)
+        if (this.identityTokenTracker)
         {
             elementList.add(new javax.xml.namespace.QName("", "identityToken"));
 
-            if (this.localIdentityToken != null)
+            if (this.identityToken != null)
             {
                 elementList.add(org.apache.axis2.databinding.utils.ConverterUtil
-                        .convertToString(this.localIdentityToken));
+                        .convertToString(this.identityToken));
             }
             else
                 throw new org.apache.axis2.databinding.ADBException("identityToken cannot be null!!");
         }
-        if (this.localRequestorTracker)
+        if (this.requestorTracker)
         {
             elementList.add(new javax.xml.namespace.QName("", "requestor"));
 
-            if (this.localRequestor != null)
+            if (this.requestor != null)
             {
-                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localRequestor));
+                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.requestor));
             }
             else
                 throw new org.apache.axis2.databinding.ADBException("requestor cannot be null!!");
@@ -279,7 +279,7 @@ public class AuthRequiredRequestType implements org.apache.axis2.databinding.ADB
      */
     public java.lang.String getRequestor()
     {
-        return this.localRequestor;
+        return this.requestor;
     }
 
     /**
@@ -365,7 +365,7 @@ public class AuthRequiredRequestType implements org.apache.axis2.databinding.ADB
             }
 
         }
-        if (this.localIdentityTokenTracker)
+        if (this.identityTokenTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
@@ -392,18 +392,18 @@ public class AuthRequiredRequestType implements org.apache.axis2.databinding.ADB
                 xmlWriter.writeStartElement("identityToken");
             }
 
-            if (this.localIdentityToken == null)
+            if (this.identityToken == null)
                 throw new org.apache.axis2.databinding.ADBException("identityToken cannot be null!!");
             else
             {
 
-                xmlWriter.writeCharacters(this.localIdentityToken);
+                xmlWriter.writeCharacters(this.identityToken);
 
             }
 
             xmlWriter.writeEndElement();
         }
-        if (this.localRequestorTracker)
+        if (this.requestorTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
@@ -430,12 +430,12 @@ public class AuthRequiredRequestType implements org.apache.axis2.databinding.ADB
                 xmlWriter.writeStartElement("requestor");
             }
 
-            if (this.localRequestor == null)
+            if (this.requestor == null)
                 throw new org.apache.axis2.databinding.ADBException("requestor cannot be null!!");
             else
             {
 
-                xmlWriter.writeCharacters(this.localRequestor);
+                xmlWriter.writeCharacters(this.requestor);
 
             }
 
@@ -456,15 +456,15 @@ public class AuthRequiredRequestType implements org.apache.axis2.databinding.ADB
         if (param != null)
         {
             // update the setting tracker
-            this.localIdentityTokenTracker = true;
+            this.identityTokenTracker = true;
         }
         else
         {
-            this.localIdentityTokenTracker = false;
+            this.identityTokenTracker = false;
 
         }
 
-        this.localIdentityToken = param;
+        this.identityToken = param;
 
     }
 
@@ -479,15 +479,15 @@ public class AuthRequiredRequestType implements org.apache.axis2.databinding.ADB
         if (param != null)
         {
             // update the setting tracker
-            this.localRequestorTracker = true;
+            this.requestorTracker = true;
         }
         else
         {
-            this.localRequestorTracker = false;
+            this.requestorTracker = false;
 
         }
 
-        this.localRequestor = param;
+        this.requestor = param;
 
     }
 
