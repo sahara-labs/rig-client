@@ -170,11 +170,10 @@ public class EmbeddedJettyServer implements IServer
         this.context = new Context(this.server, "/", Context.SESSIONS);        
         ServletHolder holder = new ServletHolder(new AxisServlet());
         
-        File repoPath = new File("./repository");
+        File repoPath = new File("./interface");
         this.logger.debug("Axis repository " + repoPath.getCanonicalPath() + ".");
-        holder.setInitParameter("axis2.repository.path", "/home/mdiponio/lib/axis2-1.5.1/repository");//repoPath.getCanonicalPath());        
+        holder.setInitParameter("axis2.repository.path", repoPath.getCanonicalPath());
         this.context.addServlet(holder, "/");
-        
     }
     
     /* 
