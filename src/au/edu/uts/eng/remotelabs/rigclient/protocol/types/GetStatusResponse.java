@@ -64,9 +64,8 @@ import org.apache.axis2.databinding.utils.BeanUtil;
 import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
 
 /**
- * GetStatusResponse bean class
+ * GetStatusResponse bean class.
  */
-
 public class GetStatusResponse implements ADBBean
 {
     private static final long serialVersionUID = 3855666356361578702L;
