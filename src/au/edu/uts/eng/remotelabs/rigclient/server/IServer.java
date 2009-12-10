@@ -61,9 +61,9 @@ public interface IServer
     public boolean shutdownServer();
     
     /**
-     * Gets an address that may be used to connect to the rig client.
+     * Gets the addresses that may be used to connect to the rig client.
      * 
-     * @return rig client address
+     * @return list of rig client addresses
      */
-    public String getAddress();
+    public String[] getAddress();
 }

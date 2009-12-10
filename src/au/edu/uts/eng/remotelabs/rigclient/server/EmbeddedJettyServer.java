@@ -43,6 +43,10 @@ package au.edu.uts.eng.remotelabs.rigclient.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.axis2.transport.http.AxisServlet;
 import org.mortbay.jetty.Connector;
@@ -62,6 +66,9 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  */
 public class EmbeddedJettyServer implements IServer
 {
+    /** Address post-fix for the service URL. */
+    public static final String URL_POSTFIX = "/services/RigClientService";
+    
     /** Jetty server. */
     private Server server;
     
@@ -73,6 +80,9 @@ public class EmbeddedJettyServer implements IServer
     
     /** Request thread pool. */
     private QueuedThreadPool threadPool;
+    
+    /** The addresses this server is listening on. */
+    private final List<String> addresses;
     
     /** Configuration. */
     private final IConfig config;
@@ -88,9 +98,9 @@ public class EmbeddedJettyServer implements IServer
         this.logger = LoggerFactory.getLoggerInstance();
         this.logger.debug("Creating a new embedded Jetty server.");
                         
-        this.config = ConfigFactory.getInstance();        
+        this.config = ConfigFactory.getInstance();
+        this.addresses = new ArrayList<String>();
     }
-    
     
     /**
      * Initialise the server.
@@ -129,6 +139,9 @@ public class EmbeddedJettyServer implements IServer
             // requests are truncated.
             this.connector = new SelectChannelConnector();
             this.connector.setPort(portNumber);
+            final String addr = this.generateAddress("http", portNumber, EmbeddedJettyServer.URL_POSTFIX);
+            this.addresses.add(addr);
+            this.logger.priority("Rig client connection address is " + addr + ".");
         }
         catch (NumberFormatException e)
         {
@@ -230,10 +243,40 @@ public class EmbeddedJettyServer implements IServer
      * @see au.edu.uts.eng.remotelabs.rigclient.server.IServer#getAddress() 
      */
     @Override
-    public String getAddress()
+    public String[] getAddress()
     {
-        // TODO listening address
-        return null;
+        return this.addresses.toArray(new String[this.addresses.size()]);
+    }
+    
+    /**
+     * Builds the address of the rig client from the passed parameters and 
+     * from the determined rig client server IP address.
+     * 
+     * @param proto protocol string e.g. 'http' or 'https'
+     * @param port port number 
+     * @param post resource name
+     * @return generated address
+     * @throws UnknownHostException error finding local IP.
+     */
+    private String generateAddress(final String proto, final int port, final String post) throws SocketException
+    {
+        StringBuilder builder = new StringBuilder();
+        
+        /* Protocol. */
+        builder.append(proto);
+        builder.append("://");
+        
+        /* IP address. */
+        // TODO autofocus
+        
+        /* Port number. */
+        builder.append(':');
+        builder.append(port);
+        
+        /* Resource string. */
+        builder.append(post);
+        
+        return builder.toString();
     }
 
 }
