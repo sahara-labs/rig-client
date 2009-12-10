@@ -59,6 +59,12 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.BatchStatusRespo
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.ErrorTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.ErrorTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.ExtensionMapperTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.GetAttributeResponseTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.GetAttributeTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.GetBatchControlStatusResponseTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.GetBatchControlStatusTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.GetStatusResponseTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.GetStatusTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.UserTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
@@ -79,6 +85,12 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    GetAttributeResponseTester.class,
+    GetAttributeTester.class,
+    GetBatchControlStatusResponseTester.class,
+    GetBatchControlStatusTester.class,
+    GetStatusResponseTester.class,
+    GetStatusTester.class,
     ExtensionMapperTester.class,
     ErrorTypeTester.class,
     ErrorTester.class,

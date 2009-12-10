@@ -42,10 +42,6 @@
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
@@ -54,49 +50,39 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.StAXUtils;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchState;
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchStatusResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.NullType;
+
 
 /**
- * Tests the {@link BatchStatusResponseType} class.
+ * Tests the {@link GetStatus} class.
  */
-public class BatchStatusResponseTypeTester extends TestCase
+public class GetStatusTester extends TestCase
 {
     @Test
     public void testParse() throws Exception
     {
-        String str = "<ns1:getBatchControlStatusResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:BatchStatusResponseType\">\n" +
-                "            <state>COMPLETE</state>\n" +
-        		"            <progress>10</progress>\n" + 
-        		"            <resultFilePath>C:\\results\\file1</resultFilePath>\n" +
-        		"            <resultFilePath>C:\\results\\file2</resultFilePath>\n" +
-        		"         </ns1:getBatchControlStatusResponse>";
+        String str = "<ns1:getStatus xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:NullType\">\n" + 
+        		"            <void>Foo</void>\n" + 
+        		"         </ns1:getStatus>";
         
-        BatchStatusResponseType obj = BatchStatusResponseType.Factory.parse(
-                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
-        assertEquals("10", obj.getProgress());
-        assertEquals(BatchState.COMPLETE, obj.getState());
-        
-        String files[] = obj.getResultFilePath();
-        List<String> fileList = Arrays.asList(files);
-        assertTrue(fileList.contains("C:\\results\\file1"));        
-        assertTrue(fileList.contains("C:\\results\\file2"));
+        GetStatus obj = GetStatus.Factory.parse(StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
+        assertNotNull(obj);
+        NullType nll = obj.getGetStatus();
+        assertNotNull(nll);
+        assertEquals("Foo", nll.get_void());
     }
     
     @Test
     public void testSerialize() throws Exception
     {
-        BatchStatusResponseType obj = new BatchStatusResponseType();
-        obj.addResultFilePath("C:\\FOO\\BAR");
-        obj.addResultFilePath("C:\\BAR\\FOO");
-        obj.setProgress("100");
-        obj.setState(BatchState.FAILED);
+        GetStatus st = new GetStatus();
+        NullType nll = new NullType();
+        nll.set_void("The endless ");
+        st.setGetStatus(nll);
         
-        OMElement ele = obj.getOMElement(new QName("", "batchStatus"), OMAbstractFactory.getOMFactory());
+        OMElement ele = st.getOMElement(GetStatus.MY_QNAME, OMAbstractFactory.getOMFactory());
         String str = ele.toStringWithConsume();
-        assertTrue(str.contains("<state>FAILED</state>"));
-        assertTrue(str.contains("<progress>100</progress>"));
-        assertTrue(str.contains("<resultFilePath>C:\\FOO\\BAR</resultFilePath>"));
-        assertTrue(str.contains("<resultFilePath>C:\\BAR\\FOO</resultFilePath>"));
+        assertTrue(str.contains("<void>The endless </void>"));
     }
 }

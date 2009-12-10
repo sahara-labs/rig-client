@@ -42,10 +42,6 @@
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
@@ -54,49 +50,56 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.StAXUtils;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchState;
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchStatusResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.StatusResponseType;
 
 /**
- * Tests the {@link BatchStatusResponseType} class.
+ * Tests the {@link GetStatusResponse} class.
  */
-public class BatchStatusResponseTypeTester extends TestCase
+public class GetStatusResponseTester extends TestCase
 {
     @Test
     public void testParse() throws Exception
     {
-        String str = "<ns1:getBatchControlStatusResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:BatchStatusResponseType\">\n" +
-                "            <state>COMPLETE</state>\n" +
-        		"            <progress>10</progress>\n" + 
-        		"            <resultFilePath>C:\\results\\file1</resultFilePath>\n" +
-        		"            <resultFilePath>C:\\results\\file2</resultFilePath>\n" +
-        		"         </ns1:getBatchControlStatusResponse>";
-        
-        BatchStatusResponseType obj = BatchStatusResponseType.Factory.parse(
+        String str = "<ns1:getStatusResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\">\n" + 
+        		"      <isMonitorFailed>false</isMonitorFailed>\n" + 
+        		"      <isInMaintenance>false</isInMaintenance>\n" + 
+        		"      <isInSession>true</isInSession>\n" + 
+        		"      <sessionUser>mdiponio</sessionUser>\n" + 
+        		"    </ns1:getStatusResponse>";
+        GetStatusResponse obj = GetStatusResponse.Factory.parse(
                 StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
-        assertEquals("10", obj.getProgress());
-        assertEquals(BatchState.COMPLETE, obj.getState());
         
-        String files[] = obj.getResultFilePath();
-        List<String> fileList = Arrays.asList(files);
-        assertTrue(fileList.contains("C:\\results\\file1"));        
-        assertTrue(fileList.contains("C:\\results\\file2"));
+        StatusResponseType resp = obj.getGetStatusResponse();
+        assertNotNull(resp);
+        
+        assertFalse(resp.getIsInMaintenance());
+        assertFalse(resp.getIsMonitorFailed());
+        assertNull(resp.getMaintenanceReason());
+        assertNull(resp.getMonitorReason());
+        assertTrue(resp.getIsInSession());
+        assertEquals("mdiponio", resp.getSessionUser());
+        assertEquals(null, resp.getSlaveUsers());
     }
     
     @Test
     public void testSerialize() throws Exception
     {
-        BatchStatusResponseType obj = new BatchStatusResponseType();
-        obj.addResultFilePath("C:\\FOO\\BAR");
-        obj.addResultFilePath("C:\\BAR\\FOO");
-        obj.setProgress("100");
-        obj.setState(BatchState.FAILED);
+        StatusResponseType st = new StatusResponseType();
+        st.setIsInMaintenance(true);
+        st.setIsInSession(false);
+        st.setIsMonitorFailed(true);
+        st.setMaintenanceReason("Tania broke it!");
+        st.setMonitorReason("Michael is feeling lazy!");
+        GetStatusResponse obj = new GetStatusResponse();
+        obj.setGetStatusResponse(st);
         
-        OMElement ele = obj.getOMElement(new QName("", "batchStatus"), OMAbstractFactory.getOMFactory());
+        OMElement ele = st.getOMElement(GetStatusResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
         String str = ele.toStringWithConsume();
-        assertTrue(str.contains("<state>FAILED</state>"));
-        assertTrue(str.contains("<progress>100</progress>"));
-        assertTrue(str.contains("<resultFilePath>C:\\FOO\\BAR</resultFilePath>"));
-        assertTrue(str.contains("<resultFilePath>C:\\BAR\\FOO</resultFilePath>"));
+        assertTrue(str.contains("<monitorReason>Michael is feeling lazy!</monitorReason>"));
+        assertTrue(str.contains("<maintenanceReason>Tania broke it!</maintenanceReason>"));
+        assertTrue(str.contains("<isInMaintenance>true</isInMaintenance>"));
+        assertTrue(str.contains("<isMonitorFailed>true</isMonitorFailed>"));
+        assertTrue(str.contains("<isInSession>false</isInSession>"));
     }
 }

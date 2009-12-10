@@ -56,24 +56,28 @@ import org.junit.Test;
 
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchState;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchStatusResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatusResponse;
+
 
 /**
- * Tests the {@link BatchStatusResponseType} class.
+ * Tests the {@link GetBatchControlStatusResponse} class.
  */
-public class BatchStatusResponseTypeTester extends TestCase
+public class GetBatchControlStatusResponseTester extends TestCase
 {
     @Test
     public void testParse() throws Exception
     {
-        String str = "<ns1:getBatchControlStatusResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:BatchStatusResponseType\">\n" +
+        String str = "<ns1:getBatchStatus xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:BatchStatusResponseType\">\n" +
                 "            <state>COMPLETE</state>\n" +
         		"            <progress>10</progress>\n" + 
         		"            <resultFilePath>C:\\results\\file1</resultFilePath>\n" +
         		"            <resultFilePath>C:\\results\\file2</resultFilePath>\n" +
-        		"         </ns1:getBatchControlStatusResponse>";
+        		"         </ns1:getBatchStatus>";
         
-        BatchStatusResponseType obj = BatchStatusResponseType.Factory.parse(
+        GetBatchControlStatusResponse resp  = GetBatchControlStatusResponse.Factory.parse(
                 StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
+        
+        BatchStatusResponseType obj = resp.getGetBatchControlStatusResponse();
         assertEquals("10", obj.getProgress());
         assertEquals(BatchState.COMPLETE, obj.getState());
         
@@ -86,13 +90,15 @@ public class BatchStatusResponseTypeTester extends TestCase
     @Test
     public void testSerialize() throws Exception
     {
+        GetBatchControlStatusResponse resp = new GetBatchControlStatusResponse();
         BatchStatusResponseType obj = new BatchStatusResponseType();
         obj.addResultFilePath("C:\\FOO\\BAR");
         obj.addResultFilePath("C:\\BAR\\FOO");
         obj.setProgress("100");
         obj.setState(BatchState.FAILED);
+        resp.setGetBatchControlStatusResponse(obj);
         
-        OMElement ele = obj.getOMElement(new QName("", "batchStatus"), OMAbstractFactory.getOMFactory());
+        OMElement ele = resp.getOMElement(new QName("", "batchStatus"), OMAbstractFactory.getOMFactory());
         String str = ele.toStringWithConsume();
         assertTrue(str.contains("<state>FAILED</state>"));
         assertTrue(str.contains("<progress>100</progress>"));
