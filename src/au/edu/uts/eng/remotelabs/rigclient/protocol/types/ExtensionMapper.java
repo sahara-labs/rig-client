@@ -18,7 +18,7 @@ public class ExtensionMapper
 
         if ("http://remotelabs.eng.uts.edu.au/rigclient/protocol".equals(namespaceURI)
                 && "state_type1".equals(typeName))
-            return au.edu.uts.eng.remotelabs.rigclient.protocol.types.State_type1.Factory.parse(reader);
+            return au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchState.Factory.parse(reader);
 
         if ("http://remotelabs.eng.uts.edu.au/rigclient/protocol".equals(namespaceURI)
                 && "BatchStatusResponseType".equals(typeName))
@@ -63,7 +63,7 @@ public class ExtensionMapper
 
         if ("http://remotelabs.eng.uts.edu.au/rigclient/protocol".equals(namespaceURI)
                 && "state_type1".equals(typeName))
-            return au.edu.uts.eng.remotelabs.rigclient.protocol.types.State_type1.Factory.parse(reader);
+            return au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchState.Factory.parse(reader);
 
         if ("http://remotelabs.eng.uts.edu.au/rigclient/protocol".equals(namespaceURI)
                 && "MaintenanceRequestType".equals(typeName))

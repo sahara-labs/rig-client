@@ -41,50 +41,29 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests;
 
-import java.io.ByteArrayInputStream;
-
 import junit.framework.TestCase;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.util.StAXUtils;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate;
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AuthRequiredRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchRequestType;
 
 
 /**
- * Tests the {@link AuthRequiredRequestType} class.
+ * Tests the {@link BatchRequestType} class.
  */
-public class AuthRequiredRequestTypeTester extends TestCase
+public class BatchRequestTypeTester extends TestCase
 {
     @Test
     public void testParse() throws Exception
     {
-        String str = "<ns1:allocate xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" " +
-        		"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:AuthRequiredRequestType\">\n" + 
-        		"            <identityToken>abc123</identityToken>\n" + 
-        		"            <requestor>mdiponio</requestor>\n" + 
-        		"     </ns1:allocate>";
-        
-        AuthRequiredRequestType obj = AuthRequiredRequestType.Factory.parse(
-                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
-        assertEquals("abc123", obj.getIdentityToken());
-        assertEquals("mdiponio", obj.getRequestor());
+        // TODO batch request parse test impl
+        fail("Not yet implemented");
     }
     
     @Test
     public void testSerialize() throws Exception
     {
-        AuthRequiredRequestType auth = new AuthRequiredRequestType();
-        auth.setIdentityToken("abc123");
-        auth.setRequestor("tmachet");
-        
-        OMElement ele = auth.getOMElement(Allocate.MY_QNAME, OMAbstractFactory.getOMFactory());
-        String str = ele.toStringWithConsume();
-        
-        assertTrue(str.contains("<identityToken>abc123</identityToken>"));
-        assertTrue(str.contains("<requestor>tmachet</requestor>"));
+        // TODO batch request serialize test impl
+        fail("Not yet implemented");
     }
 }

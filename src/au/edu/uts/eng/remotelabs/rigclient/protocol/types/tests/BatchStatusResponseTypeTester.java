@@ -42,6 +42,10 @@
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
@@ -50,41 +54,49 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.StAXUtils;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate;
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AuthRequiredRequestType;
-
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchState;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchStatusResponseType;
 
 /**
- * Tests the {@link AuthRequiredRequestType} class.
+ * Tests the {@link BatchStatusResponseType} class.
  */
-public class AuthRequiredRequestTypeTester extends TestCase
+public class BatchStatusResponseTypeTester extends TestCase
 {
     @Test
     public void testParse() throws Exception
     {
-        String str = "<ns1:allocate xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" " +
-        		"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:AuthRequiredRequestType\">\n" + 
-        		"            <identityToken>abc123</identityToken>\n" + 
-        		"            <requestor>mdiponio</requestor>\n" + 
-        		"     </ns1:allocate>";
+        String str = "<ns1:getBatchStatus xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:BatchStatusResponseType\">\n" +
+                "            <state>COMPLETE</state>\n" +
+        		"            <progress>10</progress>\n" + 
+        		"            <resultFilePath>C:\\results\\file1</resultFilePath>\n" +
+        		"            <resultFilePath>C:\\results\\file2</resultFilePath>\n" +
+        		"         </ns1:getBatchStatus>";
         
-        AuthRequiredRequestType obj = AuthRequiredRequestType.Factory.parse(
+        BatchStatusResponseType obj = BatchStatusResponseType.Factory.parse(
                 StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
-        assertEquals("abc123", obj.getIdentityToken());
-        assertEquals("mdiponio", obj.getRequestor());
+        assertEquals("10", obj.getProgress());
+        assertEquals(BatchState.COMPLETE, obj.getState());
+        
+        String files[] = obj.getResultFilePath();
+        List<String> fileList = Arrays.asList(files);
+        assertTrue(fileList.contains("C:\\results\\file1"));        
+        assertTrue(fileList.contains("C:\\results\\file2"));
     }
     
     @Test
     public void testSerialize() throws Exception
     {
-        AuthRequiredRequestType auth = new AuthRequiredRequestType();
-        auth.setIdentityToken("abc123");
-        auth.setRequestor("tmachet");
+        BatchStatusResponseType obj = new BatchStatusResponseType();
+        obj.addResultFilePath("C:\\FOO\\BAR");
+        obj.addResultFilePath("C:\\BAR\\FOO");
+        obj.setProgress("100");
+        obj.setState(BatchState.FAILED);
         
-        OMElement ele = auth.getOMElement(Allocate.MY_QNAME, OMAbstractFactory.getOMFactory());
+        OMElement ele = obj.getOMElement(new QName("", "batchStatus"), OMAbstractFactory.getOMFactory());
         String str = ele.toStringWithConsume();
-        
-        assertTrue(str.contains("<identityToken>abc123</identityToken>"));
-        assertTrue(str.contains("<requestor>tmachet</requestor>"));
+        assertTrue(str.contains("<state>FAILED</state>"));
+        assertTrue(str.contains("<progress>100</progress>"));
+        assertTrue(str.contains("<resultFilePath>C:\\FOO\\BAR</resultFilePath>"));
+        assertTrue(str.contains("<resultFilePath>C:\\BAR\\FOO</resultFilePath>"));
     }
 }

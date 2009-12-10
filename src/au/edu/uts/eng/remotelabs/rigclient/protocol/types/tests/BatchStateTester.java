@@ -39,9 +39,12 @@
  * Changelog:
  * - 10/12/2009 - mdiponio - Initial file creation.
  */
+
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests;
 
 import java.io.ByteArrayInputStream;
+
+import javax.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
@@ -50,41 +53,75 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.StAXUtils;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate;
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AuthRequiredRequestType;
-
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchState;
 
 /**
- * Tests the {@link AuthRequiredRequestType} class.
+ * Tests the {@link BatchState} class.
  */
-public class AuthRequiredRequestTypeTester extends TestCase
+public class BatchStateTester extends TestCase
 {
     @Test
-    public void testParse() throws Exception
+    public void testParseClear() throws Exception
     {
-        String str = "<ns1:allocate xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" " +
-        		"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:AuthRequiredRequestType\">\n" + 
-        		"            <identityToken>abc123</identityToken>\n" + 
-        		"            <requestor>mdiponio</requestor>\n" + 
-        		"     </ns1:allocate>";
-        
-        AuthRequiredRequestType obj = AuthRequiredRequestType.Factory.parse(
-                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
-        assertEquals("abc123", obj.getIdentityToken());
-        assertEquals("mdiponio", obj.getRequestor());
+       String str = "<state>CLEAR</state>";
+       
+       BatchState obj = BatchState.Factory.parse(
+               StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
+       assertEquals("CLEAR", obj.getValue());
+       assertEquals(BatchState.CLEAR, obj);
+    }
+    
+    @Test
+    public void testParseInProgres() throws Exception
+    {
+       String str = "<state>IN_PROGRESS</state>";
+       
+       BatchState obj = BatchState.Factory.parse(
+               StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
+       assertEquals("IN_PROGRESS", obj.getValue());
+       assertEquals(BatchState.IN_PROGRESS, obj);
+    }
+    
+    @Test
+    public void testParseComplete() throws Exception
+    {
+       String str = "<state>COMPLETE</state>";
+       
+       BatchState obj = BatchState.Factory.parse(
+               StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
+       assertEquals("COMPLETE", obj.getValue());  
+       assertEquals(BatchState.COMPLETE, obj);
+    }
+    
+    @Test
+    public void testParseFailed() throws Exception
+    {
+       String str = "<state>FAILED</state>";
+       
+       BatchState obj = BatchState.Factory.parse(
+               StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
+       assertEquals("FAILED", obj.getValue());
+       assertEquals(BatchState.FAILED, obj);
+    }
+    
+    @Test
+    public void testParseNotSupported() throws Exception
+    {
+       String str = "<state>NOT_SUPPORTED</state>";
+       
+       BatchState obj = BatchState.Factory.parse(
+               StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
+       assertEquals("NOT_SUPPORTED", obj.getValue());
+       assertEquals(BatchState.NOT_SUPPORTED, obj);
     }
     
     @Test
     public void testSerialize() throws Exception
     {
-        AuthRequiredRequestType auth = new AuthRequiredRequestType();
-        auth.setIdentityToken("abc123");
-        auth.setRequestor("tmachet");
+        BatchState obj = BatchState.CLEAR;
         
-        OMElement ele = auth.getOMElement(Allocate.MY_QNAME, OMAbstractFactory.getOMFactory());
+        OMElement ele = obj.getOMElement(new QName("", "batchState"), OMAbstractFactory.getOMFactory());
         String str = ele.toStringWithConsume();
-        
-        assertTrue(str.contains("<identityToken>abc123</identityToken>"));
-        assertTrue(str.contains("<requestor>tmachet</requestor>"));
+        assertTrue(str.contains("CLEAR"));
     }
 }
