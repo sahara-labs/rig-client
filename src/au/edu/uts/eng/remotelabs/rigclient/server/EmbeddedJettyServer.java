@@ -212,8 +212,8 @@ public class EmbeddedJettyServer implements IServer
         }
         catch (Exception e)
         {
-            this.logger.fatal("Unable to start server because of exception of type " + e.getClass().getName() + ", " +
-            		"with error message " + e.getMessage() + ".");
+            this.logger.fatal("Unable to start server because of exception: " + e.getClass().getSimpleName() + ", " +
+            		"with error message: " + e.getMessage() + ".");
             return false;
         }
     }
@@ -237,8 +237,8 @@ public class EmbeddedJettyServer implements IServer
         }
         catch (Exception e)
         {
-            this.logger.fatal("Unable to stop server because of exception of type " + e.getClass().getName() + ", " +
-            		"with error message " + e.getMessage() + ".");
+            this.logger.fatal("Unable to stop server because of exception: " + e.getClass().getSimpleName() + ", " +
+            		"with error message: " + e.getMessage() + ".");
             return false;
         }
     }
@@ -271,34 +271,42 @@ public class EmbeddedJettyServer implements IServer
         builder.append("://");
         
         /* IP address. */
-        final String configIP = this.config.getProperty("");
+        final String configIP = this.config.getProperty("Rig_Client_IP_Address");
         if (configIP == null || configIP.isEmpty())
         {
+            String configNetworkIf = this.config.getProperty("Listening_Network_Interface");
+            configNetworkIf = (configNetworkIf == null || configNetworkIf.isEmpty()) ? null : configNetworkIf;
+            
             /* Detect and use the first iterated NIC. */
             Enumeration<NetworkInterface> nics = NetworkInterface.getNetworkInterfaces();
-            if (nics.hasMoreElements())
+            boolean found = false;
+            while (nics.hasMoreElements() && !found)
             {
                 NetworkInterface nic = nics.nextElement();
-                Enumeration<InetAddress> boundAddrs = nic.getInetAddresses();
                 
+                /* If a network name is specified, check if the nic has the same name. */
+                if (configNetworkIf != null && !nic.getName().equals(configNetworkIf))
+                {
+                    continue;
+                }
+
+                Enumeration<InetAddress> boundAddrs = nic.getInetAddresses();
                 InetAddress addr = null;
                 /* Iterate through the bound address to find a IPv4 address. */
-                while (boundAddrs.hasMoreElements() && !((addr = boundAddrs.nextElement()) instanceof Inet4Address))
+                while (boundAddrs.hasMoreElements())
                 {
-                    addr = null;
-                }
-                if (addr == null)
-                {
-                    throw new SocketException("No IPv4 address found for interface.");
-                }
-                else
-                {
-                    builder.append(addr.getCanonicalHostName());
+                    if ((addr = boundAddrs.nextElement()) instanceof Inet4Address)
+                    {
+                        builder.append(addr.getCanonicalHostName());
+                        found = true;
+                    }
                 }
             }
-            else
+            
+            /* Check to see if an address was found. */ 
+            if (!found)
             {
-                throw new SocketException("No network interfaces found.");
+                throw new SocketException("Unable to find a viable listening address");
             }
         }
         else
