@@ -43,9 +43,13 @@ package au.edu.uts.eng.remotelabs.rigclient.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import org.apache.axis2.transport.http.AxisServlet;
@@ -267,7 +271,40 @@ public class EmbeddedJettyServer implements IServer
         builder.append("://");
         
         /* IP address. */
-        // TODO autofocus
+        final String configIP = this.config.getProperty("");
+        if (configIP == null || configIP.isEmpty())
+        {
+            /* Detect and use the first iterated NIC. */
+            Enumeration<NetworkInterface> nics = NetworkInterface.getNetworkInterfaces();
+            if (nics.hasMoreElements())
+            {
+                NetworkInterface nic = nics.nextElement();
+                Enumeration<InetAddress> boundAddrs = nic.getInetAddresses();
+                
+                InetAddress addr = null;
+                /* Iterate through the bound address to find a IPv4 address. */
+                while (boundAddrs.hasMoreElements() && !((addr = boundAddrs.nextElement()) instanceof Inet4Address))
+                {
+                    addr = null;
+                }
+                if (addr == null)
+                {
+                    throw new SocketException("No IPv4 address found for interface.");
+                }
+                else
+                {
+                    builder.append(addr.getCanonicalHostName());
+                }
+            }
+            else
+            {
+                throw new SocketException("No network interfaces found.");
+            }
+        }
+        else
+        {
+            builder.append(configIP);
+        }
         
         /* Port number. */
         builder.append(':');
