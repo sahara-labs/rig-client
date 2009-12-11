@@ -222,7 +222,7 @@ public class EmbeddedJettyServer implements IServer
      * @see au.edu.uts.eng.remotelabs.rigclient.server.IServer#shutdownServer()
      */
     @Override
-    public boolean shutdownServer()
+    public boolean stopListening()
     {
         if (this.server == null)
         {
@@ -241,6 +241,15 @@ public class EmbeddedJettyServer implements IServer
             		"with error message: " + e.getMessage() + ".");
             return false;
         }
+    }
+    
+    /* 
+     * @see au.edu.uts.eng.remotelabs.rigclient.server.IServer#isServerListening()
+     */
+    @Override
+    public boolean isListening()
+    {
+        return this.server.isRunning();
     }
     
     /*
@@ -323,5 +332,4 @@ public class EmbeddedJettyServer implements IServer
         
         return builder.toString();
     }
-
 }

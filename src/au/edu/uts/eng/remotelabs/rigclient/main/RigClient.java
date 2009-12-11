@@ -41,53 +41,144 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.main;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
+import au.edu.uts.eng.remotelabs.rigclient.server.EmbeddedJettyServer;
+import au.edu.uts.eng.remotelabs.rigclient.server.IServer;
+import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
+
 /**
- * Startup and shutdown class.
+ * Startup and shutdown class. 
+ * Shutdown error codes:
+ * <ul>
+ *  <li>0 - exit normal.</li>
+ *  <li>1 - unhandled exception.</li>
+ *  <li>2 - rig type class cannot be loaded and resolved.</li>
+ *  <li>3 - rig client server cannot be started.</li>
+ * </ul>
  */
 public class RigClient
-{    
+{
+    /** Listening server. */
+    private final IServer server;
+    
     /** Shutdown flag. */
     private static boolean shutdown;
+    
+    /** Logger. */
+    private final ILogger logger;
+    
+    /** Configuration. */
+    private final IConfig config;
     
     /**
      * Constructor.
      */
     public RigClient()
     {
-        // TODO service instatisation 
-    }
-    
-    public void runProgram()
-    {
-        
-        /* Wait for shutdown. */
-        while (!RigClient.shutdown)
-        {
-            try
-            {
-                Thread.sleep(10000);
-            }
-            catch (InterruptedException e)
-            {
-                break;
-            }
-        }
-        
-        /* Shutdown services. */
+        this.logger = LoggerFactory.getLoggerInstance();
+        this.config = ConfigFactory.getInstance();
+        this.server = new EmbeddedJettyServer();
     }
     
     /**
-     * Starts the rig client.
+     * Runs the program forever, until notified to shutdown.
+     */
+    public void runProgram()
+    {
+        try
+        {
+            this.logger.priority("Rig client is starting up...");
+            this.logger.priority("Rig name: " + this.config.getProperty("Rig_Name"));
+            this.logger.priority("Rig type: " + this.config.getProperty("Rig_Type"));
+
+            /* ------------------------------------------------------------------
+             * ---- 1. Get the rig type class and start the exerciser tests. ----
+             * ----------------------------------------------------------------*/
+            final IRig rig = RigFactory.getRigInstance();
+            if (rig == null)
+            {
+                this.logger.fatal("Unable to load rig type class. Unrecoverable, please check configuration to" +
+                        " ensure a valid rig type class is specified.");
+                System.exit(2);
+            }
+            rig.startTests();
+            
+            /* ------------------------------------------------------------------
+             * ---- 2. If the server isn't running, start it up. ----------------
+             * ----------------------------------------------------------------*/
+            if (!this.server.startListening())
+            {
+                this.logger.fatal("Unable to start the rig client server. Unrecoverable, please check configuration," +
+                		" to ensure a valid port number and the operating system process list to ensure no other" +
+                		" rig clients are running.");
+                System.exit(3);
+            }
+            
+            /* ------------------------------------------------------------------
+             * ---- 3. Start the registration and status notification service. --
+             * ----------------------------------------------------------------*/
+            // TODO Registration and status notification service.
+            
+            /* ------------------------------------------------------------------
+             * ---- 4. Enter the run loop and wait for shutdown. ----------------
+             * ----------------------------------------------------------------*/
+            while (!RigClient.shutdown)
+            {
+                try
+                {                    
+                    Thread.sleep(5000);
+                }
+                catch (InterruptedException e)
+                {
+                    break;
+                }
+            }
+
+            /* ------------------------------------------------------------------
+             * ---- 5. Cleanup and shutdown all services. -----------------------
+             * ----------------------------------------------------------------*/
+            /* Purge all sessions (if running). */
+            if (rig.isSessionActive())
+            {
+                rig.revoke();
+            }
+            /* Stop exerciser tests. */
+            rig.stopTests();
+            
+            /* Shutdown registration and status update service 
+            // TODO shutdown registration and status update service
+            
+            /* Stop server. */
+            this.server.stopListening();
+        } 
+        catch (Throwable thr)
+        {
+            this.logger.fatal("Unhandled exception " + thr.getClass().getSimpleName() + " with error message " +
+                    thr.getMessage() + ". This is a proverbial blue screen of death, so please file a bug report.");
+            RigClientDefines.reportBug("Unhandled exception which popped the stack.", thr);
+            System.exit(1);
+        }
+        
+        /* Sorry to see you go... */
+        System.exit(0);
+    }
+    
+    /**
+     * Starts the rig client (called through JNI).
      */
     public static void start()
     {
         RigClient.shutdown = false;
-        final RigClient rc = new RigClient();
-        rc.runProgram();
+        final RigClient rigClient = new RigClient();
+        rigClient.runProgram();
     }
     
     /**
-     * Notifies the rig client to shutdown.
+     * Notifies the rig client to shutdown (called through JNI).
      */
     public static void stop()
     {

@@ -63,7 +63,8 @@ public class RigFactory
     }
     
     /**
-     * Returns an instance of the rig type class.
+     * Returns an instance of the rig type class. If the class cannot be 
+     * resolved or instantiated <code>null</code> is returned.
      * 
      * @return rig type class
      */

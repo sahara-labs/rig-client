@@ -51,9 +51,6 @@ import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
 /**
  * Global definitions and convenient functions.
- * 
- * Error codes:
- *     - UTIL_FL_1 - Unable to set file logger appender.
  */
 public class RigClientDefines
 {
@@ -77,7 +74,7 @@ public class RigClientDefines
         final Calendar cal = Calendar.getInstance();
 
         System.out.println();
-        System.out.println("Rig Client says FRAK!");
+        System.out.println("Rig Client says CRAP!");
         System.out.println();
         System.out.println("Congratulations, you are one of the privileged people to possibly");
         System.out.println("find an actual bug!");

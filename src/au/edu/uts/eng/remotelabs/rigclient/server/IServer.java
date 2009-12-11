@@ -58,7 +58,15 @@ public interface IServer
      * 
      * @return true if successful, false otherwise.
      */
-    public boolean shutdownServer();
+    public boolean stopListening();
+    
+    /**
+     * Returns <code>true</code> if the server is running and listening 
+     * for requests.
+     * 
+     * @return true if the server is running
+     */
+    public boolean isListening();
     
     /**
      * Gets the addresses that may be used to connect to the rig client.

@@ -361,7 +361,9 @@ public abstract class AbstractRig implements IRig
                             test.getActionType() + ".");
                     
                     /* Test actions run it their own thread, so create one and start it. */
-                    new Thread(this.testThreads, test).start();
+                    final Thread thr = new Thread(this.testThreads, test);
+                    thr.setDaemon(true); /* To not keep the JVM chugging on shutdown. */
+                    thr.start();
                     return this.testActions.add(test);
                 }
                 

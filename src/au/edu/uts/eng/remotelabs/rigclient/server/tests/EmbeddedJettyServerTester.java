@@ -130,7 +130,7 @@ public class EmbeddedJettyServerTester extends TestCase
         assertFalse(stat.getIsInSession());
         assertFalse(stat.getIsMonitorFailed());
         
-        assertTrue(this.server.shutdownServer());
+        assertTrue(this.server.stopListening());
         Thread.sleep(5000);
         
         
