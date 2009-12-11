@@ -1,4 +1,46 @@
 /**
+ * SAHARA Rig Client
+ * 
+ * Software abstraction of physical rig to provide rig session control
+ * and rig device control. Automatically tests rig hardware and reports
+ * the rig status to ensure rig goodness.
+ *
+ * @license See LICENSE in the top level directory for complete license terms.
+ *
+ * Copyright (c) 2009, University of Technology, Sydney
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  * Redistributions of source code must retain the above copyright notice, 
+ *    this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright 
+ *    notice, this list of conditions and the following disclaimer in the 
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of the University of Technology, Sydney nor the names 
+ *    of its contributors may be used to endorse or promote products derived from 
+ *    this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @author Michael Diponio (mdiponio)
+ * @date 1st December 2009
+ *
+ * Changelog:
+ * - 01/12/2009 - mdiponio - Initial file creation.
+ */
+
+/**
  * RigClientServiceMessageReceiverInOut.java This file was auto-generated from
  * WSDL by the Apache Axis2 version: 1.4.1 Built on : Aug 19, 2008 (10:13:39
  * LKT)
@@ -62,7 +104,7 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         {
             /* Get the implementation class for the Web Service. */
             final Object obj = this.getTheImplementationObject(msgContext);
-            final RigClientServiceSkeletonInterface skel = (RigClientServiceSkeletonInterface) obj;
+            final RigClientServiceSkeletonInterface serviceImpl = (RigClientServiceSkeletonInterface) obj;
 
             /* Out envelope. */
             SOAPEnvelope envelope = null;
@@ -77,217 +119,146 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
             String methodName;
             if (op.getName() != null && (methodName = JavaUtils.xmlNameToJava(op.getName().getLocalPart())) != null)
             {
-
                 if ("performPrimitiveControl".equals(methodName))
                 {
-                    PerformPrimitiveControlResponse pCResponse = null;
+                    PerformPrimitiveControlResponse primResponse = null;
                     final PerformPrimitiveControl wrappedParam = (PerformPrimitiveControl) this.fromOM(msgContext
                             .getEnvelope().getBody().getFirstElement(), PerformPrimitiveControl.class, this
                             .getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    pCResponse = skel.performPrimitiveControl(wrappedParam);
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), pCResponse, false);
+                    primResponse = serviceImpl.performPrimitiveControl(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), primResponse, false);
                 }
                 else if ("getBatchControlStatus".equals(methodName))
                 {
-                    GetBatchControlStatusResponse getBatchControlStatusResponse31 = null;
+                    GetBatchControlStatusResponse batchStatus = null;
                     final GetBatchControlStatus wrappedParam = (GetBatchControlStatus) this.fromOM(msgContext
                             .getEnvelope().getBody().getFirstElement(), GetBatchControlStatus.class, this
                             .getEnvelopeNamespaces(msgContext.getEnvelope()));
-                    getBatchControlStatusResponse31 = skel.getBatchControlStatus(wrappedParam);
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), getBatchControlStatusResponse31, false);
+                    
+                    batchStatus = serviceImpl.getBatchControlStatus(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), batchStatus, false);
                 }
-                else
-
-                if ("isActivityDetectable".equals(methodName))
+                else if ("isActivityDetectable".equals(methodName))
                 {
-                    IsActivityDetectableResponse isActivityDetectableResponse33 = null;
+                    IsActivityDetectableResponse actDetectable = null;
                     final IsActivityDetectable wrappedParam = (IsActivityDetectable) this.fromOM(msgContext
                             .getEnvelope().getBody().getFirstElement(), IsActivityDetectable.class, this
                             .getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    isActivityDetectableResponse33 =
-
-                    skel.isActivityDetectable(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), isActivityDetectableResponse33, false);
+                    actDetectable = serviceImpl.isActivityDetectable(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), actDetectable, false);
                 }
-                else
-
-                if ("getAttribute".equals(methodName))
+                else if ("getAttribute".equals(methodName))
                 {
-
-                    GetAttributeResponse getAttributeResponse35 = null;
+                    GetAttributeResponse attrResponse = null;
                     final GetAttribute wrappedParam = (GetAttribute) this.fromOM(msgContext.getEnvelope().getBody()
                             .getFirstElement(), GetAttribute.class, this
                             .getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getAttributeResponse35 =
-
-                    skel.getAttribute(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), getAttributeResponse35, false);
+                    attrResponse = serviceImpl.getAttribute(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), attrResponse, false);
                 }
-                else
-
-                if ("slaveRelease".equals(methodName))
+                else if ("slaveRelease".equals(methodName))
                 {
-
-                    SlaveReleaseResponse slaveReleaseResponse37 = null;
+                    SlaveReleaseResponse slaveRelResponse = null;
                     final SlaveRelease wrappedParam = (SlaveRelease) this.fromOM(msgContext.getEnvelope().getBody()
                             .getFirstElement(), SlaveRelease.class, this
                             .getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    slaveReleaseResponse37 =
-
-                    skel.slaveRelease(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), slaveReleaseResponse37, false);
+                    slaveRelResponse = serviceImpl.slaveRelease(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), slaveRelResponse, false);
                 }
-                else
-
-                if ("release".equals(methodName))
+                else if ("release".equals(methodName))
                 {
-
-                    ReleaseResponse releaseResponse39 = null;
+                    ReleaseResponse relResponse = null;
                     final Release wrappedParam = (Release) this.fromOM(msgContext.getEnvelope().getBody()
                             .getFirstElement(), Release.class, this.getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    releaseResponse39 =
-
-                    skel.release(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), releaseResponse39, false);
+                    relResponse = serviceImpl.release(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), relResponse, false);
                 }
-                else
-
-                if ("notify".equals(methodName))
+                else if ("notify".equals(methodName))
                 {
-
-                    NotifyResponse notifyResponse41 = null;
+                    NotifyResponse notfResponse = null;
                     final Notify wrappedParam = (Notify) this.fromOM(msgContext.getEnvelope().getBody()
                             .getFirstElement(), Notify.class, this.getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    notifyResponse41 =
-
-                    skel.notify(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), notifyResponse41, false);
+                    notfResponse = serviceImpl.notify(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), notfResponse, false);
                 }
-                else
-
-                if ("setTestInterval".equals(methodName))
+                else if ("setTestInterval".equals(methodName))
                 {
-
-                    SetTestIntervalResponse setTestIntervalResponse43 = null;
+                    SetTestIntervalResponse setIntResponse = null;
                     final SetTestInterval wrappedParam = (SetTestInterval) this.fromOM(msgContext.getEnvelope()
                             .getBody().getFirstElement(), SetTestInterval.class, this.getEnvelopeNamespaces(msgContext
                             .getEnvelope()));
 
-                    setTestIntervalResponse43 =
-
-                    skel.setTestInterval(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), setTestIntervalResponse43, false);
+                    setIntResponse = serviceImpl.setTestInterval(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), setIntResponse, false);
                 }
-                else
-
-                if ("setMaintenance".equals(methodName))
+                else if ("setMaintenance".equals(methodName))
                 {
-
-                    SetMaintenanceResponse setMaintenanceResponse45 = null;
+                    SetMaintenanceResponse maintenResponse = null;
                     final SetMaintenance wrappedParam = (SetMaintenance) this.fromOM(msgContext.getEnvelope().getBody()
                             .getFirstElement(), SetMaintenance.class, this.getEnvelopeNamespaces(msgContext
                             .getEnvelope()));
 
-                    setMaintenanceResponse45 =
-
-                    skel.setMaintenance(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), setMaintenanceResponse45, false);
+                    maintenResponse = serviceImpl.setMaintenance(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), maintenResponse, false);
                 }
-                else
-
-                if ("performBatchControl".equals(methodName))
+                else if ("performBatchControl".equals(methodName))
                 {
-
-                    PerformBatchControlResponse performBatchControlResponse47 = null;
+                    PerformBatchControlResponse batchResponse = null;
                     final PerformBatchControl wrappedParam = (PerformBatchControl) this.fromOM(msgContext.getEnvelope()
                             .getBody().getFirstElement(), PerformBatchControl.class, this
                             .getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    performBatchControlResponse47 =
-
-                    skel.performBatchControl(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), performBatchControlResponse47, false);
+                    batchResponse = serviceImpl.performBatchControl(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), batchResponse, false);
                 }
-                else
-
-                if ("getStatus".equals(methodName))
+                else if ("getStatus".equals(methodName))
                 {
-
-                    GetStatusResponse getStatusResponse49 = null;
+                    GetStatusResponse statResponse = null;
                     final GetStatus wrappedParam = (GetStatus) this.fromOM(msgContext.getEnvelope().getBody()
                             .getFirstElement(), GetStatus.class, this.getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getStatusResponse49 =
-
-                    skel.getStatus(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), getStatusResponse49, false);
+                    statResponse = serviceImpl.getStatus(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), statResponse, false);
                 }
-                else
-
-                if ("allocate".equals(methodName))
+                else if ("allocate".equals(methodName))
                 {
-
-                    AllocateResponse allocateResponse51 = null;
+                    AllocateResponse allocResponse = null;
                     final Allocate wrappedParam = (Allocate) this.fromOM(msgContext.getEnvelope().getBody()
                             .getFirstElement(), Allocate.class, this.getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    allocateResponse51 =
-
-                    skel.allocate(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), allocateResponse51, false);
+                    allocResponse = serviceImpl.allocate(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), allocResponse, false);
                 }
-                else
-
-                if ("slaveAllocate".equals(methodName))
+                else if ("slaveAllocate".equals(methodName))
                 {
-
-                    SlaveAllocateResponse slaveAllocateResponse53 = null;
+                    SlaveAllocateResponse slaAllocResponse = null;
                     final SlaveAllocate wrappedParam = (SlaveAllocate) this.fromOM(msgContext.getEnvelope().getBody()
                             .getFirstElement(), SlaveAllocate.class, this.getEnvelopeNamespaces(msgContext
                             .getEnvelope()));
 
-                    slaveAllocateResponse53 =
-
-                    skel.slaveAllocate(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), slaveAllocateResponse53, false);
+                    slaAllocResponse = serviceImpl.slaveAllocate(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), slaAllocResponse, false);
                 }
-                else
-
-                if ("abortBatchControl".equals(methodName))
+                else if ("abortBatchControl".equals(methodName))
                 {
-
-                    AbortBatchControlResponse abortBatchControlResponse55 = null;
+                    AbortBatchControlResponse abortBatchResponse = null;
                     final AbortBatchControl wrappedParam = (AbortBatchControl) this.fromOM(msgContext.getEnvelope()
                             .getBody().getFirstElement(), AbortBatchControl.class, this
                             .getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    abortBatchControlResponse55 =
-
-                    skel.abortBatchControl(wrappedParam);
-
-                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), abortBatchControlResponse55, false);
-
+                    abortBatchResponse = serviceImpl.abortBatchControl(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), abortBatchResponse, false);
                 }
                 else
+                {
                     throw new RuntimeException("method not found");
-
+                }
                 newMsgContext.setEnvelope(envelope);
             }
         }
