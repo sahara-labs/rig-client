@@ -74,13 +74,13 @@ public class AbortBatchControlResponse implements ADBBean
     public static final QName MY_QNAME = new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", 
             "abortBatchControlResponse", "ns1");
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
 
@@ -88,7 +88,7 @@ public class AbortBatchControlResponse implements ADBBean
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -102,10 +102,10 @@ public class AbortBatchControlResponse implements ADBBean
 
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, AbortBatchControlResponse.MY_QNAME)
+        final OMDataSource dataSource = new ADBDataSource(this, AbortBatchControlResponse.MY_QNAME)
         {
             @Override
-            public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
+            public void serialize(final org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
                     throws XMLStreamException
             {
                 AbortBatchControlResponse.this.serialize(AbortBatchControlResponse.MY_QNAME, factory, xmlWriter);
@@ -116,14 +116,14 @@ public class AbortBatchControlResponse implements ADBBean
 
     }
 
-    public XMLStreamReader getPullParser(QName qName)
+    public XMLStreamReader getPullParser(final QName qName)
             throws ADBException
     {
         return this.controlResponse.getPullParser(AbortBatchControlResponse.MY_QNAME);
     }
 
     @SuppressWarnings("unused")
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
 
@@ -143,14 +143,14 @@ public class AbortBatchControlResponse implements ADBBean
         return prefix;
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter) 
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter) 
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter, 
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter, 
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
         // We can safely assume an element has only one type associated with it
         if (this.controlResponse == null)
@@ -160,17 +160,17 @@ public class AbortBatchControlResponse implements ADBBean
         this.controlResponse.serialize(AbortBatchControlResponse.MY_QNAME, factory, xmlWriter);
     }
 
-    public void setAbortBatchControlResponse(OperationResponseType param)
+    public void setAbortBatchControlResponse(final OperationResponseType param)
     {
         this.controlResponse = param;
     }
 
     public static class Factory
     {
-        public static AbortBatchControlResponse parse(javax.xml.stream.XMLStreamReader reader)
+        public static AbortBatchControlResponse parse(final javax.xml.stream.XMLStreamReader reader)
                 throws Exception
         {
-            AbortBatchControlResponse object = new AbortBatchControlResponse();
+            final AbortBatchControlResponse object = new AbortBatchControlResponse();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -198,7 +198,7 @@ public class AbortBatchControlResponse implements ADBBean
                     }
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

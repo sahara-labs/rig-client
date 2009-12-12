@@ -90,7 +90,7 @@ public class BatchStatusResponseType implements ADBBean
     protected boolean resultFilePathTracker = false;
     protected String[] resultFilePath;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
@@ -98,10 +98,10 @@ public class BatchStatusResponseType implements ADBBean
 
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, parentQName)
+        final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 BatchStatusResponseType.this.serialize(this.parentQName, factory, xmlWriter);
             }
@@ -109,10 +109,10 @@ public class BatchStatusResponseType implements ADBBean
         return new OMSourcedElementImpl(parentQName, factory, dataSource);
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
-        ArrayList<Serializable> elementList = new ArrayList<Serializable>();
-        ArrayList<QName> attribList = new ArrayList<QName>();
+        final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
+        final ArrayList<QName> attribList = new ArrayList<QName>();
 
         elementList.add(new QName("", "state"));
         if (this.state == null)
@@ -135,7 +135,7 @@ public class BatchStatusResponseType implements ADBBean
         {
             if (this.resultFilePath != null)
             {
-                for (String element : this.resultFilePath)
+                for (final String element : this.resultFilePath)
                 {
                     if (element != null)
                     {
@@ -153,7 +153,7 @@ public class BatchStatusResponseType implements ADBBean
         return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
     }
 
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -169,13 +169,13 @@ public class BatchStatusResponseType implements ADBBean
         return prefix;
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter, boolean serializeType)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter, final boolean serializeType)
             throws XMLStreamException, ADBException
     {
         String prefix = parentQName.getPrefix();
@@ -183,7 +183,7 @@ public class BatchStatusResponseType implements ADBBean
 
         if (namespace != null && namespace.trim().length() > 0)
         {
-            String writerPrefix = xmlWriter.getPrefix(namespace);
+            final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
             {
                 xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
@@ -207,7 +207,7 @@ public class BatchStatusResponseType implements ADBBean
         if (serializeType)
         {
 
-            String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
+            final String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
             if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
             {
                 this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", namespacePrefix
@@ -263,9 +263,9 @@ public class BatchStatusResponseType implements ADBBean
             if (this.resultFilePath != null)
             {
                 namespace = "";
-                boolean emptyNamespace = namespace == null || namespace.length() == 0;
+                final boolean emptyNamespace = namespace == null || namespace.length() == 0;
                 prefix = emptyNamespace ? null : xmlWriter.getPrefix(namespace);
-                for (String element : this.resultFilePath)
+                for (final String element : this.resultFilePath)
                 {
                     if (element != null)
                     {
@@ -273,7 +273,7 @@ public class BatchStatusResponseType implements ADBBean
                         {
                             if (prefix == null)
                             {
-                                String prefix2 = BatchStatusResponseType.generatePrefix(namespace);
+                                final String prefix2 = BatchStatusResponseType.generatePrefix(namespace);
                                 xmlWriter.writeStartElement(prefix2, "resultFilePath", namespace);
                                 xmlWriter.writeNamespace(prefix2, namespace);
                                 xmlWriter.setPrefix(prefix2, namespace);
@@ -301,14 +301,14 @@ public class BatchStatusResponseType implements ADBBean
         xmlWriter.writeEndElement();
     }
     
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
         try
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -331,7 +331,7 @@ public class BatchStatusResponseType implements ADBBean
     }
     
     @SuppressWarnings("unchecked")
-    public void addResultFilePath(String param)
+    public void addResultFilePath(final String param)
     {
         if (this.resultFilePath == null)
         {
@@ -339,17 +339,17 @@ public class BatchStatusResponseType implements ADBBean
         }
         this.resultFilePathTracker = true;
         
-        List<String> list = (List<String>)ConverterUtil.toList(this.resultFilePath);
+        final List<String> list = ConverterUtil.toList(this.resultFilePath);
         list.add(param);
         this.resultFilePath = list.toArray(new String[list.size()]);
     }
 
-    public void setProgress(String param)
+    public void setProgress(final String param)
     {
         this.progress = param;
     }
 
-    public void setResultFilePath(String[] param)
+    public void setResultFilePath(final String[] param)
     {
         if (param != null)
         {
@@ -362,12 +362,12 @@ public class BatchStatusResponseType implements ADBBean
         this.resultFilePath = param;
     }
 
-    public void setState(BatchState param)
+    public void setState(final BatchState param)
     {
         this.state = param;
     }
 
-    private void writeAttribute(String prefix, String namespace, String attName, String attValue, XMLStreamWriter xmlWriter)
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue, final XMLStreamWriter xmlWriter)
             throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
@@ -380,9 +380,9 @@ public class BatchStatusResponseType implements ADBBean
 
     public static class Factory
     {
-        public static BatchStatusResponseType parse(XMLStreamReader reader) throws Exception
+        public static BatchStatusResponseType parse(final XMLStreamReader reader) throws Exception
         {
-            BatchStatusResponseType object = new BatchStatusResponseType();
+            final BatchStatusResponseType object = new BatchStatusResponseType();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -392,7 +392,7 @@ public class BatchStatusResponseType implements ADBBean
 
                 if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
                 {
-                    String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
                     if (fullTypeName != null)
                     {
                         String nsPrefix = null;
@@ -402,18 +402,18 @@ public class BatchStatusResponseType implements ADBBean
                         }
                         nsPrefix = nsPrefix == null ? "" : nsPrefix;
 
-                        String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+                        final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
                         if (!"BatchStatusResponseType".equals(type))
                         {
                             // find namespace for the prefix
-                            String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
                             return (BatchStatusResponseType) ExtensionMapper.getTypeObject(nsUri, type, reader);
                         }
                     }
                 }
                 reader.next();
 
-                ArrayList<String> files = new ArrayList<String>();
+                final ArrayList<String> files = new ArrayList<String>();
                 while (!reader.isStartElement() && !reader.isEndElement())
                 {
                     reader.next();
@@ -436,7 +436,7 @@ public class BatchStatusResponseType implements ADBBean
 
                 if (reader.isStartElement() && new QName("", "progress").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setProgress(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -501,7 +501,7 @@ public class BatchStatusResponseType implements ADBBean
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

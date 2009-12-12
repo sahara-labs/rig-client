@@ -92,13 +92,13 @@ public class ErrorType implements ADBBean
     protected String trace;
 
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
 
@@ -106,7 +106,7 @@ public class ErrorType implements ADBBean
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -115,10 +115,10 @@ public class ErrorType implements ADBBean
 
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, parentQName)
+        final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 ErrorType.this.serialize(this.parentQName, factory, xmlWriter);
             }
@@ -126,11 +126,11 @@ public class ErrorType implements ADBBean
         return new OMSourcedElementImpl(parentQName, factory, dataSource);
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
 
-        ArrayList<Serializable> elementList = new ArrayList<Serializable>();
-        ArrayList<QName> attribList = new ArrayList<QName>();
+        final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
+        final ArrayList<QName> attribList = new ArrayList<QName>();
 
         elementList.add(new QName("", "code"));
         elementList.add(ConverterUtil.convertToString(this.code));
@@ -171,7 +171,7 @@ public class ErrorType implements ADBBean
         return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
     }
 
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -189,14 +189,14 @@ public class ErrorType implements ADBBean
         return prefix;
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter,
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
 
         String prefix = parentQName.getPrefix();
@@ -204,7 +204,7 @@ public class ErrorType implements ADBBean
 
         if (namespace != null && namespace.trim().length() > 0)
         {
-            String writerPrefix = xmlWriter.getPrefix(namespace);
+            final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
             {
                 xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
@@ -229,7 +229,7 @@ public class ErrorType implements ADBBean
         if (serializeType)
         {
 
-            String namespacePrefix = this.registerPrefix(xmlWriter,
+            final String namespacePrefix = this.registerPrefix(xmlWriter,
                     "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
             if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
             {
@@ -398,22 +398,22 @@ public class ErrorType implements ADBBean
         return this.trace;
     }
 
-    public void setCode(int param)
+    public void setCode(final int param)
     {
         this.code = param;
     }
 
-    public void setOperation(String param)
+    public void setOperation(final String param)
     {
         this.operation = param;
     }
 
-    public void setReason(String param)
+    public void setReason(final String param)
     {
         this.reason = param;
     }
 
-    public void setTrace(String param)
+    public void setTrace(final String param)
     {
         if (param != null)
         {
@@ -426,8 +426,8 @@ public class ErrorType implements ADBBean
         this.trace = param;
     }
 
-    private void writeAttribute(String prefix, String namespace, String attName, String attValue,
-            XMLStreamWriter xmlWriter) throws XMLStreamException
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue,
+            final XMLStreamWriter xmlWriter) throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
         {
@@ -440,9 +440,9 @@ public class ErrorType implements ADBBean
 
     public static class Factory
     {
-        public static ErrorType parse(XMLStreamReader reader) throws Exception
+        public static ErrorType parse(final XMLStreamReader reader) throws Exception
         {
-            ErrorType object = new ErrorType();
+            final ErrorType object = new ErrorType();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -452,7 +452,7 @@ public class ErrorType implements ADBBean
 
                 if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
                 {
-                    String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
                     if (fullTypeName != null)
                     {
                         String nsPrefix = null;
@@ -462,12 +462,12 @@ public class ErrorType implements ADBBean
                         }
                         nsPrefix = nsPrefix == null ? "" : nsPrefix;
 
-                        String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+                        final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
 
                         if (!"ErrorType".equals(type))
                         {
                             // find namespace for the prefix
-                            String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
                             return (ErrorType) ExtensionMapper.getTypeObject(nsUri, type, reader);
                         }
                     }
@@ -480,7 +480,7 @@ public class ErrorType implements ADBBean
                 }
                 if (reader.isStartElement() && new QName("", "code").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setCode(ConverterUtil.convertToInt(content));
                     reader.next();
                 }
@@ -495,7 +495,7 @@ public class ErrorType implements ADBBean
                 }
                 if (reader.isStartElement() && new QName("", "operation").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setOperation(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -510,7 +510,7 @@ public class ErrorType implements ADBBean
                 }
                 if (reader.isStartElement() && new QName("", "reason").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setReason(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -525,7 +525,7 @@ public class ErrorType implements ADBBean
                 }
                 if (reader.isStartElement() && new QName("", "trace").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setTrace(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -539,7 +539,7 @@ public class ErrorType implements ADBBean
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

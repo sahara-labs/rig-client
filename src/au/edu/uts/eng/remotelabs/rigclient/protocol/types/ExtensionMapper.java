@@ -57,7 +57,7 @@ import org.apache.axis2.databinding.ADBException;
 public class ExtensionMapper
 {
 
-    public static Object getTypeObject(String namespaceURI, String typeName, XMLStreamReader reader) throws Exception
+    public static Object getTypeObject(final String namespaceURI, final String typeName, final XMLStreamReader reader) throws Exception
     {
 
         if ("http://remotelabs.eng.uts.edu.au/rigclient/protocol".equals(namespaceURI) && 

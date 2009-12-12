@@ -82,20 +82,20 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
     
     protected String attribute;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
         try
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -105,10 +105,10 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
     @Override
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, parentQName)
+        final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter)
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter)
                     throws XMLStreamException
             {
                 AttributeRequestType.this.serialize(this.parentQName, factory, xmlWriter);
@@ -119,11 +119,11 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
     }
 
     @Override
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
 
-        ArrayList<Serializable> elementList = new ArrayList<Serializable>();
-        ArrayList<QName> attribList = new ArrayList<QName>();
+        final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
+        final ArrayList<QName> attribList = new ArrayList<QName>();
 
         attribList.add(new QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
         attribList.add(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "AttributeRequestType"));
@@ -168,7 +168,7 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
                 attribList.toArray());
     }
 
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -186,15 +186,15 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
     }
 
     @Override
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
     @Override
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter, 
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter, 
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
         String prefix = null;
         String namespace = null;
@@ -204,7 +204,7 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
 
         if (namespace != null && namespace.trim().length() > 0)
         {
-            String writerPrefix = xmlWriter.getPrefix(namespace);
+            final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
             {
                 xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
@@ -226,7 +226,7 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
             xmlWriter.writeStartElement(parentQName.getLocalPart());
         }
 
-        String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
+        final String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
         if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
         {
             this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", namespacePrefix
@@ -349,13 +349,13 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
         return this.attribute;
     }
 
-    public void setAttribute(String param)
+    public void setAttribute(final String param)
     {
         this.attribute = param;
     }
 
-    private void writeAttribute(String prefix, String namespace, String attName, String attValue, 
-            XMLStreamWriter xmlWriter) throws XMLStreamException
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue, 
+            final XMLStreamWriter xmlWriter) throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
         {
@@ -367,9 +367,9 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
 
     public static class Factory
     {
-        public static AttributeRequestType parse(XMLStreamReader reader) throws Exception
+        public static AttributeRequestType parse(final XMLStreamReader reader) throws Exception
         {
-            AttributeRequestType object = new AttributeRequestType();
+            final AttributeRequestType object = new AttributeRequestType();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -378,7 +378,7 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
                 }
                 if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
                 {
-                    String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
                     if (fullTypeName != null)
                     {
                         String nsPrefix = null;
@@ -387,11 +387,11 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
                             nsPrefix = fullTypeName.substring(0, fullTypeName.indexOf(":"));
                         }
                         nsPrefix = nsPrefix == null ? "" : nsPrefix;
-                        String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+                        final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
                         
                         if (!"AttributeRequestType".equals(type))
                         {
-                            String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
                             return (AttributeRequestType) ExtensionMapper.getTypeObject(nsUri, type, reader);
                         }
 
@@ -406,7 +406,7 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
 
                 if (reader.isStartElement() && new QName("", "identityToken").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setIdentityToken(ConverterUtil.convertToString(content));
                     reader.next();
 
@@ -419,7 +419,7 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
 
                 if (reader.isStartElement() && new QName("", "requestor").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setRequestor(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -430,7 +430,7 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
                 }
                 if (reader.isStartElement() && new QName("", "attribute").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setAttribute(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -449,7 +449,7 @@ public class AttributeRequestType extends AuthRequiredRequestType implements ADB
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

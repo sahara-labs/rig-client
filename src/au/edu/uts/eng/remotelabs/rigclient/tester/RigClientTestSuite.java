@@ -65,6 +65,12 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.GetBatchControlS
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.GetBatchControlStatusTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.GetStatusResponseTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.GetStatusTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.IsActivityDetectableResponseTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.IsActivityDetectableTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.MaintenanceRequestTypeTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.NotificationRequestTypeTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.NotifyResponseTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.NotifyTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.UserTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
@@ -85,6 +91,12 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    NotifyTester.class,
+    NotifyResponseTester.class,
+    NotificationRequestTypeTester.class,
+    MaintenanceRequestTypeTester.class,
+    IsActivityDetectableTester.class,
+    IsActivityDetectableResponseTester.class,
     GetAttributeResponseTester.class,
     GetAttributeTester.class,
     GetBatchControlStatusResponseTester.class,

@@ -75,20 +75,20 @@ public class NotifyResponse implements ADBBean
     
     protected OperationResponseType notifyResponse;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
         try
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -97,10 +97,10 @@ public class NotifyResponse implements ADBBean
 
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, NotifyResponse.MY_QNAME)
+        final OMDataSource dataSource = new ADBDataSource(this, NotifyResponse.MY_QNAME)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 NotifyResponse.this.serialize(NotifyResponse.MY_QNAME, factory, xmlWriter);
             }
@@ -108,13 +108,13 @@ public class NotifyResponse implements ADBBean
         return new OMSourcedElementImpl(NotifyResponse.MY_QNAME, factory, dataSource);
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
         return this.notifyResponse.getPullParser(NotifyResponse.MY_QNAME);
     }
 
     @SuppressWarnings("unused")
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -130,14 +130,14 @@ public class NotifyResponse implements ADBBean
         return prefix;
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter,
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
         if (this.notifyResponse == null) 
         {
@@ -151,16 +151,16 @@ public class NotifyResponse implements ADBBean
         return this.notifyResponse;
     }
     
-    public void setNotifyResponse(OperationResponseType param)
+    public void setNotifyResponse(final OperationResponseType param)
     {
         this.notifyResponse = param;
     }
 
     public static class Factory
     {
-        public static NotifyResponse parse(XMLStreamReader reader) throws Exception
+        public static NotifyResponse parse(final XMLStreamReader reader) throws Exception
         {
-            NotifyResponse object = new NotifyResponse();
+            final NotifyResponse object = new NotifyResponse();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -188,7 +188,7 @@ public class NotifyResponse implements ADBBean
                     }
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

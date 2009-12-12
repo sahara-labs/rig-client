@@ -75,13 +75,13 @@ public class GetStatusResponse implements ADBBean
     
     protected StatusResponseType getStatusResponse;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
 
@@ -89,7 +89,7 @@ public class GetStatusResponse implements ADBBean
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -103,10 +103,10 @@ public class GetStatusResponse implements ADBBean
 
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, GetStatusResponse.MY_QNAME)
+        final OMDataSource dataSource = new ADBDataSource(this, GetStatusResponse.MY_QNAME)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 GetStatusResponse.this.serialize(GetStatusResponse.MY_QNAME, factory, xmlWriter);
             }
@@ -114,13 +114,13 @@ public class GetStatusResponse implements ADBBean
         return new OMSourcedElementImpl(GetStatusResponse.MY_QNAME, factory, dataSource);
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
         return this.getStatusResponse.getPullParser(GetStatusResponse.MY_QNAME);
     }
 
     @SuppressWarnings("unused")
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -136,28 +136,28 @@ public class GetStatusResponse implements ADBBean
         return prefix;
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter,
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
         if (this.getStatusResponse == null) throw new ADBException("Property cannot be null!");
         this.getStatusResponse.serialize(GetStatusResponse.MY_QNAME, factory, xmlWriter);
     }
-    public void setGetStatusResponse(StatusResponseType param)
+    public void setGetStatusResponse(final StatusResponseType param)
     {
         this.getStatusResponse = param;
     }
 
     public static class Factory
     {
-        public static GetStatusResponse parse(XMLStreamReader reader) throws Exception
+        public static GetStatusResponse parse(final XMLStreamReader reader) throws Exception
         {
-            GetStatusResponse object = new GetStatusResponse();
+            final GetStatusResponse object = new GetStatusResponse();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -186,7 +186,7 @@ public class GetStatusResponse implements ADBBean
                     }
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

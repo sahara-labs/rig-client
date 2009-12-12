@@ -76,20 +76,20 @@ public class GetBatchControlStatusResponse implements ADBBean
     
     protected BatchStatusResponseType batchControlStatusResponse;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
         try
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -98,10 +98,10 @@ public class GetBatchControlStatusResponse implements ADBBean
 
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, GetBatchControlStatusResponse.MY_QNAME)
+        final OMDataSource dataSource = new ADBDataSource(this, GetBatchControlStatusResponse.MY_QNAME)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 GetBatchControlStatusResponse.this
                         .serialize(GetBatchControlStatusResponse.MY_QNAME, factory, xmlWriter);
@@ -110,13 +110,13 @@ public class GetBatchControlStatusResponse implements ADBBean
         return new OMSourcedElementImpl(GetBatchControlStatusResponse.MY_QNAME, factory, dataSource);
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
         return this.batchControlStatusResponse.getPullParser(GetBatchControlStatusResponse.MY_QNAME);
     }
 
     @SuppressWarnings("unused")
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -132,14 +132,14 @@ public class GetBatchControlStatusResponse implements ADBBean
         return prefix;
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter,
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
         if (this.batchControlStatusResponse == null) throw new ADBException("Property cannot be null!");
         this.batchControlStatusResponse.serialize(GetBatchControlStatusResponse.MY_QNAME, factory, xmlWriter);
@@ -150,16 +150,16 @@ public class GetBatchControlStatusResponse implements ADBBean
         return this.batchControlStatusResponse;
     }
 
-    public void setGetBatchControlStatusResponse(BatchStatusResponseType param)
+    public void setGetBatchControlStatusResponse(final BatchStatusResponseType param)
     {
         this.batchControlStatusResponse = param;
     }
 
     public static class Factory
     {
-        public static GetBatchControlStatusResponse parse(XMLStreamReader reader) throws Exception
+        public static GetBatchControlStatusResponse parse(final XMLStreamReader reader) throws Exception
         {
-            GetBatchControlStatusResponse object = new GetBatchControlStatusResponse();
+            final GetBatchControlStatusResponse object = new GetBatchControlStatusResponse();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -188,7 +188,7 @@ public class GetBatchControlStatusResponse implements ADBBean
                     }
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

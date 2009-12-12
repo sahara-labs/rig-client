@@ -47,20 +47,20 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
     
     protected DataHandler batchFile;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
         try
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -70,10 +70,10 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
     @Override
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, parentQName)
+        final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 BatchRequestType.this.serialize(this.parentQName, factory, xmlWriter);
             }
@@ -82,11 +82,11 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
     }
 
     @Override
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
 
-        ArrayList<Object> elementList = new ArrayList<Object>();
-        ArrayList<QName> attribList = new ArrayList<QName>();
+        final ArrayList<Object> elementList = new ArrayList<Object>();
+        final ArrayList<QName> attribList = new ArrayList<QName>();
 
         attribList.add(new QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
         attribList.add(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "BatchRequestType"));
@@ -123,7 +123,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
 
     }
 
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -141,14 +141,14 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
     }
 
     @Override
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
     @Override
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter, boolean serializeType)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter, final boolean serializeType)
             throws XMLStreamException, ADBException
     {
         String prefix = null;
@@ -159,7 +159,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
 
         if (namespace != null && namespace.trim().length() > 0)
         {
-            String writerPrefix = xmlWriter.getPrefix(namespace);
+            final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
             {
                 xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
@@ -181,7 +181,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
             xmlWriter.writeStartElement(parentQName.getLocalPart());
         }
 
-        String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
+        final String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
         if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
         {
             this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", namespacePrefix
@@ -300,12 +300,12 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
         return this.batchFile;
     }
 
-    public void setBatchFile(DataHandler param)
+    public void setBatchFile(final DataHandler param)
     {
         this.batchFile = param;
     }
 
-    private void writeAttribute(String prefix, String namespace, String attName, String attValue, XMLStreamWriter xmlWriter)
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue, final XMLStreamWriter xmlWriter)
             throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
@@ -319,9 +319,9 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
     
     public static class Factory
     {
-        public static BatchRequestType parse(XMLStreamReader reader) throws Exception
+        public static BatchRequestType parse(final XMLStreamReader reader) throws Exception
         {
-            BatchRequestType object = new BatchRequestType();
+            final BatchRequestType object = new BatchRequestType();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -331,7 +331,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
 
                 if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
                 {
-                    String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
                     if (fullTypeName != null)
                     {
                         String nsPrefix = null;
@@ -341,11 +341,11 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
                         }
                         nsPrefix = nsPrefix == null ? "" : nsPrefix;
 
-                        String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+                        final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
 
                         if (!"BatchRequestType".equals(type))
                         {
-                            String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
                             return (BatchRequestType) ExtensionMapper.getTypeObject(nsUri, type, reader);
                         }
                     }
@@ -359,7 +359,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
 
                 if (reader.isStartElement() && new QName("", "identityToken").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setIdentityToken(ConverterUtil.convertToString(content));
                     reader.next();
                 } 
@@ -370,7 +370,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
                 }
                 if (reader.isStartElement() && new QName("", "requestor").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setRequestor(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -393,7 +393,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
                         if (reader.getEventType() == XMLStreamConstants.START_ELEMENT && reader.getName().equals(
                                         new QName(MTOMConstants.XOP_NAMESPACE_URI, MTOMConstants.XOP_INCLUDE)))
                         {
-                            String id = ElementHelper.getContentID(reader);
+                            final String id = ElementHelper.getContentID(reader);
                             object.setBatchFile(((MTOMStAXSOAPModelBuilder) ((OMStAXWrapper) reader).getBuilder()).getDataHandler(id));
                             reader.next();
                             reader.next();
@@ -402,7 +402,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
                         else if (reader.hasText())
                         {
                             // Do the usual conversion
-                            String content = reader.getText();
+                            final String content = reader.getText();
                             object.setBatchFile(ConverterUtil.convertToBase64Binary(content));
                             reader.next();
                         }
@@ -423,7 +423,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

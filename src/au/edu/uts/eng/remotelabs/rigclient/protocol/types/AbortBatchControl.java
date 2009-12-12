@@ -89,7 +89,7 @@ public class AbortBatchControl implements ADBBean
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -107,7 +107,7 @@ public class AbortBatchControl implements ADBBean
         final OMDataSource dataSource = new ADBDataSource(this, AbortBatchControl.MY_QNAME)
         {
             @Override
-            public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
+            public void serialize(final org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
                     throws XMLStreamException
             {
                 AbortBatchControl.this.serialize(AbortBatchControl.MY_QNAME, factory, xmlWriter);
@@ -117,14 +117,14 @@ public class AbortBatchControl implements ADBBean
 
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
         /* We can safely assume an element has only one type associated with it. */
         return this.batchControl.getPullParser(AbortBatchControl.MY_QNAME);
     }
 
     @SuppressWarnings("unused")
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
 
@@ -144,30 +144,30 @@ public class AbortBatchControl implements ADBBean
         return prefix;
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter,
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
         if (this.batchControl == null) throw new ADBException("Property cannot be null.");
         this.batchControl.serialize(AbortBatchControl.MY_QNAME, factory, xmlWriter);
 
     }
 
-    public void setAbortBatchControl(AuthRequiredRequestType param)
+    public void setAbortBatchControl(final AuthRequiredRequestType param)
     {
         this.batchControl = param;
     }
 
     public static class Factory
     {
-        public static AbortBatchControl parse(XMLStreamReader reader) throws Exception
+        public static AbortBatchControl parse(final XMLStreamReader reader) throws Exception
         {
-            AbortBatchControl object = new AbortBatchControl();
+            final AbortBatchControl object = new AbortBatchControl();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -198,7 +198,7 @@ public class AbortBatchControl implements ADBBean
                     }
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

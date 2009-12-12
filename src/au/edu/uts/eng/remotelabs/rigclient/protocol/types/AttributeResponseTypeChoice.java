@@ -85,20 +85,20 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
     protected boolean errorTracker = false;
     protected ErrorType error;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
         try
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -107,10 +107,10 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
 
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, parentQName)
+        final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter)
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter)
                     throws XMLStreamException
             {
                 AttributeResponseTypeChoice.this.serialize(this.parentQName, factory, xmlWriter);
@@ -119,10 +119,10 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
         return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(parentQName, factory, dataSource);
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
-        ArrayList<Serializable> elementList = new ArrayList<Serializable>();
-        ArrayList<QName> attribList = new ArrayList<QName>();
+        final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
+        final ArrayList<QName> attribList = new ArrayList<QName>();
 
         if (this.valueTracker)
         {
@@ -150,7 +150,7 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
                 attribList.toArray());
     }
 
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -167,13 +167,13 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
         return prefix;
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter, boolean serializeType)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter, final boolean serializeType)
             throws XMLStreamException, ADBException
     {
         String prefix = null;
@@ -181,7 +181,7 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
 
         if (serializeType)
         {
-            String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
+            final String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
             if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
             {
                 this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", namespacePrefix
@@ -253,7 +253,7 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
         this.errorTracker = false;
     }
 
-    public void setError(ErrorType param)
+    public void setError(final ErrorType param)
     {
         this.clearAllSettingTrackers();
         if (param != null)
@@ -264,7 +264,7 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
         this.error = param;
     }
 
-    public void setValue(String param)
+    public void setValue(final String param)
     {
 
         this.clearAllSettingTrackers();
@@ -279,7 +279,7 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
         this.value = param;
     }
 
-    private void writeAttribute(String prefix, String namespace, String attName, String attValue, XMLStreamWriter xmlWriter)
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue, final XMLStreamWriter xmlWriter)
             throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
@@ -292,9 +292,9 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
 
     public static class Factory
     {
-        public static AttributeResponseTypeChoice parse(XMLStreamReader reader) throws Exception
+        public static AttributeResponseTypeChoice parse(final XMLStreamReader reader) throws Exception
         {
-            AttributeResponseTypeChoice object = new AttributeResponseTypeChoice();
+            final AttributeResponseTypeChoice object = new AttributeResponseTypeChoice();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -304,7 +304,7 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
 
                 if (reader.isStartElement() && new QName("", "value").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setValue(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -314,7 +314,7 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
                     reader.next();
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

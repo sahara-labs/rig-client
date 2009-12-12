@@ -87,13 +87,13 @@ public class AuthRequiredRequestType implements ADBBean
     protected boolean requestorTracker = false;
     protected String requestor;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
         try
@@ -101,7 +101,7 @@ public class AuthRequiredRequestType implements ADBBean
             isReaderMTOMAware = Boolean.TRUE.equals(reader
                     .getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -110,10 +110,10 @@ public class AuthRequiredRequestType implements ADBBean
 
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, parentQName)
+        final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 AuthRequiredRequestType.this.serialize(this.parentQName, factory, xmlWriter);
             }
@@ -121,10 +121,10 @@ public class AuthRequiredRequestType implements ADBBean
         return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(parentQName, factory, dataSource);
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
-        ArrayList<Serializable> elementList = new ArrayList<Serializable>();
-        ArrayList<QName> attribList = new ArrayList<QName>();
+        final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
+        final ArrayList<QName> attribList = new ArrayList<QName>();
 
         if (this.identityTokenTracker)
         {
@@ -155,7 +155,7 @@ public class AuthRequiredRequestType implements ADBBean
         return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
     }
 
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -172,21 +172,21 @@ public class AuthRequiredRequestType implements ADBBean
         return prefix;
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter,
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
         String prefix = parentQName.getPrefix();
         String namespace = parentQName.getNamespaceURI();
 
         if (namespace != null && namespace.trim().length() > 0)
         {
-            String writerPrefix = xmlWriter.getPrefix(namespace);
+            final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
             {
                 xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
@@ -210,7 +210,7 @@ public class AuthRequiredRequestType implements ADBBean
 
         if (serializeType)
         {
-            String namespacePrefix = this.registerPrefix(xmlWriter, 
+            final String namespacePrefix = this.registerPrefix(xmlWriter, 
                     "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
             if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
             {
@@ -304,7 +304,7 @@ public class AuthRequiredRequestType implements ADBBean
         return this.requestor;
     }
 
-    public void setIdentityToken(String param)
+    public void setIdentityToken(final String param)
     {
         if (param != null)
         {
@@ -318,7 +318,7 @@ public class AuthRequiredRequestType implements ADBBean
         this.identityToken = param;
     }
 
-    public void setRequestor(String param)
+    public void setRequestor(final String param)
     {
         if (param != null)
         {
@@ -331,7 +331,7 @@ public class AuthRequiredRequestType implements ADBBean
         this.requestor = param;
     }
 
-    private void writeAttribute(String prefix, String namespace, String attName, String attValue, XMLStreamWriter xmlWriter)
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue, final XMLStreamWriter xmlWriter)
             throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
@@ -344,9 +344,9 @@ public class AuthRequiredRequestType implements ADBBean
     
     public static class Factory
     {
-        public static AuthRequiredRequestType parse(XMLStreamReader reader) throws Exception
+        public static AuthRequiredRequestType parse(final XMLStreamReader reader) throws Exception
         {
-            AuthRequiredRequestType object = new AuthRequiredRequestType();
+            final AuthRequiredRequestType object = new AuthRequiredRequestType();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -356,7 +356,7 @@ public class AuthRequiredRequestType implements ADBBean
 
                 if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
                 {
-                    String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
                     if (fullTypeName != null)
                     {
                         String nsPrefix = null;
@@ -366,12 +366,12 @@ public class AuthRequiredRequestType implements ADBBean
                         }
                         nsPrefix = nsPrefix == null ? "" : nsPrefix;
 
-                        String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+                        final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
 
                         if (!"AuthRequiredRequestType".equals(type))
                         {
                             // find namespace for the prefix
-                            String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
                             return (AuthRequiredRequestType) ExtensionMapper.getTypeObject(nsUri, type, reader);
                         }
                     }
@@ -385,7 +385,7 @@ public class AuthRequiredRequestType implements ADBBean
 
                 if (reader.isStartElement() && new QName("", "identityToken").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setIdentityToken(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -396,7 +396,7 @@ public class AuthRequiredRequestType implements ADBBean
                 }
                 if (reader.isStartElement() && new QName("", "requestor").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setRequestor(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -410,7 +410,7 @@ public class AuthRequiredRequestType implements ADBBean
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

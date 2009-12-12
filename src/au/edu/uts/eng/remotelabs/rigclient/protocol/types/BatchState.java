@@ -94,7 +94,7 @@ public class BatchState implements ADBBean
     
     protected String state_type;
     
-    protected BatchState(String value, boolean isRegisterValue)
+    protected BatchState(final String value, final boolean isRegisterValue)
     {
         this.state_type = value;
         if (isRegisterValue)
@@ -103,13 +103,13 @@ public class BatchState implements ADBBean
         }
     }
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
 
@@ -117,7 +117,7 @@ public class BatchState implements ADBBean
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -126,10 +126,10 @@ public class BatchState implements ADBBean
     
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, BatchState.MY_QNAME)
+        final OMDataSource dataSource = new ADBDataSource(this, BatchState.MY_QNAME)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 BatchState.this.serialize(BatchState.MY_QNAME, factory, xmlWriter);
             }
@@ -137,14 +137,14 @@ public class BatchState implements ADBBean
         return new OMSourcedElementImpl(BatchState.MY_QNAME, factory, dataSource);
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
         // We can safely assume an element has only one type associated with it
         return new ADBXMLStreamReaderImpl(BatchState.MY_QNAME, new Object[] { ADBXMLStreamReader.ELEMENT_TEXT,
                 ConverterUtil.convertToString(this.state_type) }, null);
     }
 
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -161,17 +161,17 @@ public class BatchState implements ADBBean
         return prefix;
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter,
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
-        String namespace = parentQName.getNamespaceURI();
-        String localName = parentQName.getLocalPart();
+        final String namespace = parentQName.getNamespaceURI();
+        final String localName = parentQName.getLocalPart();
 
         if (!namespace.equals(""))
         {
@@ -197,7 +197,7 @@ public class BatchState implements ADBBean
         // add the type details if this is used in a simple type
         if (serializeType)
         {
-            String namespacePrefix = this.registerPrefix(xmlWriter,
+            final String namespacePrefix = this.registerPrefix(xmlWriter,
                     "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
             if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
             {
@@ -227,8 +227,8 @@ public class BatchState implements ADBBean
         return this.state_type;
     }
 
-    private void writeAttribute(String prefix, String namespace, String attName, String attValue,
-            XMLStreamWriter xmlWriter) throws XMLStreamException
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue,
+            final XMLStreamWriter xmlWriter) throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
         {
@@ -240,7 +240,7 @@ public class BatchState implements ADBBean
     
     
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(final Object obj)
     {
         return obj == this;
     }
@@ -262,24 +262,24 @@ public class BatchState implements ADBBean
      */
     public static class Factory
     {
-        public static BatchState fromString(String value, String namespaceURI) throws IllegalArgumentException
+        public static BatchState fromString(final String value, final String namespaceURI) throws IllegalArgumentException
         {
             try
             {
                 return Factory.fromValue(ConverterUtil.convertToString(value));
             }
-            catch (Exception e)
+            catch (final Exception e)
             {
                 throw new IllegalArgumentException();
             }
         }
 
-        public static BatchState fromString(XMLStreamReader xmlStreamReader, String content)
+        public static BatchState fromString(final XMLStreamReader xmlStreamReader, final String content)
         {
             if (content.indexOf(":") > -1)
             {
-                String prefix = content.substring(0, content.indexOf(":"));
-                String namespaceUri = xmlStreamReader.getNamespaceContext().getNamespaceURI(prefix);
+                final String prefix = content.substring(0, content.indexOf(":"));
+                final String namespaceUri = xmlStreamReader.getNamespaceContext().getNamespaceURI(prefix);
                 return BatchState.Factory.fromString(content, namespaceUri);
             }
             else
@@ -288,9 +288,9 @@ public class BatchState implements ADBBean
             }
         }
 
-        public static BatchState fromValue(String value) throws IllegalArgumentException
+        public static BatchState fromValue(final String value) throws IllegalArgumentException
         {
-            BatchState enumeration = BatchState._table_.get(value);
+            final BatchState enumeration = BatchState._table_.get(value);
             if (enumeration == null)
             {
                 throw new IllegalArgumentException();
@@ -298,7 +298,7 @@ public class BatchState implements ADBBean
             return enumeration;
         }
 
-        public static BatchState parse(XMLStreamReader reader) throws Exception
+        public static BatchState parse(final XMLStreamReader reader) throws Exception
         {
             BatchState object = null;
             String prefix = "";
@@ -315,7 +315,7 @@ public class BatchState implements ADBBean
                 {
                     if (reader.isStartElement() || reader.hasText())
                     {
-                        String content = reader.getElementText();
+                        final String content = reader.getElementText();
                         if (content.indexOf(":") > 0)
                         {
                             // this seems to be a Qname so find the namespace
@@ -338,7 +338,7 @@ public class BatchState implements ADBBean
                     }
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

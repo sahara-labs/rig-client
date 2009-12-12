@@ -74,20 +74,20 @@ public class AllocateResponse implements ADBBean
     
     protected OperationResponseType allocateResponse;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
         try
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -97,10 +97,10 @@ public class AllocateResponse implements ADBBean
     public OMElement getOMElement(final QName parentQName,
             final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this,AllocateResponse.MY_QNAME)
+        final OMDataSource dataSource = new ADBDataSource(this,AllocateResponse.MY_QNAME)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 AllocateResponse.this.serialize(AllocateResponse.MY_QNAME, factory, xmlWriter);
             }
@@ -109,14 +109,14 @@ public class AllocateResponse implements ADBBean
 
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
 
         return this.allocateResponse.getPullParser(AllocateResponse.MY_QNAME);
     }
 
     @SuppressWarnings("unused")
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -134,14 +134,14 @@ public class AllocateResponse implements ADBBean
     }
 
     public void serialize(final QName parentQName, final OMFactory factory,
-            MTOMAwareXMLStreamWriter xmlWriter)
+            final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter, 
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter, 
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
         if (this.allocateResponse == null)
         {
@@ -155,7 +155,7 @@ public class AllocateResponse implements ADBBean
         return this.allocateResponse;
     }
 
-    public void setAllocateResponse(OperationResponseType param)
+    public void setAllocateResponse(final OperationResponseType param)
     {
         this.allocateResponse = param;
     }
@@ -165,9 +165,9 @@ public class AllocateResponse implements ADBBean
      */
     public static class Factory
     {
-        public static AllocateResponse parse(XMLStreamReader reader) throws Exception
+        public static AllocateResponse parse(final XMLStreamReader reader) throws Exception
         {
-            AllocateResponse object = new AllocateResponse();
+            final AllocateResponse object = new AllocateResponse();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -198,7 +198,7 @@ public class AllocateResponse implements ADBBean
                     }
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

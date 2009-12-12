@@ -82,20 +82,20 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
     
     protected boolean isActivity;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
         try
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -107,7 +107,7 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
         final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
             @Override
-            public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
+            public void serialize(final org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
                     throws XMLStreamException
             {
                 ActivityDetectableType.this.serialize(this.parentQName, factory, xmlWriter);
@@ -116,7 +116,7 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
         return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(parentQName, factory, dataSource);
     }
 
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
         final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
         final ArrayList<QName> attribList = new ArrayList<QName>();
@@ -127,7 +127,7 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
 
     }
 
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace)
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace)
             throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
@@ -153,8 +153,8 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter, 
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter, 
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
         String prefix = null;
         String namespace = null;
@@ -164,7 +164,7 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
 
         if (namespace != null && namespace.trim().length() > 0)
         {
-            String writerPrefix = xmlWriter.getPrefix(namespace);
+            final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
             {
                 xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
@@ -233,12 +233,12 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
         return this.isActivity;
     }
 
-    public void setActivity(boolean param)
+    public void setActivity(final boolean param)
     {
         this.isActivity = param;
     }
 
-    private void writeAttribute(String prefix, String namespace, String attName, String attValue,
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue,
             final XMLStreamWriter xmlWriter) throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
@@ -251,9 +251,9 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
 
     public static class Factory
     {
-        public static ActivityDetectableType parse(XMLStreamReader reader) throws Exception
+        public static ActivityDetectableType parse(final XMLStreamReader reader) throws Exception
         {
-            ActivityDetectableType object = new ActivityDetectableType();
+            final ActivityDetectableType object = new ActivityDetectableType();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -263,7 +263,7 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
 
                 if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
                 {
-                    String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
                     if (fullTypeName != null)
                     {
                         String nsPrefix = null;
@@ -273,11 +273,11 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
                         }
                         nsPrefix = nsPrefix == null ? "" : nsPrefix;
 
-                        String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+                        final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
                         if (!"ActivityDetectableType".equals(type))
                         {
 
-                            String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
                             return (ActivityDetectableType) ExtensionMapper.getTypeObject(nsUri, type, reader);
                         }
                     }
@@ -291,7 +291,7 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
 
                 if (reader.isStartElement() && new QName("", "activity").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setActivity(ConverterUtil.convertToBoolean(content));
                     reader.next();
                 }
@@ -310,7 +310,7 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }
