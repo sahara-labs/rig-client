@@ -221,7 +221,7 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
     {
         final MaintenanceRequestType request = set.getSetMaintenance();
         this.logger.info("Set maintenance operation called with params: Offline=" +
-                request.getPutOffine() + ", RunTests=" + request.getRunTests() + 
+                request.getPutOffline() + ", RunTests=" + request.getRunTests() + 
                 ", Identity=" + request.getIdentityToken() + ".");
         throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
                 + "#setMaintenance");

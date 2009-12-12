@@ -82,7 +82,7 @@ public class MaintenanceRequestType extends AuthRequiredRequestType implements A
 
     private static final long serialVersionUID = 6864049285181060068L;
     
-    protected boolean putOffine;
+    protected boolean putOffline;
     
     protected boolean runTests;
 
@@ -155,8 +155,8 @@ public class MaintenanceRequestType extends AuthRequiredRequestType implements A
             }
         }
         
-        elementList.add(new QName("", "putOffine"));
-        elementList.add(ConverterUtil.convertToString(this.putOffine));
+        elementList.add(new QName("", "putOffline"));
+        elementList.add(ConverterUtil.convertToString(this.putOffline));
         elementList.add(new QName("", "runTests"));
         elementList.add(ConverterUtil.convertToString(this.runTests));
         return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
@@ -301,21 +301,21 @@ public class MaintenanceRequestType extends AuthRequiredRequestType implements A
             if (prefix == null)
             {
                 prefix = MaintenanceRequestType.generatePrefix(namespace);
-                xmlWriter.writeStartElement(prefix, "putOffine", namespace);
+                xmlWriter.writeStartElement(prefix, "putOffline", namespace);
                 xmlWriter.writeNamespace(prefix, namespace);
                 xmlWriter.setPrefix(prefix, namespace);
             }
             else
             {
-                xmlWriter.writeStartElement(namespace, "putOffine");
+                xmlWriter.writeStartElement(namespace, "putOffline");
             }
         }
         else
         {
-            xmlWriter.writeStartElement("putOffine");
+            xmlWriter.writeStartElement("putOffline");
         }
 
-        xmlWriter.writeCharacters(ConverterUtil.convertToString(this.putOffine));
+        xmlWriter.writeCharacters(ConverterUtil.convertToString(this.putOffline));
         xmlWriter.writeEndElement();
         
         namespace = "";
@@ -344,9 +344,9 @@ public class MaintenanceRequestType extends AuthRequiredRequestType implements A
         xmlWriter.writeEndElement();
     }
     
-    public boolean getPutOffine()
+    public boolean getPutOffline()
     {
-        return this.putOffine;
+        return this.putOffline;
     }
 
     public boolean getRunTests()
@@ -354,9 +354,9 @@ public class MaintenanceRequestType extends AuthRequiredRequestType implements A
         return this.runTests;
     }
 
-    public void setPutOffine(boolean param)
+    public void setPutOffline(boolean param)
     {
-        this.putOffine = param;
+        this.putOffline = param;
     }
 
     public void setRunTests(boolean param)
@@ -439,10 +439,10 @@ public class MaintenanceRequestType extends AuthRequiredRequestType implements A
                 {
                     reader.next();
                 }
-                if (reader.isStartElement() && new QName("", "putOffine").equals(reader.getName()))
+                if (reader.isStartElement() && new QName("", "putOffline").equals(reader.getName()))
                 {
                     String content = reader.getElementText();
-                    object.setPutOffine(ConverterUtil.convertToBoolean(content));
+                    object.setPutOffline(ConverterUtil.convertToBoolean(content));
                     reader.next();
                 }
                 else

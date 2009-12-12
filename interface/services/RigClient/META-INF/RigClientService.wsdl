@@ -353,7 +353,7 @@ Changelog:
             		<xsd:extension
             			base="rigclient:AuthRequiredRequestType">
             			<xsd:sequence>
-            				<xsd:element name="putOffine"
+            				<xsd:element name="putOffline"
             					type="xsd:boolean">
             				</xsd:element>
             				<xsd:element name="runTests"

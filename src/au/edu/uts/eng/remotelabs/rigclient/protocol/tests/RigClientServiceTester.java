@@ -1499,7 +1499,7 @@ public class RigClientServiceTester extends TestCase
         MaintenanceRequestType main = new MaintenanceRequestType();
         request.setSetMaintenance(main);
         main.setIdentityToken("abc123");
-        main.setPutOffine(true);
+        main.setPutOffline(true);
         main.setRunTests(true);
         
         SetMaintenanceResponse resp = this.service.setMaintenance(request);
@@ -1525,7 +1525,7 @@ public class RigClientServiceTester extends TestCase
         MaintenanceRequestType main = new MaintenanceRequestType();
         request.setSetMaintenance(main);
         main.setIdentityToken("wrong...");
-        main.setPutOffine(true);
+        main.setPutOffline(true);
         main.setRunTests(true);
         
         SetMaintenanceResponse resp = this.service.setMaintenance(request);

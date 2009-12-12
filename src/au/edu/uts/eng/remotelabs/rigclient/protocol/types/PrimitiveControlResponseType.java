@@ -387,7 +387,7 @@ public class PrimitiveControlResponseType extends
 
         elementList.add(new javax.xml.namespace.QName("", "success"));
 
-        elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localSuccess));
+        elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.success));
         if (this.localErrorTracker)
         {
             elementList.add(new javax.xml.namespace.QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
@@ -573,7 +573,7 @@ public class PrimitiveControlResponseType extends
         else
         {
             xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil
-                    .convertToString(this.localSuccess));
+                    .convertToString(this.success));
         }
 
         xmlWriter.writeEndElement();

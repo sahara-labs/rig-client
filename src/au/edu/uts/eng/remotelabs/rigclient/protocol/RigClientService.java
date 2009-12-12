@@ -728,14 +728,14 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         /* Request parameters. */
         final MaintenanceRequestType request = maintenRequest.getSetMaintenance();
         this.logger.debug("Received set maintenance request with parameters: run tests=" + request.getRunTests() + 
-                ", put offline=" + request.getPutOffine() + ".");
+                ", put offline=" + request.getPutOffline() + ".");
         
         /* Response parameters. */
         final SetMaintenanceResponse response = new SetMaintenanceResponse();
         final OperationResponseType operation = new OperationResponseType();
         response.setSetMaintenanceResponse(operation);
         final ErrorType error = new ErrorType();
-        error.setOperation("Setting maintenance to "  + (request.getPutOffine() ? "offline" : "online") + ".");
+        error.setOperation("Setting maintenance to "  + (request.getPutOffline() ? "offline" : "online") + ".");
         error.setReason("");
         operation.setError(error);
         
@@ -748,9 +748,9 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         /* DODGY The reason why the rig is going into maintenance should be communicated at request.
          * However, I'm far too lazy to fix this now. */
-        else if (this.rig.setMaintenance(request.getPutOffine(), "User request.", request.getRunTests()))
+        else if (this.rig.setMaintenance(request.getPutOffline(), "User request.", request.getRunTests()))
         {
-            this.logger.info("Successfully put the rig to state " + (request.getPutOffine() ? "offline" : "online") +
+            this.logger.info("Successfully put the rig to state " + (request.getPutOffline() ? "offline" : "online") +
                 ".");
             operation.setSuccess(true);
         }
