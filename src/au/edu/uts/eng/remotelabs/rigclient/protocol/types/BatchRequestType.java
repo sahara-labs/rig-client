@@ -46,6 +46,8 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
     private static final long serialVersionUID = 5682929355367496267L;
     
     protected DataHandler batchFile;
+    
+    protected String fileName;
 
     private static String generatePrefix(final String namespace)
     {
@@ -119,8 +121,18 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
         
         elementList.add(new QName("", "batchFile"));
         elementList.add(this.batchFile);
+        
+        elementList.add(new QName("", "fileName"));
+        if (fileName != null)
+        {
+            elementList.add(ConverterUtil.convertToString(fileName));
+        }
+        else
+        {
+            throw new ADBException("fileName cannot be null!!");
+        }
+        
         return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
-
     }
 
     private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
@@ -290,8 +302,39 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
         {
             xmlWriter.writeDataHandler(this.batchFile);
         }
-
         xmlWriter.writeEndElement();
+        
+        namespace = "";
+        if (!namespace.equals(""))
+        {
+            prefix = xmlWriter.getPrefix(namespace);
+            if (prefix == null)
+            {
+                prefix = generatePrefix(namespace);
+                xmlWriter.writeStartElement(prefix, "fileName", namespace);
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            }
+            else
+            {
+                xmlWriter.writeStartElement(namespace, "fileName");
+            }
+        }
+        else
+        {
+            xmlWriter.writeStartElement("fileName");
+        }
+
+        if (fileName == null)
+        {
+            throw new org.apache.axis2.databinding.ADBException("fileName cannot be null!!");
+        }
+        else
+        {
+            xmlWriter.writeCharacters(fileName);
+        }
+        xmlWriter.writeEndElement();
+        
         xmlWriter.writeEndElement();
     }
     
@@ -303,6 +346,16 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
     public void setBatchFile(final DataHandler param)
     {
         this.batchFile = param;
+    }
+    
+    public  String getFileName()
+    {
+        return this.fileName;
+    }
+
+    public void setFileName( String param)
+    {
+        this.fileName = param;
     }
 
     private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue, final XMLStreamWriter xmlWriter)
@@ -412,6 +465,25 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
                 else
                 {
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+                
+                
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "fileName").equals(reader.getName()))
+                {
+                    String content = reader.getElementText();
+                    object.setFileName(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+                else
+                {
+                    // A start element we are not expecting indicates an invalid
+                    // parameter was passed
+                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
+                            + reader.getLocalName());
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())

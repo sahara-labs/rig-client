@@ -177,6 +177,9 @@ Changelog:
             				<xsd:element name="batchFile"
             					type="xsd:base64Binary">
             				</xsd:element>
+            				<xsd:element name="fileName"
+            					type="xsd:string">
+            				</xsd:element>
             			</xsd:sequence>
             		</xsd:extension>
             	</xsd:complexContent>

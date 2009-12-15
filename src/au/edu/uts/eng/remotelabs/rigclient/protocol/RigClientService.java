@@ -45,6 +45,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControl;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ActivityDetectableType;
@@ -93,6 +96,8 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -107,6 +112,9 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     /** Logger. */
     private final ILogger logger;
     
+    /** Configuration. */
+    private final IConfig config;
+    
     /**
      * Constructor.
      */
@@ -114,6 +122,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     {
         this.logger = LoggerFactory.getLoggerInstance();
         this.rig = RigFactory.getRigInstance();
+        this.config = ConfigFactory.getInstance();
     }
     
     /* 
@@ -448,7 +457,11 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             final IRigControl controlledRig = (IRigControl)this.rig;
             
             /* First download the file. */
-            // TODO batch control
+            DataHandler handler = request.getBatchFile();
+            String file = this.config.getProperty("Batch_Download_Dir", System.getProperty("java.io.tmpdir"));
+                    
+            
+
             
         }
         else
