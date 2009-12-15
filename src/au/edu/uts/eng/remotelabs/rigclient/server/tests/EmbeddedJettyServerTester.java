@@ -93,7 +93,7 @@ public class EmbeddedJettyServerTester extends TestCase
         this.config = createMock(IConfig.class);
         Field fld = EmbeddedJettyServer.class.getDeclaredField("config");
         fld.setAccessible(true);
-        fld.set(this.server, config);
+        fld.set(this.server, this.config);
     }
     
     @Test
@@ -132,7 +132,6 @@ public class EmbeddedJettyServerTester extends TestCase
         
         assertTrue(this.server.stopListening());
         Thread.sleep(5000);
-        
         
         try
         {

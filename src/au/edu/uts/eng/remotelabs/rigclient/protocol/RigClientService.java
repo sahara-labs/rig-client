@@ -41,12 +41,15 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.protocol;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
 
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControl;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AbortBatchControlResponse;
@@ -444,6 +447,28 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         error.setReason("");
         operation.setError(error);
         
+        /* --------------------------------------------------------------------
+         * ---- 1. First check the rig is in session.                        --
+         * ------------------------------------------------------------------*/
+        if (!this.rig.isSessionActive())
+        {
+            this.logger.warn("Unable to perform batch control because the rig is not in session.");
+            operation.setSuccess(false);
+            error.setCode(6);
+            error.setReason("Rig not in session.");
+            return response;
+        }
+        
+        /* --------------------------------------------------------------------
+         * ---- 2. Ccheck the requestor is allowed to perform batch          --
+         * ----    control. The following entities are allowed:              --
+         * ----      * Scheduling server identified by the provided          --
+         * ----        identity token request field.                         --
+         * ----      * Master user identified by the requestor request       --
+         * ----        field.                                                --
+         * ----      * Slave active user identified by the requestor request --
+         * ----        field.                                                --
+         * ------------------------------------------------------------------*/
         if (!(this.isSourceAuthenticated(request.getIdentityToken()) || 
                 this.rig.hasPermission(request.getRequestor(), Session.SLAVE_ACTIVE)))
         {
@@ -451,25 +476,133 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             operation.setSuccess(false);
             error.setCode(3);
             error.setReason("Invalid permission.");
+            return response;
         }
-        else if (this.rig instanceof IRigControl)
-        {
-            final IRigControl controlledRig = (IRigControl)this.rig;
-            
-            /* First download the file. */
-            DataHandler handler = request.getBatchFile();
-            String file = this.config.getProperty("Batch_Download_Dir", System.getProperty("java.io.tmpdir"));
-                    
-            
-
-            
-        }
-        else
+        
+        /* --------------------------------------------------------------------
+         * ---- 3. Check the rig supports being controlled (i.e. it          --
+         * ----    implements the rig control interface).                    --
+         * ------------------------------------------------------------------*/
+        if (!(this.rig instanceof IRigControl))
         {
             this.logger.warn("Unable to perform batch control because the rig does not support it.");
             operation.setSuccess(false);
             error.setCode(10);
             error.setReason("Batch not supported.");
+            return response;
+        }
+        
+        final IRigControl controlledRig = (IRigControl)this.rig;
+
+        /* --------------------------------------------------------------------
+         * ---- 4. Download the batch instruction file.                      --
+         * ------------------------------------------------------------------*/
+        String fileName = this.config.getProperty("Batch_Download_Dir", System.getProperty("java.io.tmpdir")) + 
+        (System.currentTimeMillis() / 1000) + '-' + (new File(request.getFileName()).getName());
+        this.logger.debug("Uploading batch file to " + fileName + '.');
+
+        FileOutputStream file = null;
+        InputStream upload = null;
+        try
+        {
+            file = new FileOutputStream(fileName);
+            upload = request.getBatchFile().getInputStream();
+            byte buf[] = new byte[1024];
+            int read = 0;
+            while ((read = upload.read(buf)) == buf.length)
+            {
+                file.write(buf);
+            }
+            if (read > 0)
+            {
+                file.write(buf, 0, read); // File remaining bytes.
+            }
+            file.flush();
+            file.close();
+
+            /* ----------------------------------------------------------------
+             * ---- 5. Get the requesting user, either the requestor request --
+             * ----    field, or the session master user.                    --
+             * --------------------------------------------------------------*/
+            String user = request.getRequestor();
+            if (user == null)
+            {
+                this.logger.debug("Requestor name not provided, using the master user name.");
+                Map<String, Session> sessionUsers = this.rig.getSessionUsers();
+                for (Entry<String, Session> sUser : sessionUsers.entrySet())
+                {
+                    if (sUser.getValue() == Session.MASTER)
+                    {
+                        user = sUser.getKey();
+                        break;
+                    }
+                }
+            }
+            if (user == null)
+            {
+                this.logger.error("Attempted to run batch control, with session active, but the master user" +
+                		"was not found. Please report a bug.");
+                operation.setSuccess(false);
+                error.setCode(16);
+                error.setReason("Master user was not found.");
+                return response;
+            }
+            
+            /* ----------------------------------------------------------------
+             * ---- 6. Check batch is not running.
+             */
+
+            /* ----------------------------------------------------------------
+             * ---- 6. Run batch control!                                    --
+             * --------------------------------------------------------------*/
+            if (controlledRig.performBatch(fileName, user))
+            {
+                operation.setSuccess(true);
+            }
+            else
+            {
+                operation.setSuccess(false);
+                error.setCode(16);
+                error.setReason("Invocation failed.");
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (file != null)
+            {
+                try
+                {
+                    file.close();
+                }
+                catch (IOException e)
+                {
+                    this.logger.warn("Unable to close batch file output stream because of exception: " 
+                            + e.getClass().getSimpleName() + " with message: " + e.getMessage() + '.');
+                }
+            }
+
+            if (upload != null)
+            {
+                try
+                {
+                    upload.close();
+                }
+                catch (IOException e)
+                {
+                    this.logger.warn("Unable to close batch upload input stream because of exception: " 
+                            + e.getClass().getSimpleName() + " with message: " + e.getMessage() + '.');
+                }
+            }
         }
         
         return response;
