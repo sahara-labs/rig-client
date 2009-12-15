@@ -1,17 +1,79 @@
 /**
+ * SAHARA Rig Client
+ *
+ * Software abstraction of physical rig to provide rig session control
+ * and rig device control. Automatically tests rig hardware and reports
+ * the rig status to ensure rig goodness.
+ *
+ * @license See LICENSE in the top level directory for complete license terms.
+ *
+ * Copyright (c) 2009, University of Technology, Sydney
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of the University of Technology, Sydney nor the names
+ *    of its contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @author Michael Diponio (mdiponio)
+ * @date 8th December 2009
+ *
+ * Changelog:
+ * - 08/12/2009 - mdiponio - Initial file creation.
+ */
+
+/**
  * PrimitiveControlRequestType.java This file was auto-generated from WSDL by
  * the Apache Axis2 version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
  */
 
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.axiom.om.OMConstants;
+import org.apache.axiom.om.OMDataSource;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
+import org.apache.axis2.databinding.ADBBean;
+import org.apache.axis2.databinding.ADBDataSource;
+import org.apache.axis2.databinding.ADBException;
+import org.apache.axis2.databinding.utils.BeanUtil;
+import org.apache.axis2.databinding.utils.ConverterUtil;
+import org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl;
+import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
+
 /**
  * PrimitiveControlRequestType bean class
  */
 
-public class PrimitiveControlRequestType extends
-        au.edu.uts.eng.remotelabs.rigclient.protocol.types.AuthRequiredRequestType implements
-        org.apache.axis2.databinding.ADBBean
+public class PrimitiveControlRequestType extends AuthRequiredRequestType implements ADBBean
 {
     /*
      * This type was generated from the piece of schema that had name =
@@ -20,501 +82,192 @@ public class PrimitiveControlRequestType extends
      * ns1
      */
 
-    /**
-     * Factory class that keeps the parse method
-     */
-    public static class Factory
-    {
-
-        /**
-         * static method to create the object Precondition: If this object is an
-         * element, the current or next start element starts this object and any
-         * intervening reader events are ignorable If this object is not an
-         * element, it is a complex type and the reader is at the event just
-         * after the outer start element Postcondition: If this object is an
-         * element, the reader is positioned at its end element If this object
-         * is a complex type, the reader is positioned at the end element of its
-         * outer element
-         */
-        public static PrimitiveControlRequestType parse(javax.xml.stream.XMLStreamReader reader)
-                throws java.lang.Exception
-        {
-            PrimitiveControlRequestType object = new PrimitiveControlRequestType();
-
-            try
-            {
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
-                {
-                    java.lang.String fullTypeName = reader.getAttributeValue(
-                            "http://www.w3.org/2001/XMLSchema-instance", "type");
-                    if (fullTypeName != null)
-                    {
-                        java.lang.String nsPrefix = null;
-                        if (fullTypeName.indexOf(":") > -1)
-                        {
-                            nsPrefix = fullTypeName.substring(0, fullTypeName.indexOf(":"));
-                        }
-                        nsPrefix = nsPrefix == null ? "" : nsPrefix;
-
-                        java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
-
-                        if (!"PrimitiveControlRequestType".equals(type))
-                        {
-                            // find namespace for the prefix
-                            java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                            return (PrimitiveControlRequestType) au.edu.uts.eng.remotelabs.rigclient.protocol.types.ExtensionMapper
-                                    .getTypeObject(nsUri, type, reader);
-                        }
-
-                    }
-
-                }
-
-                new java.util.Vector();
-
-                reader.next();
-
-                java.util.ArrayList list5 = new java.util.ArrayList();
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement()
-                        && new javax.xml.namespace.QName("", "identityToken").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setIdentityToken(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-
-                else
-                {
-
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement() && new javax.xml.namespace.QName("", "requestor").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setRequestor(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-
-                else
-                {
-
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement() && new javax.xml.namespace.QName("", "controller").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setController(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-                else
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement() && new javax.xml.namespace.QName("", "action").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setAction(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-                else
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement() && new javax.xml.namespace.QName("", "param").equals(reader.getName()))
-                {
-
-                    // Process the array and step past its final element's end.
-                    list5.add(au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType.Factory.parse(reader));
-
-                    // loop until we find a start element that is not part of
-                    // this array
-                    boolean loopDone5 = false;
-                    while (!loopDone5)
-                    {
-                        // We should be at the end element, but make sure
-                        while (!reader.isEndElement())
-                        {
-                            reader.next();
-                        }
-                        // Step out of this element
-                        reader.next();
-                        // Step to next element event.
-                        while (!reader.isStartElement() && !reader.isEndElement())
-                        {
-                            reader.next();
-                        }
-                        if (reader.isEndElement())
-                        {
-                            // two continuous end elements means we are exiting
-                            // the xml structure
-                            loopDone5 = true;
-                        }
-                        else
-                        {
-                            if (new javax.xml.namespace.QName("", "param").equals(reader.getName()))
-                            {
-                                list5.add(au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType.Factory
-                                        .parse(reader));
-
-                            }
-                            else
-                            {
-                                loopDone5 = true;
-                            }
-                        }
-                    }
-                    // call the converter utility to convert and set the array
-
-                    object
-                            .setParam((au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType[]) org.apache.axis2.databinding.utils.ConverterUtil
-                                    .convertToArray(au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType.class,
-                                            list5));
-
-                } // End of if for expected property start element
-
-                else
-                {
-
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement())
-                // A start element we are not expecting indicates a trailing
-                    // invalid property
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
-
-            }
-            catch (javax.xml.stream.XMLStreamException e)
-            {
-                throw new java.lang.Exception(e);
-            }
-
-            return object;
-        }
-
-    }// end of factory class
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = -780667459288663133L;
 
-    private static java.lang.String generatePrefix(java.lang.String namespace)
+    protected String controller;
+
+    protected String action;
+
+    protected boolean paramsTracker = false;
+    protected ParamType[] params;
+
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
-        return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        return BeanUtil.getUniquePrefix();
     }
 
-    /**
-     * isReaderMTOMAware
-     * 
-     * @return true if the reader supports MTOM
-     */
-    public static boolean isReaderMTOMAware(javax.xml.stream.XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
 
         try
         {
-            isReaderMTOMAware = java.lang.Boolean.TRUE.equals(reader
-                    .getProperty(org.apache.axiom.om.OMConstants.IS_DATA_HANDLERS_AWARE));
+            isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (java.lang.IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
         return isReaderMTOMAware;
     }
 
-    /**
-     * field for Controller
-     */
-
-    protected java.lang.String localController;
-
-    /**
-     * field for Action
-     */
-
-    protected java.lang.String localAction;
-
-    /**
-     * field for Param This was an Array!
-     */
-
-    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType[] localParam;
-
-    /*
-     * This tracker boolean wil be used to detect whether the user called the
-     * set method for this attribute. It will be used to determine whether to
-     * include this field in the serialized XML
-     */
-    protected boolean localParamTracker = false;
-
-    /**
-     * Auto generated add method for the array for convenience
-     * 
-     * @param param au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType
-     */
-    public void addParam(au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType param)
+    @SuppressWarnings("unchecked")
+    public void addParam(final ParamType param)
     {
-        if (this.localParam == null)
+        if (this.params == null)
         {
-            this.localParam = new au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType[] {};
+            this.params = new ParamType[] {};
         }
 
         // update the setting tracker
-        this.localParamTracker = true;
+        this.paramsTracker = true;
 
-        java.util.List list = org.apache.axis2.databinding.utils.ConverterUtil.toList(this.localParam);
+        final List<ParamType> list = ConverterUtil.toList(this.params);
         list.add(param);
-        this.localParam = (au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType[]) list
-                .toArray(new au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType[list.size()]);
+        this.params = list.toArray(new ParamType[list.size()]);
 
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return java.lang.String
-     */
-    public java.lang.String getAction()
+    public String getAction()
     {
-        return this.localAction;
+        return this.action;
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return java.lang.String
-     */
-    public java.lang.String getController()
+    public String getController()
     {
-        return this.localController;
+        return this.controller;
     }
 
-    /**
-     * @param parentQName
-     * @param factory
-     * @return org.apache.axiom.om.OMElement
-     */
     @Override
-    public org.apache.axiom.om.OMElement getOMElement(final javax.xml.namespace.QName parentQName,
-            final org.apache.axiom.om.OMFactory factory) throws org.apache.axis2.databinding.ADBException
+    public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-
-        org.apache.axiom.om.OMDataSource dataSource = new org.apache.axis2.databinding.ADBDataSource(this, parentQName)
+        final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
-
             @Override
-            public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
-                    throws javax.xml.stream.XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 PrimitiveControlRequestType.this.serialize(this.parentQName, factory, xmlWriter);
             }
         };
-        return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(parentQName, factory, dataSource);
-
+        return new OMSourcedElementImpl(parentQName, factory, dataSource);
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType[]
-     */
-    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType[] getParam()
+    public ParamType[] getParam()
     {
-        return this.localParam;
+        return this.params;
     }
 
-    /**
-     * databinding method to get an XML representation of this object
-     */
-    public javax.xml.stream.XMLStreamReader getPullParser(javax.xml.namespace.QName qName)
-            throws org.apache.axis2.databinding.ADBException
+    @Override
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
-
-        java.util.ArrayList elementList = new java.util.ArrayList();
-        java.util.ArrayList attribList = new java.util.ArrayList();
-
-        attribList.add(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
-        attribList.add(new javax.xml.namespace.QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
-                "PrimitiveControlRequestType"));
+        final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
+        final ArrayList<QName> attribList = new ArrayList<QName>();
+        attribList.add(new QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
+        attribList.add(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "PrimitiveControlRequestType"));
         if (this.identityTokenTracker)
         {
-            elementList.add(new javax.xml.namespace.QName("", "identityToken"));
+            elementList.add(new QName("", "identityToken"));
 
             if (this.identityToken != null)
             {
-                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil
-                        .convertToString(this.identityToken));
+                elementList.add(ConverterUtil.convertToString(this.identityToken));
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("identityToken cannot be null!!");
+            {
+                throw new ADBException("identityToken cannot be null!!");
+            }
         }
         if (this.requestorTracker)
         {
-            elementList.add(new javax.xml.namespace.QName("", "requestor"));
+            elementList.add(new QName("", "requestor"));
 
             if (this.requestor != null)
             {
-                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.requestor));
+                elementList.add(ConverterUtil.convertToString(this.requestor));
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("requestor cannot be null!!");
-        }
-        elementList.add(new javax.xml.namespace.QName("", "controller"));
-
-        if (this.localController != null)
-        {
-            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localController));
-        }
-        else
-            throw new org.apache.axis2.databinding.ADBException("controller cannot be null!!");
-
-        elementList.add(new javax.xml.namespace.QName("", "action"));
-
-        if (this.localAction != null)
-        {
-            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localAction));
-        }
-        else
-            throw new org.apache.axis2.databinding.ADBException("action cannot be null!!");
-        if (this.localParamTracker)
-        {
-            if (this.localParam != null)
             {
-                for (ParamType element : this.localParam)
-                {
+                throw new ADBException("requestor cannot be null!!");
+            }
+        }
+        elementList.add(new QName("", "controller"));
 
+        if (this.controller != null)
+        {
+            elementList.add(ConverterUtil.convertToString(this.controller));
+        }
+        else
+        {
+            throw new ADBException("controller cannot be null!!");
+        }
+
+        elementList.add(new QName("", "action"));
+
+        if (this.action != null)
+        {
+            elementList.add(ConverterUtil.convertToString(this.action));
+        }
+        else
+        {
+            throw new ADBException("action cannot be null!!");
+        }
+        if (this.paramsTracker)
+        {
+            if (this.params != null)
+            {
+                for (final ParamType element : this.params)
+                {
                     if (element != null)
                     {
-                        elementList.add(new javax.xml.namespace.QName("", "param"));
+                        elementList.add(new QName("", "param"));
                         elementList.add(element);
                     }
-                    else
-                    {
-
-                        // nothing to do
-
-                    }
-
                 }
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("param cannot be null!!");
-
+            {
+                throw new ADBException("param cannot be null!!");
+            }
         }
-
-        return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(),
-                attribList.toArray());
-
+        return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
     }
 
-    /**
-     * Register a namespace prefix
-     */
-    private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace)
-            throws javax.xml.stream.XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
-        java.lang.String prefix = xmlWriter.getPrefix(namespace);
-
+        String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
         {
             prefix = PrimitiveControlRequestType.generatePrefix(namespace);
-
             while (xmlWriter.getNamespaceContext().getNamespaceURI(prefix) != null)
             {
-                prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+                prefix = BeanUtil.getUniquePrefix();
             }
-
             xmlWriter.writeNamespace(prefix, namespace);
             xmlWriter.setPrefix(prefix, namespace);
         }
-
         return prefix;
     }
 
     @Override
-    public void serialize(final javax.xml.namespace.QName parentQName, final org.apache.axiom.om.OMFactory factory,
-            org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
-            throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
+            throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
     @Override
-    public void serialize(final javax.xml.namespace.QName parentQName, final org.apache.axiom.om.OMFactory factory,
-            org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter, boolean serializeType)
-            throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
 
-        java.lang.String prefix = null;
-        java.lang.String namespace = null;
 
-        prefix = parentQName.getPrefix();
-        namespace = parentQName.getNamespaceURI();
+        String prefix = parentQName.getPrefix();
+        String namespace = parentQName.getNamespaceURI();
 
         if (namespace != null && namespace.trim().length() > 0)
         {
-            java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
+            final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
             {
                 xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
@@ -536,8 +289,7 @@ public class PrimitiveControlRequestType extends
             xmlWriter.writeStartElement(parentQName.getLocalPart());
         }
 
-        java.lang.String namespacePrefix = this.registerPrefix(xmlWriter,
-                "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
+        final String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
         if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
         {
             this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", namespacePrefix
@@ -569,7 +321,6 @@ public class PrimitiveControlRequestType extends
                 {
                     xmlWriter.writeStartElement(namespace, "identityToken");
                 }
-
             }
             else
             {
@@ -577,23 +328,21 @@ public class PrimitiveControlRequestType extends
             }
 
             if (this.identityToken == null)
-                throw new org.apache.axis2.databinding.ADBException("identityToken cannot be null!!");
+                throw new ADBException("identityToken cannot be null!!");
             else
             {
-
                 xmlWriter.writeCharacters(this.identityToken);
-
             }
 
             xmlWriter.writeEndElement();
         }
+
         if (this.requestorTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
             {
                 prefix = xmlWriter.getPrefix(namespace);
-
                 if (prefix == null)
                 {
                     prefix = PrimitiveControlRequestType.generatePrefix(namespace);
@@ -601,13 +350,11 @@ public class PrimitiveControlRequestType extends
                     xmlWriter.writeStartElement(prefix, "requestor", namespace);
                     xmlWriter.writeNamespace(prefix, namespace);
                     xmlWriter.setPrefix(prefix, namespace);
-
                 }
                 else
                 {
                     xmlWriter.writeStartElement(namespace, "requestor");
                 }
-
             }
             else
             {
@@ -615,12 +362,12 @@ public class PrimitiveControlRequestType extends
             }
 
             if (this.requestor == null)
-                throw new org.apache.axis2.databinding.ADBException("requestor cannot be null!!");
+            {
+                throw new ADBException("requestor cannot be null!!");
+            }
             else
             {
-
                 xmlWriter.writeCharacters(this.requestor);
-
             }
 
             xmlWriter.writeEndElement();
@@ -633,34 +380,30 @@ public class PrimitiveControlRequestType extends
             if (prefix == null)
             {
                 prefix = PrimitiveControlRequestType.generatePrefix(namespace);
-
                 xmlWriter.writeStartElement(prefix, "controller", namespace);
                 xmlWriter.writeNamespace(prefix, namespace);
                 xmlWriter.setPrefix(prefix, namespace);
-
             }
             else
             {
                 xmlWriter.writeStartElement(namespace, "controller");
             }
-
         }
         else
         {
             xmlWriter.writeStartElement("controller");
         }
 
-        if (this.localController == null)
-            throw new org.apache.axis2.databinding.ADBException("controller cannot be null!!");
+        if (this.controller == null)
+        {
+            throw new ADBException("controller cannot be null!!");
+        }
         else
         {
-
-            xmlWriter.writeCharacters(this.localController);
-
+            xmlWriter.writeCharacters(this.controller);
         }
 
         xmlWriter.writeEndElement();
-
         namespace = "";
         if (!namespace.equals(""))
         {
@@ -673,128 +416,232 @@ public class PrimitiveControlRequestType extends
                 xmlWriter.writeStartElement(prefix, "action", namespace);
                 xmlWriter.writeNamespace(prefix, namespace);
                 xmlWriter.setPrefix(prefix, namespace);
-
             }
             else
             {
                 xmlWriter.writeStartElement(namespace, "action");
             }
-
         }
         else
         {
             xmlWriter.writeStartElement("action");
         }
 
-        if (this.localAction == null)
-            throw new org.apache.axis2.databinding.ADBException("action cannot be null!!");
+        if (this.action == null)
+        {
+            throw new ADBException("action cannot be null!!");
+        }
         else
         {
-
-            xmlWriter.writeCharacters(this.localAction);
-
+            xmlWriter.writeCharacters(this.action);
         }
 
         xmlWriter.writeEndElement();
-        if (this.localParamTracker)
+        if (this.paramsTracker)
         {
-            if (this.localParam != null)
+            if (this.params != null)
             {
-                for (ParamType element : this.localParam)
+                for (final ParamType element : this.params)
                 {
                     if (element != null)
                     {
-                        element.serialize(new javax.xml.namespace.QName("", "param"), factory, xmlWriter);
+                        element.serialize(new QName("", "param"), factory, xmlWriter);
                     }
-                    else
-                    {
-
-                        // we don't have to do any thing since minOccures is
-                        // zero
-
-                    }
-
                 }
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("param cannot be null!!");
+                throw new ADBException("param cannot be null!!");
         }
         xmlWriter.writeEndElement();
-
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param Action
-     */
-    public void setAction(java.lang.String param)
+    public void setAction(final String param)
     {
-
-        this.localAction = param;
-
+        this.action = param;
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param Controller
-     */
-    public void setController(java.lang.String param)
+    public void setController(final String param)
     {
-
-        this.localController = param;
-
+        this.controller = param;
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param Param
-     */
-    public void setParam(au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType[] param)
+    public void setParam(final ParamType[] param)
     {
-
-        this.validateParam(param);
-
         if (param != null)
         {
-            // update the setting tracker
-            this.localParamTracker = true;
+            this.paramsTracker = true;
         }
         else
         {
-            this.localParamTracker = false;
+            this.paramsTracker = false;
 
         }
-
-        this.localParam = param;
+        this.params = param;
     }
-
-    /**
-     * validate the array for Param
-     */
-    protected void validateParam(au.edu.uts.eng.remotelabs.rigclient.protocol.types.ParamType[] param)
-    {
-
-    }
-
-    /**
-     * Util method to write an attribute with the ns prefix
-     */
-    private void writeAttribute(java.lang.String prefix, java.lang.String namespace, java.lang.String attName,
-            java.lang.String attValue, javax.xml.stream.XMLStreamWriter xmlWriter)
-            throws javax.xml.stream.XMLStreamException
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue,
+            final XMLStreamWriter xmlWriter) throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
         {
             xmlWriter.writeNamespace(prefix, namespace);
             xmlWriter.setPrefix(prefix, namespace);
-
         }
-
         xmlWriter.writeAttribute(namespace, attName, attValue);
-
     }
 
+    public static class Factory
+    {
+        public static PrimitiveControlRequestType parse(final XMLStreamReader reader) throws Exception
+        {
+            final PrimitiveControlRequestType object = new PrimitiveControlRequestType();
+            try
+            {
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
+                {
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    if (fullTypeName != null)
+                    {
+                        String nsPrefix = null;
+                        if (fullTypeName.indexOf(":") > -1)
+                        {
+                            nsPrefix = fullTypeName.substring(0, fullTypeName.indexOf(":"));
+                        }
+                        nsPrefix = nsPrefix == null ? "" : nsPrefix;
+                        final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+                        if (!"PrimitiveControlRequestType".equals(type))
+                        {
+                            // find namespace for the prefix
+                            final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            return (PrimitiveControlRequestType) ExtensionMapper.getTypeObject(nsUri, type, reader);
+                        }
+                    }
+                }
+
+                reader.next();
+                final ArrayList<ParamType> params = new ArrayList<ParamType>();
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement() && new QName("", "identityToken").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setIdentityToken(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement() && new QName("", "requestor").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setRequestor(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement() && new QName("", "controller").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setController(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+                else
+                {
+                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement() && new QName("", "action").equals(reader.getName()))
+                {
+
+                    final String content = reader.getElementText();
+                    object.setAction(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+                else
+                {
+                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement() && new QName("", "param").equals(reader.getName()))
+                {
+
+
+                    params.add(ParamType.Factory.parse(reader));
+
+                    boolean loopDone5 = false;
+                    while (!loopDone5)
+                    {
+                        while (!reader.isEndElement())
+                        {
+                            reader.next();
+                        }
+
+                        reader.next();
+
+                        while (!reader.isStartElement() && !reader.isEndElement())
+                        {
+                            reader.next();
+                        }
+                        if (reader.isEndElement())
+                        {
+
+                            loopDone5 = true;
+                        }
+                        else
+                        {
+                            if (new QName("", "param").equals(reader.getName()))
+                            {
+                                params.add(ParamType.Factory.parse(reader));
+                            }
+                            else
+                            {
+                                loopDone5 = true;
+                            }
+                        }
+                    }
+
+                    object.setParam((ParamType[]) ConverterUtil.convertToArray(ParamType.class, params));
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement())
+                {
+                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+            }
+            catch (final XMLStreamException e)
+            {
+                throw new Exception(e);
+            }
+
+            return object;
+        }
+    }
 }
