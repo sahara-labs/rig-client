@@ -39,7 +39,7 @@
  * Changelog:
  * - 02/11/2009 - mdiponio - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.rig.control;
+package au.edu.uts.eng.remotelabs.rigclient.protocol.tests;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,6 +47,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.ConfiguredBatchRunner;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryCopier;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryZipper;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.MacroSubstituter;
@@ -60,11 +62,15 @@ import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
  * <br />
  * This uses a properties file (<code>config/batch.properties</code>) to 
  * store configuration.
+ * 
+ * This is different then the canonical {@link ConfiguredBatchRunner} as
+ * the final modifier is removed from the BATCH_PROPERTIES field to
+ * allow it to be modified in tests.
  */
-public class ConfiguredBatchRunner extends AbstractBatchRunner
+public class TestConfiguredBatchRunner extends AbstractBatchRunner
 {
     /** Batch properties configuration file location. */
-    public static final String BATCH_PROPERTIES = "config/batch.properties";
+    public static String BATCH_PROPERTIES = "config/batch.properties";
     
     /** The maximum number of bytes comprising a file magic number. */
     /* DODGY This is sort of arbitrary based on no formal or even implied
@@ -85,6 +91,16 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     @Override
     protected boolean init()
     {
+        // DODGY Lazy hack to make it work on other machines  - needs to be fixed on windows.
+        try
+        {
+            this.batchConfig.setProperty("Exec", new File("test/resources/cat").getCanonicalPath());
+        }
+        catch (IOException e)
+        {
+            // DODGY being lazy...
+        }
+        
         /* Batch command. */
         this.command = this.batchConfig.getProperty("Exec");
         this.logger.debug("Loaded batch control command as " + this.command + ".");
@@ -128,13 +144,13 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
      * @param file reference to uploaded instruction file
      * @param user name of user who invoked batch control
      */
-    public ConfiguredBatchRunner(final String file, final String user)
+    public TestConfiguredBatchRunner(final String file, final String user)
     {
         super(file, user);
         
-        this.logger.debug("Creating a ConfiguredBatchRunner, using " + ConfiguredBatchRunner.BATCH_PROPERTIES +
+        this.logger.debug("Creating a ConfiguredBatchRunner, using " + TestConfiguredBatchRunner.BATCH_PROPERTIES +
                 " as the batch configuration file.");
-        this.batchConfig = new PropertiesConfig(ConfiguredBatchRunner.BATCH_PROPERTIES);
+        this.batchConfig = new PropertiesConfig(TestConfiguredBatchRunner.BATCH_PROPERTIES);
         this.logger.debug("Batch properites file information is " + this.batchConfig.getConfigurationInfomation());
         
         this.substiter = new MacroSubstituter.MacroBuilder(this.fileName, this.username).build();
@@ -198,16 +214,16 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
         try
         {
             input = new FileInputStream(file);
-            final byte fileBuf[] = new byte[ConfiguredBatchRunner.MAGIC_NUMBER_LEN];
-            byte magicBuf[] = new byte[ConfiguredBatchRunner.MAGIC_NUMBER_LEN];
+            final byte fileBuf[] = new byte[TestConfiguredBatchRunner.MAGIC_NUMBER_LEN];
+            byte magicBuf[] = new byte[TestConfiguredBatchRunner.MAGIC_NUMBER_LEN];
             
             /* Read the first 8 bytes of the file. */
-            if (input.read(fileBuf, 0, ConfiguredBatchRunner.MAGIC_NUMBER_LEN) > 
-                    ConfiguredBatchRunner.MAGIC_NUMBER_LEN)
+            if (input.read(fileBuf, 0, TestConfiguredBatchRunner.MAGIC_NUMBER_LEN) > 
+                    TestConfiguredBatchRunner.MAGIC_NUMBER_LEN)
             {
                 this.errorCode = 11;
                 this.errorReason = "Unable to read file magic number bytes.";
-                this.logger.warn("Unable to read the first " + ConfiguredBatchRunner.MAGIC_NUMBER_LEN + " bytes " +
+                this.logger.warn("Unable to read the first " + TestConfiguredBatchRunner.MAGIC_NUMBER_LEN + " bytes " +
                 		"of " + this.fileName + " failing magic number test.");
                 return false;
             }

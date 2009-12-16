@@ -427,6 +427,8 @@ public class ConfiguredBatchRunnerTester extends TestCase
             Method meth = ConfiguredBatchRunner.class.getDeclaredMethod("checkFile");
             meth.setAccessible(true);
             assertFalse((Boolean)meth.invoke(this.runner));
+            assertEquals(11, this.runner.getErrorCode());
+            assertEquals("Instruction file is too large. Maximum allowable file size is 1kB.", this.runner.getErrorReason());
         }
         catch (Exception e)
         {

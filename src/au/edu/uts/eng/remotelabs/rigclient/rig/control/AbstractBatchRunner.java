@@ -72,6 +72,16 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  *     control and should do synchronisation of the generated results 
  *     files to a persistent store.</li>
  * </ul>
+ * In each of the above methods, the fields <code>errorCode</code> and
+ * <code>errorReason</code> should be set if they fail to provide
+ * meaningful information to the requestor. Some important error
+ * codes are:
+ * <ul>
+ *     <li><strong>11</strong> - if the batch file sanity check fails.</li>
+ *     <li><strong>16</strong> - catch all for other errors. The specific
+ *     meaning of this is <em>unknown error</em> but is used for lab
+ *     setup and configuration errors.</li>
+ * </ul>
  * 
  * <strong>NOTE:</strong>The premise of uploading code and running it on 
  * a laboratory server is inherently <strong><em>insecure.</em></strong>
@@ -135,6 +145,13 @@ public abstract class AbstractBatchRunner implements Runnable
     
     /** Batch process exit code. */
     protected int exitCode;
+    
+    /* File test error information. */
+    /** Invocation error code (e.g. if file test failed). */
+    protected int errorCode;
+    
+    /** Invocation error reason. */
+    protected String errorReason;
     
     /** Results files. */
     protected List<String> resultsFiles;
@@ -311,6 +328,8 @@ public abstract class AbstractBatchRunner implements Runnable
          * ------------------------------------------------------------------*/
         if (this.command == null)
         {
+            this.errorCode = 16;
+            this.errorReason = "No command has been set to run batch control (setup error).";
             this.logger.warn("No command to invoke has been set for batch control, batch invocation has failed.");
             return false;
         }
@@ -372,6 +391,9 @@ public abstract class AbstractBatchRunner implements Runnable
                 if (!wdBase.isDirectory()) buf.append(" Base " + this.workingDirBase + " is not a directory. ");
                 if (!wdBase.canWrite()) buf.append("Base " + this.workingDirBase +  " is not writeable. ");
                 this.logger.warn(buf.toString());
+                
+                this.errorCode = 16;
+                this.errorReason = buf.toString();
                 return false;
             }
         }
@@ -413,6 +435,8 @@ public abstract class AbstractBatchRunner implements Runnable
             if (path == null)
             {
                 this.logger.error("Path enviroment variable (path) for batch control not found, batch failing.");
+                this.errorCode = 16;
+                this.errorReason = "Path environment variable (path) not found.";
                 return false;
             }
             /* Iterate through path elements and test if the command is one of the path directories. */
@@ -432,6 +456,8 @@ public abstract class AbstractBatchRunner implements Runnable
             if (!found)
             {
                 this.logger.warn("Batch command " + this.command + " not found, batch control failing.");
+                this.errorCode = 16;
+                this.errorReason = "Batch command not found as an executable.";
                 return false;
             }
             
@@ -444,6 +470,8 @@ public abstract class AbstractBatchRunner implements Runnable
         {
             this.logger.warn("Do not have permission to execute batch command " + commFile.getAbsolutePath() + 
                     ". Batch control failing.");
+            this.errorCode = 16;
+            this.errorReason = "Batch command is not executable either not executable file or invalid permission.";
             return false;
         }
         
@@ -712,6 +740,22 @@ public abstract class AbstractBatchRunner implements Runnable
         return this.exitCode;
     }
     
+    /**
+     * @return the errorCode
+     */
+    public int getErrorCode()
+    {
+        return errorCode;
+    }
+
+    /**
+     * @return the errorReason
+     */
+    public String getErrorReason()
+    {
+        return errorReason;
+    }
+
     /**
      * Gets the user who invoked batch control.
      * 

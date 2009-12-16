@@ -178,8 +178,7 @@ public class AbstractControlledRigTester extends TestCase
     @Test
     public void testPerformBatch()
     {
-        final String instructions = System.getProperty("user.dir") + 
-                "/test/resources/Control/instructions.txt";
+        final String instructions = System.getProperty("user.dir") + "/test/resources/Control/instructions.txt";
         try
         {
             /* Set up AbstractRig. */
@@ -322,6 +321,72 @@ public class AbstractControlledRigTester extends TestCase
             Process proc = (Process)field.get(runner);
             proc.waitFor();
             Thread.sleep(1000); /* Time for clean up and such to run. */
+            assertFalse(this.rig.isBatchRunning());
+
+            verify(this.mockConfig);
+        }
+        catch (Exception e)
+        {
+            fail("Exception: " + e.getClass().getName() + ", message: " + e.getMessage() + ".");
+        }
+    }
+    
+    /**
+     * Tests the <code>AbstractRig.revoke</code> method.
+     */
+    @Test
+    public void testRevokeAbortBatch()
+    {
+       final String instructions = System.getProperty("user.dir") + 
+                "/test/resources/Control/instructions.txt";
+        try
+        {
+            /* Set up AbstractRig. */
+            String wdBase = System.getProperty("user.dir") + "/test/resources/Control/WorkDirBase";
+            reset(this.mockConfig);
+            expect(this.mockConfig.getProperty("Batch_Working_Dir"))
+                .andReturn(wdBase);
+            expect(this.mockConfig.getProperty("Batch_Create_Nested_Dir", "true"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("Batch_Flush_Env", "false"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "true"))
+                .andReturn("false");
+            expect(this.mockConfig.getProperty("Batch_Timeout", "60"))
+                .andReturn("30");
+            expect(this.mockConfig.getProperty("Batch_Termination_TimeOut", "10"))
+                .andReturn("10");
+            replay(this.mockConfig);
+            
+            assertTrue(this.rig.assign("mdiponio"));
+            /* Set up batch runner. */
+            if (System.getProperty("os.name").equals("Windows"))
+            {
+                // TODO Write a bat script to run the test case
+                fail("Windows batch command script implmenation");
+            }
+            else
+            {
+                this.rig.setComm(System.getProperty("user.dir") + "/test/resources/Control/slow-cat.sh");
+            }
+            List<String> args = new ArrayList<String>();
+            args.add(instructions);
+            args.add("10");
+            args.add("stdout");
+            this.rig.setArgs(args);
+            this.rig.setEnv(new HashMap<String, String>());
+            
+            /* Run the batch process. */
+            assertFalse(this.rig.isBatchRunning());
+            assertTrue(this.rig.performBatch(instructions, "tmachet"));
+            
+            assertTrue(this.rig.isBatchRunning());
+            Thread.sleep(1000);
+            
+            assertTrue(this.rig.revoke());
+            Thread.sleep(1000);
             assertFalse(this.rig.isBatchRunning());
 
             verify(this.mockConfig);

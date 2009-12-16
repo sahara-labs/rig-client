@@ -290,13 +290,21 @@ Changelog:
             					<xsd:enumeration value="IN_PROGRESS"></xsd:enumeration>
             					<xsd:enumeration value="COMPLETE"></xsd:enumeration>
             					<xsd:enumeration value="FAILED"></xsd:enumeration>
-            					<xsd:enumeration value="NOT_SUPPORTED"></xsd:enumeration>
+            					<xsd:enumeration
+            						value="NOT_SUPPORTED">
+            					</xsd:enumeration>
             				</xsd:restriction>
             			</xsd:simpleType>
             		</xsd:element>
-                    <xsd:element name="progress" type="xsd:string"></xsd:element>
-                    <xsd:element name="resultFilePath" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-            	</xsd:sequence>NewOperation
+            		<xsd:element name="progress" type="xsd:string"></xsd:element>
+            		<xsd:element name="resultFilePath" type="xsd:string"
+            			minOccurs="0" maxOccurs="unbounded">
+            		</xsd:element>
+            		<xsd:element name="exitCode" type="xsd:int" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="stdout" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="stderr" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            	</xsd:sequence>
+            	NewOperation
             </xsd:complexType>
     
             <xsd:complexType name="AttributeRequestType">

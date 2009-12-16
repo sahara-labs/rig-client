@@ -89,6 +89,15 @@ public class BatchStatusResponseType implements ADBBean
     
     protected boolean resultFilePathTracker = false;
     protected String[] resultFilePath;
+    
+    protected boolean exitCodeTracker = false;
+    protected int exitCode;
+    
+    protected boolean stdoutTracker = false;
+    protected String stdout;
+
+    protected boolean stderrTracker = false;
+    protected String stderr;
 
     private static String generatePrefix(final String namespace)
     {
@@ -147,6 +156,36 @@ public class BatchStatusResponseType implements ADBBean
             else
             {
                 throw new ADBException("resultFilePath cannot be null!!");
+            }
+        }
+        
+        if (this.exitCodeTracker)
+        {
+            elementList.add(new QName("", "exitCode"));
+            elementList.add(ConverterUtil.convertToString(this.exitCode));
+        }
+        if (this.stdoutTracker)
+        {
+            elementList.add(new QName("", "stdout"));
+            if (this.stdout != null)
+            {
+                elementList.add(ConverterUtil.convertToString(this.stdout));
+            }
+            else
+            {
+                throw new ADBException("stdout cannot be null!!");
+            }
+        }
+        if (this.stderrTracker)
+        {
+            elementList.add(new QName("", "stderr"));
+            if (this.stderr != null)
+            {
+                elementList.add(ConverterUtil.convertToString(this.stderr));
+            }
+            else
+            {
+                throw new ADBException("stderr cannot be null!!");
             }
         }
 
@@ -298,6 +337,109 @@ public class BatchStatusResponseType implements ADBBean
                 throw new ADBException("resultFilePath cannot be null!!");
             }
         }
+        
+        if (exitCodeTracker)
+        {
+            namespace = "";
+            if (!namespace.equals(""))
+            {
+                prefix = xmlWriter.getPrefix(namespace);
+                if (prefix == null)
+                {
+                    prefix = generatePrefix(namespace);
+                    xmlWriter.writeStartElement(prefix, "exitCode", namespace);
+                    xmlWriter.writeNamespace(prefix, namespace);
+                    xmlWriter.setPrefix(prefix, namespace);
+                }
+                else
+                {
+                    xmlWriter.writeStartElement(namespace, "exitCode");
+                }
+            }
+            else
+            {
+                xmlWriter.writeStartElement("exitCode");
+            }
+
+            if (exitCode == Integer.MIN_VALUE)
+            {
+                throw new ADBException("exitCode cannot be null!!");
+            }
+            else
+            {
+                xmlWriter.writeCharacters(ConverterUtil.convertToString(exitCode));
+            }
+            xmlWriter.writeEndElement();
+        }
+
+        if (stdoutTracker)
+        {
+            namespace = "";
+            if (!namespace.equals(""))
+            {
+                prefix = xmlWriter.getPrefix(namespace);
+
+                if (prefix == null)
+                {
+                    prefix = generatePrefix(namespace);
+                    xmlWriter.writeStartElement(prefix, "stdout", namespace);
+                    xmlWriter.writeNamespace(prefix, namespace);
+                    xmlWriter.setPrefix(prefix, namespace);
+                }
+                else
+                {
+                    xmlWriter.writeStartElement(namespace, "stdout");
+                }
+            }
+            else
+            {
+                xmlWriter.writeStartElement("stdout");
+            }
+
+            if (stdout == null)
+            {
+                throw new ADBException("stdout cannot be null!!");
+            }
+            else
+            {
+                xmlWriter.writeCharacters(stdout);
+            }
+            xmlWriter.writeEndElement();
+        }
+        
+        if (stderrTracker)
+        {
+            namespace = "";
+            if (!namespace.equals(""))
+            {
+                prefix = xmlWriter.getPrefix(namespace);
+                if (prefix == null)
+                {
+                    prefix = generatePrefix(namespace);
+                    xmlWriter.writeStartElement(prefix, "stderr", namespace);
+                    xmlWriter.writeNamespace(prefix, namespace);
+                    xmlWriter.setPrefix(prefix, namespace);
+                }
+                else
+                {
+                    xmlWriter.writeStartElement(namespace, "stderr");
+                }
+            }
+            else
+            {
+                xmlWriter.writeStartElement("stderr");
+            }
+
+            if (stderr == null)
+            {
+                throw new ADBException("stderr cannot be null!!");
+            }
+            else
+            {
+                xmlWriter.writeCharacters(stderr);
+            }
+            xmlWriter.writeEndElement();
+        }
         xmlWriter.writeEndElement();
     }
     
@@ -365,6 +507,61 @@ public class BatchStatusResponseType implements ADBBean
     public void setState(final BatchState param)
     {
         this.state = param;
+    }
+    
+    public int getExitCode()
+    {
+        return this.exitCode;
+    }
+    
+    public void setExitCode(int param)
+    {
+        if (param == Integer.MIN_VALUE)
+        {
+            this.exitCodeTracker = false;
+        }
+        else
+        {
+            this.exitCodeTracker = true;
+        }
+        this.exitCode = param;
+    }
+    
+    public String getStdout()
+    {
+        return this.stdout;
+    }
+
+    public void setStdout(String param)
+    {
+        if (param != null)
+        {
+            this.stdoutTracker = true;
+        }
+        else
+        {
+            this.stdoutTracker = false;
+        }
+        this.stdout = param;
+    }
+
+    public String getStderr()
+    {
+        return this.stderr;
+    }
+
+    public void setStderr(String param)
+    {
+        if (param != null)
+        {
+            // update the setting tracker
+            this.stderrTracker = true;
+        }
+        else
+        {
+            this.stderrTracker = false;
+        }
+        this.stderr = param;
     }
 
     private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue, final XMLStreamWriter xmlWriter)
@@ -489,7 +686,43 @@ public class BatchStatusResponseType implements ADBBean
 
                     object.setResultFilePath(files.toArray(new String[files.size()]));
                 }
+                
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "exitCode").equals(reader.getName()))
+                {
+                    String content = reader.getElementText();
+                    object.setExitCode(ConverterUtil.convertToInt(content));
+                    reader.next();
+                }
+                else
+                {
+                    object.setExitCode(Integer.MIN_VALUE);
+                }
 
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement() && new QName("", "stdout").equals(reader.getName()))
+                {
+                    String content = reader.getElementText();
+                    object.setStdout(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "stderr").equals(reader.getName()))
+                {
+                    String content = reader.getElementText();
+                    object.setStderr(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
                 {

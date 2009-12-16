@@ -70,6 +70,9 @@ public class BatchStatusResponseTypeTester extends TestCase
         		"            <progress>10</progress>\n" + 
         		"            <resultFilePath>C:\\results\\file1</resultFilePath>\n" +
         		"            <resultFilePath>C:\\results\\file2</resultFilePath>\n" +
+        		"            <exitCode>8</exitCode>" + 
+        		"            <stdout>Some standard out</stdout>" +
+        		"            <stderr>Some standard err</stderr>" +
         		"         </ns1:getBatchControlStatusResponse>";
         
         BatchStatusResponseType obj = BatchStatusResponseType.Factory.parse(
@@ -81,6 +84,10 @@ public class BatchStatusResponseTypeTester extends TestCase
         List<String> fileList = Arrays.asList(files);
         assertTrue(fileList.contains("C:\\results\\file1"));        
         assertTrue(fileList.contains("C:\\results\\file2"));
+        
+        assertEquals(8, obj.getExitCode());
+        assertEquals("Some standard out", obj.getStdout());
+        assertEquals("Some standard err", obj.getStderr());
     }
     
     @Test
@@ -91,6 +98,9 @@ public class BatchStatusResponseTypeTester extends TestCase
         obj.addResultFilePath("C:\\BAR\\FOO");
         obj.setProgress("100");
         obj.setState(BatchState.FAILED);
+        obj.setExitCode(8);
+        obj.setStdout("Some standard out");
+        obj.setStderr("Some standard err");
         
         OMElement ele = obj.getOMElement(new QName("", "batchStatus"), OMAbstractFactory.getOMFactory());
         String str = ele.toStringWithConsume();
@@ -98,5 +108,8 @@ public class BatchStatusResponseTypeTester extends TestCase
         assertTrue(str.contains("<progress>100</progress>"));
         assertTrue(str.contains("<resultFilePath>C:\\FOO\\BAR</resultFilePath>"));
         assertTrue(str.contains("<resultFilePath>C:\\BAR\\FOO</resultFilePath>"));
+        assertTrue(str.contains("<exitCode>8</exitCode>"));
+        assertTrue(str.contains("<stdout>Some standard out</stdout>"));
+        assertTrue(str.contains("<stderr>Some standard err</stderr>"));
     }
 }

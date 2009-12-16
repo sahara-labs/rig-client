@@ -60,6 +60,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeChoice;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchState;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchStatusResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ErrorType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
@@ -95,6 +97,7 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.StatusResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.TestIntervalRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchResults;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
@@ -460,7 +463,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         
         /* --------------------------------------------------------------------
-         * ---- 2. Ccheck the requestor is allowed to perform batch          --
+         * ---- 2. Check the requestor is allowed to perform batch          --
          * ----    control. The following entities are allowed:              --
          * ----      * Scheduling server identified by the provided          --
          * ----        identity token request field.                         --
@@ -493,12 +496,27 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         
         final IRigControl controlledRig = (IRigControl)this.rig;
+        
+        
+        /* ----------------------------------------------------------------
+         * ---- 4. Check batch is not already running.                   --
+         * --------------------------------------------------------------*/
+        if (controlledRig.isBatchRunning())
+        {
+            this.logger.info("Unable to perform batch control because there is an existing batch operation running.");
+            operation.setSuccess(false);
+            error.setCode(12);
+            error.setReason("Existing batch operation.");
+            return response;
+        }
+
 
         /* --------------------------------------------------------------------
-         * ---- 4. Download the batch instruction file.                      --
+         * ---- 5. Download the batch instruction file.                      --
          * ------------------------------------------------------------------*/
         String fileName = this.config.getProperty("Batch_Download_Dir", System.getProperty("java.io.tmpdir")) + 
-        (System.currentTimeMillis() / 1000) + '-' + (new File(request.getFileName()).getName());
+            System.getProperty("file.separator") + (System.currentTimeMillis() / 1000) + 
+            '-' + (new File(request.getFileName()).getName());
         this.logger.debug("Uploading batch file to " + fileName + '.');
 
         FileOutputStream file = null;
@@ -521,7 +539,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             file.close();
 
             /* ----------------------------------------------------------------
-             * ---- 5. Get the requesting user, either the requestor request --
+             * ---- 6. Get the requesting user, either the requestor request --
              * ----    field, or the session master user.                    --
              * --------------------------------------------------------------*/
             String user = request.getRequestor();
@@ -549,11 +567,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             }
             
             /* ----------------------------------------------------------------
-             * ---- 6. Check batch is not running.
-             */
-
-            /* ----------------------------------------------------------------
-             * ---- 6. Run batch control!                                    --
+             * ---- 7. Run batch control!                                    --
              * --------------------------------------------------------------*/
             if (controlledRig.performBatch(fileName, user))
             {
@@ -561,20 +575,24 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             }
             else
             {
-                operation.setSuccess(false);
-                error.setCode(16);
-                error.setReason("Invocation failed.");
+                operation.setSuccess(true);
+                BatchResults res = controlledRig.getBatchResults();
+                error.setCode(res.getErrorCode());
+                String reason = res.getErrorReason();
+                error.setReason(reason == null ? "Unknown error." : reason);
             }
         }
         catch (FileNotFoundException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            operation.setSuccess(false);
+            error.setCode(16);
+            error.setReason("Unable to upload batch instruction file.");
         }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            operation.setSuccess(false);
+            error.setCode(16);
+            error.setReason("Unable to upload batch instruction file.");        
         }
         finally
         {
@@ -614,11 +632,11 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     @Override
     public AbortBatchControlResponse abortBatchControl(final AbortBatchControl abortRequest)
     {
-        // TODO
         /* Request parameters. */
         final String requestor = abortRequest.getAbortBatchControl().getRequestor();
-
-        this.logger.debug("Received abort batch control request with parameter: requestor=" + requestor + ".");
+        final String identTok = abortRequest.getAbortBatchControl().getIdentityToken();
+        this.logger.debug("Received abort batch control request with parameters: identity token=" + identTok + 
+                ", requestor=" + requestor + ".");
         
         /* Response parameters. */
         final AbortBatchControlResponse response = new AbortBatchControlResponse();
@@ -630,10 +648,11 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         error.setReason("");
         operation.setError(error);
         
-        if (!(this.rig instanceof IRigControl))
+        if (this.rig instanceof IRigControl)
         {
             final IRigControl controlRig = (IRigControl)this.rig;
-            if (!this.rig.hasPermission(requestor, Session.SLAVE_ACTIVE)) // Does the requestor have permission
+            if (!(this.isSourceAuthenticated(identTok) ||
+                    this.rig.hasPermission(requestor, Session.SLAVE_ACTIVE))) // Does the requestor have permission
             {
                 this.logger.warn("Requestor " + requestor + " does not have permission to abort batch control.");
                 operation.setSuccess(false);
@@ -661,7 +680,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             error.setCode(10);
             error.setReason("Batch control not supported.");
         }
-        
         return response;
     }
     
@@ -671,8 +689,69 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     @Override
     public GetBatchControlStatusResponse getBatchControlStatus(final GetBatchControlStatus statusRequest)
     {
-        // TODO Auto-generated method stub
-        return null;
+        /* Request parameters. */
+        final String requestor = statusRequest.getGetBatchControlStatus().getRequestor();
+        final String identTok = statusRequest.getGetBatchControlStatus().getIdentityToken();
+        this.logger.debug("Received batch status request with parameters: identity token=" + identTok + 
+                ", requestor=" + requestor + ".");
+        
+        /* Response parameters. */
+        final GetBatchControlStatusResponse response = new GetBatchControlStatusResponse();
+        final BatchStatusResponseType status = new BatchStatusResponseType();
+        response.setGetBatchControlStatusResponse(status);
+        
+        if (!(this.rig instanceof IRigControl))
+        {
+            this.logger.info("Rig does not support batch control, so sending a not supported status..");
+            status.setProgress("-1");
+            status.setState(BatchState.NOT_SUPPORTED);
+        }
+        else if (!(this.isSourceAuthenticated(identTok) ||
+                this.rig.hasPermission(requestor, Session.SLAVE_PASSIVE)))
+        {
+            this.logger.info("Requestor " + requestor + " does not have permission to abort batch control.");
+            status.setProgress("-1");
+            status.setState(BatchState.NOT_SUPPORTED);
+        }
+        else
+        {
+            IRigControl control = (IRigControl)this.rig;
+            status.setProgress(String.valueOf(control.getBatchProgress()));
+            
+            BatchResults res = control.getBatchResults();
+            switch (control.getBatchState())
+            {
+                case ABORTED:
+                    /* Falls through. */
+                case COMPLETE:
+                    status.setState(BatchState.COMPLETE);
+                    status.setResultFilePath(res.getResultsFiles());
+                    status.setExitCode(res.getExitCode());
+                    if (res.getStandardOut() != null) status.setStdout(res.getStandardOut());
+                    if (res.getStandardErr() != null) status.setStderr(res.getStandardErr());
+                    break;
+                case CLEAR:
+                    status.setState(BatchState.CLEAR);
+                    break;
+                case IN_PROGRESS:
+                    status.setState(BatchState.IN_PROGRESS);
+                    if (res.getStandardOut() != null) status.setStdout(res.getStandardOut());
+                    if (res.getStandardErr() != null) status.setStderr(res.getStandardErr());
+                    break;
+                case FAILED:
+                    status.setState(BatchState.FAILED);
+                    status.setResultFilePath(res.getResultsFiles());
+                    status.setExitCode(res.getExitCode());
+                    if (res.getStandardOut() != null) status.setStdout(res.getStandardOut());
+                    if (res.getStandardErr() != null) status.setStderr(res.getStandardErr());
+                    break;
+                default:
+                    status.setState(BatchState.NOT_SUPPORTED);
+                    break;
+            }
+        }
+        
+        return response;
     }
 
     /* 

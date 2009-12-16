@@ -890,6 +890,17 @@ public abstract class AbstractRig implements IRig
             this.logger.warn("Unable to terminate a session as there is no currently running session.");
             return false;
         }
+        
+        /* Revoke any running batch control operations. */
+        if (this instanceof IRigControl)
+        {
+            IRigControl controlRig = (IRigControl)this;
+            if (controlRig.isBatchRunning())
+            {
+                this.logger.info("Aborting batch control because of session termination.");
+                controlRig.abortBatch();
+            }
+        }
 
         String user = null;
         Session perm;

@@ -1,0 +1,4 @@
+#!/bin/sh
+sleep 30
+cat $1 > work-gods-damn-it.txt
+cat $1

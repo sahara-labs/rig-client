@@ -181,6 +181,12 @@ public interface IRigControl
         /** Batch process exit code. */
         private int exitCode;
         
+        /** Invocation error code. */
+        private int errorCode;
+        
+        /** Invocation error reason. */
+        private String errorReason;
+        
         /**
          * Constructor.
          */
@@ -291,6 +297,38 @@ public interface IRigControl
         public void setExitCode(int code)
         {
             this.exitCode = code;
+        }
+
+        /**
+         * @return the errorCode
+         */
+        public int getErrorCode()
+        {
+            return errorCode;
+        }
+
+        /**
+         * @param errorCode the errorCode to set
+         */
+        public void setErrorCode(int errorCode)
+        {
+            this.errorCode = errorCode;
+        }
+
+        /**
+         * @return the errorReason
+         */
+        public String getErrorReason()
+        {
+            return errorReason;
+        }
+
+        /**
+         * @param errorReason the errorReason to set
+         */
+        public void setErrorReason(String errorReason)
+        {
+            this.errorReason = errorReason;
         }
     }
     
