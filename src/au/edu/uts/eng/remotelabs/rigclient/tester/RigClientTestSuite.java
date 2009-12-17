@@ -46,6 +46,7 @@ import org.junit.runners.Suite;
 
 import au.edu.uts.eng.remotelabs.rigclient.protocol.tests.RigClientServiceTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveUserType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AbortBatchControlResponseTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AbortBatchControlTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.ActivityDetectableTypeTester;
@@ -71,6 +72,12 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.MaintenanceReque
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.NotificationRequestTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.NotifyResponseTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.NotifyTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.OperationResponseTypeTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.ReleaseResponseTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.ReleaseTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.StatusResponseTypeTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.TestIntervalRequestTypeTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.TypeSlaveUserTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.UserTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
@@ -91,6 +98,13 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    TestIntervalRequestTypeTester.class,
+    TypeSlaveUserTester.class,
+    SlaveUserType.class,
+    StatusResponseTypeTester.class,
+    ReleaseTester.class,
+    ReleaseResponseTester.class,
+    OperationResponseTypeTester.class,
     NotifyTester.class,
     NotifyResponseTester.class,
     NotificationRequestTypeTester.class,

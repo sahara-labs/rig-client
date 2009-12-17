@@ -37,11 +37,13 @@
  * @date 10th December 2009
  *
  * Changelog:
- * - 10/12/2009 - mdiponio - Initial file creation.
+ * - 17/12/2009 - mdiponio - Initial file creation.
  */
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -53,24 +55,26 @@ import org.junit.Test;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.StatusResponseType;
 
+
 /**
- * Tests the {@link GetStatusResponse} class.
+ * Tests the {@link StatusResponseType} class.
  */
-public class GetStatusResponseTester extends TestCase
+public class StatusResponseTypeTester extends TestCase
 {
     @Test
     public void testParse() throws Exception
     {
-        String str = "<ns1:getStatusResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\">\n" + 
-        		"      <isMonitorFailed>false</isMonitorFailed>\n" + 
-        		"      <isInMaintenance>false</isInMaintenance>\n" + 
-        		"      <isInSession>true</isInSession>\n" + 
-        		"      <sessionUser>mdiponio</sessionUser>\n" + 
-        		"    </ns1:getStatusResponse>";
-        GetStatusResponse obj = GetStatusResponse.Factory.parse(
-                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
+        String str = "<ns1:getStatusResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:StatusResponseType\">\n" + 
+                "      <isMonitorFailed>false</isMonitorFailed>\n" + 
+                "      <isInMaintenance>false</isInMaintenance>\n" + 
+                "      <isInSession>true</isInSession>\n" + 
+                "      <sessionUser>tmachet</sessionUser>\n" +
+                "      <slaveUsers>mdiponio</slaveUsers>\n" +
+                "      <slaveUsers>mville</slaveUsers>\n" +
+                "    </ns1:getStatusResponse>";
         
-        StatusResponseType resp = obj.getGetStatusResponse();
+        StatusResponseType resp = StatusResponseType.Factory.parse(
+                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
         assertNotNull(resp);
         
         assertFalse(resp.getIsInMaintenance());
@@ -78,8 +82,13 @@ public class GetStatusResponseTester extends TestCase
         assertNull(resp.getMaintenanceReason());
         assertNull(resp.getMonitorReason());
         assertTrue(resp.getIsInSession());
-        assertEquals("mdiponio", resp.getSessionUser());
-        assertEquals(null, resp.getSlaveUsers());
+        assertEquals("tmachet", resp.getSessionUser());
+        
+        String slaveUsers[] = resp.getSlaveUsers();
+        assertEquals(2, slaveUsers.length);
+        List<String> slaves = Arrays.asList(slaveUsers);
+        assertTrue(slaves.contains("mdiponio"));
+        assertTrue(slaves.contains("mville"));
     }
     
     @Test
@@ -91,10 +100,8 @@ public class GetStatusResponseTester extends TestCase
         st.setIsMonitorFailed(true);
         st.setMaintenanceReason("Tania broke it!");
         st.setMonitorReason("Michael is feeling lazy!");
-        GetStatusResponse obj = new GetStatusResponse();
-        obj.setGetStatusResponse(st);
         
-        OMElement ele = obj.getOMElement(GetStatusResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
+        OMElement ele = st.getOMElement(GetStatusResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
         String str = ele.toStringWithConsume();
         assertTrue(str.contains("<monitorReason>Michael is feeling lazy!</monitorReason>"));
         assertTrue(str.contains("<maintenanceReason>Tania broke it!</maintenanceReason>"));

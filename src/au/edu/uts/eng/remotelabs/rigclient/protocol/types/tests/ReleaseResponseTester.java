@@ -37,7 +37,7 @@
  * @date 10th December 2009
  *
  * Changelog:
- * - 10/12/2009 - mdiponio - Initial file creation.
+ * - 17/12/2009 - mdiponio - Initial file creation.
  */
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests;
 
@@ -50,56 +50,63 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.StAXUtils;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.StatusResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ErrorType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.OperationResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
+
 
 /**
- * Tests the {@link GetStatusResponse} class.
+ * Tests the {@link ReleaseResponse} class.
  */
-public class GetStatusResponseTester extends TestCase
+public class ReleaseResponseTester extends TestCase
 {
     @Test
     public void testParse() throws Exception
     {
-        String str = "<ns1:getStatusResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\">\n" + 
-        		"      <isMonitorFailed>false</isMonitorFailed>\n" + 
-        		"      <isInMaintenance>false</isInMaintenance>\n" + 
-        		"      <isInSession>true</isInSession>\n" + 
-        		"      <sessionUser>mdiponio</sessionUser>\n" + 
-        		"    </ns1:getStatusResponse>";
-        GetStatusResponse obj = GetStatusResponse.Factory.parse(
-                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
+        String xmlStr = "<ns1:releaseResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:OperationResponseType\">\n" + 
+                "            <success>false</success>\n" + 
+                "            <ns1:error>\n" + 
+                "               <code>3</code>\n" + 
+                "               <operation>Fail!</operation>\n" + 
+                "               <reason>Invalid permission.</reason>\n" + 
+                "            </ns1:error>" +
+                "         </ns1:releaseResponse>";
         
-        StatusResponseType resp = obj.getGetStatusResponse();
+        ReleaseResponse rel = ReleaseResponse.Factory.parse(
+                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(xmlStr.getBytes())));
+        OperationResponseType resp = rel.getReleaseResponse();
         assertNotNull(resp);
+        assertFalse(resp.getSuccess());
         
-        assertFalse(resp.getIsInMaintenance());
-        assertFalse(resp.getIsMonitorFailed());
-        assertNull(resp.getMaintenanceReason());
-        assertNull(resp.getMonitorReason());
-        assertTrue(resp.getIsInSession());
-        assertEquals("mdiponio", resp.getSessionUser());
-        assertEquals(null, resp.getSlaveUsers());
+        ErrorType err = resp.getError();
+        assertNotNull(err);
+        assertEquals(3, err.getCode());
+        assertEquals("Fail!", err.getOperation());
+        assertEquals("Invalid permission.", err.getReason());
     }
     
     @Test
-    public void testSerialize() throws Exception
+    public void testSerialise() throws Exception
     {
-        StatusResponseType st = new StatusResponseType();
-        st.setIsInMaintenance(true);
-        st.setIsInSession(false);
-        st.setIsMonitorFailed(true);
-        st.setMaintenanceReason("Tania broke it!");
-        st.setMonitorReason("Michael is feeling lazy!");
-        GetStatusResponse obj = new GetStatusResponse();
-        obj.setGetStatusResponse(st);
+        ReleaseResponse resp = new ReleaseResponse();
+        OperationResponseType op = new OperationResponseType();
+        op.setSuccess(true);
+        resp.setReleaseResponse(op);
         
-        OMElement ele = obj.getOMElement(GetStatusResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        String str = ele.toStringWithConsume();
-        assertTrue(str.contains("<monitorReason>Michael is feeling lazy!</monitorReason>"));
-        assertTrue(str.contains("<maintenanceReason>Tania broke it!</maintenanceReason>"));
-        assertTrue(str.contains("<isInMaintenance>true</isInMaintenance>"));
-        assertTrue(str.contains("<isMonitorFailed>true</isMonitorFailed>"));
-        assertTrue(str.contains("<isInSession>false</isInSession>"));
+        ErrorType err = new ErrorType();
+        err.setCode(3);
+        err.setOperation("Test.");
+        err.setReason("Invalid permission.");
+        err.setTrace("Trace.");
+        op.setError(err);
+        
+        OMElement ele = resp.getOMElement(ReleaseResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
+        String eleStr = ele.toStringWithConsume();
+        assertNotNull(eleStr);
+
+        assertTrue(eleStr.contains("<code>3</code>"));
+        assertTrue(eleStr.contains("<reason>Invalid permission.</reason>"));
+        assertTrue(eleStr.contains("<operation>Test.</operation>"));
+        assertTrue(eleStr.contains("<trace>Trace.</trace>"));
     }
 }

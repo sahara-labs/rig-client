@@ -37,11 +37,13 @@
  * @date 10th December 2009
  *
  * Changelog:
- * - 10/12/2009 - mdiponio - Initial file creation.
+ * - 17/12/2009 - mdiponio - Initial file creation.
  */
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests;
 
 import java.io.ByteArrayInputStream;
+
+import javax.xml.stream.XMLStreamReader;
 
 import junit.framework.TestCase;
 
@@ -50,56 +52,48 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.StAXUtils;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.StatusResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveUserType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser;
+
 
 /**
- * Tests the {@link GetStatusResponse} class.
+ * Tests the {@link SlaveUserType} class.
  */
-public class GetStatusResponseTester extends TestCase
+public class SlaveUserTypeTester extends TestCase
 {
     @Test
     public void testParse() throws Exception
     {
-        String str = "<ns1:getStatusResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\">\n" + 
-        		"      <isMonitorFailed>false</isMonitorFailed>\n" + 
-        		"      <isInMaintenance>false</isInMaintenance>\n" + 
-        		"      <isInSession>true</isInSession>\n" + 
-        		"      <sessionUser>mdiponio</sessionUser>\n" + 
-        		"    </ns1:getStatusResponse>";
-        GetStatusResponse obj = GetStatusResponse.Factory.parse(
-                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
-        
-        StatusResponseType resp = obj.getGetStatusResponse();
-        assertNotNull(resp);
-        
-        assertFalse(resp.getIsInMaintenance());
-        assertFalse(resp.getIsMonitorFailed());
-        assertNull(resp.getMaintenanceReason());
-        assertNull(resp.getMonitorReason());
-        assertTrue(resp.getIsInSession());
-        assertEquals("mdiponio", resp.getSessionUser());
-        assertEquals(null, resp.getSlaveUsers());
+        String xmlString = "<ns1:slaveAllocate xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:SlaveUserType\">\n" +
+                "            <identityToken>abc123</identityToken>\n" + 
+                "            <requestor>tmachet</requestor>\n" +
+                "            <user>mdiponio</user>\n" + 
+                "            <type>Passive</type>\n" +
+                "         </ns1:slaveAllocate>";
+        XMLStreamReader reader = StAXUtils.createXMLStreamReader(new ByteArrayInputStream(xmlString.getBytes()));
+        SlaveUserType user = SlaveUserType.Factory.parse(reader);
+        assertEquals("mdiponio", user.getUser());
+        assertEquals("tmachet", user.getRequestor());
+        assertEquals("abc123", user.getIdentityToken());
+        assertEquals(TypeSlaveUser.Passive, user.getType());
     }
     
     @Test
-    public void testSerialize() throws Exception
+    public void testSerialise() throws Exception
     {
-        StatusResponseType st = new StatusResponseType();
-        st.setIsInMaintenance(true);
-        st.setIsInSession(false);
-        st.setIsMonitorFailed(true);
-        st.setMaintenanceReason("Tania broke it!");
-        st.setMonitorReason("Michael is feeling lazy!");
-        GetStatusResponse obj = new GetStatusResponse();
-        obj.setGetStatusResponse(st);
+        SlaveUserType user = new SlaveUserType();
+        user.setIdentityToken("abc123");
+        user.setUser("mdiponio");
+        user.setType(TypeSlaveUser.Active);
         
-        OMElement ele = obj.getOMElement(GetStatusResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        String str = ele.toStringWithConsume();
-        assertTrue(str.contains("<monitorReason>Michael is feeling lazy!</monitorReason>"));
-        assertTrue(str.contains("<maintenanceReason>Tania broke it!</maintenanceReason>"));
-        assertTrue(str.contains("<isInMaintenance>true</isInMaintenance>"));
-        assertTrue(str.contains("<isMonitorFailed>true</isMonitorFailed>"));
-        assertTrue(str.contains("<isInSession>false</isInSession>"));
+        OMElement ele = user.getOMElement(Release.MY_QNAME, OMAbstractFactory.getOMFactory());
+        assertNotNull(ele);
+        String xml = ele.toStringWithConsume();
+        assertNotNull(xml);
+        assertFalse(xml.isEmpty());
+        assertTrue(xml.contains("<identityToken>abc123</identityToken>"));
+        assertTrue(xml.contains("<user>mdiponio</user>"));
+        assertTrue(xml.contains("<type>Active</type>"));
     }
 }

@@ -1,6 +1,6 @@
 /**
  * SAHARA Rig Client
- * 
+ *
  * Software abstraction of physical rig to provide rig session control
  * and rig device control. Automatically tests rig hardware and reports
  * the rig status to ensure rig goodness.
@@ -10,27 +10,27 @@
  * Copyright (c) 2009, University of Technology, Sydney
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- *  * Redistributions of source code must retain the above copyright notice, 
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in the 
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- *  * Neither the name of the University of Technology, Sydney nor the names 
- *    of its contributors may be used to endorse or promote products derived from 
+ *  * Neither the name of the University of Technology, Sydney nor the names
+ *    of its contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
@@ -81,23 +81,23 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
      */
 
     private static final long serialVersionUID = 6748991599014263029L;
-    
+
     protected int interval;
 
-    private static String generatePrefix(String namespace)
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
 
-    public static boolean isReaderMTOMAware(XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
         try
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
@@ -107,10 +107,10 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
     @Override
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-        OMDataSource dataSource = new ADBDataSource(this, parentQName)
+        final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
             @Override
-            public void serialize(MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 TestIntervalRequestType.this.serialize(this.parentQName, factory, xmlWriter);
             }
@@ -119,14 +119,14 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
     }
 
     @Override
-    public XMLStreamReader getPullParser(QName qName) throws ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
-        ArrayList<Serializable> elementList = new ArrayList<Serializable>();
-        ArrayList<QName> attribList = new ArrayList<QName>();
+        final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
+        final ArrayList<QName> attribList = new ArrayList<QName>();
 
         attribList.add(new QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
         attribList.add(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "TestIntervalRequestType"));
-        
+
         if (this.identityTokenTracker)
         {
             elementList.add(new QName("", "identityToken"));
@@ -139,7 +139,7 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
                 throw new ADBException("identityToken cannot be null!!");
             }
         }
-        
+
         if (this.requestorTracker)
         {
             elementList.add(new QName("", "requestor"));
@@ -153,14 +153,14 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
                 throw new ADBException("requestor cannot be null!!");
             }
         }
-        
+
         elementList.add(new QName("", "interval"));
         elementList.add(ConverterUtil.convertToString(this.interval));
 
         return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
     }
 
-    private String registerPrefix(XMLStreamWriter xmlWriter, String namespace) throws XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
@@ -178,21 +178,21 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
     }
 
     @Override
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter)
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
     @Override
-    public void serialize(final QName parentQName, final OMFactory factory, MTOMAwareXMLStreamWriter xmlWriter,
-            boolean serializeType) throws XMLStreamException, ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
         String prefix = parentQName.getPrefix();
         String namespace = parentQName.getNamespaceURI();
         if (namespace != null && namespace.trim().length() > 0)
         {
-            String writerPrefix = xmlWriter.getPrefix(namespace);
+            final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
             {
                 xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
@@ -213,7 +213,7 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
             xmlWriter.writeStartElement(parentQName.getLocalPart());
         }
 
-        String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
+        final String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
         if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
         {
             this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", namespacePrefix
@@ -258,7 +258,7 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
             }
             xmlWriter.writeEndElement();
         }
-        
+
         if (this.requestorTracker)
         {
             namespace = "";
@@ -292,7 +292,7 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
             }
             xmlWriter.writeEndElement();
         }
-        
+
         namespace = "";
         if (!namespace.equals(""))
         {
@@ -325,20 +325,20 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
         xmlWriter.writeEndElement();
         xmlWriter.writeEndElement();
     }
-    
+
     public int getInterval()
     {
         return this.interval;
     }
 
-    public void setInterval(int param)
+    public void setInterval(final int param)
     {
         this.interval = param;
     }
 
 
-    private void writeAttribute(String prefix, String namespace, String attName, String attValue,
-            XMLStreamWriter xmlWriter) throws XMLStreamException
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue,
+            final XMLStreamWriter xmlWriter) throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
         {
@@ -350,9 +350,9 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
 
     public static class Factory
     {
-        public static TestIntervalRequestType parse(XMLStreamReader reader) throws Exception
+        public static TestIntervalRequestType parse(final XMLStreamReader reader) throws Exception
         {
-            TestIntervalRequestType object = new TestIntervalRequestType();
+            final TestIntervalRequestType object = new TestIntervalRequestType();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
@@ -361,7 +361,7 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
                 }
                 if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
                 {
-                    String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
                     if (fullTypeName != null)
                     {
                         String nsPrefix = null;
@@ -371,12 +371,12 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
                         }
                         nsPrefix = nsPrefix == null ? "" : nsPrefix;
 
-                        String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+                        final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
 
                         if (!"TestIntervalRequestType".equals(type))
                         {
                             // find namespace for the prefix
-                            String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
                             return (TestIntervalRequestType) ExtensionMapper.getTypeObject(nsUri, type, reader);
                         }
                     }
@@ -390,11 +390,11 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
 
                 if (reader.isStartElement() && new QName("", "identityToken").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setIdentityToken(ConverterUtil.convertToString(content));
                     reader.next();
                 }
-                
+
                 while (!reader.isStartElement() && !reader.isEndElement())
                 {
                     reader.next();
@@ -402,7 +402,7 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
 
                 if (reader.isStartElement() && new QName("", "requestor").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setRequestor(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -414,7 +414,7 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
 
                 if (reader.isStartElement() && new QName("", "interval").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setInterval(ConverterUtil.convertToInt(content));
                     reader.next();
                 }
@@ -432,7 +432,7 @@ public class TestIntervalRequestType extends AuthRequiredRequestType implements 
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

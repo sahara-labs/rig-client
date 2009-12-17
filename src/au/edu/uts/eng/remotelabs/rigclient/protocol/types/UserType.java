@@ -1,6 +1,6 @@
 /**
  * SAHARA Rig Client
- * 
+ *
  * Software abstraction of physical rig to provide rig session control
  * and rig device control. Automatically tests rig hardware and reports
  * the rig status to ensure rig goodness.
@@ -10,27 +10,27 @@
  * Copyright (c) 2009, University of Technology, Sydney
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- *  * Redistributions of source code must retain the above copyright notice, 
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in the 
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- *  * Neither the name of the University of Technology, Sydney nor the names 
- *    of its contributors may be used to endorse or promote products derived from 
+ *  * Neither the name of the University of Technology, Sydney nor the names
+ *    of its contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
@@ -76,7 +76,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
 
     /** Serializable class. */
     private static final long serialVersionUID = 8325159414836793539L;
-    
+
     /** User. */
     protected String localUser;
 
@@ -84,7 +84,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
     {
         if ("http://remotelabs.eng.uts.edu.au/rigclient/protocol".equals(namespace)) return "ns1";
         return BeanUtil.getUniquePrefix();
-    } 
+    }
 
     /**
      * @param parentQName
@@ -121,7 +121,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
 
         attribList.add(new QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
         attribList.add(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "UserType"));
-        
+
         if (this.identityTokenTracker)
         {
             elementList.add(new QName("", "identityToken"));
@@ -134,7 +134,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
                 throw new ADBException("identityToken cannot be null.");
             }
         }
-        
+
         if (this.requestorTracker)
         {
             elementList.add(new QName("", "requestor"));
@@ -197,7 +197,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
 
     @Override
     public void serialize(final QName parentQName, final org.apache.axiom.om.OMFactory factory,
-            final org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter, 
+            final org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter,
             final boolean serializeType)
             throws XMLStreamException, ADBException
     {
@@ -278,7 +278,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
             }
             xmlWriter.writeEndElement();
         }
-        
+
         if (this.requestorTracker)
         {
             namespace = "";
@@ -312,7 +312,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
             }
             xmlWriter.writeEndElement();
         }
-        
+
         namespace = "";
         if (!namespace.equals(""))
         {
@@ -356,7 +356,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
     {
         this.localUser = param;
     }
-    
+
     /**
      * @return String user
      */
@@ -380,10 +380,10 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
 
         xmlWriter.writeAttribute(namespace, attName, attValue);
     }
-    
+
     /**
      * True if reader is MTOM aware.
-     * 
+     *
      * @return true if the reader supports MTOM
      */
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
@@ -394,13 +394,13 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
         return isReaderMTOMAware;
     }
-    
+
     /**
      * Factory class that contains a static parse method.
      */
@@ -409,12 +409,12 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
         /**
          * Parses an XML representation of the surrounding and generates an instance
          * of the surrounding class.
-         * 
+         *
          * @param reader stream containing an XML representation of this class
          * @return instance of surrounding class
          * @throws Exception XML representation is invalid
          */
-        public static UserType parse(XMLStreamReader reader) throws Exception
+        public static UserType parse(final XMLStreamReader reader) throws Exception
         {
             final UserType object = new UserType();
             try
@@ -501,7 +501,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
                 }
 
             }
-            catch (XMLStreamException e)
+            catch (final XMLStreamException e)
             {
                 throw new Exception(e);
             }

@@ -48,9 +48,12 @@ import javax.xml.stream.XMLStreamReader;
 
 import junit.framework.TestCase;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.StAXUtils;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType;
 
 /**
@@ -71,5 +74,21 @@ public class UserTypeTester extends TestCase
         assertEquals("mdiponio", user.getUser());
         assertEquals("tmachet", user.getRequestor());
         assertEquals("abc123", user.getIdentityToken());
+    }
+    
+    @Test
+    public void testSerialise() throws Exception
+    {
+        UserType user = new UserType();
+        user.setIdentityToken("abc123");
+        user.setUser("mdiponio");
+        
+        OMElement ele = user.getOMElement(Release.MY_QNAME, OMAbstractFactory.getOMFactory());
+        assertNotNull(ele);
+        String xml = ele.toStringWithConsume();
+        assertNotNull(xml);
+        assertFalse(xml.isEmpty());
+        assertTrue(xml.contains("<identityToken>abc123</identityToken>"));
+        assertTrue(xml.contains("<user>mdiponio</user>"));
     }
 }

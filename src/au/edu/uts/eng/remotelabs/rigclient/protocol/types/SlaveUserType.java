@@ -1,16 +1,77 @@
 /**
+ * SAHARA Rig Client
+ *
+ * Software abstraction of physical rig to provide rig session control
+ * and rig device control. Automatically tests rig hardware and reports
+ * the rig status to ensure rig goodness.
+ *
+ * @license See LICENSE in the top level directory for complete license terms.
+ *
+ * Copyright (c) 2009, University of Technology, Sydney
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of the University of Technology, Sydney nor the names
+ *    of its contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @author Michael Diponio (mdiponio)
+ * @date 8th December 2009
+ *
+ * Changelog:
+ * - 08/12/2009 - mdiponio - Initial file creation.
+ */
+
+
+/**
  * SlaveUserType.java This file was auto-generated from WSDL by the Apache Axis2
  * version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
  */
 
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types;
 
-/**
- * SlaveUserType bean class
- */
+import java.io.Serializable;
 
-public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType implements
-        org.apache.axis2.databinding.ADBBean
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.axiom.om.OMConstants;
+import org.apache.axiom.om.OMDataSource;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
+import org.apache.axis2.databinding.ADBBean;
+import org.apache.axis2.databinding.ADBDataSource;
+import org.apache.axis2.databinding.ADBException;
+import org.apache.axis2.databinding.utils.BeanUtil;
+import org.apache.axis2.databinding.utils.ConverterUtil;
+import org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl;
+import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
+
+/**
+ * SlaveUserType bean class.
+ */
+public class SlaveUserType extends UserType implements ADBBean
 {
     /*
      * This type was generated from the piece of schema that had name =
@@ -19,346 +80,140 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
      * ns1
      */
 
-    /**
-     * Factory class that keeps the parse method
-     */
-    public static class Factory
-    {
-
-        /**
-         * static method to create the object Precondition: If this object is an
-         * element, the current or next start element starts this object and any
-         * intervening reader events are ignorable If this object is not an
-         * element, it is a complex type and the reader is at the event just
-         * after the outer start element Postcondition: If this object is an
-         * element, the reader is positioned at its end element If this object
-         * is a complex type, the reader is positioned at the end element of its
-         * outer element
-         */
-        public static SlaveUserType parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception
-        {
-            SlaveUserType object = new SlaveUserType();
-
-            try
-            {
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
-                {
-                    java.lang.String fullTypeName = reader.getAttributeValue(
-                            "http://www.w3.org/2001/XMLSchema-instance", "type");
-                    if (fullTypeName != null)
-                    {
-                        java.lang.String nsPrefix = null;
-                        if (fullTypeName.indexOf(":") > -1)
-                        {
-                            nsPrefix = fullTypeName.substring(0, fullTypeName.indexOf(":"));
-                        }
-                        nsPrefix = nsPrefix == null ? "" : nsPrefix;
-
-                        java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
-
-                        if (!"SlaveUserType".equals(type))
-                        {
-                            // find namespace for the prefix
-                            java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                            return (SlaveUserType) au.edu.uts.eng.remotelabs.rigclient.protocol.types.ExtensionMapper
-                                    .getTypeObject(nsUri, type, reader);
-                        }
-
-                    }
-
-                }
-
-                new java.util.Vector();
-
-                reader.next();
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement()
-                        && new javax.xml.namespace.QName("", "identityToken").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setIdentityToken(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-
-                else
-                {
-
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement() && new javax.xml.namespace.QName("", "requestor").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setRequestor(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-
-                else
-                {
-
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement() && new javax.xml.namespace.QName("", "user").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setUser(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-                else
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement() && new javax.xml.namespace.QName("", "type").equals(reader.getName()))
-                {
-
-                    object.setType(au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser.Factory
-                            .parse(reader));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-                else
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement())
-                // A start element we are not expecting indicates a trailing
-                    // invalid property
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
-
-            }
-            catch (javax.xml.stream.XMLStreamException e)
-            {
-                throw new java.lang.Exception(e);
-            }
-
-            return object;
-        }
-
-    }// end of factory class
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 2299250930833355437L;
 
-    private static java.lang.String generatePrefix(java.lang.String namespace)
+    protected TypeSlaveUser type;
+
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
-        return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        return BeanUtil.getUniquePrefix();
     }
 
-    /**
-     * isReaderMTOMAware
-     * 
-     * @return true if the reader supports MTOM
-     */
-    public static boolean isReaderMTOMAware(javax.xml.stream.XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
 
         try
         {
-            isReaderMTOMAware = java.lang.Boolean.TRUE.equals(reader
-                    .getProperty(org.apache.axiom.om.OMConstants.IS_DATA_HANDLERS_AWARE));
+            isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (java.lang.IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
         return isReaderMTOMAware;
     }
 
-    /**
-     * field for Type
-     */
-
-    protected au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser localType;
-
-    /**
-     * @param parentQName
-     * @param factory
-     * @return org.apache.axiom.om.OMElement
-     */
     @Override
-    public org.apache.axiom.om.OMElement getOMElement(final javax.xml.namespace.QName parentQName,
-            final org.apache.axiom.om.OMFactory factory) throws org.apache.axis2.databinding.ADBException
+    public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
 
-        org.apache.axiom.om.OMDataSource dataSource = new org.apache.axis2.databinding.ADBDataSource(this, parentQName)
+        final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
 
             @Override
-            public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
-                    throws javax.xml.stream.XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 SlaveUserType.this.serialize(this.parentQName, factory, xmlWriter);
             }
         };
-        return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(parentQName, factory, dataSource);
-
+        return new OMSourcedElementImpl(parentQName, factory, dataSource);
     }
 
-    /**
-     * databinding method to get an XML representation of this object
-     */
     @Override
-    public javax.xml.stream.XMLStreamReader getPullParser(javax.xml.namespace.QName qName)
-            throws org.apache.axis2.databinding.ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
+        final java.util.ArrayList<Serializable> elementList = new java.util.ArrayList<Serializable>();
+        final java.util.ArrayList<QName> attribList = new java.util.ArrayList<QName>();
 
-        java.util.ArrayList elementList = new java.util.ArrayList();
-        java.util.ArrayList attribList = new java.util.ArrayList();
+        attribList.add(new QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
+        attribList.add(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "SlaveUserType"));
 
-        attribList.add(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
-        attribList.add(new javax.xml.namespace.QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
-                "SlaveUserType"));
         if (this.identityTokenTracker)
         {
-            elementList.add(new javax.xml.namespace.QName("", "identityToken"));
-
+            elementList.add(new QName("", "identityToken"));
             if (this.identityToken != null)
             {
-                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil
-                        .convertToString(this.identityToken));
+                elementList.add(ConverterUtil.convertToString(this.identityToken));
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("identityToken cannot be null!!");
+            {
+                throw new ADBException("identityToken cannot be null");
+            }
         }
+
         if (this.requestorTracker)
         {
-            elementList.add(new javax.xml.namespace.QName("", "requestor"));
-
+            elementList.add(new QName("", "requestor"));
             if (this.requestor != null)
             {
-                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.requestor));
+                elementList.add(ConverterUtil.convertToString(this.requestor));
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("requestor cannot be null!!");
+            {
+                throw new ADBException("requestor cannot be null");
+            }
         }
-        elementList.add(new javax.xml.namespace.QName("", "user"));
 
+        elementList.add(new QName("", "user"));
         if (this.localUser != null)
         {
-            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localUser));
+            elementList.add(ConverterUtil.convertToString(this.localUser));
         }
         else
-            throw new org.apache.axis2.databinding.ADBException("user cannot be null!!");
+        {
+            throw new ADBException("user cannot be null");
+        }
 
-        elementList.add(new javax.xml.namespace.QName("", "type"));
+        elementList.add(new QName("", "type"));
+        if (this.type == null)
+        {
+            throw new ADBException("type cannot be null");
+        }
+        elementList.add(this.type);
 
-        if (this.localType == null) throw new org.apache.axis2.databinding.ADBException("type cannot be null!!");
-        elementList.add(this.localType);
-
-        return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(),
-                attribList.toArray());
-
+        return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser
-     */
-    public au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser getType()
+    public TypeSlaveUser getType()
     {
-        return this.localType;
+        return this.type;
     }
 
-    /**
-     * Register a namespace prefix
-     */
-    private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace)
-            throws javax.xml.stream.XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
-        java.lang.String prefix = xmlWriter.getPrefix(namespace);
-
+        String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
         {
             prefix = SlaveUserType.generatePrefix(namespace);
-
             while (xmlWriter.getNamespaceContext().getNamespaceURI(prefix) != null)
             {
-                prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+                prefix = BeanUtil.getUniquePrefix();
             }
-
             xmlWriter.writeNamespace(prefix, namespace);
             xmlWriter.setPrefix(prefix, namespace);
         }
-
         return prefix;
     }
 
     @Override
-    public void serialize(final javax.xml.namespace.QName parentQName, final org.apache.axiom.om.OMFactory factory,
-            org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
-            throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
+            throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
     @Override
-    public void serialize(final javax.xml.namespace.QName parentQName, final org.apache.axiom.om.OMFactory factory,
-            org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter, boolean serializeType)
-            throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
 
-        java.lang.String prefix = null;
-        java.lang.String namespace = null;
-
-        prefix = parentQName.getPrefix();
-        namespace = parentQName.getNamespaceURI();
-
+        String prefix = parentQName.getPrefix();
+        String namespace = parentQName.getNamespaceURI();
         if (namespace != null && namespace.trim().length() > 0)
         {
-            java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
+            final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
             {
                 xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
@@ -369,7 +224,6 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
                 {
                     prefix = SlaveUserType.generatePrefix(namespace);
                 }
-
                 xmlWriter.writeStartElement(prefix, parentQName.getLocalPart(), namespace);
                 xmlWriter.writeNamespace(prefix, namespace);
                 xmlWriter.setPrefix(prefix, namespace);
@@ -380,8 +234,7 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
             xmlWriter.writeStartElement(parentQName.getLocalPart());
         }
 
-        java.lang.String namespacePrefix = this.registerPrefix(xmlWriter,
-                "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
+        final String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
         if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
         {
             this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", namespacePrefix
@@ -406,13 +259,11 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
                     xmlWriter.writeStartElement(prefix, "identityToken", namespace);
                     xmlWriter.writeNamespace(prefix, namespace);
                     xmlWriter.setPrefix(prefix, namespace);
-
                 }
                 else
                 {
                     xmlWriter.writeStartElement(namespace, "identityToken");
                 }
-
             }
             else
             {
@@ -420,37 +271,33 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
             }
 
             if (this.identityToken == null)
-                throw new org.apache.axis2.databinding.ADBException("identityToken cannot be null!!");
+            {
+                throw new ADBException("identityToken cannot be null");
+            }
             else
             {
-
                 xmlWriter.writeCharacters(this.identityToken);
-
             }
-
             xmlWriter.writeEndElement();
         }
+
         if (this.requestorTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
             {
                 prefix = xmlWriter.getPrefix(namespace);
-
                 if (prefix == null)
                 {
                     prefix = SlaveUserType.generatePrefix(namespace);
-
                     xmlWriter.writeStartElement(prefix, "requestor", namespace);
                     xmlWriter.writeNamespace(prefix, namespace);
                     xmlWriter.setPrefix(prefix, namespace);
-
                 }
                 else
                 {
                     xmlWriter.writeStartElement(namespace, "requestor");
                 }
-
             }
             else
             {
@@ -458,35 +305,31 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
             }
 
             if (this.requestor == null)
-                throw new org.apache.axis2.databinding.ADBException("requestor cannot be null!!");
+            {
+                throw new ADBException("requestor cannot be null");
+            }
             else
             {
-
                 xmlWriter.writeCharacters(this.requestor);
-
             }
-
             xmlWriter.writeEndElement();
         }
+
         namespace = "";
         if (!namespace.equals(""))
         {
             prefix = xmlWriter.getPrefix(namespace);
-
             if (prefix == null)
             {
                 prefix = SlaveUserType.generatePrefix(namespace);
-
                 xmlWriter.writeStartElement(prefix, "user", namespace);
                 xmlWriter.writeNamespace(prefix, namespace);
                 xmlWriter.setPrefix(prefix, namespace);
-
             }
             else
             {
                 xmlWriter.writeStartElement(namespace, "user");
             }
-
         }
         else
         {
@@ -494,51 +337,140 @@ public class SlaveUserType extends au.edu.uts.eng.remotelabs.rigclient.protocol.
         }
 
         if (this.localUser == null)
-            throw new org.apache.axis2.databinding.ADBException("user cannot be null!!");
+        {
+            throw new ADBException("user cannot be null");
+        }
         else
         {
-
             xmlWriter.writeCharacters(this.localUser);
-
         }
-
         xmlWriter.writeEndElement();
 
-        if (this.localType == null) throw new org.apache.axis2.databinding.ADBException("type cannot be null!!");
-        this.localType.serialize(new javax.xml.namespace.QName("", "type"), factory, xmlWriter);
-
+        if (this.type == null)
+        {
+            throw new ADBException("type cannot be null");
+        }
+        this.type.serialize(new QName("", "type"), factory, xmlWriter);
         xmlWriter.writeEndElement();
-
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param Type
-     */
-    public void setType(au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser param)
+    public void setType(final TypeSlaveUser param)
     {
-
-        this.localType = param;
-
+        this.type = param;
     }
 
-    /**
-     * Util method to write an attribute with the ns prefix
-     */
-    private void writeAttribute(java.lang.String prefix, java.lang.String namespace, java.lang.String attName,
-            java.lang.String attValue, javax.xml.stream.XMLStreamWriter xmlWriter)
-            throws javax.xml.stream.XMLStreamException
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue,
+            final XMLStreamWriter xmlWriter) throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
         {
             xmlWriter.writeNamespace(prefix, namespace);
             xmlWriter.setPrefix(prefix, namespace);
-
         }
-
         xmlWriter.writeAttribute(namespace, attName, attValue);
-
     }
 
+    public static class Factory
+    {
+        public static SlaveUserType parse(final XMLStreamReader reader) throws Exception
+        {
+            final SlaveUserType object = new SlaveUserType();
+            try
+            {
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
+                {
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    if (fullTypeName != null)
+                    {
+                        String nsPrefix = null;
+                        if (fullTypeName.indexOf(":") > -1)
+                        {
+                            nsPrefix = fullTypeName.substring(0, fullTypeName.indexOf(":"));
+                        }
+                        nsPrefix = nsPrefix == null ? "" : nsPrefix;
+
+                        final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+
+                        if (!"SlaveUserType".equals(type))
+                        {
+                            // find namespace for the prefix
+                            final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            return (SlaveUserType) ExtensionMapper.getTypeObject(nsUri, type, reader);
+                        }
+                    }
+                }
+
+                reader.next();
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "identityToken").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setIdentityToken(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "requestor").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setRequestor(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "user").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setUser(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+                else
+                {
+                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "type").equals(reader.getName()))
+                {
+                    object.setType(TypeSlaveUser.Factory.parse(reader));
+                    reader.next();
+                }
+                else
+                {
+                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement())
+                {
+                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+            }
+            catch (final XMLStreamException e)
+            {
+                throw new Exception(e);
+            }
+            return object;
+        }
+    }
 }

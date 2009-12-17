@@ -1,15 +1,79 @@
 /**
+ * SAHARA Rig Client
+ *
+ * Software abstraction of physical rig to provide rig session control
+ * and rig device control. Automatically tests rig hardware and reports
+ * the rig status to ensure rig goodness.
+ *
+ * @license See LICENSE in the top level directory for complete license terms.
+ *
+ * Copyright (c) 2009, University of Technology, Sydney
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of the University of Technology, Sydney nor the names
+ *    of its contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @author Michael Diponio (mdiponio)
+ * @date 8th December 2009
+ *
+ * Changelog:
+ * - 08/12/2009 - mdiponio - Initial file creation.
+ */
+
+/**
  * StatusResponseType.java This file was auto-generated from WSDL by the Apache
  * Axis2 version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
  */
 
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.axiom.om.OMConstants;
+import org.apache.axiom.om.OMDataSource;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
+import org.apache.axis2.databinding.ADBBean;
+import org.apache.axis2.databinding.ADBDataSource;
+import org.apache.axis2.databinding.ADBException;
+import org.apache.axis2.databinding.utils.BeanUtil;
+import org.apache.axis2.databinding.utils.ConverterUtil;
+import org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl;
+import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
+
 /**
  * StatusResponseType bean class
  */
 
-public class StatusResponseType implements org.apache.axis2.databinding.ADBBean
+public class StatusResponseType implements ADBBean
 {
     /*
      * This type was generated from the piece of schema that had name =
@@ -18,636 +82,214 @@ public class StatusResponseType implements org.apache.axis2.databinding.ADBBean
      * ns1
      */
 
-    /**
-     * Factory class that keeps the parse method
-     */
-    public static class Factory
-    {
-
-        /**
-         * static method to create the object Precondition: If this object is an
-         * element, the current or next start element starts this object and any
-         * intervening reader events are ignorable If this object is not an
-         * element, it is a complex type and the reader is at the event just
-         * after the outer start element Postcondition: If this object is an
-         * element, the reader is positioned at its end element If this object
-         * is a complex type, the reader is positioned at the end element of its
-         * outer element
-         */
-        public static StatusResponseType parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception
-        {
-            StatusResponseType object = new StatusResponseType();
-
-            int event;
-            java.lang.String nillableValue = null;
-            java.lang.String prefix = "";
-            java.lang.String namespaceuri = "";
-            try
-            {
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
-                {
-                    java.lang.String fullTypeName = reader.getAttributeValue(
-                            "http://www.w3.org/2001/XMLSchema-instance", "type");
-                    if (fullTypeName != null)
-                    {
-                        java.lang.String nsPrefix = null;
-                        if (fullTypeName.indexOf(":") > -1)
-                        {
-                            nsPrefix = fullTypeName.substring(0, fullTypeName.indexOf(":"));
-                        }
-                        nsPrefix = nsPrefix == null ? "" : nsPrefix;
-
-                        java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
-
-                        if (!"StatusResponseType".equals(type))
-                        {
-                            // find namespace for the prefix
-                            java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                            return (StatusResponseType) au.edu.uts.eng.remotelabs.rigclient.protocol.types.ExtensionMapper
-                                    .getTypeObject(nsUri, type, reader);
-                        }
-
-                    }
-
-                }
-
-                // Note all attributes that were handled. Used to differ normal
-                // attributes
-                // from anyAttributes.
-                java.util.Vector handledAttributes = new java.util.Vector();
-
-                reader.next();
-
-                java.util.ArrayList list7 = new java.util.ArrayList();
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement()
-                        && new javax.xml.namespace.QName("", "isMonitorFailed").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setIsMonitorFailed(org.apache.axis2.databinding.utils.ConverterUtil
-                            .convertToBoolean(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-                else
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement()
-                        && new javax.xml.namespace.QName("", "monitorReason").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setMonitorReason(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-
-                else
-                {
-
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement()
-                        && new javax.xml.namespace.QName("", "isInMaintenance").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setIsInMaintenance(org.apache.axis2.databinding.utils.ConverterUtil
-                            .convertToBoolean(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-                else
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement()
-                        && new javax.xml.namespace.QName("", "maintenanceReason").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setMaintenanceReason(org.apache.axis2.databinding.utils.ConverterUtil
-                            .convertToString(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-
-                else
-                {
-
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement()
-                        && new javax.xml.namespace.QName("", "isInSession").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setIsInSession(org.apache.axis2.databinding.utils.ConverterUtil.convertToBoolean(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-                else
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement()
-                        && new javax.xml.namespace.QName("", "sessionUser").equals(reader.getName()))
-                {
-
-                    java.lang.String content = reader.getElementText();
-
-                    object.setSessionUser(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-
-                    reader.next();
-
-                } // End of if for expected property start element
-
-                else
-                {
-
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement() && new javax.xml.namespace.QName("", "slaveUsers").equals(reader.getName()))
-                {
-
-                    // Process the array and step past its final element's end.
-                    list7.add(reader.getElementText());
-
-                    // loop until we find a start element that is not part of
-                    // this array
-                    boolean loopDone7 = false;
-                    while (!loopDone7)
-                    {
-                        // Ensure we are at the EndElement
-                        while (!reader.isEndElement())
-                        {
-                            reader.next();
-                        }
-                        // Step out of this element
-                        reader.next();
-                        // Step to next element event.
-                        while (!reader.isStartElement() && !reader.isEndElement())
-                        {
-                            reader.next();
-                        }
-                        if (reader.isEndElement())
-                        {
-                            // two continuous end elements means we are exiting
-                            // the xml structure
-                            loopDone7 = true;
-                        }
-                        else
-                        {
-                            if (new javax.xml.namespace.QName("", "slaveUsers").equals(reader.getName()))
-                            {
-                                list7.add(reader.getElementText());
-
-                            }
-                            else
-                            {
-                                loopDone7 = true;
-                            }
-                        }
-                    }
-                    // call the converter utility to convert and set the array
-
-                    object.setSlaveUsers((java.lang.String[]) list7.toArray(new java.lang.String[list7.size()]));
-
-                } // End of if for expected property start element
-
-                else
-                {
-
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement())
-                // A start element we are not expecting indicates a trailing
-                    // invalid property
-                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement "
-                            + reader.getLocalName());
-
-            }
-            catch (javax.xml.stream.XMLStreamException e)
-            {
-                throw new java.lang.Exception(e);
-            }
-
-            return object;
-        }
-
-    }// end of factory class
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 6597119032817306694L;
 
-    private static java.lang.String generatePrefix(java.lang.String namespace)
+    protected boolean isMonitorFailed;
+
+    protected String monitorReason;
+    protected boolean monitorReasonTracker = false;
+
+    protected boolean isInMaintenance;
+
+    protected String maintenanceReason;
+    protected boolean maintenanceReasonTracker = false;
+
+    protected boolean isInSession;
+
+    protected String sessionUser;
+    protected boolean sessionUserTracker = false;
+
+    protected String[] slaveUsers;
+    protected boolean slaveUsersTracker = false;
+
+    private static String generatePrefix(final String namespace)
     {
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
-        return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        return BeanUtil.getUniquePrefix();
     }
 
-    /**
-     * isReaderMTOMAware
-     * 
-     * @return true if the reader supports MTOM
-     */
-    public static boolean isReaderMTOMAware(javax.xml.stream.XMLStreamReader reader)
+    public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
-
         try
         {
-            isReaderMTOMAware = java.lang.Boolean.TRUE.equals(reader
-                    .getProperty(org.apache.axiom.om.OMConstants.IS_DATA_HANDLERS_AWARE));
+            isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
         }
-        catch (java.lang.IllegalArgumentException e)
+        catch (final IllegalArgumentException e)
         {
             isReaderMTOMAware = false;
         }
         return isReaderMTOMAware;
     }
 
-    /**
-     * field for IsMonitorFailed
-     */
-
-    protected boolean localIsMonitorFailed;
-
-    /**
-     * field for MonitorReason
-     */
-
-    protected java.lang.String localMonitorReason;
-
-    /*
-     * This tracker boolean wil be used to detect whether the user called the
-     * set method for this attribute. It will be used to determine whether to
-     * include this field in the serialized XML
-     */
-    protected boolean localMonitorReasonTracker = false;
-
-    /**
-     * field for IsInMaintenance
-     */
-
-    protected boolean localIsInMaintenance;
-
-    /**
-     * field for MaintenanceReason
-     */
-
-    protected java.lang.String localMaintenanceReason;
-
-    /*
-     * This tracker boolean wil be used to detect whether the user called the
-     * set method for this attribute. It will be used to determine whether to
-     * include this field in the serialized XML
-     */
-    protected boolean localMaintenanceReasonTracker = false;
-
-    /**
-     * field for IsInSession
-     */
-
-    protected boolean localIsInSession;
-
-    /**
-     * field for SessionUser
-     */
-
-    protected java.lang.String localSessionUser;
-
-    /*
-     * This tracker boolean wil be used to detect whether the user called the
-     * set method for this attribute. It will be used to determine whether to
-     * include this field in the serialized XML
-     */
-    protected boolean localSessionUserTracker = false;
-
-    /**
-     * field for SlaveUsers This was an Array!
-     */
-
-    protected java.lang.String[] localSlaveUsers;
-
-    /*
-     * This tracker boolean wil be used to detect whether the user called the
-     * set method for this attribute. It will be used to determine whether to
-     * include this field in the serialized XML
-     */
-    protected boolean localSlaveUsersTracker = false;
-
-    /**
-     * Auto generated add method for the array for convenience
-     * 
-     * @param param java.lang.String
-     */
-    public void addSlaveUsers(java.lang.String param)
+    @SuppressWarnings("unchecked")
+    public void addSlaveUsers(final String param)
     {
-        if (this.localSlaveUsers == null)
+        if (this.slaveUsers == null)
         {
-            this.localSlaveUsers = new java.lang.String[] {};
+            this.slaveUsers = new String[] {};
         }
 
         // update the setting tracker
-        this.localSlaveUsersTracker = true;
-
-        java.util.List list = org.apache.axis2.databinding.utils.ConverterUtil.toList(this.localSlaveUsers);
+        this.slaveUsersTracker = true;
+        final List<String> list = ConverterUtil.toList(this.slaveUsers);
         list.add(param);
-        this.localSlaveUsers = (java.lang.String[]) list.toArray(new java.lang.String[list.size()]);
-
+        this.slaveUsers = list.toArray(new String[list.size()]);
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return boolean
-     */
     public boolean getIsInMaintenance()
     {
-        return this.localIsInMaintenance;
+        return this.isInMaintenance;
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return boolean
-     */
     public boolean getIsInSession()
     {
-        return this.localIsInSession;
+        return this.isInSession;
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return boolean
-     */
     public boolean getIsMonitorFailed()
     {
-        return this.localIsMonitorFailed;
+        return this.isMonitorFailed;
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return java.lang.String
-     */
-    public java.lang.String getMaintenanceReason()
+    public String getMaintenanceReason()
     {
-        return this.localMaintenanceReason;
+        return this.maintenanceReason;
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return java.lang.String
-     */
-    public java.lang.String getMonitorReason()
+    public String getMonitorReason()
     {
-        return this.localMonitorReason;
+        return this.monitorReason;
     }
 
-    /**
-     * @param parentQName
-     * @param factory
-     * @return org.apache.axiom.om.OMElement
-     */
-    public org.apache.axiom.om.OMElement getOMElement(final javax.xml.namespace.QName parentQName,
-            final org.apache.axiom.om.OMFactory factory) throws org.apache.axis2.databinding.ADBException
+    public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-
-        org.apache.axiom.om.OMDataSource dataSource = new org.apache.axis2.databinding.ADBDataSource(this, parentQName)
+        final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
-
-            public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
-                    throws javax.xml.stream.XMLStreamException
+            public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 StatusResponseType.this.serialize(this.parentQName, factory, xmlWriter);
             }
         };
-        return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(parentQName, factory, dataSource);
-
+        return new OMSourcedElementImpl(parentQName, factory, dataSource);
     }
 
-    /**
-     * databinding method to get an XML representation of this object
-     */
-    public javax.xml.stream.XMLStreamReader getPullParser(javax.xml.namespace.QName qName)
-            throws org.apache.axis2.databinding.ADBException
+    public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
 
-        java.util.ArrayList elementList = new java.util.ArrayList();
-        java.util.ArrayList attribList = new java.util.ArrayList();
+        final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
+        final ArrayList<QName> attribList = new ArrayList<QName>();
 
-        elementList.add(new javax.xml.namespace.QName("", "isMonitorFailed"));
+        elementList.add(new QName("", "isMonitorFailed"));
+        elementList.add(ConverterUtil.convertToString(this.isMonitorFailed));
 
-        elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localIsMonitorFailed));
-        if (this.localMonitorReasonTracker)
+        if (this.monitorReasonTracker)
         {
-            elementList.add(new javax.xml.namespace.QName("", "monitorReason"));
-
-            if (this.localMonitorReason != null)
+            elementList.add(new QName("", "monitorReason"));
+            if (this.monitorReason != null)
             {
-                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil
-                        .convertToString(this.localMonitorReason));
+                elementList.add(ConverterUtil.convertToString(this.monitorReason));
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("monitorReason cannot be null!!");
-        }
-        elementList.add(new javax.xml.namespace.QName("", "isInMaintenance"));
-
-        elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localIsInMaintenance));
-        if (this.localMaintenanceReasonTracker)
-        {
-            elementList.add(new javax.xml.namespace.QName("", "maintenanceReason"));
-
-            if (this.localMaintenanceReason != null)
             {
-                elementList.add(org.apache.axis2.databinding.utils.ConverterUtil
-                        .convertToString(this.localMaintenanceReason));
+                throw new ADBException("monitorReason cannot be null!!");
+            }
+        }
+
+        elementList.add(new QName("", "isInMaintenance"));
+        elementList.add(ConverterUtil.convertToString(this.isInMaintenance));
+
+        if (this.maintenanceReasonTracker)
+        {
+            elementList.add(new QName("", "maintenanceReason"));
+            if (this.maintenanceReason != null)
+            {
+                elementList.add(ConverterUtil.convertToString(this.maintenanceReason));
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("maintenanceReason cannot be null!!");
-        }
-        elementList.add(new javax.xml.namespace.QName("", "isInSession"));
-
-        elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localIsInSession));
-        if (this.localSessionUserTracker)
-        {
-            elementList.add(new javax.xml.namespace.QName("", "sessionUser"));
-
-            if (this.localSessionUser != null)
             {
-                elementList
-                        .add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(this.localSessionUser));
+                throw new ADBException("maintenanceReason cannot be null!!");
+            }
+        }
+
+        elementList.add(new QName("", "isInSession"));
+        elementList.add(ConverterUtil.convertToString(this.isInSession));
+
+        if (this.sessionUserTracker)
+        {
+            elementList.add(new QName("", "sessionUser"));
+            if (this.sessionUser != null)
+            {
+                elementList.add(ConverterUtil.convertToString(this.sessionUser));
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("sessionUser cannot be null!!");
-        }
-        if (this.localSlaveUsersTracker)
-        {
-            if (this.localSlaveUsers != null)
             {
-                for (String localSlaveUser : this.localSlaveUsers)
+                throw new ADBException("sessionUser cannot be null!!");
+            }
+        }
+
+        if (this.slaveUsersTracker)
+        {
+            if (this.slaveUsers != null)
+            {
+                for (final String localSlaveUser : this.slaveUsers)
                 {
-
                     if (localSlaveUser != null)
                     {
-                        elementList.add(new javax.xml.namespace.QName("", "slaveUsers"));
-                        elementList.add(org.apache.axis2.databinding.utils.ConverterUtil
-                                .convertToString(localSlaveUser));
+                        elementList.add(new QName("", "slaveUsers"));
+                        elementList.add(ConverterUtil.convertToString(localSlaveUser));
                     }
-                    else
-                    {
-
-                        // have to do nothing
-
-                    }
-
                 }
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("slaveUsers cannot be null!!");
-
+            {
+                throw new ADBException("slaveUsers cannot be null!!");
+            }
         }
-
-        return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(),
-                attribList.toArray());
-
+        return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return java.lang.String
-     */
-    public java.lang.String getSessionUser()
+    public String getSessionUser()
     {
-        return this.localSessionUser;
+        return this.sessionUser;
     }
 
-    /**
-     * Auto generated getter method
-     * 
-     * @return java.lang.String[]
-     */
-    public java.lang.String[] getSlaveUsers()
+    public String[] getSlaveUsers()
     {
-        return this.localSlaveUsers;
+        return this.slaveUsers;
     }
 
-    /**
-     * Register a namespace prefix
-     */
-    private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace)
-            throws javax.xml.stream.XMLStreamException
+    private String registerPrefix(final XMLStreamWriter xmlWriter, final String namespace) throws XMLStreamException
     {
-        java.lang.String prefix = xmlWriter.getPrefix(namespace);
-
+        String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
         {
             prefix = StatusResponseType.generatePrefix(namespace);
-
             while (xmlWriter.getNamespaceContext().getNamespaceURI(prefix) != null)
             {
-                prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+                prefix = BeanUtil.getUniquePrefix();
             }
-
             xmlWriter.writeNamespace(prefix, namespace);
             xmlWriter.setPrefix(prefix, namespace);
         }
-
         return prefix;
     }
 
-    public void serialize(final javax.xml.namespace.QName parentQName, final org.apache.axiom.om.OMFactory factory,
-            org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
-            throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
+            throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
-    public void serialize(final javax.xml.namespace.QName parentQName, final org.apache.axiom.om.OMFactory factory,
-            org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter, boolean serializeType)
-            throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException
+    public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
+            final boolean serializeType) throws XMLStreamException, ADBException
     {
-
-        java.lang.String prefix = null;
-        java.lang.String namespace = null;
-
-        prefix = parentQName.getPrefix();
-        namespace = parentQName.getNamespaceURI();
+        String prefix = parentQName.getPrefix();
+        String namespace = parentQName.getNamespaceURI();
 
         if (namespace != null && namespace.trim().length() > 0)
         {
-            java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
+            final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
             {
                 xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
@@ -671,8 +313,7 @@ public class StatusResponseType implements org.apache.axis2.databinding.ADBBean
 
         if (serializeType)
         {
-
-            java.lang.String namespacePrefix = this.registerPrefix(xmlWriter,
+            final String namespacePrefix = this.registerPrefix(xmlWriter,
                     "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
             if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
             {
@@ -684,14 +325,12 @@ public class StatusResponseType implements org.apache.axis2.databinding.ADBBean
                 this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", "StatusResponseType",
                         xmlWriter);
             }
-
         }
 
         namespace = "";
         if (!namespace.equals(""))
         {
             prefix = xmlWriter.getPrefix(namespace);
-
             if (prefix == null)
             {
                 prefix = StatusResponseType.generatePrefix(namespace);
@@ -699,29 +338,21 @@ public class StatusResponseType implements org.apache.axis2.databinding.ADBBean
                 xmlWriter.writeStartElement(prefix, "isMonitorFailed", namespace);
                 xmlWriter.writeNamespace(prefix, namespace);
                 xmlWriter.setPrefix(prefix, namespace);
-
             }
             else
             {
                 xmlWriter.writeStartElement(namespace, "isMonitorFailed");
             }
-
         }
         else
         {
             xmlWriter.writeStartElement("isMonitorFailed");
         }
 
-        if (false)
-            throw new org.apache.axis2.databinding.ADBException("isMonitorFailed cannot be null!!");
-        else
-        {
-            xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil
-                    .convertToString(this.localIsMonitorFailed));
-        }
-
+        xmlWriter.writeCharacters(ConverterUtil.convertToString(this.isMonitorFailed));
         xmlWriter.writeEndElement();
-        if (this.localMonitorReasonTracker)
+
+        if (this.monitorReasonTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
@@ -735,65 +366,51 @@ public class StatusResponseType implements org.apache.axis2.databinding.ADBBean
                     xmlWriter.writeStartElement(prefix, "monitorReason", namespace);
                     xmlWriter.writeNamespace(prefix, namespace);
                     xmlWriter.setPrefix(prefix, namespace);
-
                 }
                 else
                 {
                     xmlWriter.writeStartElement(namespace, "monitorReason");
                 }
-
             }
             else
             {
                 xmlWriter.writeStartElement("monitorReason");
             }
 
-            if (this.localMonitorReason == null)
-                throw new org.apache.axis2.databinding.ADBException("monitorReason cannot be null!!");
+            if (this.monitorReason == null)
+            {
+                throw new ADBException("monitorReason cannot be null!!");
+            }
             else
             {
-
-                xmlWriter.writeCharacters(this.localMonitorReason);
-
+                xmlWriter.writeCharacters(this.monitorReason);
             }
-
             xmlWriter.writeEndElement();
         }
         namespace = "";
         if (!namespace.equals(""))
         {
             prefix = xmlWriter.getPrefix(namespace);
-
             if (prefix == null)
             {
                 prefix = StatusResponseType.generatePrefix(namespace);
-
                 xmlWriter.writeStartElement(prefix, "isInMaintenance", namespace);
                 xmlWriter.writeNamespace(prefix, namespace);
                 xmlWriter.setPrefix(prefix, namespace);
-
             }
             else
             {
                 xmlWriter.writeStartElement(namespace, "isInMaintenance");
             }
-
         }
         else
         {
             xmlWriter.writeStartElement("isInMaintenance");
         }
-
-        if (false)
-            throw new org.apache.axis2.databinding.ADBException("isInMaintenance cannot be null!!");
-        else
-        {
-            xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil
-                    .convertToString(this.localIsInMaintenance));
-        }
-
+        xmlWriter.writeCharacters(ConverterUtil.convertToString(this.isInMaintenance));
         xmlWriter.writeEndElement();
-        if (this.localMaintenanceReasonTracker)
+
+        if (this.maintenanceReasonTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
@@ -803,456 +420,380 @@ public class StatusResponseType implements org.apache.axis2.databinding.ADBBean
                 if (prefix == null)
                 {
                     prefix = StatusResponseType.generatePrefix(namespace);
-
                     xmlWriter.writeStartElement(prefix, "maintenanceReason", namespace);
                     xmlWriter.writeNamespace(prefix, namespace);
                     xmlWriter.setPrefix(prefix, namespace);
-
                 }
                 else
                 {
                     xmlWriter.writeStartElement(namespace, "maintenanceReason");
                 }
-
             }
             else
             {
                 xmlWriter.writeStartElement("maintenanceReason");
             }
 
-            if (this.localMaintenanceReason == null)
-                throw new org.apache.axis2.databinding.ADBException("maintenanceReason cannot be null!!");
+            if (this.maintenanceReason == null)
+            {
+                throw new ADBException("maintenanceReason cannot be null!!");
+            }
             else
             {
-
-                xmlWriter.writeCharacters(this.localMaintenanceReason);
-
+                xmlWriter.writeCharacters(this.maintenanceReason);
             }
-
             xmlWriter.writeEndElement();
         }
         namespace = "";
         if (!namespace.equals(""))
         {
             prefix = xmlWriter.getPrefix(namespace);
-
             if (prefix == null)
             {
                 prefix = StatusResponseType.generatePrefix(namespace);
-
                 xmlWriter.writeStartElement(prefix, "isInSession", namespace);
                 xmlWriter.writeNamespace(prefix, namespace);
                 xmlWriter.setPrefix(prefix, namespace);
-
             }
             else
             {
                 xmlWriter.writeStartElement(namespace, "isInSession");
             }
-
         }
         else
         {
             xmlWriter.writeStartElement("isInSession");
         }
-
-        if (false)
-            throw new org.apache.axis2.databinding.ADBException("isInSession cannot be null!!");
-        else
-        {
-            xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil
-                    .convertToString(this.localIsInSession));
-        }
-
+        xmlWriter.writeCharacters(ConverterUtil.convertToString(this.isInSession));
         xmlWriter.writeEndElement();
-        if (this.localSessionUserTracker)
+
+        if (this.sessionUserTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
             {
                 prefix = xmlWriter.getPrefix(namespace);
-
                 if (prefix == null)
                 {
                     prefix = StatusResponseType.generatePrefix(namespace);
-
                     xmlWriter.writeStartElement(prefix, "sessionUser", namespace);
                     xmlWriter.writeNamespace(prefix, namespace);
                     xmlWriter.setPrefix(prefix, namespace);
-
                 }
                 else
                 {
                     xmlWriter.writeStartElement(namespace, "sessionUser");
                 }
-
             }
             else
             {
                 xmlWriter.writeStartElement("sessionUser");
             }
 
-            if (this.localSessionUser == null)
-                throw new org.apache.axis2.databinding.ADBException("sessionUser cannot be null!!");
+            if (this.sessionUser == null)
+            {
+                throw new ADBException("sessionUser cannot be null!!");
+            }
             else
             {
-
-                xmlWriter.writeCharacters(this.localSessionUser);
-
+                xmlWriter.writeCharacters(this.sessionUser);
             }
-
             xmlWriter.writeEndElement();
         }
-        if (this.localSlaveUsersTracker)
+
+        if (this.slaveUsersTracker)
         {
-            if (this.localSlaveUsers != null)
+            if (this.slaveUsers != null)
             {
                 namespace = "";
-                boolean emptyNamespace = namespace == null || namespace.length() == 0;
+                final boolean emptyNamespace = namespace == null || namespace.length() == 0;
                 prefix = emptyNamespace ? null : xmlWriter.getPrefix(namespace);
-                for (String localSlaveUser : this.localSlaveUsers)
+                for (final String localSlaveUser : this.slaveUsers)
                 {
-
                     if (localSlaveUser != null)
                     {
-
                         if (!emptyNamespace)
                         {
                             if (prefix == null)
                             {
-                                java.lang.String prefix2 = StatusResponseType.generatePrefix(namespace);
-
+                                final String prefix2 = StatusResponseType.generatePrefix(namespace);
                                 xmlWriter.writeStartElement(prefix2, "slaveUsers", namespace);
                                 xmlWriter.writeNamespace(prefix2, namespace);
                                 xmlWriter.setPrefix(prefix2, namespace);
-
                             }
                             else
                             {
                                 xmlWriter.writeStartElement(namespace, "slaveUsers");
                             }
-
                         }
                         else
                         {
                             xmlWriter.writeStartElement("slaveUsers");
                         }
 
-                        xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil
-                                .convertToString(localSlaveUser));
-
+                        xmlWriter.writeCharacters(ConverterUtil.convertToString(localSlaveUser));
                         xmlWriter.writeEndElement();
-
                     }
-                    else
-                    {
-
-                        // we have to do nothing since minOccurs is zero
-
-                    }
-
                 }
             }
             else
-                throw new org.apache.axis2.databinding.ADBException("slaveUsers cannot be null!!");
-
+            {
+                throw new ADBException("slaveUsers cannot be null!!");
+            }
         }
         xmlWriter.writeEndElement();
-
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param IsInMaintenance
-     */
-    public void setIsInMaintenance(boolean param)
+    public void setIsInMaintenance(final boolean param)
     {
-
-        this.localIsInMaintenance = param;
-
+        this.isInMaintenance = param;
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param IsInSession
-     */
-    public void setIsInSession(boolean param)
+    public void setIsInSession(final boolean param)
     {
-
-        this.localIsInSession = param;
-
+        this.isInSession = param;
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param IsMonitorFailed
-     */
-    public void setIsMonitorFailed(boolean param)
+    public void setIsMonitorFailed(final boolean param)
     {
-
-        this.localIsMonitorFailed = param;
-
+        this.isMonitorFailed = param;
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param MaintenanceReason
-     */
-    public void setMaintenanceReason(java.lang.String param)
+    public void setMaintenanceReason(final String param)
     {
-
         if (param != null)
         {
-            // update the setting tracker
-            this.localMaintenanceReasonTracker = true;
+            this.maintenanceReasonTracker = true;
         }
         else
         {
-            this.localMaintenanceReasonTracker = false;
-
+            this.maintenanceReasonTracker = false;
         }
-
-        this.localMaintenanceReason = param;
-
+        this.maintenanceReason = param;
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param MonitorReason
-     */
-    public void setMonitorReason(java.lang.String param)
+    public void setMonitorReason(final String param)
     {
-
         if (param != null)
         {
-            // update the setting tracker
-            this.localMonitorReasonTracker = true;
+            this.monitorReasonTracker = true;
         }
         else
         {
-            this.localMonitorReasonTracker = false;
-
+            this.monitorReasonTracker = false;
         }
-
-        this.localMonitorReason = param;
-
+        this.monitorReason = param;
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param SessionUser
-     */
-    public void setSessionUser(java.lang.String param)
+    public void setSessionUser(final String param)
     {
-
         if (param != null)
         {
-            // update the setting tracker
-            this.localSessionUserTracker = true;
+            this.sessionUserTracker = true;
         }
         else
         {
-            this.localSessionUserTracker = false;
-
+            this.sessionUserTracker = false;
         }
-
-        this.localSessionUser = param;
-
+        this.sessionUser = param;
     }
 
-    /**
-     * Auto generated setter method
-     * 
-     * @param param SlaveUsers
-     */
-    public void setSlaveUsers(java.lang.String[] param)
+    public void setSlaveUsers(final String[] param)
     {
-
-        this.validateSlaveUsers(param);
-
         if (param != null)
         {
-            // update the setting tracker
-            this.localSlaveUsersTracker = true;
+            this.slaveUsersTracker = true;
         }
         else
         {
-            this.localSlaveUsersTracker = false;
-
+            this.slaveUsersTracker = false;
         }
-
-        this.localSlaveUsers = param;
+        this.slaveUsers = param;
     }
 
-    /**
-     * validate the array for SlaveUsers
-     */
-    protected void validateSlaveUsers(java.lang.String[] param)
-    {
-
-    }
-
-    /**
-     * Util method to write an attribute with the ns prefix
-     */
-    private void writeAttribute(java.lang.String prefix, java.lang.String namespace, java.lang.String attName,
-            java.lang.String attValue, javax.xml.stream.XMLStreamWriter xmlWriter)
-            throws javax.xml.stream.XMLStreamException
+    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue,
+            final XMLStreamWriter xmlWriter) throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
         {
             xmlWriter.writeNamespace(prefix, namespace);
             xmlWriter.setPrefix(prefix, namespace);
-
         }
-
         xmlWriter.writeAttribute(namespace, attName, attValue);
-
     }
 
-    /**
-     * Util method to write an attribute without the ns prefix
-     */
-    private void writeAttribute(java.lang.String namespace, java.lang.String attName, java.lang.String attValue,
-            javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException
+    public static class Factory
     {
-        if (namespace.equals(""))
+        public static StatusResponseType parse(final XMLStreamReader reader) throws Exception
         {
-            xmlWriter.writeAttribute(attName, attValue);
-        }
-        else
-        {
-            this.registerPrefix(xmlWriter, namespace);
-            xmlWriter.writeAttribute(namespace, attName, attValue);
-        }
-    }
+            final StatusResponseType object = new StatusResponseType();
 
-    /**
-     * method to handle Qnames
-     */
-
-    private void writeQName(javax.xml.namespace.QName qname, javax.xml.stream.XMLStreamWriter xmlWriter)
-            throws javax.xml.stream.XMLStreamException
-    {
-        java.lang.String namespaceURI = qname.getNamespaceURI();
-        if (namespaceURI != null)
-        {
-            java.lang.String prefix = xmlWriter.getPrefix(namespaceURI);
-            if (prefix == null)
+            try
             {
-                prefix = StatusResponseType.generatePrefix(namespaceURI);
-                xmlWriter.writeNamespace(prefix, namespaceURI);
-                xmlWriter.setPrefix(prefix, namespaceURI);
-            }
-
-            if (prefix.trim().length() > 0)
-            {
-                xmlWriter.writeCharacters(prefix + ":"
-                        + org.apache.axis2.databinding.utils.ConverterUtil.convertToString(qname));
-            }
-            else
-            {
-                // i.e this is the default namespace
-                xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(qname));
-            }
-
-        }
-        else
-        {
-            xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(qname));
-        }
-    }
-
-    /**
-     * Util method to write an attribute without the ns prefix
-     */
-    private void writeQNameAttribute(java.lang.String namespace, java.lang.String attName,
-            javax.xml.namespace.QName qname, javax.xml.stream.XMLStreamWriter xmlWriter)
-            throws javax.xml.stream.XMLStreamException
-    {
-
-        java.lang.String attributeNamespace = qname.getNamespaceURI();
-        java.lang.String attributePrefix = xmlWriter.getPrefix(attributeNamespace);
-        if (attributePrefix == null)
-        {
-            attributePrefix = this.registerPrefix(xmlWriter, attributeNamespace);
-        }
-        java.lang.String attributeValue;
-        if (attributePrefix.trim().length() > 0)
-        {
-            attributeValue = attributePrefix + ":" + qname.getLocalPart();
-        }
-        else
-        {
-            attributeValue = qname.getLocalPart();
-        }
-
-        if (namespace.equals(""))
-        {
-            xmlWriter.writeAttribute(attName, attributeValue);
-        }
-        else
-        {
-            this.registerPrefix(xmlWriter, namespace);
-            xmlWriter.writeAttribute(namespace, attName, attributeValue);
-        }
-    }
-
-    private void writeQNames(javax.xml.namespace.QName[] qnames, javax.xml.stream.XMLStreamWriter xmlWriter)
-            throws javax.xml.stream.XMLStreamException
-    {
-
-        if (qnames != null)
-        {
-            // we have to store this data until last moment since it is not
-            // possible to write any
-            // namespace data after writing the charactor data
-            java.lang.StringBuffer stringToWrite = new java.lang.StringBuffer();
-            java.lang.String namespaceURI = null;
-            java.lang.String prefix = null;
-
-            for (int i = 0; i < qnames.length; i++)
-            {
-                if (i > 0)
+                while (!reader.isStartElement() && !reader.isEndElement())
                 {
-                    stringToWrite.append(" ");
+                    reader.next();
                 }
-                namespaceURI = qnames[i].getNamespaceURI();
-                if (namespaceURI != null)
+                if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
                 {
-                    prefix = xmlWriter.getPrefix(namespaceURI);
-                    if (prefix == null || prefix.length() == 0)
-                    {
-                        prefix = StatusResponseType.generatePrefix(namespaceURI);
-                        xmlWriter.writeNamespace(prefix, namespaceURI);
-                        xmlWriter.setPrefix(prefix, namespaceURI);
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    if (fullTypeName != null)   {
+                        String nsPrefix = null;
+                        if (fullTypeName.indexOf(":") > -1)
+                        {
+                            nsPrefix = fullTypeName.substring(0, fullTypeName.indexOf(":"));
+                        }
+                        nsPrefix = nsPrefix == null ? "" : nsPrefix;
+                        final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
+                        if (!"StatusResponseType".equals(type))
+                        {
+                            // find namespace for the prefix
+                            final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
+                            return (StatusResponseType) au.edu.uts.eng.remotelabs.rigclient.protocol.types.ExtensionMapper
+                                    .getTypeObject(nsUri, type, reader);
+                        }
                     }
+                }
 
-                    if (prefix.trim().length() > 0)
-                    {
-                        stringToWrite.append(prefix).append(":").append(
-                                org.apache.axis2.databinding.utils.ConverterUtil.convertToString(qnames[i]));
-                    }
-                    else
-                    {
-                        stringToWrite.append(org.apache.axis2.databinding.utils.ConverterUtil
-                                .convertToString(qnames[i]));
-                    }
+                reader.next();
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement() && new QName("", "isMonitorFailed").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setIsMonitorFailed(ConverterUtil.convertToBoolean(content));
+                    reader.next();
+
                 }
                 else
                 {
-                    stringToWrite.append(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(qnames[i]));
+                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "monitorReason").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setMonitorReason(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "isInMaintenance").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setIsInMaintenance(ConverterUtil.convertToBoolean(content));
+                    reader.next();
+                }
+                else
+                {
+                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "maintenanceReason").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setMaintenanceReason(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement() && new QName("", "isInSession").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setIsInSession(ConverterUtil.convertToBoolean(content));
+                    reader.next();
+                }
+                else
+                {
+                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement() && new QName("", "sessionUser").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setSessionUser(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                final ArrayList<String> slaveUserList = new ArrayList<String>();
+                if (reader.isStartElement() && new QName("", "slaveUsers").equals(reader.getName()))
+                {
+                    slaveUserList.add(reader.getElementText());
+                    boolean hasSiblings = false;
+                    while (!hasSiblings)
+                    {
+                        while (!reader.isEndElement())
+                        {
+                            reader.next();
+                        }
+                        reader.next();
+                        while (!reader.isStartElement() && !reader.isEndElement())
+                        {
+                            reader.next();
+                        }
+                        if (reader.isEndElement())
+                        {
+                            hasSiblings = true;
+                        }
+                        else
+                        {
+                            if (new QName("", "slaveUsers").equals(reader.getName()))
+                            {
+                                slaveUserList.add(reader.getElementText());
+                            }
+                            else
+                            {
+                                hasSiblings = true;
+                            }
+                        }
+                    }
+                    object.setSlaveUsers(slaveUserList.toArray(new String[slaveUserList.size()]));
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+
+                if (reader.isStartElement())
+                {
+                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
             }
-            xmlWriter.writeCharacters(stringToWrite.toString());
+            catch (final XMLStreamException e)
+            {
+                throw new Exception(e);
+            }
+
+            return object;
         }
-
     }
-
 }
