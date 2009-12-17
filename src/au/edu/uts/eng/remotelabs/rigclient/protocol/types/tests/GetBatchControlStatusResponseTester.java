@@ -67,12 +67,12 @@ public class GetBatchControlStatusResponseTester extends TestCase
     @Test
     public void testParse() throws Exception
     {
-        String str = "<ns1:getBatchStatus xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:BatchStatusResponseType\">\n" +
+        String str = "<ns1:getBatchControlStatusResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:BatchStatusResponseType\">\n" +
                 "            <state>COMPLETE</state>\n" +
         		"            <progress>10</progress>\n" + 
         		"            <resultFilePath>C:\\results\\file1</resultFilePath>\n" +
         		"            <resultFilePath>C:\\results\\file2</resultFilePath>\n" +
-        		"         </ns1:getBatchStatus>";
+        		"         </ns1:getBatchControlStatusResponse>";
         
         GetBatchControlStatusResponse resp  = GetBatchControlStatusResponse.Factory.parse(
                 StAXUtils.createXMLStreamReader(new ByteArrayInputStream(str.getBytes())));
