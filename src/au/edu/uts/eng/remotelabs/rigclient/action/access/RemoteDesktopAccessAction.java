@@ -34,7 +34,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date 10th December 2009
+ * @date 21st December 2009
  *
  * Changelog:
  * - 21/12/2009 - mdiponio - Initial file creation.
