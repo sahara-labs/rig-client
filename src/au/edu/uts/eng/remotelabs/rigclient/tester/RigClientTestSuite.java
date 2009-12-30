@@ -45,13 +45,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import au.edu.uts.eng.remotelabs.rigclient.protocol.tests.RigClientServiceTester;
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeRequestType;
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveUserType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AbortBatchControlResponseTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AbortBatchControlTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.ActivityDetectableTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AllocateResponseTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AllocateTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AttributeRequestTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AttributeResponseTypeChoiceTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.AttributeResponseTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.BatchRequestTypeTester;
@@ -75,6 +74,7 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.NotifyTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.OperationResponseTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.ReleaseResponseTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.ReleaseTester;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.SlaveUserTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.StatusResponseTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.TestIntervalRequestTypeTester;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests.TypeSlaveUserTester;
@@ -91,6 +91,7 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractRigTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.ConfiguredControlledRigTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.ConfiguredRigTester;
 import au.edu.uts.eng.remotelabs.rigclient.type.tests.RigFactoryTester;
+import au.edu.uts.eng.remotelabs.rigclient.util.tests.LogFormatterTester;
 import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
 
 /**
@@ -98,9 +99,10 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    LogFormatterTester.class,
     TestIntervalRequestTypeTester.class,
     TypeSlaveUserTester.class,
-    SlaveUserType.class,
+    SlaveUserTypeTester.class,
     StatusResponseTypeTester.class,
     ReleaseTester.class,
     ReleaseResponseTester.class,
@@ -125,7 +127,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
     BatchRequestTypeTester.class,
     AttributeResponseTypeChoiceTester.class,
     AttributeResponseTypeTester.class,
-    AttributeRequestType.class,
+    AttributeRequestTypeTester.class,
     ActivityDetectableTypeTester.class,
     AbortBatchControlResponseTester.class,
     AbortBatchControlTester.class,

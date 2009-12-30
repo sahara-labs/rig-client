@@ -41,6 +41,9 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Returns an instance of a ILogger implementation.
@@ -109,14 +112,15 @@ public class LoggerFactory
             case SYSTEM_ERROR:
                 return new SystemErrLogger();
             case FILE:
-                return null;
+                return new FileLogger();
             case ROLLED_FILE:
-                // TODO implement rolled file logger
+                return new RolledFileLogger();
             case SYSLOG:
                 // TODO implement SysLog logger
+                
             case WINEVENTS:
-                // TODO implement Windows events logger
-                throw new UnsupportedOperationException();
+                return new WinEventsLogger();
+                
             default:
                 /* DODGY -> Stupid fraking compiler, anyway using system 
                  * standard error stream logger. */
@@ -175,6 +179,37 @@ public class LoggerFactory
         else if (type.equalsIgnoreCase("WARN")) return ILogger.WARN;
         else if (type.equalsIgnoreCase("INFO")) return ILogger.INFO;
         else return ILogger.DEBUG;
-
+    }
+    
+    /**
+     * Returns the configured formatting strings for each of the log types.
+     * 
+     * @return formatting strings
+     */
+    static Map<Integer, String> getFormatStrings()
+    {
+        Map<Integer, String> frmStrings = new HashMap<Integer, String>(6);
+        IConfig config = ConfigFactory.getInstance();
+        
+        final String def = config.getProperty("Default_Log_Format", "[__LEVEL__] - [__ISO8601__] - __MESSAGE__");
+        String frm = config.getProperty("FATAL_Log_Format");
+        frmStrings.put(ILogger.FATAL, frm == null ? def : frm);
+        
+        frm = config.getProperty("PRIORITY_Log_Format");
+        frmStrings.put(ILogger.PRIORITY, frm == null ? def : frm);
+        
+        frm = config.getProperty("ERROR_Log_Format");
+        frmStrings.put(ILogger.ERROR, frm == null ? def : frm);
+        
+        frm = config.getProperty("WARN_Log_Format");
+        frmStrings.put(ILogger.WARN, frm == null ? def : frm);
+        
+        frm = config.getProperty("INFO_Log_Format");
+        frmStrings.put(ILogger.INFO, frm == null ? def : frm);
+        
+        frm = config.getProperty("DEBUG_Log_Format");
+        frmStrings.put(ILogger.DEBUG, frm == null ? def : frm);
+        
+        return frmStrings;
     }
 }

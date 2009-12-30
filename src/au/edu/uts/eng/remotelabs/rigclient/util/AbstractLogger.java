@@ -41,6 +41,8 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
+import java.util.Map;
+
 /**
  * Abstract logger, fills in some boilerplate code.
  */
@@ -49,70 +51,70 @@ abstract class AbstractLogger implements ILogger
     /** Level to log to. */
     protected short logLevel;
     
+    /** Log formatter. */
+    private final LogFormatter formatter;
+    
+    /** Format strings for each log type. */
+    private final Map<Integer, String> formatStrings;
+    
     /**
      * Constructor - loads the logging level.
      */
     public AbstractLogger()
     {
         this.logLevel = LoggerFactory.getLoggingLevel();
-    }
+        this.formatStrings = LoggerFactory.getFormatStrings();
+        this.formatter = new LogFormatter();
+     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.ILogger#debug(java.lang.String)
-     */
     @Override
     public void debug(final String message)
     {
-        this.log(ILogger.DEBUG, message);        
+        if (ILogger.DEBUG <= this.logLevel)
+        {
+            this.log(ILogger.DEBUG, 
+                    this.formatter.formatLog(this.formatStrings.get(ILogger.DEBUG), message, "DEBUG", 3));
+        }
     }
 
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.ILogger#error(java.lang.String)
-     */
     @Override
     public void error(final String message)
     {
-        this.log(ILogger.ERROR, message);
+        this.log(ILogger.ERROR, 
+                this.formatter.formatLog(this.formatStrings.get(ILogger.ERROR), message, "ERROR", 3));
     }
 
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.ILogger#fatal(java.lang.String)
-     */
     @Override
     public void fatal(final String message)
     {
-        this.log(ILogger.FATAL, message);        
+        this.log(ILogger.FATAL, 
+                this.formatter.formatLog(this.formatStrings.get(ILogger.FATAL), message, "FATAL", 3));        
     }
 
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.ILogger#info(java.lang.String)
-     */
     @Override
     public void info(final String message)
     {
-        this.log(ILogger.INFO, message);        
+        if (ILogger.INFO <= this.logLevel)
+        {
+            this.log(ILogger.INFO, 
+                    this.formatter.formatLog(this.formatStrings.get(ILogger.INFO), message, "INFO", 3));
+        }
     }
 
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.ILogger#priority(java.lang.String)
-     */
     @Override
     public void priority(final String message)
     {
-        this.log(ILogger.PRIORITY, message);        
+        this.log(ILogger.PRIORITY, 
+                this.formatter.formatLog(this.formatStrings.get(ILogger.PRIORITY), message, "PRIORITY", 3));        
     }
 
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.ILogger#warn(java.lang.String)
-     */
     @Override
     public void warn(final String message)
     {
-        this.log(ILogger.WARN, message);
+        if (ILogger.WARN <= this.logLevel)
+        {
+            this.log(ILogger.WARN, 
+                    this.formatter.formatLog(this.formatStrings.get(ILogger.WARN), message, "WARN", 3));
+        }
     }
 }

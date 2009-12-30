@@ -302,7 +302,7 @@ public class BatchStatusResponseType implements ADBBean
             if (this.resultFilePath != null)
             {
                 namespace = "";
-                final boolean emptyNamespace = namespace == null || namespace.length() == 0;
+                final boolean emptyNamespace = namespace.length() == 0;
                 prefix = emptyNamespace ? null : xmlWriter.getPrefix(namespace);
                 for (final String element : this.resultFilePath)
                 {
@@ -338,7 +338,7 @@ public class BatchStatusResponseType implements ADBBean
             }
         }
         
-        if (exitCodeTracker)
+        if (this.exitCodeTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
@@ -361,18 +361,18 @@ public class BatchStatusResponseType implements ADBBean
                 xmlWriter.writeStartElement("exitCode");
             }
 
-            if (exitCode == Integer.MIN_VALUE)
+            if (this.exitCode == Integer.MIN_VALUE)
             {
                 throw new ADBException("exitCode cannot be null!!");
             }
             else
             {
-                xmlWriter.writeCharacters(ConverterUtil.convertToString(exitCode));
+                xmlWriter.writeCharacters(ConverterUtil.convertToString(this.exitCode));
             }
             xmlWriter.writeEndElement();
         }
 
-        if (stdoutTracker)
+        if (this.stdoutTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
@@ -396,18 +396,18 @@ public class BatchStatusResponseType implements ADBBean
                 xmlWriter.writeStartElement("stdout");
             }
 
-            if (stdout == null)
+            if (this.stdout == null)
             {
                 throw new ADBException("stdout cannot be null!!");
             }
             else
             {
-                xmlWriter.writeCharacters(stdout);
+                xmlWriter.writeCharacters(this.stdout);
             }
             xmlWriter.writeEndElement();
         }
         
-        if (stderrTracker)
+        if (this.stderrTracker)
         {
             namespace = "";
             if (!namespace.equals(""))
@@ -430,13 +430,13 @@ public class BatchStatusResponseType implements ADBBean
                 xmlWriter.writeStartElement("stderr");
             }
 
-            if (stderr == null)
+            if (this.stderr == null)
             {
                 throw new ADBException("stderr cannot be null!!");
             }
             else
             {
-                xmlWriter.writeCharacters(stderr);
+                xmlWriter.writeCharacters(this.stderr);
             }
             xmlWriter.writeEndElement();
         }
@@ -514,7 +514,7 @@ public class BatchStatusResponseType implements ADBBean
         return this.exitCode;
     }
     
-    public void setExitCode(int param)
+    public void setExitCode(final int param)
     {
         if (param == Integer.MIN_VALUE)
         {
@@ -532,7 +532,7 @@ public class BatchStatusResponseType implements ADBBean
         return this.stdout;
     }
 
-    public void setStdout(String param)
+    public void setStdout(final String param)
     {
         if (param != null)
         {
@@ -550,7 +550,7 @@ public class BatchStatusResponseType implements ADBBean
         return this.stderr;
     }
 
-    public void setStderr(String param)
+    public void setStderr(final String param)
     {
         if (param != null)
         {
@@ -693,7 +693,7 @@ public class BatchStatusResponseType implements ADBBean
                 }
                 if (reader.isStartElement() && new QName("", "exitCode").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setExitCode(ConverterUtil.convertToInt(content));
                     reader.next();
                 }
@@ -709,7 +709,7 @@ public class BatchStatusResponseType implements ADBBean
 
                 if (reader.isStartElement() && new QName("", "stdout").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setStdout(ConverterUtil.convertToString(content));
                     reader.next();
                 }
@@ -719,7 +719,7 @@ public class BatchStatusResponseType implements ADBBean
                 }
                 if (reader.isStartElement() && new QName("", "stderr").equals(reader.getName()))
                 {
-                    String content = reader.getElementText();
+                    final String content = reader.getElementText();
                     object.setStderr(ConverterUtil.convertToString(content));
                     reader.next();
                 }

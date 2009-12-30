@@ -74,7 +74,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
         this.logger = LoggerFactory.getLoggerInstance();
         
         this.domainName = ConfigFactory.getInstance().getProperty("Windows_Domain");
-        if (domainName == null)
+        if (this.domainName == null)
         {
             this.logger.info("Windows domain name not found, so not using a domain name.");
         }

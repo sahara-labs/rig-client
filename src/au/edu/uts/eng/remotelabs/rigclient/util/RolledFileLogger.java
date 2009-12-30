@@ -34,31 +34,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date 5th October 2009
+ * @date 12th December 2009
  *
  * Changelog:
- * - 05/10/2009 - mdiponio - Initial file creation.
+ * - 29/12/2009 - mdiponio - Initial file creation.
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.RollingFileAppender;
 
 import au.edu.uts.eng.remotelabs.rigclient.main.RigClientDefines;
 
 /**
- *  Appends messages to a file using Log4j. This does not roll the
- *  file, so be wary of log file bloat. 
+ * Appends messages to a log file. The log file is rolled to backup files 
+ * when it exceeds a maximum file size. After a maximum backup file number
+ * is exceeded, the oldest backup files are deleted.
  */
-class FileLogger extends AbstractLog4JLogger
+public class RolledFileLogger extends AbstractLog4JLogger
 {
     @Override
     protected void setAppeneder()
     {
-        /* File logger. */
+       /* File logger. */
         final IConfig conf = ConfigFactory.getInstance();
         final String fileName = conf.getProperty(null);
         
@@ -71,10 +72,18 @@ class FileLogger extends AbstractLog4JLogger
             System.err.println("Shutting down...");
             throw new RuntimeException("Unable to load file logger file name.");
         }
-
+        
+        final int fileSize = this.getConfigInt(conf.getProperty("Log_File_Max_Size", "10"), 10);
+        final int numBackups = this.getConfigInt(conf.getProperty("Log_File_Backups", "5"), 5);
+        
         try
         {
-            this.logger.addAppender(new FileAppender(new PatternLayout(AbstractLog4JLogger.PATTERN_LAYOUT), fileName));
+            RollingFileAppender appender = new RollingFileAppender(
+                    new PatternLayout(AbstractLog4JLogger.PATTERN_LAYOUT), fileName);
+            appender.setMaximumFileSize(fileSize * 1024 * 1024);
+            appender.setMaxBackupIndex(numBackups);
+            
+            this.logger.addAppender(appender);
         }
         catch (IOException ioe)
         {

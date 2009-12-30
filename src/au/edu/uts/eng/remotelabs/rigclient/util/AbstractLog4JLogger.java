@@ -50,7 +50,11 @@ import org.apache.log4j.Logger;
 */
 abstract class AbstractLog4JLogger extends AbstractLogger
 {
-   /** Log4j logger. */
+   /**
+     * 
+     */
+    protected static final String PATTERN_LAYOUT = "%m%n";
+/** Log4j logger. */
    protected Logger logger;
    
    /**
@@ -91,10 +95,6 @@ abstract class AbstractLog4JLogger extends AbstractLogger
     */
    protected abstract void setAppeneder();
 
-
-   /*
-    * @see au.edu.uts.eng.remotelabs.rigclient.util.ILogger#log(java.lang.short, java.lang.String)
-    */
    @Override
    public void log(final int level, final String message)
    {
@@ -117,4 +117,23 @@ abstract class AbstractLog4JLogger extends AbstractLogger
            break;
        }
    }
+
+/**
+ * Gets an integer from a configuration value which may not be a valid integer.
+ * 
+ * @param str config string
+ * @param def value if string is not a valid int
+ * @return valid integer 
+ */
+protected int getConfigInt(String str, int def)
+{
+    try
+    {
+        return Integer.parseInt(str);
+    }
+    catch (NumberFormatException ex)
+    {
+        return def;
+    }
+}
 }

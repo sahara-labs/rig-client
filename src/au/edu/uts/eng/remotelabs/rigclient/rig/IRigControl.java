@@ -304,7 +304,7 @@ public interface IRigControl
          */
         public int getErrorCode()
         {
-            return errorCode;
+            return this.errorCode;
         }
 
         /**
@@ -320,7 +320,7 @@ public interface IRigControl
          */
         public String getErrorReason()
         {
-            return errorReason;
+            return this.errorReason;
         }
 
         /**

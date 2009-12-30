@@ -34,66 +34,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date 5th October 2009
+ * @date 12th December 2009
  *
  * Changelog:
- * - 05/10/2009 - mdiponio - Initial file creation.
+ * - 29/12/2009 - mdiponio - Initial file creation.
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.PatternLayout;
-
-import au.edu.uts.eng.remotelabs.rigclient.main.RigClientDefines;
+import org.apache.log4j.nt.NTEventLogAppender;
 
 /**
- *  Appends messages to a file using Log4j. This does not roll the
- *  file, so be wary of log file bloat. 
+ * Logger which appends messages to the Windows Event Log.
+ * This only works on Windows and requires the file
+ * <code>NTEventLogAppender.dll</code> in a directory on the
+ * PATH (e.g. C:\Windows\system32). 
  */
-class FileLogger extends AbstractLog4JLogger
+public class WinEventsLogger extends AbstractLog4JLogger
 {
     @Override
     protected void setAppeneder()
     {
-        /* File logger. */
-        final IConfig conf = ConfigFactory.getInstance();
-        final String fileName = conf.getProperty(null);
-        
-        if (fileName == null)
+        if (!System.getProperty("os.name").startsWith("Windows"))
         {
-            System.err.println("FATAL - Failed to load logging file name from configuration.");
-            System.err.println("Check the " + conf.getConfigurationInfomation() + " is present, readable by the rig client");
-            System.err.println("and the 'Log_File_Name' field is present.");
-            System.err.println();
-            System.err.println("Shutting down...");
-            throw new RuntimeException("Unable to load file logger file name.");
+            System.err.println("Failed: Unable to use a Windows Events logger on a non windows platform.");
+            System.err.println("Please use a different logger type.");
+            throw new RuntimeException("Unable to load Windows Events logger on a non windows platform.");
         }
 
-        try
-        {
-            this.logger.addAppender(new FileAppender(new PatternLayout(AbstractLog4JLogger.PATTERN_LAYOUT), fileName));
-        }
-        catch (IOException ioe)
-        {
-            /* Check the file. */
-            final File file = new File(fileName);
-            if (file.isFile())
-            {
-                System.err.println("FATAL - Failed to add a Log4J file appender. (FileLogger->addAppender)");
-                RigClientDefines.reportBug("log4j File Logger", ioe);
-                System.err.println("Shutting down, sorry...");
-                throw new RuntimeException("Failed adding file appender.");
-            }
-            else
-            {
-                System.err.println("FATAL - The loaded configuration file name (" + fileName + ") is not a valid file.");
-                System.err.println("Change the configuration file property 'Log_File_Name' in");
-                System.err.println(conf.getConfigurationInfomation() + " to a valid file.");
-                throw new RuntimeException("Log file does not exist.");
-            }
-        }
+        NTEventLogAppender appender = new NTEventLogAppender(new PatternLayout(AbstractLog4JLogger.PATTERN_LAYOUT));
+        this.logger.addAppender(appender);
     }
+
 }

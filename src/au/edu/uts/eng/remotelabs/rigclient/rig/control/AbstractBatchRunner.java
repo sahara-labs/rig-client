@@ -745,7 +745,7 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     public int getErrorCode()
     {
-        return errorCode;
+        return this.errorCode;
     }
 
     /**
@@ -753,7 +753,7 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     public String getErrorReason()
     {
-        return errorReason;
+        return this.errorReason;
     }
 
     /**

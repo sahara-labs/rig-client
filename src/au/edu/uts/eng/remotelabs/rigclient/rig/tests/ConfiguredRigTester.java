@@ -46,7 +46,6 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
-import static org.easymock.EasyMock.verify;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -105,6 +104,14 @@ public class ConfiguredRigTester extends TestCase
             .andReturn("SystemErr");
         expect(this.mockConfig.getProperty("Log_Level"))
             .andReturn("DEBUG");
+        expect(this.mockConfig.getProperty("Default_Log_Format", "[__LEVEL__] - [__ISO8601__] - __MESSAGE__"))
+            .andReturn("[__LEVEL__] - [__ISO8601__] - __MESSAGE__");
+        expect(this.mockConfig.getProperty("FATAL_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("PRIORITY_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("ERROR_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("WARN_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("Action_Package_Prefixes", ""))
             .andReturn("au.edu.uts.eng.remotelabs;au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests;" +
                     "au.edu.uts.eng.remotelabs.rigclient.rig.internal");
@@ -158,7 +165,6 @@ public class ConfiguredRigTester extends TestCase
         List<ITestAction> reset = (List<ITestAction>)field.get(this.rig);
         assertEquals(0, reset.size());
         
-        verify(this.mockConfig);
     }
 
 }

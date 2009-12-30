@@ -123,9 +123,9 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
         elementList.add(this.batchFile);
         
         elementList.add(new QName("", "fileName"));
-        if (fileName != null)
+        if (this.fileName != null)
         {
-            elementList.add(ConverterUtil.convertToString(fileName));
+            elementList.add(ConverterUtil.convertToString(this.fileName));
         }
         else
         {
@@ -325,13 +325,13 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
             xmlWriter.writeStartElement("fileName");
         }
 
-        if (fileName == null)
+        if (this.fileName == null)
         {
             throw new org.apache.axis2.databinding.ADBException("fileName cannot be null!!");
         }
         else
         {
-            xmlWriter.writeCharacters(fileName);
+            xmlWriter.writeCharacters(this.fileName);
         }
         xmlWriter.writeEndElement();
         

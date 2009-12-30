@@ -166,6 +166,7 @@ public class StatusResponseType implements ADBBean
     {
         final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
+            @Override
             public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
                 StatusResponseType.this.serialize(this.parentQName, factory, xmlWriter);
@@ -506,7 +507,7 @@ public class StatusResponseType implements ADBBean
             if (this.slaveUsers != null)
             {
                 namespace = "";
-                final boolean emptyNamespace = namespace == null || namespace.length() == 0;
+                final boolean emptyNamespace = namespace.length() == 0;
                 prefix = emptyNamespace ? null : xmlWriter.getPrefix(namespace);
                 for (final String localSlaveUser : this.slaveUsers)
                 {

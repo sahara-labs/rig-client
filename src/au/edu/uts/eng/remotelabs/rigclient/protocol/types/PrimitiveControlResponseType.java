@@ -440,7 +440,6 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
                         final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
                         if (!"PrimitiveControlResponseType".equals(type))
                         {
-                            // find namespace for the prefix
                             final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
                             return (PrimitiveControlResponseType) ExtensionMapper.getTypeObject(nsUri, type, reader);
                         }
@@ -448,9 +447,7 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
                 }
 
                 reader.next();
-
-                final ArrayList<ParamType> list4 = new ArrayList<ParamType>();
-
+                final ArrayList<ParamType> resultList = new ArrayList<ParamType>();
                 while (!reader.isStartElement() && !reader.isEndElement())
                 {
                     reader.next();
@@ -458,59 +455,41 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
 
                 if (reader.isStartElement() && new QName("", "success").equals(reader.getName()))
                 {
-
                     final String content = reader.getElementText();
-
                     object.setSuccess(ConverterUtil.convertToBoolean(content));
-
                     reader.next();
-
-                } // End of if for expected property start element
+                }
                 else
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
+                {
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
                 {
                     reader.next();
                 }
-
                 if (reader.isStartElement()
                         && new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "error").equals(reader
                                 .getName()))
                 {
-
                     object.setError(ErrorType.Factory.parse(reader));
-
                     reader.next();
-
-                } // End of if for expected property start element
-
-                else
-                {
-
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
                 {
                     reader.next();
                 }
-
                 if (reader.isStartElement() && new QName("", "wasSuccessful").equals(reader.getName()))
                 {
-
                     final String content = reader.getElementText();
-
                     object.setWasSuccessful(ConverterUtil.convertToString(content));
-
                     reader.next();
-
                 }
                 else
-                    // A start element we are not expecting indicates an invalid
-                    // parameter was passed
+                {
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
                 {
@@ -519,59 +498,52 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
 
                 if (reader.isStartElement() && new QName("", "result").equals(reader.getName()))
                 {
-
-                    list4.add(ParamType.Factory.parse(reader));
-                    boolean loopDone4 = false;
-                    while (!loopDone4)
+                    resultList.add(ParamType.Factory.parse(reader));
+                    boolean noMoreSiblings = false;
+                    while (!noMoreSiblings)
                     {
-
                         while (!reader.isEndElement())
                         {
                             reader.next();
                         }
-
                         reader.next();
-
                         while (!reader.isStartElement() && !reader.isEndElement())
                         {
                             reader.next();
                         }
                         if (reader.isEndElement())
                         {
-                            loopDone4 = true;
+                            noMoreSiblings = true;
                         }
                         else
                         {
                             if (new QName("", "result").equals(reader.getName()))
                             {
-                                list4.add(ParamType.Factory.parse(reader));
+                                resultList.add(ParamType.Factory.parse(reader));
                             }
                             else
                             {
-                                loopDone4 = true;
+                                noMoreSiblings = true;
                             }
                         }
                     }
-
-                    object.setResult((ParamType[]) ConverterUtil.convertToArray(ParamType.class, list4));
+                    object.setResult((ParamType[]) ConverterUtil.convertToArray(ParamType.class, resultList));
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
                 {
                     reader.next();
                 }
-
                 if (reader.isStartElement() && new QName("", "error").equals(reader.getName()))
                 {
                     object.setError(ErrorType.Factory.parse(reader));
                     reader.next();
                 }
-
+                
                 while (!reader.isStartElement() && !reader.isEndElement())
                 {
                     reader.next();
                 }
-
                 if (reader.isStartElement())
                 {
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
