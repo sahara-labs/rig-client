@@ -82,6 +82,14 @@ public class PrimitiveCacheTester extends TestCase
             .andReturn("DEBUG");
         expect(this.mockConfig.getProperty("Package_Prefixes"))
             .andReturn("au.edu.uts.eng.remotelabs;au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests");
+        expect(this.mockConfig.getProperty("Default_Log_Format", "[__LEVEL__] - [__ISO8601__] - __MESSAGE__"))
+            .andReturn("[__LEVEL__] - [__ISO8601__] - __MESSAGE__");
+        expect(this.mockConfig.getProperty("FATAL_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("PRIORITY_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("ERROR_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("WARN_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
         replay(this.mockConfig);
         
         ConfigFactory.getInstance();

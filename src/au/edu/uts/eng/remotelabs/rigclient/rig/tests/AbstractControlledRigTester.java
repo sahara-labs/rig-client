@@ -93,6 +93,14 @@ public class AbstractControlledRigTester extends TestCase
             .andReturn("INFO");
         expect(this.mockConfig.getProperty("Action_Failure_Threshold"))
             .andReturn("2");
+        expect(this.mockConfig.getProperty("Default_Log_Format", "[__LEVEL__] - [__ISO8601__] - __MESSAGE__"))
+            .andReturn("[__LEVEL__] - [__ISO8601__] - __MESSAGE__");
+        expect(this.mockConfig.getProperty("FATAL_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("PRIORITY_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("ERROR_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("WARN_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
         replay(this.mockConfig);
 
         Field configField = ConfigFactory.class.getDeclaredField("instance");
