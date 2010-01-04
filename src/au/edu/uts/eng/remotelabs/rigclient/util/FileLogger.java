@@ -60,7 +60,7 @@ class FileLogger extends AbstractLog4JLogger
     {
         /* File logger. */
         final IConfig conf = ConfigFactory.getInstance();
-        final String fileName = conf.getProperty(null);
+        final String fileName = conf.getProperty("Log_File_Name");
         
         if (fileName == null)
         {
@@ -82,7 +82,7 @@ class FileLogger extends AbstractLog4JLogger
             final File file = new File(fileName);
             if (file.isFile())
             {
-                System.err.println("FATAL - Failed to add a Log4J file appender. (FileLogger->addAppender)");
+                System.err.println("FATAL - Failed to add a Log4J file appender.");
                 RigClientDefines.reportBug("log4j File Logger", ioe);
                 System.err.println("Shutting down, sorry...");
                 throw new RuntimeException("Failed adding file appender.");

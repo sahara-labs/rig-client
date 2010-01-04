@@ -116,8 +116,7 @@ public class LoggerFactory
             case ROLLED_FILE:
                 return new RolledFileLogger();
             case SYSLOG:
-                // TODO implement SysLog logger
-                
+                return new SyslogLogger();
             case WINEVENTS:
                 return new WinEventsLogger();
                 

@@ -61,7 +61,7 @@ public class RolledFileLogger extends AbstractLog4JLogger
     {
        /* File logger. */
         final IConfig conf = ConfigFactory.getInstance();
-        final String fileName = conf.getProperty(null);
+        final String fileName = conf.getProperty("Log_File_Name");
         
         if (fileName == null)
         {
