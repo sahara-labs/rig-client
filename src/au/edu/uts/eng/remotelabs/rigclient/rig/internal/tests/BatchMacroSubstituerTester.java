@@ -48,15 +48,15 @@ import junit.framework.TestCase;
 
 import org.junit.Before;
 
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.MacroSubstituter;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.BatchMacroSubstituter;
 
 /**
  * Tests the macro substituter class.
  */
-public class MacroSubstituerTester extends TestCase
+public class BatchMacroSubstituerTester extends TestCase
 {
     /** Object of class under test. */
-    private MacroSubstituter substituter;
+    private BatchMacroSubstituter substituter;
     
     /** Current time to give to substituter. */
     private final Calendar calendar = Calendar.getInstance();
@@ -70,7 +70,7 @@ public class MacroSubstituerTester extends TestCase
     /**
      * Constructor.
      */
-    public MacroSubstituerTester()
+    public BatchMacroSubstituerTester()
     {
         this.file = System.getProperty("user.dir");
         this.user = "mdiponio";
@@ -83,17 +83,17 @@ public class MacroSubstituerTester extends TestCase
     @Override
     public void setUp() throws Exception
     {
-        this.substituter = new MacroSubstituter.MacroBuilder(this.file, this.user).setCalendar(this.calendar).build();
+        this.substituter = new BatchMacroSubstituter.MacroBuilder(this.file, this.user).setCalendar(this.calendar).build();
     }
     
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.MacroSubstituter#addLeadingZeros}
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.BatchMacroSubstituter#addLeadingZeros}
      */
     public void testAddLeadingZeros()
     {
         try
         {
-            Method meth = MacroSubstituter.class.getDeclaredMethod("addLeadingZeros", int.class);
+            Method meth = BatchMacroSubstituter.class.getDeclaredMethod("addLeadingZeros", int.class);
             meth.setAccessible(true);
             String str = (String)meth.invoke(this.substituter, 10);
             assertEquals(2, str.length());
@@ -111,7 +111,7 @@ public class MacroSubstituerTester extends TestCase
     }
     
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.MacroSubstituter#substituteMacros(String)}
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.BatchMacroSubstituter#substituteMacros(String)}
      */
     public void testSubstitute()
     {

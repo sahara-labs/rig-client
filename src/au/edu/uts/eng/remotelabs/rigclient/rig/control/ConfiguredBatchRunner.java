@@ -49,7 +49,7 @@ import java.nio.ByteBuffer;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryCopier;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryZipper;
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.MacroSubstituter;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.BatchMacroSubstituter;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
 
@@ -74,7 +74,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     public static final int MAGIC_NUMBER_LEN = 8;
     
     /** Macro substituter. */
-    private final MacroSubstituter substiter;
+    private final BatchMacroSubstituter substiter;
     
     /** Batch configuration. */
     private final IConfig batchConfig;
@@ -137,7 +137,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
         this.batchConfig = new PropertiesConfig(ConfiguredBatchRunner.BATCH_PROPERTIES);
         this.logger.debug("Batch properites file information is " + this.batchConfig.getConfigurationInfomation());
         
-        this.substiter = new MacroSubstituter.MacroBuilder(this.fileName, this.username).build();
+        this.substiter = new BatchMacroSubstituter.MacroBuilder(this.fileName, this.username).build();
     }
 
     /* 

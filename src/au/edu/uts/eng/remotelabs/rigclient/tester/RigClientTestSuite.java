@@ -83,7 +83,7 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.AbstractBatchRunner
 import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.ConfiguredBatchRunnerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.DirectoryCopierTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.DirectoryZipperTester;
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.MacroSubstituerTester;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests.BatchMacroSubstituerTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.PrimitiveCacheTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.PrimitiveFrontTester;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.AbstractControlledRigTester;
@@ -143,7 +143,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.tests.PropertiesConfigTester;
     PrimitiveCacheTester.class,
     DirectoryCopierTester.class,
     DirectoryZipperTester.class,
-    MacroSubstituerTester.class,
+    BatchMacroSubstituerTester.class,
     AbstractBatchRunnerTester.class,
     AbstractControlledRigTester.class,
     AbstractRigTester.class,

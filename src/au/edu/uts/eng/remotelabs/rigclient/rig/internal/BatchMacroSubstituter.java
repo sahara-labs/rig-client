@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Macro substituter for the configured batch runner.
+ * <p />
  * Substitutes macro variables into a string.  All variables must be prefixed
  * with '<code>--</code>' and end in '<code>--<code>'. The following is the 
  * list of macro variable name and macro value pairs.
@@ -69,7 +71,7 @@ import java.util.Map;
  * specified by a <code>Calendar</code> instance provided as a construction
  * parameter or if none provided, the current date/time.
  */
-public class MacroSubstituter
+public class BatchMacroSubstituter
 {
     /**
      * Substitution macros.
@@ -106,7 +108,7 @@ public class MacroSubstituter
      * 
      * @param macroBuilder contains mandatory and optional parameters for construction
      */
-    private MacroSubstituter(final MacroBuilder macroBuilder)
+    private BatchMacroSubstituter(final MacroBuilder macroBuilder)
     {
         this.fileName = macroBuilder.fileName;
         this.userName = macroBuilder.userName;
@@ -219,7 +221,7 @@ public class MacroSubstituter
     }
     
     /**
-     * Builder pattern inner class to build {@link MacroSubstituter} instances.
+     * Builder pattern inner class to build {@link BatchMacroSubstituter} instances.
      */
     public static class MacroBuilder
     {
@@ -254,19 +256,19 @@ public class MacroSubstituter
         }
 
         /**
-         * Build a {@link MacroSubstituter} instance.
+         * Build a {@link BatchMacroSubstituter} instance.
          * 
-         * @return instance of {@link MacroSubstituter}
+         * @return instance of {@link BatchMacroSubstituter}
          * @throws IllegalStateException if the <code>file</code> or 
          *         <code>user</code> are provided as null.
          */
-        public MacroSubstituter build()
+        public BatchMacroSubstituter build()
         {
             if (this.fileName == null || this.userName == null)
             {
                 throw new IllegalStateException();
             }
-            return new MacroSubstituter(this);
+            return new BatchMacroSubstituter(this);
         }
     }
 }
