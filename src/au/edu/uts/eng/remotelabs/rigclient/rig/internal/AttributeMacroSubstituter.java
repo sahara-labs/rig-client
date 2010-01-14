@@ -43,8 +43,6 @@ package au.edu.uts.eng.remotelabs.rigclient.rig.internal;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
@@ -74,7 +72,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  *     3. If neither are set, the __IP__ and __HOSTNAME__ are determined from
  *        the first iterated network interface (eth0 on Linux systems).
  */
-public class AttributeMacroSubstituer
+public class AttributeMacroSubstituter
 { 
     
     /** Configured IP address. */
@@ -86,7 +84,7 @@ public class AttributeMacroSubstituer
     /** Logger. */
     private ILogger logger;
     
-    public AttributeMacroSubstituer()
+    public AttributeMacroSubstituter()
     {
         this.logger = LoggerFactory.getLoggerInstance();
         
@@ -102,7 +100,14 @@ public class AttributeMacroSubstituer
         }
     }
     
-    public String substitueMacros(String str)
+    /**
+     * Substitutes the marcos with their run-time determined values.
+     * 
+     * @param str macro string
+     * @return string with macros replaced
+     * @throws Exception error detected network information
+     */
+    public String substitueMacros(String str) throws Exception
     {
         StringBuilder buf = new StringBuilder();
         
@@ -110,11 +115,95 @@ public class AttributeMacroSubstituer
         {
             if (tok.equalsIgnoreCase("IP"))
             {
-                NetworkInterface inf;
+                buf.append(this.findNetworkMacroValue(false));
+            }
+            else if (tok.equalsIgnoreCase("HOSTNAME"))
+            {
+                buf.append(this.findNetworkMacroValue(true));
+            }
+            else
+            {
+                buf.append(tok);
             }
         }
         
-        
         return buf.toString();
+    }
+    
+    /**
+     * Finds and returns either the host name or IP of a network interface.
+     * The network interface used is either:
+     * <ol>
+     *  <li>The network interface with the configured IP address, if the IP 
+     *  address is set.</li>
+     *  <li>The network interface with the configured device name, if the
+     *  device name is configured and the IP address is not configured.</li>
+     *  <li>The first iterated non-loopback network interface if neither 
+     *  the network interface IP address or network device name is 
+     *  configured.</li>
+     * </ol>
+     * 
+     * @param returnHostname true if the host name is to be returned, \
+     *        otherwise the IP address is returned 
+     * @return host name or IP network host name or IP
+     * @throws Exception error finding network information or no viable \
+     *         network interface 
+     */
+    private String findNetworkMacroValue(boolean returnHostname) throws Exception
+    {
+        NetworkInterface inf = null;
+        
+        /* If IP configured, use the configured value. */
+        if (this.ip != null)
+        {
+            if (returnHostname)
+            {
+                inf = NetworkInterface.getByInetAddress(InetAddress.getByName(this.ip));
+            }
+            else
+            {
+                return this.ip;
+            }
+        }
+        /* If NIC configured, determined the (first)IP of the NIC. */ 
+        else if (this.nic != null)
+        {
+            inf = NetworkInterface.getByName(this.nic);
+            
+        }
+        /* Otherwise, use first non-loopback device. */
+        else
+        {
+            Enumeration<NetworkInterface> nics = NetworkInterface.getNetworkInterfaces();
+            while (nics.hasMoreElements())
+            {
+                inf = nics.nextElement();
+                if (inf.isLoopback())
+                {
+                    inf = null;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        
+        if (inf == null)
+        {
+            this.logger.warn("Unable to find any viable network interfaces for a IP address macro substitution.");
+            throw new Exception(" no network interface found");
+        }
+     
+        Enumeration<InetAddress> addrs = inf.getInetAddresses();
+        if (addrs.hasMoreElements())
+        {
+            return returnHostname ? addrs.nextElement().getHostName(): addrs.nextElement().getHostAddress();
+        }
+
+
+        this.logger.warn("Unable to find an IP address for network interface " + inf.getDisplayName() + " as it" +
+                " appears to have none.");
+        throw new Exception(" no addresses found for interface " + inf.getDisplayName()); 
     }
 }
