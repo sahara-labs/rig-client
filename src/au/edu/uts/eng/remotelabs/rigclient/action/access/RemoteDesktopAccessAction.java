@@ -41,9 +41,8 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
-import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
+import au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
-import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
@@ -58,14 +57,12 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * which specifies the Windows / Samba domain the user is part of 
  * (i.e their name is '\\&lt;Windows_Domain&gt;\&lt;name&gt;'.
  */
-public class RemoteDesktopAccessAction implements IAccessAction
+public class RemoteDesktopAccessAction extends ExecAccessAction
 {
     /** Domain name. */
     private final String domainName;
     
-    /** Logger. */
-    private final ILogger logger;
-    
+   
     /**
      * Constructor.
      */
@@ -118,4 +115,19 @@ public class RemoteDesktopAccessAction implements IAccessAction
     {
         return "Windows Remote Desktop.";
     }
+    
+    @Override
+    public boolean  setupAccessAction()
+    {
+        // TODO
+        return false;
+    }
+    
+    @Override
+    public boolean  verifyAccessAction()
+    {
+        // TODO
+        return false;
+    }
+    
 }
