@@ -41,6 +41,7 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.internal;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
@@ -89,11 +90,11 @@ public class AttributeMacroSubstituter
         this.logger = LoggerFactory.getLoggerInstance();
         
         final IConfig conf = ConfigFactory.getInstance();
-        if ((this.ip = conf.getProperty("")) != null)
+        if ((this.ip = conf.getProperty("Rig_Client_IP_Address")) != null)
         {
             this.logger.info("Providing network information based on the configured IP: " + this.ip + ".");
         }
-        else if ((this.nic = conf.getProperty("")) != null)
+        else if ((this.nic = conf.getProperty("Listening_Network_Interface")) != null)
         {
             this.logger.info("Providing network information based on the configured network interface name " + 
                     this.nic + ".");
@@ -196,9 +197,22 @@ public class AttributeMacroSubstituter
         }
      
         Enumeration<InetAddress> addrs = inf.getInetAddresses();
-        if (addrs.hasMoreElements())
+        while (addrs.hasMoreElements())
         {
-            return returnHostname ? addrs.nextElement().getHostName(): addrs.nextElement().getHostAddress();
+            InetAddress addr = addrs.nextElement();
+            if (!(addr instanceof Inet4Address)) // Only interested in IPv4 currently
+            {
+                continue;
+            }
+
+            if (returnHostname)
+            {
+                return addr.getHostName();
+            }
+            else
+            {
+                return addr.getHostAddress();
+            }
         }
 
 
