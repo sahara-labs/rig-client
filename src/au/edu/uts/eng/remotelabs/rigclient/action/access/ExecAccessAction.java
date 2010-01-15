@@ -32,10 +32,12 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -125,9 +127,32 @@ public abstract class ExecAccessAction implements IAccessAction
             processCommand.addAll(this.commandArguments);
             this.logger.info("Access action command arguments are " + this.commandArguments.toString());
         }
-        return false;
+
+        final ProcessBuilder builder = new ProcessBuilder(processCommand);
         
+        if (this.workingDirectory == null)
+        {
+            this.workingDirectory = System.getProperty("user.dir");
+            this.logger.warn("No working directory set-up, using Rig Client  working directory " + this.workingDirectory
+                    + " as default.");
+        }
+        else
+        {
+            this.logger.info("User set action access command working directory is " + this.workingDirectory);
+        }
+        final File workingDir = new File(this.workingDirectory);
+        builder.directory(workingDir);
         
+        final Map<String, String> env = builder.environment();
+        for (Entry<String, String> e : this.environmentVariables.entrySet())
+        {
+            this.logger.info("Adding access action environment variable " + e.getKey() + " with value " + e.getValue());
+            env.put(e.getKey(), e.getValue());
+        }
+        this.logger.info("Access action environment variables: " + env.toString());
+
+        
+        return true;
         
     }
 
