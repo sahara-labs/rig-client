@@ -104,6 +104,8 @@ public class AbstractRigTester extends TestCase
         expect(this.mockConfig.getProperty("WARN_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn("127.0.0.1");
+        expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn(null);
         
         replay(this.mockConfig);
         
@@ -154,7 +156,6 @@ public class AbstractRigTester extends TestCase
         assertTrue(this.rig.isInSession(active) == Session.SLAVE_ACTIVE);
         assertTrue(this.rig.isInSession(passive) == Session.SLAVE_PASSIVE);
         
-        /* Make sure the cannot be readded as the same permssion. */
         assertFalse(this.rig.addSlave(active, false));
         assertFalse(this.rig.addSlave(passive, true));
         assertTrue(this.rig.isInSession(active) == Session.SLAVE_ACTIVE);
@@ -831,6 +832,31 @@ public class AbstractRigTester extends TestCase
      * Tests the <code>AbstractRig.getAllRigAttributes()</code> method.
      */
     @Test
+    public void testGetAllRigAttributesSubs()
+    {
+        // Setup
+        Map<String, String> prop = new HashMap<String, String>();
+        prop.put("Camera1", "http://__IP__/stream1.jpg");
+        prop.put("Camera2", "http://__HOSTNAME__/stream2.jpg");
+        
+        reset(this.mockConfig);
+        expect(this.mockConfig.getAllProperties())
+                .andReturn(prop);
+        replay(this.mockConfig);
+        
+        /* Check all key value pairs are the same. */
+        Map<String, String> attrib = this.rig.getAllRigAttributes();
+        assertEquals("http://127.0.0.1/stream1.jpg", attrib.remove("Camera1"));
+        assertEquals("http://localhost/stream2.jpg", attrib.remove("Camera2"));
+        assertTrue(attrib.isEmpty());
+        
+        verify(this.mockConfig);
+    }
+    
+    /**
+     * Tests the <code>AbstractRig.getRigAttribute()</code> method.
+     */
+    @Test
     public void testGetAttribute()
     {
         reset(this.mockConfig);
@@ -843,7 +869,37 @@ public class AbstractRigTester extends TestCase
     }
     
     /**
-     * Tests the <code>AbstractRig.getAllRigAttributes()</code> method
+     * Tests the <code>AbstractRig.getRigAttribute()</code> method.
+     */
+    @Test
+    public void testGetAttributeIpSub()
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("IP"))
+            .andReturn("__IP__");
+        replay(this.mockConfig);
+        
+        assertEquals("127.0.0.1", this.rig.getRigAttribute("IP"));
+        verify(this.mockConfig);
+    }
+    
+    /**
+     * Tests the <code>AbstractRig.getRigAttribute()</code> method.
+     */
+    @Test
+    public void testGetAttributeHostNameSub()
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("IP"))
+            .andReturn("__HOSTNAME__");
+        replay(this.mockConfig);
+        
+        assertEquals("localhost", this.rig.getRigAttribute("IP"));
+        verify(this.mockConfig);
+    }
+    
+    /**
+     * Tests the <code>AbstractRig.getRigAttribute()</code> method
      * with a property that isn't found.
      */
     @Test

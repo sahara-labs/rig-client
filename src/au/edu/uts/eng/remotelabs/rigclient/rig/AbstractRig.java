@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -134,6 +135,9 @@ public abstract class AbstractRig implements IRig
      *  successful action. */
     private final Map<IAction, Integer> actionFailures;
     
+    /** Macro substituter for the <code>getRigAttribute</code> method. */ 
+    protected final AttributeMacroSubstituter macroSubstituter;
+    
     /** Rig client configuration. */
     protected IConfig configuration;
     
@@ -146,8 +150,6 @@ public abstract class AbstractRig implements IRig
     public AbstractRig()
     {
         this.logger = LoggerFactory.getLoggerInstance();
-        this.logger.debug("Creating a new AbstractRig instance");
-        
         this.configuration = ConfigFactory.getInstance();
         
         this.sessionUsers = new HashMap<String, Session>();
@@ -159,6 +161,8 @@ public abstract class AbstractRig implements IRig
         this.testActions = new ArrayList<ITestAction>();
         this.detectionActions = new ArrayList<IActivityDetectorAction>();
         this.testThreads = new ThreadGroup("Test Threads");
+        
+        this.macroSubstituter = new AttributeMacroSubstituter();
         
         this.inMaintenance = false;
 
@@ -409,7 +413,24 @@ public abstract class AbstractRig implements IRig
     @Override
     public Map<String, String> getAllRigAttributes()
     {
-        return this.configuration.getAllProperties();
+        final Map<String, String> allProps = this.configuration.getAllProperties();
+        final Map<String, String> substituedProps = new HashMap<String, String>(allProps.size());
+        
+        for (Entry<String, String> prop : allProps.entrySet())
+        {
+            try
+            {
+                substituedProps.put(prop.getKey(), this.macroSubstituter.substitueMacros(prop.getValue()));
+            }
+            catch (Exception e)
+            {
+                this.logger.warn("Failed to substitute macros of rig attribute with key " + prop.getKey() + " and with" +
+                        " configured value as " + prop.getValue() + ". Using unsubstituted value.");
+                substituedProps.put(prop.getKey(), prop.getValue());
+            }
+        }
+        
+        return substituedProps;
     }
 
     /* 
@@ -490,7 +511,16 @@ public abstract class AbstractRig implements IRig
         {
             this.logger.info("Found rig attribute value, value of " + key + " is " + value + ".");
         }
-        return value;
+        try
+        {
+            return this.macroSubstituter.substitueMacros(value);
+        }
+        catch (Exception e)
+        {
+            this.logger.warn("Failed to substitute macros of rig attribute with key " + key + " and with" +
+                    " configured value as " + value + ". Using unsubstituted value.");
+            return value;
+        }
     }
 
     /* 

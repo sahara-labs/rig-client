@@ -282,7 +282,7 @@ public class AttributeMacroSubstituterTester extends TestCase
         String ip = this.detectIpFromExec(device);
         if (ip == null) return null;
         
-        ProcessBuilder builder = new ProcessBuilder("nslookup", ip);
+        ProcessBuilder builder = new ProcessBuilder("/usr/bin/nslookup", ip);
         Process proc = builder.start();
         if (proc.waitFor() == 0)
         {
@@ -320,7 +320,7 @@ public class AttributeMacroSubstituterTester extends TestCase
     {
         if (System.getProperty("os.name").equals("Linux"))
         {
-            ProcessBuilder builder = new ProcessBuilder("ifconfig");
+            ProcessBuilder builder = new ProcessBuilder("/sbin/ifconfig");
             if (device != null) builder.command().add(device);
             
             Process proc = builder.start();
@@ -338,7 +338,7 @@ public class AttributeMacroSubstituterTester extends TestCase
                         return parts[1];
                     }
                 }
-            }            
+            }
         }
         else if (System.getProperty("os.name").startsWith("Windows"))
         {
