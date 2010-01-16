@@ -71,6 +71,8 @@ import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
 
 /**
  * PrimitiveControlResponseType bean class
+ * 
+ * FIXME Protocol bug - appending error node twice.
  */
 public class PrimitiveControlResponseType extends OperationResponseType implements ADBBean
 {
@@ -87,9 +89,6 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
 
     protected boolean resultParamsTracker = false;
     protected ParamType[] resultParams;
-
-    protected boolean errorTracker = false;
-    protected ErrorType error;
 
     private static String generatePrefix(final String namespace)
     {
