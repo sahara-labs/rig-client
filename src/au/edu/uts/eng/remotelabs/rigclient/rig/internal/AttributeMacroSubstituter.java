@@ -74,12 +74,11 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  *        the first iterated network interface (eth0 on Linux systems).
  */
 public class AttributeMacroSubstituter
-{ 
-    
-    /** Configured IP address. */
+{   
+    /** Configured IP address to use as IP and discover hostname from. */
     private String ip;
     
-    /** Configured network interface name. */
+    /** Configured network interface name to discover IP and hostname from. */
     private String nic;
     
     /** Logger. */
@@ -90,14 +89,21 @@ public class AttributeMacroSubstituter
         this.logger = LoggerFactory.getLoggerInstance();
         
         final IConfig conf = ConfigFactory.getInstance();
-        if ((this.ip = conf.getProperty("Rig_Client_IP_Address")) != null)
+        if ((this.ip = conf.getProperty("Rig_Client_IP_Address")) != null && this.ip.length() > 0)
         {
             this.logger.info("Providing network information based on the configured IP: " + this.ip + ".");
+            this.nic = null;
         }
-        else if ((this.nic = conf.getProperty("Listening_Network_Interface")) != null)
+        else if ((this.nic = conf.getProperty("Listening_Network_Interface")) != null && this.nic.length() > 0)
         {
             this.logger.info("Providing network information based on the configured network interface name " + 
                     this.nic + ".");
+            this.ip = null;
+        }
+        else
+        {
+            this.ip = null;
+            this.nic = null;
         }
     }
     
@@ -192,7 +198,7 @@ public class AttributeMacroSubstituter
         
         if (inf == null)
         {
-            this.logger.warn("Unable to find any viable network interfaces for a IP address macro substitution.");
+            this.logger.warn("Unable to find any viable network interfaces for network information macro substitution.");
             throw new Exception(" no network interface found");
         }
      

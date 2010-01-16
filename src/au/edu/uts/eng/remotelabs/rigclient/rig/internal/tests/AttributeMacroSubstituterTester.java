@@ -44,6 +44,7 @@ package au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -57,6 +58,7 @@ import org.junit.Test;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * Tests the {@link AttributeMacroSubstituter} class.
@@ -96,6 +98,8 @@ public class AttributeMacroSubstituterTester extends TestCase
         f.setAccessible(true);
         f.set(null, this.mockConfig);
         
+        LoggerFactory.getLoggerInstance();
+        
         this.subs = new AttributeMacroSubstituter();
     }
     
@@ -108,6 +112,114 @@ public class AttributeMacroSubstituterTester extends TestCase
         String str = "this_has_no_macros";
         String subStr = this.subs.substitueMacros(str);
         assertEquals(str, subStr);
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter#substitueMacros(java.lang.String)}.
+     */
+    @Test
+    public void testSubstitueMacrosDetectIPConfIP() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn("127.0.0.1");
+        expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn(null);
+        replay(this.mockConfig);
+        
+        AttributeMacroSubstituter attrSub = new AttributeMacroSubstituter();
+        String ipStr = "http://__IP__//camera1";
+        String str = attrSub.substitueMacros(ipStr);
+        
+        assertNotNull(str);
+        assertTrue(str.startsWith("http://"));
+        assertTrue(str.endsWith("camera1"));
+        assertFalse(str.contains("__"));
+        
+        String[] tok = str.split("//");
+        assertEquals(3, tok.length);
+        assertEquals("http:", tok[0]);
+        assertEquals("camera1", tok[2]);
+        assertEquals("127.0.0.1", tok[1]);
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter#substitueMacros(java.lang.String)}.
+     */
+    @Test
+    public void testSubstitueMacrosDetectHostnameConfIP() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn("127.0.0.1");
+        expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn("should_be_ignored");
+        replay(this.mockConfig);
+        
+        AttributeMacroSubstituter attrSub = new AttributeMacroSubstituter();
+        String ipStr = "http://__HOSTNAME__//camera1";
+        String str = attrSub.substitueMacros(ipStr);
+
+        assertNotNull(str);
+        assertTrue(str.startsWith("http://"));
+        assertTrue(str.endsWith("camera1"));
+        assertFalse(str.contains("__"));
+        
+        String[] tok = str.split("//");
+        assertEquals(3, tok.length);
+        assertEquals("http:", tok[0]);
+        assertEquals("camera1", tok[2]);
+        assertEquals("localhost", tok[1]);
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter#substitueMacros(java.lang.String)}.
+     */
+    @Test
+    public void testSubstitueMacrosDetectIPConfNic() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn("");
+        expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn("lo");
+        replay(this.mockConfig);
+        
+        AttributeMacroSubstituter attrSub = new AttributeMacroSubstituter();
+        String ipStr = "http://__IP__//camera1";
+        String str = attrSub.substitueMacros(ipStr);
+
+        assertNotNull(str);
+        assertTrue(str.startsWith("http://"));
+        assertTrue(str.endsWith("camera1"));
+        assertFalse(str.contains("__"));
+        
+        String[] tok = str.split("//");
+        assertEquals(3, tok.length);
+        assertEquals("http:", tok[0]);
+        assertEquals("camera1", tok[2]);
+        assertEquals(this.detectIpFromExec("lo"), tok[1]);
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter#substitueMacros(java.lang.String)}.
+     */
+    @Test
+    public void testSubstitueMacrosDetectHostNameConfNic() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn("");
+        expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn("lo");
+        replay(this.mockConfig);
+        
+        AttributeMacroSubstituter attrSub = new AttributeMacroSubstituter();
+        String ipStr = "http://__HOSTNAME__//camera1";
+        String str = attrSub.substitueMacros(ipStr);
+
+        assertNotNull(str);
+        assertTrue(str.startsWith("http://"));
+        assertTrue(str.endsWith("camera1"));
+        assertFalse(str.contains("__"));
+        
+        String[] tok = str.split("//");
+        assertEquals(3, tok.length);
+        assertEquals("http:", tok[0]);
+        assertEquals("camera1", tok[2]);
+        assertEquals(this.detectHostNameFromExec("lo"), tok[1]);
     }
 
     /**
