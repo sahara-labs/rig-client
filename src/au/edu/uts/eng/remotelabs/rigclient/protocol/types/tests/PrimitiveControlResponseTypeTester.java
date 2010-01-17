@@ -42,10 +42,13 @@
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types.tests;
 
 
+import java.io.ByteArrayInputStream;
+
 import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.StAXUtils;
 import org.junit.Test;
 
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ErrorType;
@@ -61,7 +64,37 @@ public class PrimitiveControlResponseTypeTester extends TestCase
     @Test
     public void testParse() throws Exception
     {
-        // TODO test parsing.
+        String xml = "<ns1:performPrimitiveControlResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:PrimitiveControlResponseType\">\n" + 
+        		"  <success>true</success>\n" + 
+        		"  <error>\n" + 
+        		"    <code>10</code>\n" + 
+        		"    <operation>primitive</operation>\n" + 
+        		"    <reason>not supported</reason>\n" + 
+        		"  </error>\n" + 
+        		"  <wasSuccessful>Successful</wasSuccessful>\n" + 
+        		"  <result>\n" + 
+        		"    <name>foo</name>\n" + 
+        		"    <value>bar</value>\n" + 
+        		"  </result>\n" + 
+        		"</ns1:performPrimitiveControlResponse>";
+        
+        PrimitiveControlResponseType prim = PrimitiveControlResponseType.Factory.parse(
+                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(xml.getBytes())));
+        
+        assertNotNull(prim);
+        assertTrue(prim.getSuccess());
+        assertEquals("Successful", prim.getWasSuccessful());
+        
+        ErrorType err = prim.getError();
+        assertEquals(10, err.getCode());
+        assertEquals("primitive", err.getOperation());
+        assertEquals("not supported", err.getReason());
+        
+        ParamType[] res = prim.getResult();
+        assertNotNull(res);
+        assertEquals(1, res.length);
+        assertEquals("foo", res[0].getName());
+        assertEquals("bar", res[0].getValue());
     }
     
     @Test
@@ -82,7 +115,18 @@ public class PrimitiveControlResponseTypeTester extends TestCase
         
         OMElement ele = prim.getOMElement(PerformPrimitiveControlResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
         String xml = ele.toStringWithConsume();
-        System.out.println(xml);
         
+        assertNotNull(xml);
+        assertTrue(xml.contains("performPrimitiveControlResponse"));
+        assertTrue(xml.contains("<success>true</success>"));
+        assertTrue(xml.contains("<wasSuccessful>Successful</wasSuccessful>"));
+        assertTrue(xml.contains("<name>foo</name>"));
+        assertTrue(xml.contains("<value>bar</value>"));
+        
+        String parts[] = xml.split("error");
+        assertEquals(3, parts.length); // There should only be one error.
+        assertTrue(parts[0].contains("<success>true</success>")); // Preceding error
+        assertTrue(parts[1].contains("<operation>primitive</operation>")); // Part of error
+        assertTrue(parts[2].contains("<wasSuccessful>Successful</wasSuccessful>")); // After error
     }
 }

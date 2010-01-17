@@ -801,6 +801,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
                 request.getAction() + ".");
         error.setReason("");
         control.setError(error);
+        control.setWasSuccessful("");
         
         if (!(this.isSourceAuthenticated(request.getIdentityToken()) || 
                 this.rig.hasPermission(requestor, Session.SLAVE_ACTIVE)))
@@ -839,6 +840,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             control.setSuccess(false);
             error.setCode(14);
             error.setReason("Primitive control not supported.");
+            control.setWasSuccessful("FAILED - Not supported.");
         }
         
         return response;

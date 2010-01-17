@@ -251,9 +251,6 @@ Changelog:
             					type="rigclient:ParamType" maxOccurs="unbounded"
             					minOccurs="0">
             				</xsd:element>
-            				<xsd:element name="error"
-            					type="rigclient:ErrorType" maxOccurs="1" minOccurs="0">
-            				</xsd:element>
             			</xsd:sequence>
             		</xsd:extension>
             	</xsd:complexContent>

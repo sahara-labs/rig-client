@@ -70,9 +70,7 @@ import org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl;
 import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
 
 /**
- * PrimitiveControlResponseType bean class
- * 
- * FIXME Protocol bug - appending error node twice.
+ * PrimitiveControlResponseType bean class.
  */
 public class PrimitiveControlResponseType extends OperationResponseType implements ADBBean
 {
@@ -157,13 +155,13 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
         elementList.add(ConverterUtil.convertToString(this.success));
         if (this.errorTracker)
         {
-            elementList.add(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "error"));
+            elementList.add(new QName("", "error"));
 
             if (this.error == null) throw new ADBException("error cannot be null!!");
             elementList.add(this.error);
         }
+        
         elementList.add(new QName("", "wasSuccessful"));
-
         if (this.wasSuccessful != null)
         {
             elementList.add(ConverterUtil.convertToString(this.wasSuccessful));
@@ -191,13 +189,7 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
                 throw new ADBException("result cannot be null!!");
             }
         }
-        if (this.errorTracker)
-        {
-            elementList.add(new QName("", "error"));
 
-            if (this.error == null) throw new ADBException("error cannot be null!!");
-            elementList.add(this.error);
-        }
         return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
     }
 
@@ -278,6 +270,7 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
                     "PrimitiveControlResponseType", xmlWriter);
         }
 
+        /* Success element. */
         namespace = "";
         if (!namespace.equals(""))
         {
@@ -290,25 +283,24 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
                 xmlWriter.writeStartElement(prefix, "success", namespace);
                 xmlWriter.writeNamespace(prefix, namespace);
                 xmlWriter.setPrefix(prefix, namespace);
-
             }
             else
             {
                 xmlWriter.writeStartElement(namespace, "success");
             }
-
         }
         else
         {
             xmlWriter.writeStartElement("success");
         }
-
         xmlWriter.writeCharacters(ConverterUtil.convertToString(this.success));
         xmlWriter.writeEndElement();
+
+        /* Error element. */
         if (this.errorTracker)
         {
             if (this.error == null) throw new ADBException("error cannot be null!!");
-            this.error.serialize(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "error"),
+            this.error.serialize(new QName("", "error"),
                     factory, xmlWriter);
         }
         namespace = "";
@@ -334,6 +326,7 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
             xmlWriter.writeStartElement("wasSuccessful");
         }
 
+        /* Was successful string. */
         if (this.wasSuccessful == null)
         {
             throw new ADBException("wasSuccessful cannot be null!!");
@@ -342,8 +335,9 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
         {
             xmlWriter.writeCharacters(this.wasSuccessful);
         }
-
         xmlWriter.writeEndElement();
+        
+        /* Results list. */
         if (this.resultParamsTracker)
         {
             if (this.resultParams != null)
@@ -361,11 +355,7 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
                 throw new ADBException("result cannot be null!!");
             }
         }
-        if (this.errorTracker)
-        {
-            if (this.error == null) throw new ADBException("error cannot be null!!");
-            this.error.serialize(new QName("", "error"), factory, xmlWriter);
-        }
+        
         xmlWriter.writeEndElement();
     }
 
@@ -468,8 +458,7 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
                     reader.next();
                 }
                 if (reader.isStartElement()
-                        && new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "error").equals(reader
-                                .getName()))
+                        && new QName("", "error").equals(reader.getName()))
                 {
                     object.setError(ErrorType.Factory.parse(reader));
                     reader.next();
@@ -527,16 +516,6 @@ public class PrimitiveControlResponseType extends OperationResponseType implemen
                         }
                     }
                     object.setResult((ParamType[]) ConverterUtil.convertToArray(ParamType.class, resultList));
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-                if (reader.isStartElement() && new QName("", "error").equals(reader.getName()))
-                {
-                    object.setError(ErrorType.Factory.parse(reader));
-                    reader.next();
                 }
                 
                 while (!reader.isStartElement() && !reader.isEndElement())
