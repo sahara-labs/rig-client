@@ -125,6 +125,8 @@ public class RigClientDefines
     public static String prependPackage(String pack, String clazz)
     {
         StringBuilder name = new StringBuilder();
+        pack = pack.trim();
+        clazz = clazz.trim();
         
         name.append(pack);
         if (name.charAt(name.length() - 1) != '.')
