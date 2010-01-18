@@ -133,6 +133,8 @@ Changelog:
 		<delete dir="${javadoc.dir}/resources" />
 		<delete dir="${javadoc.dir}/au" />
 		<delete dir="${reports.emma.dir}" verbose="no" />
+		<delete dir="${dist.dir}" />
+		<delete dir="_axis2" />
 	</target>
 	
 	<!-- Execute unit test suite with EMMA code coverage. -->
