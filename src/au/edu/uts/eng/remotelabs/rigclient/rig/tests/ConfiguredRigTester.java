@@ -129,6 +129,8 @@ public class ConfiguredRigTester extends TestCase
             .andReturn("");
         expect(this.mockConfig.getProperty("Action_Failure_Threshold"))
             .andReturn("3");
+        expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn(null);
+        expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn(null);
         replay(this.mockConfig);
         
         this.rig = new ConfiguredRig();

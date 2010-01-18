@@ -101,6 +101,8 @@ public class AbstractControlledRigTester extends TestCase
         expect(this.mockConfig.getProperty("WARN_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn(null);
+        expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn(null);
         replay(this.mockConfig);
 
         Field configField = ConfigFactory.class.getDeclaredField("instance");
