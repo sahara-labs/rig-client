@@ -44,10 +44,13 @@ Changelog:
 <project name="RigClient" default="build" basedir=".">
 	<!-- Properties -->
 	<property name="component.name" value="Rig Client" /> <!-- Rig Client component name. -->
+	<property name="main.class" value="au.edu.uts.eng.remotelabs.rigclient.main.RigClientMain" />
 	<property name="build.classes.dir" location="bin" /> <!-- Build classes location. -->
 	<property name="lib.dir" location="lib" /> <!-- Library location. -->
 	<property name="javadoc.dir" location="doc" /> <!-- Javadoc location. -->
 	<property name="src.dir" location="src" /> <!-- Source code locatiom. -->
+	<property name="dist.dir" location="dist" />
+	<property name="dist.jar" value="rigclient.jar" />
 	<property name="test.lib.dir" location="test/lib" /> <!-- Test library location. -->
 	<property name="tool.lib.dir" location="test/tools" /> <!-- Static analysis tools. -->
 	<property name="reports.junit.xml.dir" location="test/reports/junit" /> <!-- JUnit reports -->
@@ -75,7 +78,7 @@ Changelog:
 	</path>
 	
 	<!-- Everything! -->
-	<target name="all" depends="clean,build,test,pmd,bugs,doc"/>
+	<target name="all" depends="clean,build,dist,test,pmd,bugs,doc"/>
 	
 	<!-- Code compilation -->
 	<target name="build">
@@ -85,6 +88,32 @@ Changelog:
 			<classpath refid="project.classpath" />
 		</javac>
 		<echo>The ${component.name} has been successfully built.</echo>
+	</target>
+	
+	<!-- Generate an executable bundle. -->
+	<target name="dist" depends="build">
+		<mkdir dir="${dist.dir}"/>
+		<jar destfile="${dist.dir}/${dist.jar}">
+		            <manifest>
+		                <attribute name="Main-Class" value="${main.class}"/>
+		                <attribute name="Class-Path" value="."/>
+		            </manifest>
+		            <fileset dir="${build.classes.dir}"/>
+					<zipgroupfileset dir="${lib.dir}/Axis2/">
+						<exclude name="**/NOTICE.txt" />
+			            <include name="**/*.jar" />
+			            <exclude name="**/manifest.mf"/>
+						<exclude name="**/META-INF/*.SF" />
+						<exclude name="**/*.txt" />
+			        </zipgroupfileset>
+					<zipgroupfileset dir="${lib.dir}/Jetty/">
+						<exclude name="**/NOTICE.txt" />
+			            <include name="**/*.jar" />
+			            <exclude name="**/manifest.mf"/>
+						<exclude name="**/META-INF/*.SF" />
+						<exclude name="**/*.txt" />
+					</zipgroupfileset>
+		        </jar>
 	</target>
 	
 	<!-- Clean previously built code. -->
