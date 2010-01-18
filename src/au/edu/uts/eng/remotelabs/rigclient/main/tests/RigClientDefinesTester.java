@@ -41,9 +41,7 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.main.tests;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -52,7 +50,7 @@ import au.edu.uts.eng.remotelabs.rigclient.main.RigClientDefines;
 /**
  * Tests the {@link RigClientDefines} class.
  */
-public class RigClientDefinesTester
+public class RigClientDefinesTester extends TestCase
 {
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.main.RigClientDefines#prependPackage(java.lang.String, java.lang.String)}.
