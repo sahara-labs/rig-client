@@ -75,6 +75,7 @@ public abstract class ExecAccessAction implements IAccessAction
     protected final Map<String, String> environmentVariables;
 
     /** Command input String */
+    //TODO - change to allow implementation to do what they want - dont need buffer
     protected StringBuffer inputStringBuffer;
 
     /** Command output String */
@@ -102,6 +103,7 @@ public abstract class ExecAccessAction implements IAccessAction
         this.commandArguments = new ArrayList<String>();
         this.environmentVariables = new HashMap<String, String>();
         
+        // TODO - change
         this.inputStringBuffer = new StringBuffer();
         this.outputStringBuffer = new StringBuffer();
         this.errorStringBuffer = new StringBuffer();
@@ -142,8 +144,8 @@ public abstract class ExecAccessAction implements IAccessAction
         
         if (this.workingDirectory == null)
         {
-            this.workingDirectory = System.getProperty("user.dir");
-            this.logger.warn("No working directory set-up, using Rig Client  working directory " + this.workingDirectory
+            this.workingDirectory = System.getProperty("java.io.tmpdir");
+            this.logger.warn("No working directory set-up, using tmp directory " + this.workingDirectory
                     + " as default.");
         }
         else
@@ -165,12 +167,16 @@ public abstract class ExecAccessAction implements IAccessAction
         {
             this.accessActionProcess = builder.start();
             this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
-
+            this.accessActionProcess.waitFor();
+            return true;
+            
         }
         catch (Exception ex)
         {
             this.logger.warn("Access Action failed with exception of type " + ex.getClass().getName() + " and with " +
                     "message " + ex.getMessage());
+            return false;
+            
         }
         finally
         {
@@ -178,8 +184,6 @@ public abstract class ExecAccessAction implements IAccessAction
             //this.cleanup();
         }
        
-        return true;
-        
     }
 
     /**
