@@ -65,7 +65,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  *  <li><code>isSetIntervalHonoured</code> - Specifies if the test 
  *  interval is changed when the <code>setInterval</code> method is 
  *  invoked. The default is to honour the test interval.</li>
- *  <li><code>runInterval - The between each test run in seconds. The 
+ *  <li><code>runInterval - The time between each test run in seconds. The 
  *  default is 60 seconds.</li>
  * </ul>
  * <strong>NOTE:</strong> The abstract methods declared in this class
@@ -82,12 +82,12 @@ public abstract class AbstractTestAction implements ITestAction
     protected int runInterval = 60;
     
     /** Whether the test is periodic or aperiodic. */
-    protected final boolean isPeriodic = true;
+    protected boolean isPeriodic = true;
     
     /** Whether a call to setInterval will actually cause the test run 
      *  interval to be changed (i.e. if the specified test interval is 
      *  honoured). The default is to honour the specified test interval. */
-    protected final boolean isSetIntervalHonoured = true;
+    protected boolean isSetIntervalHonoured = true;
     
     /** Random number generator. */
     protected final Random randomNumGen;
