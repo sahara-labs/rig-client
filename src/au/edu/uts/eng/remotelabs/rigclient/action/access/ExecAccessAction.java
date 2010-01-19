@@ -33,7 +33,9 @@
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,13 +59,15 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * </ul>
  */
 
-public abstract class ExecAccessAction implements IAccessAction
+public abstract class ExecAccessAction implements IAccessAction 
 {
-    //TODO - add throws exception
     
     /** Arguments for access command */
     protected final List<String> commandArguments;
 
+    /** Access Action process. */
+    private Process accessActionProcess;
+    
     /** Command to execute */
     protected String command;
     
@@ -76,6 +80,9 @@ public abstract class ExecAccessAction implements IAccessAction
     /** Command output String */
     protected StringBuffer outputStringBuffer;
 
+    /** Error String */
+    protected StringBuffer errorStringBuffer;
+
     /** Working directory for access command */
     protected String workingDirectory;
 
@@ -85,8 +92,10 @@ public abstract class ExecAccessAction implements IAccessAction
     /**
      * Constructor, initialises the argument and environment variable lists 
      */
-    public ExecAccessAction()
+    public ExecAccessAction() 
     {
+        // TODO put in exceptions
+        
         this.logger = LoggerFactory.getLoggerInstance();
         this.logger.debug("Creating a new ExecAccessAction instance");
         
@@ -95,6 +104,7 @@ public abstract class ExecAccessAction implements IAccessAction
         
         this.inputStringBuffer = new StringBuffer();
         this.outputStringBuffer = new StringBuffer();
+        this.errorStringBuffer = new StringBuffer();
         
 
     }
@@ -151,7 +161,23 @@ public abstract class ExecAccessAction implements IAccessAction
         }
         this.logger.info("Access action environment variables: " + env.toString());
 
-        
+        try
+        {
+            this.accessActionProcess = builder.start();
+            this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
+
+        }
+        catch (Exception ex)
+        {
+            this.logger.warn("Access Action failed with exception of type " + ex.getClass().getName() + " and with " +
+                    "message " + ex.getMessage());
+        }
+        finally
+        {
+            /* Cleanup. */
+            //this.cleanup();
+        }
+       
         return true;
         
     }
@@ -185,4 +211,31 @@ public abstract class ExecAccessAction implements IAccessAction
      * @return true if successful, false otherwise
      */
     protected abstract boolean verifyAccessAction();
-}
+
+    /**
+     * Gets a formatted time stamp with day, month, year, hour, minute
+     * and second components separated with the <code>glue</code> parameter.
+     * 
+     * @param dateGlue character to append date components with
+     * @param join character to join date and time with
+     * @param timeGlue character to append time with
+     * @return String formatted time stamp
+     */
+    protected String getTimeStamp(final char dateGlue, final char join, final char timeGlue)
+    {
+        final Calendar cal = Calendar.getInstance();
+        final StringBuffer buf = new StringBuffer();
+        buf.append(cal.get(Calendar.DATE));
+        buf.append(dateGlue);
+        buf.append(cal.get(Calendar.MONTH) + 1);
+        buf.append(dateGlue);
+        buf.append(cal.get(Calendar.YEAR));
+        buf.append(join);
+        buf.append(cal.get(Calendar.HOUR_OF_DAY));
+        buf.append(timeGlue);
+        buf.append(cal.get(Calendar.MINUTE));
+        buf.append(timeGlue);
+        buf.append(cal.get(Calendar.SECOND));
+        return buf.toString();
+    }
+ }
