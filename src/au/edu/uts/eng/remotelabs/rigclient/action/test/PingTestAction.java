@@ -85,7 +85,7 @@ public class PingTestAction extends AbstractTestAction
     private final Map<String, Integer> hosts;
     
     /** Ping process builder. */
-    private ProcessBuilder pingBuilder;
+    private final ProcessBuilder pingBuilder;
     
     /** The number of times ping can fail before the test fails. */
     private int failThreshold;
@@ -106,7 +106,7 @@ public class PingTestAction extends AbstractTestAction
     public void setUp()
     {
         /* Set up command. */
-        List<String> command = new ArrayList<String>();
+        final List<String> command = new ArrayList<String>();
         String tmp =this.config.getProperty("Ping_Test_Command", PingTestAction.DEFAULT_PING);
         this.logger.info("Ping command is " + tmp + ".");
         command.add(tmp);
@@ -166,7 +166,7 @@ public class PingTestAction extends AbstractTestAction
     @Override
     public void doTest()
     {
-        List<String> command = this.pingBuilder.command();
+        final List<String> command = this.pingBuilder.command();
         for (Entry<String, Integer> host : this.hosts.entrySet())
         {
             if (!this.runTest) return;
@@ -174,7 +174,7 @@ public class PingTestAction extends AbstractTestAction
             command.add(host.getKey());
             try
             {
-                Process proc = this.pingBuilder.start();
+                final Process proc = this.pingBuilder.start();
                 if (proc.waitFor() != 0)
                 {
                     host.setValue(host.getValue() + 1);
