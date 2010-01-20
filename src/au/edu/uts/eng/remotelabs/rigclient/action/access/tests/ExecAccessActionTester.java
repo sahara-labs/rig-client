@@ -82,7 +82,7 @@ public class ExecAccessActionTester extends TestCase
     @Test
     public void testExecuteAccessAction()
     {
-        // if config needed mack config is creaTED AND values set (not here)
+        // if config needed mock config is creaTED AND values set (not here)
         fail("Not yet implemented");
     }
 

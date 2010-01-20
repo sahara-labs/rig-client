@@ -32,8 +32,11 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -42,6 +45,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -74,15 +79,11 @@ public abstract class ExecAccessAction implements IAccessAction
     /** Environment variables for access command */
     protected final Map<String, String> environmentVariables;
 
-    /** Command input String */
-    //TODO - change to allow implementation to do what they want - dont need buffer
-    protected StringBuffer inputStringBuffer;
+    /** Command output string */
+    protected String outputString;
 
-    /** Command output String */
-    protected StringBuffer outputStringBuffer;
-
-    /** Error String */
-    protected StringBuffer errorStringBuffer;
+    /** Error string */
+    protected String errorString;
 
     /** Working directory for access command */
     protected String workingDirectory;
@@ -95,7 +96,6 @@ public abstract class ExecAccessAction implements IAccessAction
      */
     public ExecAccessAction() 
     {
-        // TODO put in exceptions
         
         this.logger = LoggerFactory.getLoggerInstance();
         this.logger.debug("Creating a new ExecAccessAction instance");
@@ -103,12 +103,9 @@ public abstract class ExecAccessAction implements IAccessAction
         this.commandArguments = new ArrayList<String>();
         this.environmentVariables = new HashMap<String, String>();
         
-        // TODO - change
-        this.inputStringBuffer = new StringBuffer();
-        this.outputStringBuffer = new StringBuffer();
-        this.errorStringBuffer = new StringBuffer();
+        this.outputString = new String();
+        this.errorString = new String();
         
-
     }
     
     /**
@@ -168,6 +165,9 @@ public abstract class ExecAccessAction implements IAccessAction
             this.accessActionProcess = builder.start();
             this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
             this.accessActionProcess.waitFor();
+            this.outputString = this.getAccessOutputString();
+            this.errorString = this.getAccessErrorString();
+            
             return true;
             
         }
@@ -181,9 +181,36 @@ public abstract class ExecAccessAction implements IAccessAction
         finally
         {
             /* Cleanup. */
-            //this.cleanup();
+            this.cleanup();
         }
        
+    }
+
+    /**
+     * Cleans up access action invokation
+     */
+    private void cleanup()
+    {
+        this.logger.debug("Cleaning a access action control invocation.");
+        try
+        {
+            if (this.accessActionProcess.getInputStream() != null) 
+            {
+                this.accessActionProcess.getInputStream().close();
+            }
+            
+            if (this.accessActionProcess.getErrorStream() != null) 
+            {
+                this.accessActionProcess.getErrorStream().close();
+            }
+        }
+        catch (IOException ex)
+        {
+            this.logger.warn("Failed to clean a batch control invocation because of error " + ex.getMessage());
+        }
+        
+
+        
     }
 
     /**
@@ -242,4 +269,67 @@ public abstract class ExecAccessAction implements IAccessAction
         buf.append(cal.get(Calendar.SECOND));
         return buf.toString();
     }
+    
+    /**
+     * Get input string of access action process, the the output from the 
+     * access action 
+     * 
+     * @return String input string of subprocess
+     */
+    protected String getAccessOutputString()
+    {
+        InputStream is = this.accessActionProcess.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        
+        final StringBuffer buf = new StringBuffer();
+
+        try
+        {
+            while (br != null )
+            {
+                buf.append(br.readLine());
+                buf.append(System.getProperty("line.separator"));
+            }
+        }
+        catch (IOException e)
+        {
+            this.logger.warn("Reading access action input stream failed with error " + e.getMessage() + ".");
+            return null;
+        }
+
+        return buf.toString();
+        
+    }
+    
+
+    /**
+     * Get error string of access action process.
+     * 
+     * @return String error string of subprocess
+     */
+    protected String getAccessErrorString()
+    {
+        InputStream is = this.accessActionProcess.getErrorStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        
+        final StringBuffer buf = new StringBuffer();
+
+        try
+        {
+            while (br != null )
+            {
+                buf.append(br.readLine());
+                buf.append(System.getProperty("line.separator"));
+            }
+        }
+        catch (IOException e)
+        {
+            this.logger.warn("Reading access action input stream failed with error " + e.getMessage() + ".");
+            return null;
+        }
+
+        return buf.toString();
+        
+    }
+    
  }
