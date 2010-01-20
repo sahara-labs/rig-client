@@ -41,6 +41,7 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +82,7 @@ public class PingTestAction extends AbstractTestAction
     public static final String DEFAULT_PING = "ping";
     
     /** The hosts and their associated failures. */
-    private final Map<String, Long> hosts;
+    private final Map<String, Integer> hosts;
     
     /** Ping process builder. */
     private ProcessBuilder pingBuilder;
@@ -97,24 +98,101 @@ public class PingTestAction extends AbstractTestAction
         this.isPeriodic = true;
         this.isSetIntervalHonoured = false;
         
-        this.hosts = new HashMap<String, Long>();
+        this.hosts = new HashMap<String, Integer>();
+        this.pingBuilder = new ProcessBuilder();
     }
     
     @Override
     public void setUp()
     {
+        /* Set up command. */
         List<String> command = new ArrayList<String>();
-        String tmp;
+        String tmp =this.config.getProperty("Ping_Test_Command", PingTestAction.DEFAULT_PING);
+        this.logger.info("Ping command is " + tmp);
+        command.add(tmp);
         
-        command.add(this.config.getProperty("Ping_Test_Command", PingTestAction.DEFAULT_PING));
+        tmp = this.config.getProperty("Ping_Test_Args", this.getDefaultPingArgs());
+        this.logger.info(tmp.length() > 1 ? "Ping arguments are " + tmp + "." : "Not using any ping arguments.");
+        for (String a : tmp.split("\\s"))
+        {
+            if (a.length() > 0) command.add(a);
+        }
+        this.pingBuilder.command(command);
+
+        /* Load hosts. */
+        if ((tmp = this.config.getProperty("Ping_Test_Host_1")) == null)
+        {
+            this.logger.error("When using ping test, atleast one host must be configured using the property" +
+            		" 'Ping_Test_Host_1.");
+            return;
+        }
+        this.logger.info("Going to test host " + tmp + " with ping test.");
+        this.hosts.put(tmp, 0);
         
+        int c = 2;
+        while ((tmp = this.config.getProperty("Ping_Test_Host_" + c)) != null)
+        {
+            this.logger.info("Going to test host " + tmp + " with ping test.");
+            this.hosts.put(tmp, 0);
+            ++c;
+        }
+        
+        /* Other configuration. */
+        try
+        {
+            this.runInterval = Integer.parseInt(this.config.getProperty("Ping_Test_Interval", "30"));
+            this.logger.info("The ping test interval is " + this.runInterval + " seconds.");
+        }
+        catch (NumberFormatException ex)
+        {
+            this.logger.warn("Invalid ping test interval configuration. It should be either undefined or a valid " +
+            		" number to specify the test interval in seconds. Using 30 seconds as the default.");
+            this.runInterval = 30;
+        }
+        
+        try
+        {
+            this.failThreshold = Integer.parseInt(this.config.getProperty("Ping_Test_Fail_Threshold", "3"));
+            this.logger.info("The ping test fail threshold is " + this.failThreshold + ".");
+        }
+        catch (NumberFormatException ex)
+        {
+            this.logger.warn("Invalid ping test fail threshold specified. This should be an integer value specifying " +
+            		"the number of ping failures constitute a test failure. Using 3 as the default.");
+            this.failThreshold = 3;
+        }
     }
     
     @Override
     public void doTest()
     {
-        // TODO Auto-generated method stub
-
+        List<String> command = this.pingBuilder.command();
+        for (Entry<String, Integer> host : this.hosts.entrySet())
+        {
+            if (!this.runTest) return;
+            
+            command.add(host.getKey());
+            try
+            {
+                Process proc = this.pingBuilder.start();
+                if (proc.waitFor() != 0)
+                {
+                    host.setValue(host.getValue() + 1);
+                }
+            }
+            catch (IOException e)
+            {
+                this.logger.error("IO Exception running ping test for host " + host.getKey() + ". Does the " +
+                		" ping (" + command.get(0) + ") executable exist?");
+            }
+            catch (InterruptedException e)
+            {
+                /* Resetting the interrupt to propagate it to shutdown the test. */
+                Thread.currentThread().interrupt();
+                return;
+            }
+            command.remove(host.getKey());
+        }
     }
 
     @Override
@@ -126,7 +204,7 @@ public class PingTestAction extends AbstractTestAction
     @Override
     public String getReason()
     {
-        for (Entry<String, Long> host : this.hosts.entrySet())
+        for (Entry<String, Integer> host : this.hosts.entrySet())
         {
             if (host.getValue() > this.failThreshold)
             {
@@ -139,7 +217,7 @@ public class PingTestAction extends AbstractTestAction
     @Override
     public boolean getStatus()
     {
-        for (Entry<String, Long> host : this.hosts.entrySet())
+        for (Entry<String, Integer> host : this.hosts.entrySet())
         {
             if (host.getValue() > this.failThreshold)
             {
@@ -156,5 +234,40 @@ public class PingTestAction extends AbstractTestAction
     {
         return "Ping test";
     }
+    
+    /**
+     * Gets the default ping arguments based on the detected operation system.
+     * The arguments attempt to send one ping and have a timeout of 5 seconds.
+     * 
+     * @return default ping argument string
+     */
+    private String getDefaultPingArgs()
+    {
+        final String os = System.getProperty("os.name");
 
+        if (os.startsWith("Windows"))
+        {
+            /* Windows - [-n 1] 1 ping
+             *         - [-w 5000] 5 second timeout. */
+            this.logger.info("Returning Microsoft Windows ping default arguments as '-n 1 -w 5000' to " +
+            "send one ping with a timeout of 5 seconds.");
+            return "-n 1 -w 5000";
+        }
+        else if (os.startsWith("Linux"))
+        {
+            /* Linux - [-c 1] 1 ping
+             *       - [-q] Quiet mode
+             *       - [-W 5] 5 second timeout */
+            this.logger.info("Returning Linux ping default arguments as '-c 1 -q -W 5 to send one ping with a " +
+            "timeout of 5 seconds.");
+            return "-c 1 -q -W 5";
+        }
+        else
+        {
+            this.logger.warn("Unsupported operating system detected (" + os + "), not specifing any ping " +
+                    "arguments." + " If you have the need for another operating system, please fill a " +
+            "bug report or email mdiponio@eng.uts.edu.au.");
+            return "";
+        }
+    }
 }
