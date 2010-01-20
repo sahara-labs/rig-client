@@ -44,18 +44,22 @@ package au.edu.uts.eng.remotelabs.rigclient.action.test.tests;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.action.test.AbstractTestAction;
 import au.edu.uts.eng.remotelabs.rigclient.action.test.PingTestAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
@@ -100,6 +104,7 @@ public class PingTestActionTester extends TestCase
         this.pinger = new PingTestAction();
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testSetup() throws Exception
     {
@@ -130,16 +135,138 @@ public class PingTestActionTester extends TestCase
         assertEquals("ping", PingTestAction.DEFAULT_PING);
         
         reset(this.mockConfig);
-        expect(this.mockConfig.getProperty("Ping_Test_Command", "ping")).andReturn("ping");
-        expect(this.mockConfig.getProperty("Ping_Test_Args", args)).andReturn(args);
-        
+        expect(this.mockConfig.getProperty("Ping_Test_Command", "ping")).andReturn("/bin/ping");
+        expect(this.mockConfig.getProperty("Ping_Test_Args", args)).andReturn("-c 1 -q");
+        expect(this.mockConfig.getProperty("Ping_Test_Host_1")).andReturn("127.0.0.1");
+        expect(this.mockConfig.getProperty("Ping_Test_Host_2")).andReturn("138.25.49.129");
+        expect(this.mockConfig.getProperty("Ping_Test_Host_3")).andReturn(null);
+        expect(this.mockConfig.getProperty("Ping_Test_Interval", "30")).andReturn("60");
+        expect(this.mockConfig.getProperty("Ping_Test_Fail_Threshold", "3")).andReturn("5");
         replay(this.mockConfig);
         
         meth = PingTestAction.class.getDeclaredMethod("setUp");
         meth.setAccessible(true);
         meth.invoke(this.pinger);
         
-        verify(this.mockConfig);
+        Field f = PingTestAction.class.getDeclaredField("hosts");
+        f.setAccessible(true);
+        Map<String, Integer> hosts = (Map<String, Integer>)f.get(this.pinger);
+        assertNotNull(hosts);
+        assertTrue(hosts.containsKey("127.0.0.1"));
+        assertTrue(hosts.containsKey("138.25.49.129"));
+        
+        f = PingTestAction.class.getDeclaredField("pingBuilder");
+        f.setAccessible(true);
+        ProcessBuilder bldr = (ProcessBuilder)f.get(this.pinger);
+        assertNotNull(bldr);
+        List<String> comm = bldr.command();
+        assertEquals("/bin/ping", comm.get(0));
+        assertEquals("-c", comm.get(1));
+        assertEquals("1", comm.get(2));
+        assertEquals("-q", comm.get(3));
+        
+        f = PingTestAction.class.getDeclaredField("failThreshold");
+        f.setAccessible(true);
+        assertEquals(5, f.getInt(this.pinger));
+        
+        f = AbstractTestAction.class.getDeclaredField("runInterval");
+        f.setAccessible(true);
+        assertEquals(60, f.getInt(this.pinger));
+        
+        assertTrue(this.pinger.getStatus());
+        assertEquals(null, this.pinger.getReason());
+        
+        verify(this.mockConfig);   
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testRun() throws Exception
+    {
+        Thread thr = new Thread(this.pinger);
+        
+        Method meth = PingTestAction.class.getDeclaredMethod("getDefaultPingArgs");
+        meth.setAccessible(true);
+        String args = (String)meth.invoke(this.pinger);
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Ping_Test_Command", "ping")).andReturn("/bin/ping");
+        expect(this.mockConfig.getProperty("Ping_Test_Args", args)).andReturn("-c 1 -q");
+        expect(this.mockConfig.getProperty("Ping_Test_Host_1")).andReturn("127.0.0.1");
+        expect(this.mockConfig.getProperty("Ping_Test_Host_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("Ping_Test_Interval", "30")).andReturn("3");
+        expect(this.mockConfig.getProperty("Ping_Test_Fail_Threshold", "3")).andReturn("5");
+        replay(this.mockConfig);
+        
+        /* This should succeed pinging local host. */
+        thr.start();
+        this.pinger.startTest();
+        
+        /* Wait for approx 10 iterations. */
+        Thread.sleep(30000);
+        
+        this.pinger.stopTest();
+        thr.interrupt();
+        
+        assertTrue(this.pinger.getStatus());
+        assertNull(this.pinger.getReason());
+        assertNull(this.pinger.getFailureReason());
+        
+        Field f = PingTestAction.class.getDeclaredField("hosts");
+        f.setAccessible(true);
+        Map<String, Integer> hosts = (Map<String, Integer>)f.get(this.pinger);
+        assertNotNull(hosts);
+        assertTrue(hosts.containsKey("127.0.0.1"));
+        assertEquals(Integer.valueOf(0), hosts.get("127.0.0.1"));
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testRunFailPing() throws Exception
+    {
+        Thread thr = new Thread(this.pinger);
+        
+        Method meth = PingTestAction.class.getDeclaredMethod("getDefaultPingArgs");
+        meth.setAccessible(true);
+        String args = (String)meth.invoke(this.pinger);
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Ping_Test_Command", "ping")).andReturn("/bin/ping");
+        expect(this.mockConfig.getProperty("Ping_Test_Args", args)).andReturn("-c 1 -q");
+        expect(this.mockConfig.getProperty("Ping_Test_Host_1")).andReturn("127.0.0.1");
+        expect(this.mockConfig.getProperty("Ping_Test_Host_2")).andReturn("some.unknown.host");
+        expect(this.mockConfig.getProperty("Ping_Test_Host_3")).andReturn(null);
+        expect(this.mockConfig.getProperty("Ping_Test_Interval", "30")).andReturn("5");
+        expect(this.mockConfig.getProperty("Ping_Test_Fail_Threshold", "3")).andReturn("2");
+        replay(this.mockConfig);
+        
+        /* This should succeed pinging local host. */
+        thr.start();
+        this.pinger.startTest();
+        
+        /* Wait for approx 10 iterations. */
+        Thread.sleep(60000);
+        
+        this.pinger.stopTest();
+        thr.interrupt();
+        
+        assertFalse(this.pinger.getStatus());
+        assertNotNull(this.pinger.getReason());
+        assertNull(this.pinger.getFailureReason());
+        
+        Field f = PingTestAction.class.getDeclaredField("hosts");
+        f.setAccessible(true);
+        Map<String, Integer> hosts = (Map<String, Integer>)f.get(this.pinger);
+        assertNotNull(hosts);
+        assertTrue(hosts.containsKey("127.0.0.1"));
+        assertEquals(Integer.valueOf(0), hosts.get("127.0.0.1"));
+        
+        assertTrue(hosts.containsKey("some.unknown.host"));
+        assertTrue(2 < hosts.get("some.unknown.host"));
+    }
+    
+    @Test
+    public void testGetActionType()
+    {
+        assertEquals("Ping test", this.pinger.getActionType());
     }
 
 }

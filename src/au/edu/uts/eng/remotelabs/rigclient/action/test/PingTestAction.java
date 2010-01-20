@@ -108,7 +108,7 @@ public class PingTestAction extends AbstractTestAction
         /* Set up command. */
         List<String> command = new ArrayList<String>();
         String tmp =this.config.getProperty("Ping_Test_Command", PingTestAction.DEFAULT_PING);
-        this.logger.info("Ping command is " + tmp);
+        this.logger.info("Ping command is " + tmp + ".");
         command.add(tmp);
         
         tmp = this.config.getProperty("Ping_Test_Args", this.getDefaultPingArgs());
