@@ -105,8 +105,14 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
     /** The time in seconds to wait for the camera stream server to respond. */
     private int timeOut;
     
-    /** Minimum image size in kilobytes. */
+    /** Minimum image size in bytes. */
     private int minImageSize;
+    
+    /** Whether to check for the frame uniqueness. */
+    private boolean checkUniqueness;
+    
+    /** The maximum number of sequential frames which may be identical. */
+    private int maxUniqFrames;
     
     public JPEGFrameCameraTestAction()
     {
@@ -167,8 +173,8 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
         cnf = this.config.getProperty("Camera_Test_Image_Min_Size", "10");
         try
         {
-            this.minImageSize = Integer.parseInt(cnf);
-            this.logger.info("Camera test minimum image size is " + this.minImageSize + "kB.");
+            this.minImageSize = Integer.parseInt(cnf) * 1024;
+            this.logger.info("Camera test minimum image size is " + cnf + "kB.");
         }
         catch (NumberFormatException ex)
         {
@@ -195,7 +201,7 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
     public void doTest()
     {
         byte soi[] = new byte[2];
-        byte buf[] = new byte[1024];
+        int size;
         
         for (Entry<String, Camera> camera : this.cameraUrls.entrySet())
         {
@@ -239,8 +245,8 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                 if (conn.getContentLength() != -1 && conn.getContentLength() < (this.minImageSize * 1024))
                 {
                     this.logger.debug("Camera with URL " + url + " has failed because the supplied content length (" +
-                            (conn.getContentLength() / 1024) + "kB) is less the minimum size " + this.minImageSize +
-                            "kB.");
+                            (conn.getContentLength() / 1024) + "kB) is less the minimum size " + 
+                            (this.minImageSize * 1024 ) + "kB.");
                     cam.incrementFails();
                     conn.disconnect();
                     continue;
@@ -253,7 +259,7 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                     Thread.sleep(500);
                     if (stream.available() < 1)
                     {
-                        this.logger.debug("Camera with URL " + url + " has failed because there isn't any reponse " +
+                        this.logger.debug("Camera with URL " + url + " has failed because there isn't any response " +
                         		"to read even after waitng 1 second.");
                         cam.incrementFails();
                         stream.close();
@@ -264,20 +270,30 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                 
                 if (conn.getContentLength() == -1)
                 {
-                    stream.mark(this.minImageSize * 1024 + 100);
+                    stream.mark(this.minImageSize + 1024);
                     
-                    /* Need to read stream to determine if it exceeds minimum size. 
-                     * Read in byte chunks, with some time to stream. */ 
-                    
-                    while (stream.read(buf, 0, 1024) < 1024)
-                        // TODO 
+                    /* Need to read stream to determine if it exceeds minimum size. */
+                    size = 0;
+                    while (stream.read() != -1 || size++ >= this.minImageSize);
+                    if (size < this.minImageSize)
+                    {
+                        this.logger.debug("Camera with URL " + url + " has failed because the read image size (" +
+                        		(size / 1024) + "kB) is less than the set image size (" + (this.minImageSize / 1024) +
+                        		").");
+                        cam.incrementFails();
+                        stream.close();
+                        conn.disconnect();
+                        continue;
+                    }
                     
                     stream.reset();
                 }
                 
                 /* Test the JPEG SOI marker (FFD8). */
+                stream.mark(1024);
                 soi[0] = (byte)(stream.read() & 0xFF);
                 soi[1] = (byte)(stream.read() & 0xFF);
+                stream.reset();
                 if (soi[0] != 0xFF && soi[1] != 0xD8)
                 {
                     this.logger.debug("Camera with URL " + url + " has failed because the SOI marker (" +
