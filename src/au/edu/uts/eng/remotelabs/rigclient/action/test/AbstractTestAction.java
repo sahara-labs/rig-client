@@ -69,7 +69,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  *  default is 60 seconds.</li>
  * </ul>
  * <strong>NOTE:</strong> The abstract methods declared in this class
- * do provide any indication of the success of their invocation. The 
+ * do not provide any indication of the success of their invocation. The 
  * relative success or failure of them should be indicated by calls
  * to <code>getStatus</code> and <code>getReason</code>.
  */
