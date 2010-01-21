@@ -54,13 +54,13 @@ public class MockAccessAction extends ExecAccessAction
      * @see au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction#setupAccessAction()
      */
     @Override
-    protected boolean setupAccessAction()
+    protected void setupAccessAction()
     {
         // TODO Auto-generated method stub
-        return false;
     }
 
-    /* (non-Javadoc)
+    /* 
+     * (non-Javadoc)
      * @see au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction#verifyAccessAction()
      */
     @Override

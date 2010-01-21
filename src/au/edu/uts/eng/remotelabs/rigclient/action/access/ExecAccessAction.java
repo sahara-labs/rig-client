@@ -79,6 +79,9 @@ public abstract class ExecAccessAction implements IAccessAction
     /** Environment variables for access command */
     protected final Map<String, String> environmentVariables;
 
+    /** Access Action process exit code. */
+    protected int exitCode;
+
     /** Command output string */
     protected String outputString;
 
@@ -164,7 +167,7 @@ public abstract class ExecAccessAction implements IAccessAction
         {
             this.accessActionProcess = builder.start();
             this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
-            this.accessActionProcess.waitFor();
+            this.exitCode = this.accessActionProcess.waitFor();
             this.outputString = this.getAccessOutputString();
             this.errorString = this.getAccessErrorString();
             
@@ -187,7 +190,7 @@ public abstract class ExecAccessAction implements IAccessAction
     }
 
     /**
-     * Cleans up access action invokation
+     * Cleans up access action invocation
      */
     private void cleanup()
     {
@@ -233,7 +236,7 @@ public abstract class ExecAccessAction implements IAccessAction
      * 
      * @return true if successful, false otherwise
      */
-    protected abstract boolean setupAccessAction();
+    protected abstract void setupAccessAction();
 
     
     /**
@@ -281,13 +284,14 @@ public abstract class ExecAccessAction implements IAccessAction
         InputStream is = this.accessActionProcess.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         
-        final StringBuffer buf = new StringBuffer();
-
+        String line = null;
+        final StringBuilder buf = new StringBuilder();
+        
         try
         {
-            while (br != null )
+            while ( (line = br.readLine()) != null )
             {
-                buf.append(br.readLine());
+                buf.append(line);
                 buf.append(System.getProperty("line.separator"));
             }
         }
@@ -332,4 +336,15 @@ public abstract class ExecAccessAction implements IAccessAction
         
     }
     
+    /**
+     * Gets the exit code of the access action process. If the access action process has not
+     * completed, the returned exit code is 0.
+     * 
+     * @return exit code
+     */
+    public int getExitCode()
+    {
+        return this.exitCode;
+    }
+
  }

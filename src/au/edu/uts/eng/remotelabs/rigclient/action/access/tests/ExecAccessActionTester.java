@@ -41,12 +41,21 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access.tests;
 
-import static org.junit.Assert.fail;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
+import java.lang.reflect.Field;
+
 import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.tests.MockBatchRunner;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
 /**
  * @author tmachet
@@ -54,6 +63,12 @@ import org.junit.Test;
  */
 public class ExecAccessActionTester extends TestCase
 {
+    /** Object of class under test. */
+    private MockAccessAction action;
+    
+    /** Mock configuration class. */
+    private IConfig mockConfig;
+
 
     /**
      * @throws java.lang.Exception
@@ -62,7 +77,28 @@ public class ExecAccessActionTester extends TestCase
     @Before
     public void setUp() throws Exception
     {
-        // runs before test case - create instance 
+        
+        this.mockConfig = createMock(IConfig.class);
+        expect(this.mockConfig.getProperty("Logger_Type"))
+                .andReturn("SystemErr");
+        expect(this.mockConfig.getProperty("Log_Level"))
+                .andReturn("DEBUG");
+        expect(this.mockConfig.getProperty("Default_Log_Format", "[__LEVEL__] - [__ISO8601__] - __MESSAGE__"))
+                .andReturn("[__LEVEL__] - [__ISO8601__] - __MESSAGE__");
+        expect(this.mockConfig.getProperty("FATAL_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("PRIORITY_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("ERROR_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("WARN_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
+        replay(this.mockConfig);
+        
+        Field configField = ConfigFactory.class.getDeclaredField("instance");
+        configField.setAccessible(true);
+        configField.set(null, this.mockConfig);
+        
+        //this.action = new MockAccessAction("", "", true);
+        
     }
 
     /**

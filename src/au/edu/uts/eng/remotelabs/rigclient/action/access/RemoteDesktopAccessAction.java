@@ -41,7 +41,11 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction;
+import au.edu.uts.eng.remotelabs.rigclient.action.test.PingTestAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -59,8 +63,23 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  */
 public class RemoteDesktopAccessAction extends ExecAccessAction
 {
+    /** Default user group for remote desktop access. */
+    public static final String DEFAULT_GROUPNAME = "Remote Desktop Users";
+
+    /** Default command for changing user groups for windows */
+    public static final String DEFAULT_COMMAND = "net";
+
+    /** Default command for changing user groups for windows */
+    public static final String DEFAULT_LOCALGROUP = "localgroup";
+
     /** Domain name. */
     private final String domainName;
+    
+    /** group name for user group that has remote desktop access. */
+    protected String groupName;
+
+    /** user name to be assigned access. */
+    protected String userName;
     
    
     /**
@@ -75,6 +94,10 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
         {
             this.logger.info("Windows domain name not found, so not using a domain name.");
         }
+        
+        this.groupName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Groupname",RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
+        this.logger.debug("Remote Desktop User group is " + this.groupName);
+        
     }
     
     /* 
@@ -83,8 +106,26 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     @Override
     public boolean assign(String name)
     {
-        // TODO Auto-generated method stub
-        return false;
+        
+        this.userName = name;
+        this.setupAccessAction();
+        this.commandArguments.add("/ADD");
+        this.logger.debug("Remote Desktop Access assign - arguments are"  + this.commandArguments.toString());
+        
+        if(!this.executeAccessAction())
+        {
+            this.logger.error("Remote Desktop Access action failed, command unsuccessful");
+            return false;
+        }
+            
+        if(!this.verifyAccessAction())
+        {
+            this.logger.error("Remote Desktop Access revoke action failed, exit code is" + this.getExitCode());
+            return false;
+        }
+
+        return true;
+        
     }
 
     /* 
@@ -93,8 +134,24 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     @Override
     public boolean revoke(String name)
     {
-        // TODO Auto-generated method stub
-        return false;
+        this.userName = name;
+        this.setupAccessAction();
+        this.commandArguments.add("/DELETE");
+        this.logger.debug("Remote Desktop Access revoke - arguments are"  + this.commandArguments.toString());
+        
+        if(!this.executeAccessAction())
+        {
+            this.logger.error("Remote Desktop Access action failed, command unsuccessful");
+            return false;
+        }
+        
+        if(!this.verifyAccessAction())
+        {
+            this.logger.error("Remote Desktop Access revoke action failed, exit code is" + this.getExitCode());
+            return false;
+        }
+            
+        return true;
     }
 
     /* 
@@ -113,21 +170,51 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     @Override
     public String getActionType()
     {
-        return "Windows Remote Desktop.";
+        return "Windows Remote Desktop Access.";
     }
     
+    /**
+     * Sets up access action common parts.  
+     * 
+     * This supplies the:
+     * <ul>
+     *     <li><strong>Command</strong> - The common command for assigna nd revoke "net localgroup"
+     *     <li><strong>Command arguments</strong> - The common group name, domain if specified and
+     *     user name
+     *     <li><strong>Working directory</strong> - The configurable working directory for access
+     * 
+     * @see au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction#setupAccessAction()
+     */
     @Override
-    public boolean  setupAccessAction()
+    public void setupAccessAction()
     {
-        // TODO
-        return false;
+        this.command = RemoteDesktopAccessAction.DEFAULT_COMMAND;
+        this.commandArguments.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
+        this.commandArguments.add(this.groupName);
+        
+        if (this.domainName != null)
+        {
+            this.commandArguments.add(this.domainName + "\\" + this.userName);
+        }
+        else
+        {
+             this.commandArguments.add(this.userName);
+        }
+        
+        //No need to set up environment variables or working dir - TM
+
     }
     
     @Override
     public boolean  verifyAccessAction()
     {
-        // TODO
-        return false;
+        if(this.getExitCode() == 1)
+        {
+            return false;
+        }
+        
+        return true;
+            
     }
     
 }
