@@ -53,9 +53,8 @@ import java.util.Map.Entry;
  * <p />
  * The behavior of ping test is:
  * <ol>
- *  <li>Test run interval - by default is 30 seconds but may be configured
- *  by setting the property 'Ping_Test_Interval' in standard configuration
- *  to a value in seconds.</li>
+ *  <li>Test run interval - the default is 30 seconds but may be configured
+ *  by setting the property 'Ping_Test_Interval' to a value in seconds.</li>
  *  <li>Periodicity - is periodic.</li>
  *  <li>Set interval - ignored, not honoured.</li> 
  * </ol>
