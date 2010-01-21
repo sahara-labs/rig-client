@@ -99,6 +99,13 @@ Changelog:
 		                <attribute name="Class-Path" value="."/>
 		            </manifest>
 		            <fileset dir="${build.classes.dir}"/>
+					<zipgroupfileset dir="${lib.dir}">
+						<exclude name="**/NOTICE.txt" />
+					    <include name="**/*.jar" />
+					    <exclude name="**/manifest.mf"/>
+						<exclude name="**/META-INF/*.SF" />
+						<exclude name="**/*.txt" />
+					</zipgroupfileset>
 					<zipgroupfileset dir="${lib.dir}/Axis2/">
 						<exclude name="**/NOTICE.txt" />
 			            <include name="**/*.jar" />
