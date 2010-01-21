@@ -45,8 +45,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
-import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
-import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -316,13 +314,14 @@ public abstract class ExecAccessAction implements IAccessAction
         InputStream is = this.accessActionProcess.getErrorStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         
-        final StringBuffer buf = new StringBuffer();
+        String line = null;
+        final StringBuilder buf = new StringBuilder();
 
         try
         {
-            while (br != null )
+            while ((line = br.readLine()) != null )
             {
-                buf.append(br.readLine());
+                buf.append(line);
                 buf.append(System.getProperty("line.separator"));
             }
         }

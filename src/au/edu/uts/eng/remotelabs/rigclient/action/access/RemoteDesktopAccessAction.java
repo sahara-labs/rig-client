@@ -41,11 +41,6 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction;
-import au.edu.uts.eng.remotelabs.rigclient.action.test.PingTestAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -106,6 +101,8 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     @Override
     public boolean assign(String name)
     {
+        this.checkUserGroup();
+        
         
         this.userName = name;
         this.setupAccessAction();
@@ -126,6 +123,18 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
 
         return true;
         
+    }
+
+    /**
+     * Method to check that a user is not already assigned to a user group
+     * before adding them.
+     * 
+     * 
+     */
+    private boolean checkUserGroup()
+    {
+        // TODO Auto-generated method stub
+        return true;
     }
 
     /* 
@@ -208,8 +217,11 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     @Override
     public boolean  verifyAccessAction()
     {
-        if(this.getExitCode() == 1)
+        if(this.getExitCode() != 0)
         {
+            this.logger.warn("Verifying Access Action, output is " + this.getAccessOutputString());
+            this.logger.warn("Verifying Access Action, std error is " + this.getAccessErrorString());
+
             return false;
         }
         
