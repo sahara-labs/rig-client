@@ -33,11 +33,11 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @author Michael Diponio (mdiponio)
- * @date 21st December 2009
+ * @author Tania Machet (tmachet)
+ * @date 16th January 2010
  *
  * Changelog:
- * - 21/12/2009 - mdiponio - Initial file creation.
+ * - 16/01/2010 - tmachet- Initial file creation.
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
@@ -46,15 +46,24 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * Windows Terminal Services access action. Performs the access action by
- * adding and removing users from the 'Remote Desktop Users' group which
- * controls who may remote login to a Windows console using RDP. 
+ * adding and removing users from the configurable Remote Desktop Users group 
+ * which controls who may remote login to a Windows console using RDP. 
  * <p>
  * This action only works for Windows, on other platforms a 
  * {@link IllegalStateException} will be thrown on construction.
  * <p>
- * An optional configuration option is <strong>'Windows_Domain'</strong>
- * which specifies the Windows / Samba domain the user is part of 
- * (i.e their name is '\\&lt;Windows_Domain&gt;\&lt;name&gt;'.
+ * The configuration properties for RemoteDesktopAccessAction are:
+ * <ul>
+ *  <li><tt>Remote_Desktop_Windows_Domain</tt> - specifies the Windows/
+ *  Samba domain the user is part of (i.e their name 
+ *  is '\\&lt;Windows_Domain&gt;\&lt;name&gt;')
+ *  <li><tt>Remote_Desktop_Groupname</tt> - the name of the user group
+ *   to which the user must be added for Remote Desktop access permissions
+ *  </ul> 
+ *  Access is granted with the <code>assign</code> method that adds users 
+ *  to the user group if they do not exist there yet.
+ *  Access is revoked with the <code>revoke</code> method that removes
+ *  the user from the group   
  */
 public class RemoteDesktopAccessAction extends ExecAccessAction
 {
@@ -80,49 +89,112 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     /**
      * Constructor.
      */
-    public RemoteDesktopAccessAction()
+    public RemoteDesktopAccessAction() 
     {
-        this.logger = LoggerFactory.getLoggerInstance();
-        
-        this.domainName = ConfigFactory.getInstance().getProperty("Windows_Domain");
-        if (this.domainName == null)
+        final String os = System.getProperty("os.name");
+
+        // RDP access only valid for WIndows - chack that the OS is windows
+        if (os.startsWith("Windows"))
         {
-            this.logger.info("Windows domain name not found, so not using a domain name.");
+            // Get domain if it is confirgured
+            this.domainName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain");
+            if (this.domainName == null)
+            {
+                this.logger.info("Windows domain name not found, so not using a domain name.");
+            }
+            
+            // Get Remote Desktop User group name
+            this.groupName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Groupname",RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
+            this.logger.debug("Remote Desktop User group is " + this.groupName);
+
+            //Set up command command and arguments for remote access
+            this.setupAccessAction();
+            
         }
-        
-        this.groupName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Groupname",RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
-        this.logger.debug("Remote Desktop User group is " + this.groupName);
-        
+        else
+        {
+            throw new IllegalStateException("Remote Desktop Action is only valid for WINDOWS platforms not " + os);
+        }
     }
     
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction#assign(java.lang.String)
+    /* *
+     * The action to assign users to a Remote Desktop session is done by adding them to 
+     * a configurable user group that has permissions for the Remote Desktop.
+     * 
+     *  The user is first checked to see if it already in the group, if not, a command
+     *  is set up and executed to add the user to the group, and the result verified.
+     *  
+     *  Additional arguments for assign are:
+     *  <ul>
+     *  <li> <tt> Domain </tt> - optional configurable windows domain of user
+     *  <li> <tt> User Name </tt> - name of the user
+     *   
      */
     @Override
     public boolean assign(String name)
     {
-        this.checkUserGroup();
-        
+        final boolean failed;
         
         this.userName = name;
-        this.setupAccessAction();
-        this.commandArguments.add("/ADD");
-        this.logger.debug("Remote Desktop Access assign - arguments are"  + this.commandArguments.toString());
-        
-        if(!this.executeAccessAction())
-        {
-            this.logger.error("Remote Desktop Access action failed, command unsuccessful");
-            return false;
-        }
-            
-        if(!this.verifyAccessAction())
-        {
-            this.logger.error("Remote Desktop Access revoke action failed, exit code is" + this.getExitCode());
-            return false;
-        }
 
-        return true;
-        
+        // Check whether this user already belongs to the group, if so continue
+        if(!this.checkUserInGroup())
+        {
+            /* Add the command argument user name (with the Domain name if it is configured) and /ADD */
+            if (this.domainName != null)
+            {
+                this.commandArguments.add(this.domainName + "\\" + this.userName);
+            }
+            else
+            {
+                 this.commandArguments.add(this.userName);
+            }
+            this.commandArguments.add("/ADD");
+            this.logger.debug("Remote Desktop Access assign - arguments are"  + this.commandArguments.toString());
+            
+            // Execute the command ie net localgroup groupname (domain/)username /ADD
+            if(!this.executeAccessAction())
+            {
+                this.logger.error("Remote Desktop Access action failed, command unsuccessful");
+                failed = true;
+            }
+            else
+            {
+                if(!this.verifyAccessAction())
+                {
+                    this.logger.error("Remote Desktop Access revoke action failed, exit code is" + this.getExitCode());
+                    failed = true;
+                }
+                else
+                {
+                    failed = false;
+                }
+            }
+            
+            if(failed == true)
+            {
+                return false;
+            }
+            else
+            {
+                /* Remove the command arguments user name (with the Domain name if it is configured) and /ADD */
+                if (this.domainName != null)
+                {
+                    this.commandArguments.remove(this.domainName + "\\" + this.userName);
+                }
+                else
+                {
+                    this.commandArguments.remove(this.userName);
+                }                
+                this.commandArguments.remove("/ADD");
+                return true;
+            }
+        }
+        else
+        {
+            this.logger.info("User " + this.userName + " is already in the group " + this.groupName);
+            return true;
+        }
     }
 
     /**
@@ -131,10 +203,19 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
      * 
      * 
      */
-    private boolean checkUserGroup()
+    private boolean checkUserInGroup()
     {
-        // TODO Auto-generated method stub
-        return true;
+        /* Execute the command to determine the users in the group
+        * ie net localgroup groupname */
+        this.executeAccessAction();
+        
+        if(this.getAccessOutputString().contains(this.userName))
+        {
+            return true;
+        }
+        
+        return false;
+
     }
 
     /* 
@@ -143,24 +224,59 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     @Override
     public boolean revoke(String name)
     {
-        this.userName = name;
-        this.setupAccessAction();
+        final boolean failed;
+        
+        /* Add the command argument user name (with the Domain name if it is configured) and /DELETE */
+        if (this.domainName != null)
+        {
+            this.commandArguments.add(this.domainName + "\\" + this.userName);
+        }
+        else
+        {
+             this.commandArguments.add(this.userName);
+        }
         this.commandArguments.add("/DELETE");
         this.logger.debug("Remote Desktop Access revoke - arguments are"  + this.commandArguments.toString());
         
+
+        // Execute the command ie net localgroup groupname (domain/)username /DELETE
         if(!this.executeAccessAction())
         {
-            this.logger.error("Remote Desktop Access action failed, command unsuccessful");
+            this.logger.error("Remote Desktop Access revoke action failed, command unsuccessful");
+            failed = true;
+        }
+        else
+        {
+            if(this.checkUserInGroup())
+            {
+                this.logger.error("Remote Desktop Access revoke action failed, user " + this.userName + " still in group.");
+                failed = true;
+            }
+            else
+            {
+                failed = false;
+            }
+        }
+
+        if(failed == true)
+        {
             return false;
+        }
+        else
+        {
+            /* Remove the command arguments user name (with the Domain name if it is configured) and /DELETE */
+            if (this.domainName != null)
+            {
+                this.commandArguments.remove(this.domainName + "\\" + this.userName);
+            }
+            else
+            {
+                this.commandArguments.remove(this.userName);
+            }                
+            this.commandArguments.remove("/DELETE");
+            return true;
         }
         
-        if(!this.verifyAccessAction())
-        {
-            this.logger.error("Remote Desktop Access revoke action failed, exit code is" + this.getExitCode());
-            return false;
-        }
-            
-        return true;
     }
 
     /* 
@@ -187,33 +303,29 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
      * 
      * This supplies the:
      * <ul>
-     *     <li><strong>Command</strong> - The common command for assigna nd revoke "net localgroup"
-     *     <li><strong>Command arguments</strong> - The common group name, domain if specified and
-     *     user name
-     *     <li><strong>Working directory</strong> - The configurable working directory for access
-     * 
-     * @see au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction#setupAccessAction()
+     *     <li><strong>Command</strong> - The common command for assign and revoke "net"
+     *     <li><strong>Command arguments</strong> - The command parameters ie localgroup",
+     *     configurable remote desktop group name
      */
     @Override
     public void setupAccessAction()
     {
+        
         this.command = RemoteDesktopAccessAction.DEFAULT_COMMAND;
         this.commandArguments.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
         this.commandArguments.add(this.groupName);
         
-        if (this.domainName != null)
-        {
-            this.commandArguments.add(this.domainName + "\\" + this.userName);
-        }
-        else
-        {
-             this.commandArguments.add(this.userName);
-        }
-        
-        //No need to set up environment variables or working dir - TM
-
     }
     
+    /**
+     * Verifies the result of the .  
+     * 
+     * This supplies the:
+     * <ul>
+     *     <li><strong>Command</strong> - The common command for assign and revoke "net"
+     *     <li><strong>Command arguments</strong> - The command parameters ie localgroup",
+     *     configurable remote desktop group name
+     */
     @Override
     public boolean  verifyAccessAction()
     {
