@@ -97,15 +97,11 @@ public abstract class ExecAccessAction implements IAccessAction
      */
     public ExecAccessAction() 
     {
-        
         this.logger = LoggerFactory.getLoggerInstance();
         this.logger.debug("Creating a new ExecAccessAction instance");
         
         this.commandArguments = new ArrayList<String>();
         this.environmentVariables = new HashMap<String, String>();
-        
-        this.outputString = new String();
-        this.errorString = new String();
         
     }
     
