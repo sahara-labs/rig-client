@@ -46,6 +46,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -68,7 +70,16 @@ import java.util.Map.Entry;
  *  as a failure because the image is probably not valid. Empirical evidence
  *  with the UTS:FEIT Remote Laboratory iSight camera, using a patched VLC
  *  server to stream single a JPEG frames at 320x240 provides frames of 
- *  suggests sizes of at least 60kB are nominal.</li>  
+ *  suggests sizes of at least 60kB are nominal.</li>
+ *  <li>Image Uniqueness - If a set number of sequential images (one image read
+ *  at each test run) are identical (having the same hash), it is taken as the
+ *  streaming server has locked up. This has occurred erratically in the UTS:FEIT 
+ *  Remote Laboratory when a FireWire camera has failed causing VLC to provide
+ *  a cached image. The returned image is always the same irrespective of any
+ *  changes of the target. The uniqueness test is slightly expensive, requiring
+ *  hashes to be computer of each image, thus may be disabled. It is unlikely
+ *  to returned false positives as a one bit difference is enough to determine
+ *  image uniqueness.</li>
  * </ul>
  * The behavior of JPEG camera test is:
  * <ul>
@@ -141,6 +152,11 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
             {
                 this.logger.error("Camera stream URL " + cnf + " is not a valid URL. It will not be tested.");
             }
+            catch (NoSuchAlgorithmException e)
+            {
+                this.logger.error("BUG: Using an invalid hash type in camera test. Please fill a bug report.");
+                throw new IllegalStateException("Unknown camera frame hash has type.");
+            }
             ++c;
         }
         
@@ -195,6 +211,8 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
             		"seconds. Using the default of every 30 seconds.");
             this.runInterval = 30;
         }
+        
+        /* Camera uniqueness test. */
     }
 
     @Override
@@ -357,6 +375,21 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
             {
                 return false;
             }
+            
+            /* Check uniqueness. */
+            if (this.checkUniqueness)
+            {
+                byte[][] hashes = cam.getValue().getFrameHashes();
+                
+                
+                for (int i = 1; i < hashes.length; i++)
+                {
+                    for (int j = 1; i < hashes[i].length; j++)
+                    {
+                        
+                    }
+                }
+            }
         }
         
         return true;
@@ -376,10 +409,19 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
         /** Number of times the camera has failed. */
         private int fails;
         
-        public Camera(String url) throws MalformedURLException
+        /** Array of frame hashes. */
+        private byte hashes[][];
+        
+        /** Frame hasher. */
+        private MessageDigest hasher;
+        
+        public Camera(String url) throws MalformedURLException, NoSuchAlgorithmException
         {
             this.fails = 0;
             this.camUrl = new URL(url);
+            
+            this.hashes = new byte[JPEGFrameCameraTestAction.this.maxUniqFrames][16]; // MD5 hash length
+            this.hasher = MessageDigest.getInstance("MD5");
         }
 
         /**
@@ -412,6 +454,31 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
         public void incrementFails()
         {
             this.fails++;
+        }
+        
+        /**
+         * Determines the hash of a image frame.
+         * 
+         * @param buf image buffer
+         */
+        public void determineHash(byte buf[])
+        {
+            /* Slide the frame hashes to the left. */
+            int i;
+            for (i = 1 ; i < this.hashes.length; i++)
+            {
+                this.hashes[i - 1] = this.hashes[i];
+            }
+            
+            this.hashes[i] = this.hasher.digest(buf);
+        }
+        
+        /**
+         * @return the hashes
+         */
+        public byte[][] getFrameHashes()
+        {
+            return this.hashes;
         }
     }
 }
