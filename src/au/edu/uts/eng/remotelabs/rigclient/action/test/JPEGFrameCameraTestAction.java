@@ -46,8 +46,10 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -103,10 +105,18 @@ import java.util.Map.Entry;
  *  implausibly small to reduce the possibly of false postives.</li>
  *  <li><tt>Camera_Test_Interval</tt> - The amount of time between camera test
  *  runs in seconds.</li>
+ *  <li><tt>Camera_Test_Enable_Uniqueness_Test</tt> - Whether to perform the 
+ *  uniqueness test. The default is not to perform this test.</li>
+ *  <li><tt>Camera_Test_Max_Num_Unique_Frames</tt> - The maximum number of 
+ *  unique frames which can be the same before failing the uniqueness 
+ *  test. The default is 10.</li>
  * </ul>
  */
 public class JPEGFrameCameraTestAction extends AbstractTestAction
 {
+    /** The initial size of the frame buffer. */
+    public static final int INITIAL_FRAME_BUF_SIZE = 50 * 1024;
+    
     /** The list of camera URLs and their failures. */
     private Map<String, Camera> cameraUrls;
     
@@ -138,27 +148,6 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
     public void setUp()
     {
         String cnf;
-        
-        /* Load the camera URLs. */
-        int c = 1;
-        while ((cnf = this.config.getProperty("Camera_Test_URL_" + c)) != null)
-        {
-            this.logger.info("Going to test camera stream with URL " + cnf + ".");
-            try
-            {
-                this.cameraUrls.put(cnf, new Camera(cnf));
-            }
-            catch (MalformedURLException e)
-            {
-                this.logger.error("Camera stream URL " + cnf + " is not a valid URL. It will not be tested.");
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-                this.logger.error("BUG: Using an invalid hash type in camera test. Please fill a bug report.");
-                throw new IllegalStateException("Unknown camera frame hash has type.");
-            }
-            ++c;
-        }
         
         cnf = this.config.getProperty("Camera_Test_Fail_Threshold", "3");
         try
@@ -213,12 +202,56 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
         }
         
         /* Camera uniqueness test. */
-    }
+        if (this.checkUniqueness = Boolean.parseBoolean(this.config.getProperty(
+                "Camera_Test_Max_Num_Unique_Frames", "false")))
+        {
+            this.logger.info("Going to test the uniqueness of the camera frames.");
+        }
+        
+        cnf = this.config.getProperty("Camera_Test_Max_Num_Unique_Frames", "10");
+        try
+        {
+            this.maxUniqFrames = Integer.parseInt(cnf);
+            this.logger.info("The maximum number of unique frames is " + this.maxUniqFrames + ".");
+            this.maxUniqFrames += 1;
+        }
+        catch (NumberFormatException ex)
+        {
+            this.logger.info("The configured camera test maximum number of unique frames " +
+            		"(Camera_Test_Max_Num_Unique_Frames) is not a valid number of frames. Using the default of 10 " +
+            		"frames.");
+            this.maxUniqFrames = 11;
+        }
+        
+        
+        
+        /* Load the camera URLs. */
+        int c = 1;
+        while ((cnf = this.config.getProperty("Camera_Test_URL_" + c)) != null)
+        {
+            this.logger.info("Going to test camera stream with URL " + cnf + ".");
+            try
+            {
+                this.cameraUrls.put(cnf, new Camera(cnf));
+            }
+            catch (MalformedURLException e)
+            {
+                this.logger.error("Camera stream URL " + cnf + " is not a valid URL. It will not be tested.");
+            }
+            catch (NoSuchAlgorithmException e)
+            {
+                this.logger.error("BUG: Using an invalid hash type in camera test. Please fill a bug report.");
+                throw new IllegalStateException("Unknown camera frame hash has type.");
+            }
+            ++c;
+        }
+    } 
 
     @Override
     public void doTest()
     {
         byte soi[] = new byte[2];
+        byte buf[] = new byte[65536];
         int size;
         
         for (Entry<String, Camera> camera : this.cameraUrls.entrySet())
@@ -322,8 +355,22 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                     continue;
                 }
                 
+                if (this.checkUniqueness)
+                {
+                    /* Read in the entire frame and compute its hash. */
+                    int len = stream.read(buf);
+                    while (len >= buf.length && stream.available() > 0)
+                    {
+                        buf = Arrays.copyOf(buf, buf.length + buf.length / 2);
+                        len += stream.read(buf, len, buf.length - len);
+                    }
+                    cam.determineHash(buf, len);
+                }
+                
                 /* Success! */
                 cam.clearFails();
+                stream.close();
+                conn.disconnect();
             }
             catch (IOException e)
             {
@@ -335,10 +382,13 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            catch (DigestException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
-
-    
 
     @Override
     public void tearDown()
@@ -354,7 +404,29 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
         {
             if (cam.getValue().getFails() > this.failThreshold)
             {
-                buf.append("Camera with " + cam.getKey() + " has failed.");
+                buf.append("Camera with URL " + cam.getKey() + " has failed.");
+            }
+            
+            /* Check uniqueness. */
+            if (this.checkUniqueness)
+            {
+                byte[][] hashes = cam.getValue().getFrameHashes();
+                                
+                boolean allSame = true;
+                for (int i = 1; i < hashes.length; i++)
+                {
+                    if (!Arrays.equals(hashes[i - 1], hashes[i]))
+                    {
+                        allSame = false;
+                        break;
+                    }
+                }
+                
+                if (allSame)
+                {
+                   buf.append("Camera with URL " + cam.getKey() + " has failed because it has returned " +
+                   		" at least " + this.maxUniqFrames + " identical frames.");
+                }
             }
         }
         
@@ -380,14 +452,20 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
             if (this.checkUniqueness)
             {
                 byte[][] hashes = cam.getValue().getFrameHashes();
-                
-                
+                                
+                boolean allSame = true;
                 for (int i = 1; i < hashes.length; i++)
                 {
-                    for (int j = 1; i < hashes[i].length; j++)
+                    if (!Arrays.equals(hashes[i - 1], hashes[i]))
                     {
-                        
+                        allSame = false;
+                        break;
                     }
+                }
+                
+                if (allSame)
+                {
+                    return false;
                 }
             }
         }
@@ -460,17 +538,20 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
          * Determines the hash of a image frame.
          * 
          * @param buf image buffer
+         * @param len populated buffer length
          */
-        public void determineHash(byte buf[])
+        public void determineHash(byte buf[], int len) throws DigestException
         {
-            /* Slide the frame hashes to the left. */
+            /* Slide the frame hashes to the left to keep sequential order. */
             int i;
             for (i = 1 ; i < this.hashes.length; i++)
             {
                 this.hashes[i - 1] = this.hashes[i];
             }
             
-            this.hashes[i] = this.hasher.digest(buf);
+            this.hasher.update(buf, 0, len);
+            this.hashes[i] = this.hasher.digest();
+            this.hasher.reset();
         }
         
         /**
