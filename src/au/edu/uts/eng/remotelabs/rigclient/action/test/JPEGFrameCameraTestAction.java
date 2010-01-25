@@ -45,12 +45,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -203,7 +205,7 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
         
         /* Camera uniqueness test. */
         if (this.checkUniqueness = Boolean.parseBoolean(this.config.getProperty(
-                "Camera_Test_Max_Num_Unique_Frames", "false")))
+                "Camera_Test_Enable_Uniqueness_Test", "false")))
         {
             this.logger.info("Going to test the uniqueness of the camera frames.");
         }
@@ -251,13 +253,15 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
     public void doTest()
     {
         byte soi[] = new byte[2];
-        byte buf[] = new byte[65536];
+        byte buf[] = new byte[(int)(this.minImageSize * 1024 * 1.5)];
         int size;
         
-        for (Entry<String, Camera> camera : this.cameraUrls.entrySet())
+        Iterator<Entry<String, Camera>> it = this.cameraUrls.entrySet().iterator();
+        while (it.hasNext())
         {
             if (!this.runTest) break;
             
+            Entry<String, Camera> camera = it.next();
             String url = camera.getKey();
             Camera cam = camera.getValue();
             try
@@ -361,7 +365,7 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                     int len = stream.read(buf);
                     while (len >= buf.length && stream.available() > 0)
                     {
-                        buf = Arrays.copyOf(buf, buf.length + buf.length / 2);
+                        buf = Arrays.copyOf(buf, (int)(buf.length * 1.5));
                         len += stream.read(buf, len, buf.length - len);
                     }
                     cam.determineHash(buf, len);
@@ -372,20 +376,27 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                 stream.close();
                 conn.disconnect();
             }
+            catch (DigestException e)
+            {
+                this.logger.error("Error calculating hash of image frames for uniqueness test. Error message is: " + 
+                        e.getMessage() + ". Disabling uniqueness test.");
+                this.checkUniqueness = false;
+            }
+            catch (ProtocolException e)
+            {
+                this.logger.error("Wrong protocol for confguired camera with URL " + url + ". This test is meant " +
+                		"for cameras streaming JPEG frames over HTTP. This camera will NOT be tested.");
+                it.remove();
+            }
             catch (IOException e)
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                this.logger.error("Error connecting to camera stream with URL " + url + ". This is treated as a " +
+                		"camera failure.");
+                cam.incrementFails();
             }
             catch (InterruptedException e)
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            catch (DigestException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }

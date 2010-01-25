@@ -67,6 +67,8 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  *  invoked. The default is to honour the test interval.</li>
  *  <li><code>runInterval - The time between each test run in seconds. The 
  *  default is 60 seconds.</li>
+ *  <li><code>doNightTimeSchedule</code> - Specifies if the test run 
+ *  interval is reduced at night time.</li>
  * </ul>
  * <strong>NOTE:</strong> The abstract methods declared in this class
  * do not provide any indication of the success of their invocation. The 
@@ -88,6 +90,16 @@ public abstract class AbstractTestAction implements ITestAction
      *  interval to be changed (i.e. if the specified test interval is 
      *  honoured). The default is to honour the specified test interval. */
     protected boolean isSetIntervalHonoured = true;
+    
+    /** Whether at a set time the run interval is reduced to a 'dark'
+     *  period and at another set time the run interval is increased
+     *  to a day period. */
+    protected boolean doDarkTimeSchedule = false;
+    
+    /** Dark factor, the multiple of the light interval to use as the
+     *  dark period run interval. */
+    protected double darkFactor;
+
     
     /** Random number generator. */
     protected final Random randomNumGen;
