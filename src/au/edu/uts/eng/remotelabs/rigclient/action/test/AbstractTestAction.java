@@ -41,6 +41,7 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.test;
 
+import java.util.Calendar;
 import java.util.Random;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.ITestAction;
@@ -68,7 +69,11 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  *  <li><code>runInterval - The time between each test run in seconds. The 
  *  default is 60 seconds.</li>
  *  <li><code>doNightTimeSchedule</code> - Specifies if the test run 
- *  interval is reduced at night time.</li>
+ *  interval is reduced at night time. If this is set to true, the
+ *  <code>darkTimeFactor</code> property should be set with a value to
+ *  specify the reduction in frequency. For example if it is set to
+ *  5, during the dark time the tests will run 5 times slower than 
+ *  the light period.</li>
  * </ul>
  * <strong>NOTE:</strong> The abstract methods declared in this class
  * do not provide any indication of the success of their invocation. The 
@@ -94,12 +99,17 @@ public abstract class AbstractTestAction implements ITestAction
     /** Whether at a set time the run interval is reduced to a 'dark'
      *  period and at another set time the run interval is increased
      *  to a day period. */
-    protected boolean doDarkTimeSchedule = false;
+    protected boolean doLightDarkSchedule = false;
     
     /** Dark factor, the multiple of the light interval to use as the
      *  dark period run interval. */
-    protected double darkFactor;
-
+    protected double darkTimeFactor = 5;
+    
+    /** The time the light time begins. The default is 9:00. */
+    protected int lightTime[] = {9, 0};
+    
+    /** The time the dark time begins. The default is 18:00. */
+    protected int darkTime[] = {18, 0};
     
     /** Random number generator. */
     protected final Random randomNumGen;
@@ -126,6 +136,14 @@ public abstract class AbstractTestAction implements ITestAction
         /* Run setup. */
         this.setUp();
         
+        /* If light - dark scheduling enable, load light and dark times. */
+        if (this.doLightDarkSchedule)
+        {
+            this.logger.info("Light - dark scheduling enabled for test " + this.getActionType() + ".");
+            this.loadLightDarkConfig(true, this.lightTime);
+            this.loadLightDarkConfig(false, this.darkTime);
+        }
+        
         try
         {
             while (!Thread.interrupted())
@@ -134,14 +152,23 @@ public abstract class AbstractTestAction implements ITestAction
                  * if the test run interval is shortened past the existing sleep interval,
                  * the existing sleep time is reduced to within the new test run
                  * interval. */
-                if (this.isPeriodic)
+                if (this.doLightDarkSchedule)
                 {
-                    sleepCount = this.runInterval;
+                    if (this.isLightTime(Calendar.getInstance()))
+                    {
+                        sleepCount = this.isPeriodic ? this.runInterval : this.randomNumGen.nextInt(this.runInterval + 1);
+                    }
+                    else
+                    {
+                        sleepCount = this.isPeriodic ? (int)(this.runInterval * this.darkTimeFactor) :
+                            (int)(this.randomNumGen.nextInt(this.runInterval + 1 ) * this.darkTimeFactor);
+                    }
                 }
                 else
                 {
-                    sleepCount = this.randomNumGen.nextInt(this.runInterval + 1);
+                    sleepCount = this.isPeriodic ? this.runInterval : this.randomNumGen.nextInt(this.runInterval + 1);
                 }
+                
                 while (sleepCount > 0)
                 {
                     if (this.runInterval < sleepCount) // Occurs when the test interval time is reduced to 
@@ -222,8 +249,89 @@ public abstract class AbstractTestAction implements ITestAction
     @Override
     public String getFailureReason()
     {
-        /* This method is redundant in <code>ITestAction</code implementations
-         * as the error reason method is <code>getReason</code>. */
+        /* This method is redundant in ITestAction implementations
+         * as the error reason method is getReason. */
         return null;
+    }
+    
+    /**
+     * Returns true if it is the current light time period.
+     * 
+     * @param cal Calendar time
+     * @return true if light time
+     */
+    private boolean isLightTime(Calendar cal)
+    {
+        int currentHour = cal.get(Calendar.HOUR_OF_DAY);
+        int currentMin = cal.get(Calendar.MINUTE);
+        
+        /* Whether the dark time is earlier than the light time. */
+        if (this.darkTime[0] > this.lightTime[0] || 
+                (this.darkTime[0] == this.lightTime[0] && this.darkTime[1] > this.lightTime[1]))
+        {
+            /* 1) Before light period starts. */
+            if (this.lightTime[0] > currentHour || (this.lightTime[0] == currentHour && this.lightTime[1] > currentMin))
+            {
+                return false;
+            }
+            /* 2) Before dark period starts. */
+            else if (this.darkTime[0] > currentHour || (this.darkTime[0] == currentHour && this.darkTime[1] > currentMin))
+            {
+                return true;
+            }        
+            /* 3) After the dark period starts. */
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            /* 1) Before dark period starts. */
+            if (this.darkTime[0] > currentHour || (this.darkTime[0] == currentHour && this.darkTime[1] > currentMin))
+            {
+                return true;
+            }
+            /* 2) Before light period starts. */
+            else if (this.lightTime[0] > currentHour || (this.lightTime[0] == currentHour && this.lightTime[1] > currentMin))
+            {
+                return false;
+            }
+            /* 3) After light period starts. */
+            else
+            {
+                return true;
+            }
+        }
+    }
+    
+    /**
+     * Loads the configuration for the scheduling light and dark period start times.
+     * 
+     * @param light whether to load light or dark period
+     * @param def default time
+     */
+    private void loadLightDarkConfig(boolean light, int def[])
+    {
+        String tmp = light ? this.config.getProperty("Test_Light_Time", "09:00") :
+                this.config.getProperty("Test_Dark_Time", "18:00");
+        int arr[] = light ? this.lightTime : this.darkTime;
+        try
+        {
+            String time[] = tmp.split(":");
+            arr[0] = Integer.parseInt(time[0]);
+            arr[1] = Integer.parseInt(time[1]);
+            
+            if (arr[0] < 0 || arr[0] > 24 || arr[1] < 0 || arr[1] > 60)
+            {
+                throw new NumberFormatException();
+            }
+        }
+        catch (NumberFormatException ex)
+        {
+            this.logger.warn("Incorrect configuration for " + (light ? "light" : "dark") + " time start. It should " +
+            		" in the 24 hour notation with a column (':') separating the hour and minute portions.");
+            arr = def;
+        }
     }
 }

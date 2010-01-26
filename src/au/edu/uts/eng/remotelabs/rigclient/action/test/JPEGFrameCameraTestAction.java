@@ -144,6 +144,7 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
         this.isPeriodic = true;
         this.runInterval = 30;
         this.isSetIntervalHonoured = false;
+        this.doLightDarkSchedule = false;
     }
     
     @Override

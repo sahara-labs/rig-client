@@ -96,6 +96,7 @@ public class PingTestAction extends AbstractTestAction
         this.runInterval = 30;
         this.isPeriodic = true;
         this.isSetIntervalHonoured = false;
+        this.doLightDarkSchedule = false;
         
         this.hosts = new HashMap<String, Integer>();
         this.pingBuilder = new ProcessBuilder();
