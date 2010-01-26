@@ -55,6 +55,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.action.test.AbstractTestAction;
 import au.edu.uts.eng.remotelabs.rigclient.action.test.JPEGFrameCameraTestAction;
 import au.edu.uts.eng.remotelabs.rigclient.action.test.JPEGFrameCameraTestAction.Camera;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
@@ -146,6 +147,25 @@ public class JPEGFrameCameraTestActionTester extends TestCase
         
         f = JPEGFrameCameraTestAction.class.getDeclaredField("minImageSize");
         f.setAccessible(true);
+        assertEquals(50 * 1024, f.getInt(this.test));
         
+        f = AbstractTestAction.class.getDeclaredField("runInterval");
+        f.setAccessible(true);
+        assertEquals(10, f.getInt(this.test));
+        
+        f = JPEGFrameCameraTestAction.class.getDeclaredField("checkUniqueness");
+        f.setAccessible(true);
+        assertTrue(f.getBoolean(this.test));
+        
+        f = JPEGFrameCameraTestAction.class.getDeclaredField("maxUniqFrames");
+        f.setAccessible(true);
+        assertEquals(4, f.getInt(this.test));
+    }
+    
+    public void testDoTest()
+    {
+        this.test.setUp();
+        this.test.startTest();
+        this.test.doTest();
     }
 }

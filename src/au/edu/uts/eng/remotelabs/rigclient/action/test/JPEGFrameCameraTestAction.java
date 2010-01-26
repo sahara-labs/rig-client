@@ -188,7 +188,7 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
         {
             this.logger.warn("The configured value of the camera test minimum image size (Camera_Test_Image_Min_Size)" +
             		" is not a valid integer. Using the default of 10kB.");
-            this.minImageSize = 10;
+            this.minImageSize = 10 * 1024;
         }
         
         cnf = this.config.getProperty("Camera_Test_Interval", "30");
@@ -330,12 +330,12 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                     
                     /* Need to read stream to determine if it exceeds minimum size. */
                     size = 0;
-                    while (stream.read() != -1 || size++ >= this.minImageSize);
+                    while (stream.read() != -1 && size++ < this.minImageSize);
                     if (size < this.minImageSize)
                     {
                         this.logger.debug("Camera with URL " + url + " has failed because the read image size (" +
                         		(size / 1024) + "kB) is less than the set image size (" + (this.minImageSize / 1024) +
-                        		").");
+                        		"kB).");
                         cam.incrementFails();
                         stream.close();
                         conn.disconnect();
@@ -350,10 +350,11 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                 soi[0] = (byte)(stream.read() & 0xFF);
                 soi[1] = (byte)(stream.read() & 0xFF);
                 stream.reset();
-                if (soi[0] != 0xFF && soi[1] != 0xD8)
+                if ((soi[0] & 0xFF) != 0xFF || (soi[1] & 0xFF) != 0xD8)
                 {
                     this.logger.debug("Camera with URL " + url + " has failed because the SOI marker (" +
-                            Integer.toHexString(soi[0]) + Integer.toHexString(soi[1]) + " is not FFD8.");
+                            Integer.toHexString(Byte.valueOf(soi[0]).intValue()).toUpperCase() + 
+                            Integer.toHexString(Byte.valueOf(soi[1]).intValue()).toUpperCase() + " is not FFD8.");
                     cam.incrementFails();
                     stream.close();
                     conn.disconnect();
@@ -391,7 +392,7 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
             }
             catch (IOException e)
             {
-                this.logger.error("Error connecting to camera stream with URL " + url + ". This is treated as a " +
+                this.logger.debug("Error connecting to camera stream with URL " + url + ". This is treated as a " +
                 		"camera failure.");
                 cam.incrementFails();
             }
