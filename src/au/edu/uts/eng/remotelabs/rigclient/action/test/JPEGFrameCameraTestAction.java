@@ -298,11 +298,11 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                  *     1) Use the HTTP response Content-Length header if provided.
                  *     2) Read the stream and determine the number of bytes returned, up to
                  *        the set minimum image size. */
-                if (conn.getContentLength() != -1 && conn.getContentLength() < (this.minImageSize * 1024))
+                if (conn.getContentLength() != -1 && conn.getContentLength() < (this.minImageSize))
                 {
                     this.logger.debug("Camera with URL " + url + " has failed because the supplied content length (" +
                             (conn.getContentLength() / 1024) + "kB) is less the minimum size " + 
-                            (this.minImageSize * 1024 ) + "kB.");
+                            this.minImageSize + "kB.");
                     cam.incrementFails();
                     conn.disconnect();
                     continue;
@@ -353,8 +353,8 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                 if ((soi[0] & 0xFF) != 0xFF || (soi[1] & 0xFF) != 0xD8)
                 {
                     this.logger.debug("Camera with URL " + url + " has failed because the SOI marker (" +
-                            Integer.toHexString(Byte.valueOf(soi[0]).intValue()).toUpperCase() + 
-                            Integer.toHexString(Byte.valueOf(soi[1]).intValue()).toUpperCase() + " is not FFD8.");
+                            Integer.toHexString(soi[0]).toUpperCase().substring(6) + 
+                            Integer.toHexString(soi[1]).toUpperCase().substring(6) + " is not FFD8).");
                     cam.incrementFails();
                     stream.close();
                     conn.disconnect();
@@ -418,10 +418,10 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
             if (cam.getValue().getFails() > this.failThreshold)
             {
                 buf.append("Camera with URL " + cam.getKey() + " has failed.");
+                buf.append(' ');
             }
-            
             /* Check uniqueness. */
-            if (this.checkUniqueness)
+            else if (this.checkUniqueness)
             {
                 byte[][] hashes = cam.getValue().getFrameHashes();
                                 
@@ -438,7 +438,7 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                 if (allSame)
                 {
                    buf.append("Camera with URL " + cam.getKey() + " has failed because it has returned " +
-                   		" at least " + this.maxUniqFrames + " identical frames.");
+                   		"at least " + this.maxUniqFrames + " identical frames.");
                 }
             }
         }
@@ -557,10 +557,11 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
         {
             /* Slide the frame hashes to the left to keep sequential order. */
             int i;
-            for (i = 1 ; i < this.hashes.length; i++)
+            for (i = 1; i < this.hashes.length; i++)
             {
                 this.hashes[i - 1] = this.hashes[i];
             }
+            i--;
             
             this.hasher.update(buf, 0, len);
             this.hashes[i] = this.hasher.digest();
