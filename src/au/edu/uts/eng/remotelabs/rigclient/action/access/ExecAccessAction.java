@@ -55,7 +55,8 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * Abstract class for command line execution of an access
- * action. 
+ * action.   Executes a command line process given the ProcessBuilder 
+ * parameters.
  * <p>
  * The following methods should be overridden for rig 
  * specific access control.
@@ -90,7 +91,7 @@ public abstract class ExecAccessAction implements IAccessAction
 
     /** Error string */
     protected String errorString;
-
+    
     /** Working directory for access command */
     protected String workingDirectory;
 

@@ -318,13 +318,9 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     }
     
     /**
-     * Verifies the result of the .  
+     * Verifies the result of the process.  
      * 
-     * This supplies the:
-     * <ul>
-     *     <li><strong>Command</strong> - The common command for assign and revoke "net"
-     *     <li><strong>Command arguments</strong> - The command parameters ie localgroup",
-     *     configurable remote desktop group name
+     * This is done using the Windows exit code recieved from the last command.
      */
     @Override
     public boolean  verifyAccessAction()

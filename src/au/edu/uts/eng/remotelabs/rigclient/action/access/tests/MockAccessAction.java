@@ -42,6 +42,7 @@
 package au.edu.uts.eng.remotelabs.rigclient.action.access.tests;
 
 import au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 
 /**
  * @author tmachet
@@ -49,14 +50,31 @@ import au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction;
  */
 public class MockAccessAction extends ExecAccessAction
 {
-
+    /**
+     * Constructor  - sets instruction file name.
+     * 
+     * @param fileName
+     * @param user 
+     */
+    public MockAccessAction()
+    {
+        super();
+    }
+    
     /* (non-Javadoc)
      * @see au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction#setupAccessAction()
      */
     @Override
     protected void setupAccessAction()
     {
-        // TODO Auto-generated method stub
+        // set up action to echo out comment
+        this.command = "echo";
+        this.commandArguments.add("testing");
+        this.commandArguments.add("testing");
+        this.commandArguments.add("123");
+        
+        this.workingDirectory = "/tmp";
+        
     }
 
     /* 
