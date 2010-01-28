@@ -42,7 +42,6 @@
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
-import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * Windows Terminal Services access action. Performs the access action by
