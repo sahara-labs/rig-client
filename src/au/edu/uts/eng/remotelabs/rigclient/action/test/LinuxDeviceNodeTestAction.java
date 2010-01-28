@@ -43,7 +43,15 @@ package au.edu.uts.eng.remotelabs.rigclient.action.test;
 
 /**
  * Tests the existence of device nodes. At its most basic, the test ensures a
- * one or more files are present. 
+ * one or more files are present. Optionally it may test the following device
+ * node parameters:
+ * <ul>
+ *  <li>Device type - if the device node is a character device 
+ *  ('<tt>c</tt>'), a block device ('<tt>b</tt>'), a directory 
+ *  ('<tt>d</tt>'), a regular file ('<tt>-</tt>'), a 
+ *  symbolic link ('<tt>l</li>' 
+ *  
+ * <ul>
  */
 public class LinuxDeviceNodeTestAction extends AbstractTestAction
 {
