@@ -44,18 +44,36 @@ package au.edu.uts.eng.remotelabs.rigclient.action.test;
 /**
  * Tests the existence of device nodes. At its most basic, the test ensures a
  * one or more files are present. Optionally it may test the following device
- * node parameters:
+ * node parameters (actually file parameters, but device nodes are files):
  * <ul>
- *  <li>Device type - if the device node is a character device 
- *  ('<tt>c</tt>'), a block device ('<tt>b</tt>'), a directory 
- *  ('<tt>d</tt>'), a regular file ('<tt>-</tt>'), a 
- *  symbolic link ('<tt>l</li>' 
- *  
+ *  <li>File type - if the device node is a character device ('<tt>c</tt>'),
+ *  a block device ('<tt>b</tt>'), a directory ('<tt>d</tt>'), a regular file
+ *  ('<tt>-</tt>'), a symbolic link ('<tt>l</tt>'), a socket ('<tt>s</tt>') or
+ *  a named pipe ('<tt>p</tt>').</li>
+ *  <li>File permission - Either the octal file permission number (e.g. '644')
+ *  or a string specifying the permissions as shown by 'ls' (e.g. 'rw-rw----').
+ *  </li>
+ *  <li>File owner user name - The name of the user who should have ownership
+ *  of the file.</li>
+ *  <li>File group name of owner - The name of the group who should have 
+ *  ownership of the file.</li>
+ *  <li>Device node numbers - The device node major and/or minor numbers.</li>
+ *  <li>Device driver name - the name of the device driver as listed in
+ *  <tt>/proc/devices</tt>. This determines from the device name the major
+ *  number of the device, then ensures the device node has the same major.</li>
  * <ul>
+ * 
  */
 public class LinuxDeviceNodeTestAction extends AbstractTestAction
 {
-    
+    public LinuxDeviceNodeTestAction()
+    {
+        this.isPeriodic = true;
+        this.isSetIntervalHonoured = false;
+        this.doLightDarkSchedule = false;
+        this.runInterval = 60;
+    }
+
     
     @Override
     public void doTest()
@@ -76,8 +94,7 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
     @Override
     public void tearDown()
     {
-        // TODO Auto-generated method stub
-
+        /* Does nothing. */
     }
 
     
@@ -102,6 +119,14 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
     {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    class DeviceNodeTest
+    {
+        public DeviceNodeTest()
+        {
+            
+        }
     }
 
 }
