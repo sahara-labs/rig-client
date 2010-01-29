@@ -267,6 +267,68 @@ public class AbstractBatchRunnerTester extends TestCase
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#invoke()}.
      */
     @Test
+    public void testInvokeEnvWinPath()
+    {
+        final String wdBase = System.getProperty("user.dir") + "/test/resources/BatchRunner";
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Batch_Working_Dir"))
+            .andReturn(wdBase);
+        expect(this.mockConfig.getProperty("Batch_Create_Nested_Dir", "true"))
+            .andReturn("false");
+        expect(this.mockConfig.getProperty("Batch_Flush_Env", "false"))
+            .andReturn("true");
+        replay(this.mockConfig);
+        
+        try
+        {
+            Field field = AbstractBatchRunner.class.getDeclaredField("command");
+            field.setAccessible(true);
+            
+            if (System.getProperty("os.name").equals("Windows"))
+            {
+                field.set(this.runner, "set");
+            }
+            else
+            {
+                field.set(this.runner, "env");
+            }
+            
+            final Map<String, String> envMap = new HashMap<String, String>();
+            for (int i = 1; i <= 20; i++)
+            {
+                envMap.put("env" + i, "val" + i);
+            }
+            
+            /* Windows is annoying inconsistent with the environment variables. Some
+             * use PATH, path or Path. */
+            envMap.put("Path", System.getenv("PATH"));
+            
+            field = AbstractBatchRunner.class.getDeclaredField("envMap");
+            field.setAccessible(true);
+            field.set(this.runner, envMap);
+            
+            Method meth = AbstractBatchRunner.class.getDeclaredMethod("invoke");
+            meth.setAccessible(true);
+            assertTrue((Boolean)meth.invoke(this.runner));
+            
+            String env[] = this.runner.getAllStandardOut().split(System.getProperty("line.separator"));
+            assertEquals(21, env.length);
+            Arrays.sort(env);
+            for (int i = 1; i <= 20; i++)
+            {
+                assertTrue(Arrays.binarySearch(env, "env" + i + "=val" + i) >= 0);
+            }
+        }
+        catch (Exception e)
+        {
+           fail(e.getClass().getName() + " - " + e.getMessage());
+        }   
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner#invoke()}.
+     */
+    @Test
     public void testInvokeNoRunDirEnvFlushFail()
     {
         final String wd = System.getProperty("user.dir") + "/test/resources/BatchRunner";

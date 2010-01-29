@@ -431,7 +431,19 @@ public abstract class AbstractBatchRunner implements Runnable
         {
             this.logger.info("Batch control command is not absolute. This isn't recommended but will test path for" +
             		" command file.");
-            final String path = env.get("PATH");
+            
+            String path = env.get("PATH");
+            if (path == null)
+            {
+                for (Entry<String, String> envVar : env.entrySet())
+                {
+                    if (envVar.getKey().toUpperCase().equals("PATH"))
+                    {
+                        path = envVar.getValue();
+                        break;
+                    }
+                }
+            }
             if (path == null)
             {
                 this.logger.error("Path enviroment variable (path) for batch control not found, batch failing.");
