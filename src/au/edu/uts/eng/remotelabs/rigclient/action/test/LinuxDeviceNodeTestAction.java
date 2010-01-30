@@ -41,8 +41,15 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.test;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 
 /**
  * Tests the existence of device nodes. At its most basic, the test ensures a
@@ -64,21 +71,36 @@ import java.util.List;
  *  <li>Device driver name - the name of the device driver as listed in
  *  <tt>/proc/devices</tt>. This determines from the device name the major
  *  number of the device, then ensures the device node has the same major.</li>
- * <ul>
+ * </ul>
  * The behaviour of Linux device node test is:
  * <ul>
  *  <li>Periodicity - is periodic.</li>
  *  <li>Set interval - ignored, not honoured.</li>
  *  <li>Light-dark scheduling - disabled.</li>
  * </ul>
- * The configuration properties for this test is:
+ * This test may be configured to test multiple device nodes, with configuration 
+ * property related to a specific device node suffixed with a number. The 
+ * following are the configurable properties:
  * <ul>
- *  <li></li>
+ *  <li><tt>LinuxDeviceNode_Test_Path_&lt;n&gt;</tt> - The path to the device node
+ *  (usually in '/dev'.</li>
+ *  <li><tt>LinuxDeviceNode_Test_Type_&lt;n&gt;</tt> - The device node file type,
+ *  either '-', 'd', 'c', 'b', 'l', 's' or 'p'.</li>
+ *  <li><tt>LinuxDeviceNode_Test_Type_&lt;n&gt;</tt> - The permission string as
+ *  shown be 'ls'.</li>
  * </ul>
  */
 public class LinuxDeviceNodeTestAction extends AbstractTestAction
 {
-    private List<DeviceNode> deviceNode;
+    private List<DeviceNode> deviceNodes;
+    
+    private ProcessBuilder ls;
+    
+    private ProcessBuilder stat;
+    
+    /** The number of times a node test can fail before this test action 
+     *  returns a failure. */
+    private int failThreshold;
     
     public LinuxDeviceNodeTestAction()
     {
@@ -87,7 +109,9 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         this.doLightDarkSchedule = false;
         this.runInterval = 60;
         
-        this.deviceNode = new ArrayList<DeviceNode>();
+        this.deviceNodes = new ArrayList<DeviceNode>();
+        this.ls = new ProcessBuilder("/bin/ls", "-l");
+        this.stat = new ProcessBuilder("/bin/stat", "-c");
     }
 
     
@@ -125,16 +149,22 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
     @Override
     public boolean getStatus()
     {
-        // TODO Auto-generated method stub
-        return false;
+        for (DeviceNode node : this.deviceNodes)
+        {
+            if (node.getFails() > this.failThreshold)
+            {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     
     @Override
     public String getActionType()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return "Linux device node test";
     }
     
     
@@ -153,11 +183,11 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         
         /** Device node permission string (e.g 'rwxr--r--'). If this is set
          *  to <code>null</code>, the permission string test is disabled. */
-        private String permissionStr;
+        private String permissionStr = null;
         
         /** The name of the owning user. If this is set to <code>null</code>
          *  The owner name test is disabled. */
-        private String owner;
+        private String owner = null;
         
         /** The user identifier of the owning user. If this is set to '-1' 
          *  the owner uid tests is disabled. */
@@ -165,7 +195,7 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         
         /** The name of the owning group. If this is set to <code>null</code>,
          *  this test is disabled. */
-        private String group;
+        private String group = null;
         
         /** The group identifier of the owning group. If this is set to '-1'
          *  the group identifier test is disabled. */
@@ -173,22 +203,147 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         
         /** The device node major number. If this is set to '-1' the major 
          *  number test is disabled. */
-        private int majorNumber = -1;
+        private final int majorNumber = -1;
         
         /** The device node minor number. If this is set to '-1' the minor
          *  number test is disabled. */
-        private int minorNumber = -1;
+        private final int minorNumber = -1;
         
         /** The name of the device driver name as shown in '/proc/devices'.
          *  If this is set to <code>null</code> the test is disabled. */
-        private String driverName;
+        private final String driverName = null;
         
-        private DeviceNode(String path, int confNum)
+        /** The number of times this device node has failed. */
+        private int fails = 0;
+        
+        /** Failure reason. */
+        private String failureReason;
+        
+        /**
+         * Loads the device node test configuration for the specified path and
+         * configuration suffix.
+         * 
+         * @param path the path of the node
+         * @param confNum the device nodes configuration number
+         */
+        DeviceNode(String path, final int confNum)
         {
+            IConfig config = LinuxDeviceNodeTestAction.this.config;
+            ILogger logger = LinuxDeviceNodeTestAction.this.logger;
+            
             this.nodePath = path;
+            String tmp = config.getProperty("LinuxDeviceNode_Test_Type_" + confNum);
+            if (tmp != null)
+            {
+                this.fileType = tmp.charAt(0);
+                logger.info("Going to test device node " + this.nodePath + " for file type " + this.fileType + '.');
+            }
+            
+            if ((tmp = config.getProperty("LinuxDeviceNode_Test_Permission_" + confNum)) != null)
+            {
+                this.permissionStr = tmp;
+                logger.info("Going to test device node " + this.nodePath + " for permission string " + 
+                        this.permissionStr + '.');
+            }
+            
+            if ((tmp = config.getProperty("" + confNum)) != null)
+            {
+                try
+                {
+                    this.octalPermissions = Integer.parseInt(tmp);
+                    logger.info("Going to test device node " + this.nodePath + " for octal permission number " +
+                            this.octalPermissions + '.');
+                }
+                catch (NumberFormatException ex)
+                {
+                    this.octalPermissions = -1;
+                    logger.warn("Invalid octal permission number " + tmp + ", no going to test octal file permission " +
+                    		"of" + this.nodePath + '.');
+                }
+            }
+            
         }
         
+        /**
+         * Test the device node.
+         */
+        public void test()
+        {
+            ILogger logger = LinuxDeviceNodeTestAction.this.logger;
+            try
+            {
+                /* 1) Test the device node file exists. */
+                File node = new File(this.nodePath);
+                if (!node.exists())
+                {
+                    
+                    logger.debug("Failing device node test for " + this.nodePath + " because the file does not exist.");
+                    this.fails++;
+                    return;
+                }
+                
+                /* Get the output of `ls`. */
+                String lsParts[] = null;
+                LinuxDeviceNodeTestAction.this.ls.command().add(this.nodePath);
+                Process proc = LinuxDeviceNodeTestAction.this.ls.start();
+                LinuxDeviceNodeTestAction.this.ls.command().remove(this.nodePath);
+                if (proc.waitFor() != 0)
+                {
+                    /* ls doesn't detect this file... Bizarre, Java detects is... */
+                    logger.debug("Failing device node test for " + this.nodePath + " becase the file does not exist " +
+                    		"('ls' returned a non-zero (" + proc.exitValue() + ") return code.");
+                    this.fails++;
+                    this.failureReason = "Does not exist.";
+                    return;
+                }
+                
+                BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+                lsParts = reader.readLine().split("\\s");
+                reader.close();
+                
+                /* 2) Test the file type. */
+                if (this.fileType != '\0' && this.fileType != lsParts[0].charAt(0))
+                {
+                    logger.debug("Failed device node test for " + this.nodePath + " becase the file type (" 
+                            + lsParts[0].charAt(0) + ") is not " + this.fileType + '.');
+                    this.fails++;
+                    this.failureReason = "Not of type " + this.fileType + '.';
+                    return;
+                }
+                
+                /* 3) Test the device file permission (can include on exclude file type prefix). */
+                if (this.permissionStr != null && 
+                        (this.permissionStr.equals(lsParts[0]) || this.permissionStr.equals(lsParts[0].substring(1))))
+                {
+                    logger.debug("Failed device node test for " + this.nodePath + " because the file permissions are " +
+                    		"incorrect (" + lsParts[0].substring(1) + " is not " + this.permissionStr + ").");
+                    this.fails++;
+                    this.failureReason = "Incorrect permission.";
+                    return;
+                }
+                
+                
+                
+                /* All good!. */
+                this.fails = 0;
+            }
+            catch (IOException ex)
+            {
+                // TODO io exception
+            }
+            catch (InterruptedException e)
+            {
+               Thread.currentThread().interrupt();
+            }
+            
+            /* Last chance cleanup. */
+            LinuxDeviceNodeTestAction.this.ls.command().remove(this.nodePath);
+        }
         
+        public int getFails()
+        {
+            return this.fails;
+        }
     }
 
 }
