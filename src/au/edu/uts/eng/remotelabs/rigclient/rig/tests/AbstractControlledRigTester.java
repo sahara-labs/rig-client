@@ -211,7 +211,7 @@ public class AbstractControlledRigTester extends TestCase
             /* Set up batch runner. */
             if (System.getProperty("os.name").equals("Windows"))
             {
-                // TODO Write a bat script to run the test case
+                // LATER Write a bat script to run the test case
                 fail("Windows batch command script implmenation");
             }
             else
@@ -300,10 +300,9 @@ public class AbstractControlledRigTester extends TestCase
             replay(this.mockConfig);
             
             /* Set up batch runner. */
-            /* Set up batch runner. */
             if (System.getProperty("os.name").equals("Windows"))
             {
-                // TODO Write a bat script to run the test case
+                // LATER Write a bat script to run the test case
                 fail("Windows batch command script implmenation");
             }
             else
@@ -374,7 +373,7 @@ public class AbstractControlledRigTester extends TestCase
             /* Set up batch runner. */
             if (System.getProperty("os.name").equals("Windows"))
             {
-                // TODO Write a bat script to run the test case
+                // LATER Write a bat script to run the test case
                 fail("Windows batch command script implmenation");
             }
             else
@@ -439,7 +438,7 @@ public class AbstractControlledRigTester extends TestCase
             /* Set up batch runner. */
             if (System.getProperty("os.name").equals("Windows"))
             {
-                // TODO Write a bat script to run the test case
+                // LATER Write a bat script to run the test case
                 fail("Windows batch command script implmenation");
             }
             else
@@ -473,7 +472,7 @@ public class AbstractControlledRigTester extends TestCase
                                                   // code for untrapped signals
             if (System.getProperty("os.name").equals("Windows"))
             {
-                // TODO find out what a JVM uses on Windows
+                // LATER find out what a JVM uses on Windows
                 fail("Windows error code checking not implemented");
             }
             else
@@ -520,7 +519,7 @@ public class AbstractControlledRigTester extends TestCase
             
             if (System.getProperty("os.name").equals("Windows"))
             {
-                // TODO Write a bat script to run the test case
+                // LATER Write a bat script to run the test case
                 fail("Windows batch command script implmenation");
             }
             else

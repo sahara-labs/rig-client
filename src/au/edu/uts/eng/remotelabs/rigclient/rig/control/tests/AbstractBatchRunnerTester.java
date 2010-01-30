@@ -484,7 +484,7 @@ public class AbstractBatchRunnerTester extends TestCase
              * systems - Linux / UNIX, uses'cat'. */
             if (System.getProperty("os.name").equals("Windows"))
             {
-                // TODO Windows equivalent batch script
+                // LATER Windows equivalent batch script
                 fail("Windows equivalent batch script not implemented");
             }
             else
@@ -612,7 +612,7 @@ public class AbstractBatchRunnerTester extends TestCase
              * systems - Linux / UNIX, uses'cat'. */
             if (System.getProperty("os.name").equals("Windows"))
             {
-                // TODO Windows equivalent batch script
+                // LATER Windows equivalent batch script
                 fail("Windows equivalent batch script not implemented");
             }
             else

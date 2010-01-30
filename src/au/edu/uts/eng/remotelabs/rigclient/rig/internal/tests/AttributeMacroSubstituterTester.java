@@ -342,7 +342,7 @@ public class AttributeMacroSubstituterTester extends TestCase
         }
         else if (System.getProperty("os.name").startsWith("Windows"))
         {
-            // TODO Implement detecting IP for Windows ipconfig command
+            // LATER Implement detecting IP for Windows ipconfig command
         }
         
         return null;

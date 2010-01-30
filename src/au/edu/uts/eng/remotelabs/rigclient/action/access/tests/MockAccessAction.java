@@ -42,7 +42,6 @@
 package au.edu.uts.eng.remotelabs.rigclient.action.access.tests;
 
 import au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction;
-import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 
 /**
  * @author tmachet
@@ -84,7 +83,6 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     protected boolean verifyAccessAction()
     {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -94,7 +92,6 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     public boolean assign(String name)
     {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -104,7 +101,6 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     public boolean revoke(String name)
     {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -114,7 +110,6 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     public String getActionType()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -124,7 +119,6 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     public String getFailureReason()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
