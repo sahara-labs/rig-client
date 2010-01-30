@@ -57,6 +57,7 @@ import java.util.Map.Entry;
  *  by setting the property 'Ping_Test_Interval' to a value in seconds.</li>
  *  <li>Periodicity - is periodic.</li>
  *  <li>Set interval - ignored, not honoured.</li> 
+ *  <li>Light-dark scheduling - disabled.</li>
  * </ol>
  * The configuration properties for PingTestAction are:
  * <ul>

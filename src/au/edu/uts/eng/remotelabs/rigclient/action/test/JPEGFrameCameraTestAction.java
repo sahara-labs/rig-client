@@ -90,7 +90,8 @@ import java.util.Map.Entry;
  *  <li>Test run interval - the default is 30 seconds but may be configured
  *  by setting the property 'Camera_Test_Interval' to a value in seconds.</li>
  *  <li>Periodicity - is periodic.</li>
- *  <li>Set interval - ignored, not honoured.</li> </li>
+ *  <li>Set interval - ignored, not honoured.</li> 
+ *  <li>Light-dark scheduling - disabled.</li>
  * </ul>
  * The camera test can be configured with the following properties:
  * <ul>
