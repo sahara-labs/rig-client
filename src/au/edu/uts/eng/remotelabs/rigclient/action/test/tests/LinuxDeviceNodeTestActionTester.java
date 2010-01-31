@@ -1,0 +1,868 @@
+/**
+ * SAHARA Rig Client
+ * 
+ * Software abstraction of physical rig to provide rig session control
+ * and rig device control. Automatically tests rig hardware and reports
+ * the rig status to ensure rig goodness.
+ *
+ * @license See LICENSE in the top level directory for complete license terms.
+ *
+ * Copyright (c) 2010, University of Technology, Sydney
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  * Redistributions of source code must retain the above copyright notice, 
+ *    this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright 
+ *    notice, this list of conditions and the following disclaimer in the 
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of the University of Technology, Sydney nor the names 
+ *    of its contributors may be used to endorse or promote products derived from 
+ *    this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @author Michael Diponio (mdiponio)
+ * @date 12th December 2010
+ *
+ * Changelog:
+ * - 30/01/2010 - mdiponio - Initial file creation.
+ */
+package au.edu.uts.eng.remotelabs.rigclient.action.test.tests;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+
+import java.lang.reflect.Field;
+import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction;
+import au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction.DeviceNode;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
+
+/**
+ * Tests the {@link LinuxDeviceNodeTestAction} class.
+ */
+public class LinuxDeviceNodeTestActionTester extends TestCase
+{
+    /** Object of class under test. */
+    private LinuxDeviceNodeTestAction test;
+    
+    /** Mock configuration. */
+    private IConfig mockConfig;
+
+    @Before
+    @Override
+    public void setUp() throws Exception
+    {
+           this.mockConfig = createMock(IConfig.class);
+        expect(this.mockConfig.getProperty("Logger_Type"))
+                .andReturn("SystemErr");
+        expect(this.mockConfig.getProperty("Log_Level"))
+                .andReturn("DEBUG");
+        expect(this.mockConfig.getProperty("Default_Log_Format", "[__LEVEL__] - [__ISO8601__] - __MESSAGE__"))
+                .andReturn("[__LEVEL__] - [__ISO8601__] - __MESSAGE__");
+        expect(this.mockConfig.getProperty("FATAL_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("PRIORITY_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("ERROR_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("WARN_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
+        replay(this.mockConfig);
+        
+        ConfigFactory.getInstance();
+        Field f = ConfigFactory.class.getDeclaredField("instance");
+        f.setAccessible(true);
+        f.set(null, this.mockConfig);
+        
+        LoggerFactory.getLoggerInstance(); 
+        this.test = new LinuxDeviceNodeTestAction();
+    }
+
+    @Test
+    public void testSetUp()
+    {
+        fail("Not yet implemented");
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTest() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn("rw-rw-rw-");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn("666");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn("1");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn("3");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn("mem");
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFile() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+    }
+
+        /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileNotExist() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/does_not_exist");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/does_not_exist", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(1, node.getFails());
+        assertEquals("Does not exist.", node.getReason());
+        
+        this.test.doTest();
+        assertEquals(2, node.getFails());
+        assertEquals("Does not exist.", node.getReason());
+
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileType() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileWrongType() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("b");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(1, node.getFails());
+        assertNotNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(2, node.getFails());
+        assertNotNull(node.getReason());
+
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFilePermission() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn("rw-rw-rw-");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileWrongPermission() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn("rwxrwx---");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(1, node.getFails());
+        assertNotNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(2, node.getFails());
+        assertNotNull(node.getReason());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileOctalPermissions() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn("666");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileWrongOctalPermissions() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn("777");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(1, node.getFails());
+        assertNotNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(2, node.getFails());
+        assertNotNull(node.getReason());
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileUser() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileWrongUser() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn("mdiponio");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(1, node.getFails());
+        assertNotNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(2, node.getFails());
+        assertNotNull(node.getReason());
+
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileUid() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileWrongUid() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn("1001");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(1, node.getFails());
+        assertNotNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(2, node.getFails());
+        assertNotNull(node.getReason());
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileGroup() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileWrongGroup() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn("mdiponio");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(1, node.getFails());
+        assertNotNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(2, node.getFails());
+        assertNotNull(node.getReason());
+
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileGid() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDoTestFileWrongGid() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn("100");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        
+        DeviceNode node = nodes.get(0);
+        assertNotNull(node);
+        assertEquals("/dev/null", node.getPath());
+        assertEquals(0, node.getFails());
+        assertNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(1, node.getFails());
+        assertNotNull(node.getReason());
+        
+        this.test.doTest();
+        assertEquals(2, node.getFails());
+        assertNotNull(node.getReason());
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#getReason()}.
+     */
+    @Test
+    public void testGetReason()
+    {
+        fail("Not yet implemented");
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#getStatus()}.
+     */
+    @Test
+    public void testGetStatus()
+    {
+        fail("Not yet implemented");
+    }
+
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#getActionType()}.
+     */
+    @Test
+    public void testGetActionType()
+    {
+        assertEquals("Linux device node test", this.test.getActionType());
+    }
+
+}

@@ -227,8 +227,6 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
             this.maxUniqFrames = 11;
         }
         
-        
-        
         /* Load the camera URLs. */
         int c = 1;
         while ((cnf = this.config.getProperty("Camera_Test_URL_" + c)) != null)

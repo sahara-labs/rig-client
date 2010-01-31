@@ -82,28 +82,66 @@ import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
  * property related to a specific device node suffixed with a number. The 
  * following are the configurable properties:
  * <ul>
- *  <li><tt>LinuxDeviceNode_Test_Path_&lt;n&gt;</tt> - The path to the device node
- *  (usually in '/dev'.</li>
- *  <li><tt>LinuxDeviceNode_Test_Type_&lt;n&gt;</tt> - The device node file type,
- *  either '-', 'd', 'c', 'b', 'l', 's' or 'p'.</li>
- *  <li><tt>LinuxDeviceNode_Test_Type_&lt;n&gt;</tt> - The permission string as
- *  shown be 'ls'.</li>
+ *  <li><tt>LinuxDeviceNode_Test_Path_&lt;n&gt;</tt> - The path to the device
+ *  node (usually in '/dev'.</li>
+ *  <li><tt>LinuxDeviceNode_Test_Type_&lt;n&gt;</tt> - The device node file
+ *  type, either '-', 'd', 'c', 'b', 'l', 's' or 'p'.</li>
+ *  <li><tt>LinuxDeviceNode_Test_Permission_&lt;n&gt;</tt> - The permission
+ *  string as shown be 'ls'.</li>
+ *  <li><tt>LinuxDeviceNode_Test_Octal_Permission_&lt;n&gt;</tt> - The device
+ *  node permission as an octal number.</li>
+ *  <li><tt>LinuxDeviceNode_Test_User_&lt;n&gt;</tt> - The name of the owning 
+ *  user.</li>
+ *  <li><tt>LinuxDeviceNode_Test_UID_&lt;n&gt;</tt> - The uid of the owning
+ *  user.</li>
+ *  <li><tt>LinuxDeviceNode_Test_Group_&lt;n&gt;</tt> - The name of the owning
+ *  group.</li>
+ *  <li><tt>LinuxDeviceNode_Test_GID_&lt;n&gt;</tt> - The gid of the owning
+ *  group.</li>
+ *  <li><tt>LinuxDeviceNode_Test_Major_Number_&lt;n&gt;</tt> - The major
+ *  number of the device node. This is only useful for character and
+ *  block devices ('c' or 'b' must be set as the file type).</li>
+ *  <li><tt>LinuxDeviceNode_Test_Minor_Number_&lt;n&gt;</tt> - The minor 
+ *  number of the device node. This is only useful for character and
+ *  block devices ('c' or 'b' must be set as the file type).</li>
+ *  <li><tt>LinuxDeviceNode_Test_Driver_&lt;n&gt;</tt> - The driver name of
+ *  the device as shown in <strong>/proc/devices</strong>. This is only useful
+ *  for character and block devices ('c' or 'b' must be set as the file type).</li>
  * </ul>
  */
 public class LinuxDeviceNodeTestAction extends AbstractTestAction
 {
+    /** The list of device nodes to test. */
     private List<DeviceNode> deviceNodes;
     
+    /** The process builder to spawn 'ls'. */
     private ProcessBuilder ls;
     
+    /** The process builder to spawn stat. */
     private ProcessBuilder stat;
     
     /** The number of times a node test can fail before this test action 
      *  returns a failure. */
     private int failThreshold;
     
+    /**
+     * Constructor, sets up the default test behaviour.
+     * 
+     * @throws IllegalStateException thrown when not running on Linux
+     */
     public LinuxDeviceNodeTestAction()
     {
+        super();
+        
+        /* This will only work on Linux. */
+        if (!System.getProperty("os.name").startsWith("Linux"))
+        {
+            this.logger.error("Can only run the Linux device node test action on a Linux operation system. " +
+            		"Detected operating system " + System.getProperty("os.name") + '.');
+            throw new IllegalStateException("Wrong operating system.");
+        }
+        
+        /* Test behaviour setup. */
         this.isPeriodic = true;
         this.isSetIntervalHonoured = false;
         this.doLightDarkSchedule = false;
@@ -111,25 +149,36 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         
         this.deviceNodes = new ArrayList<DeviceNode>();
         this.ls = new ProcessBuilder("/bin/ls", "-l");
-        this.stat = new ProcessBuilder("/bin/stat", "-c");
+        this.stat = new ProcessBuilder("/usr/bin/stat", "-c");
+        this.failThreshold = 3;
     }
-
-    
-    @Override
-    public void doTest()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     
     @Override
     public void setUp()
     {
-        // TODO Auto-generated method stub
-
+        String tmp;
+        
+        /* Common configuration.*/
+        // TODO common configuration
+        
+        /* Load each node. */
+        int i = 1;
+        while ((tmp = this.config.getProperty("LinuxDeviceNode_Test_Path_" + i)) != null)
+        {
+            this.logger.info("Going to test device node with path " + tmp + '.');
+            this.deviceNodes.add(new DeviceNode(tmp, i));
+            i++;
+        }
     }
-
+    
+    @Override
+    public void doTest()
+    {
+        for (DeviceNode node : this.deviceNodes)
+        {
+            node.test();
+        }
+    }
     
     @Override
     public void tearDown()
@@ -137,14 +186,24 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         /* Does nothing. */
     }
 
-    
     @Override
     public String getReason()
     {
-        // TODO Auto-generated method stub
-        return null;
+        StringBuilder buf = new StringBuilder();
+        for (DeviceNode node : this.deviceNodes)
+        {
+            if (node.getFails() > this.failThreshold)
+            {
+                if (buf.length() > 0)
+                {
+                    buf.append(", ");
+                }
+                buf.append("Device node " + node.getPath() + " failure: " + node.getReason());
+            }
+        }
+        
+        return buf.length() > 0 ? buf.toString() : null;
     }
-
     
     @Override
     public boolean getStatus()
@@ -160,15 +219,16 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         return true;
     }
 
-    
     @Override
     public String getActionType()
     {
         return "Linux device node test";
     }
     
-    
-    class DeviceNode
+    /**
+     * The test for a specific device node.
+     */
+    public class DeviceNode
     {
         /** The device node file path. */
         private final String nodePath;
@@ -199,19 +259,19 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         
         /** The group identifier of the owning group. If this is set to '-1'
          *  the group identifier test is disabled. */
-        private int guid = -1;
+        private int gid = -1;
         
         /** The device node major number. If this is set to '-1' the major 
          *  number test is disabled. */
-        private final int majorNumber = -1;
+        private int majorNumber = -1;
         
         /** The device node minor number. If this is set to '-1' the minor
          *  number test is disabled. */
-        private final int minorNumber = -1;
+        private int minorNumber = -1;
         
         /** The name of the device driver name as shown in '/proc/devices'.
          *  If this is set to <code>null</code> the test is disabled. */
-        private final String driverName = null;
+        private String driverName = null;
         
         /** The number of times this device node has failed. */
         private int fails = 0;
@@ -246,7 +306,7 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                         this.permissionStr + '.');
             }
             
-            if ((tmp = config.getProperty("" + confNum)) != null)
+            if ((tmp = config.getProperty("LinuxDeviceNode_Test_Octal_Permission_" + confNum)) != null)
             {
                 try
                 {
@@ -262,6 +322,89 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                 }
             }
             
+            if ((tmp = config.getProperty("LinuxDeviceNode_Test_User_" + confNum)) != null)
+            {
+                this.owner = tmp;
+                logger.info("Going to test device node " + this.nodePath + " for owning user " + this.owner + ".");
+            }
+            
+            if ((tmp = config.getProperty("LinuxDeviceNode_Test_UID_" + confNum)) != null)
+            {
+                try
+                {
+                    this.uid = Integer.parseInt(tmp);
+                    logger.info("Going to test device node " + this.nodePath + " for owning uid " + this.uid + '.');
+                }
+                catch (NumberFormatException ex)
+                {
+                    this.uid = -1;
+                    logger.warn("Invalid uid number " + tmp + ", not going to test owning user of " + 
+                            this.nodePath + '.'); 
+                }
+            }
+            
+            if ((tmp = config.getProperty("LinuxDeviceNode_Test_Group_" + confNum)) != null)
+            {
+                this.group = tmp;
+                logger.info("Going to test device node " + this.nodePath + " for owning group " + this.group + ".");
+            }
+            
+            if ((tmp = config.getProperty("LinuxDeviceNode_Test_GID_" + confNum)) != null)
+            {
+                try
+                {
+                    this.gid = Integer.parseInt(tmp);
+                    logger.info("Going to test device node " + this.nodePath + " for owning gid " + this.gid + '.');
+                }
+                catch (NumberFormatException ex)
+                {
+                    this.gid = -1;
+                    logger.warn("Invalid gid number " + tmp + ", not going to test owning group of " + 
+                            this.nodePath + '.'); 
+                }
+            }
+            
+            if ((tmp = config.getProperty("LinuxDeviceNode_Test_Major_Number_" + confNum)) != null &&
+                    (this.fileType == 'c' || this.fileType == 'b'))
+            {
+                try
+                {
+                    this.majorNumber = Integer.parseInt(tmp);
+                    logger.info("Going to test device node " + this.nodePath + " for major number " + 
+                            this.majorNumber + '.');
+                }
+                catch (NumberFormatException ex)
+                {
+                    this.majorNumber = -1;
+                    logger.warn("Invalid major number " + tmp + ", not going to test the major number of " + 
+                            this.nodePath + '.'); 
+                }
+            }
+
+            if ((tmp = config.getProperty("LinuxDeviceNode_Test_Minor_Number_" + confNum)) != null &&
+                    (this.fileType == 'c' || this.fileType == 'b'))
+            {
+                try
+                {
+                    this.minorNumber = Integer.parseInt(tmp);
+                    logger.info("Going to test device node " + this.nodePath + " for minor number " + 
+                            this.minorNumber + '.');
+                }
+                catch (NumberFormatException ex)
+                {
+                    this.minorNumber = -1;
+                    logger.warn("Invalid minor number " + tmp + ", not going to test the minor number of " + 
+                            this.nodePath + '.'); 
+                }
+            }
+           
+           if ((tmp = config.getProperty("LinuxDeviceNode_Test_Driver_" + confNum)) != null &&
+                   (this.fileType == 'c' || this.fileType == 'b'))
+           {
+               this.driverName = tmp;
+               logger.info("Going to test if device node " + this.nodePath + " has the same major number as device " +
+               		"driver " + this.driverName + '.');
+           }
         }
         
         /**
@@ -270,6 +413,7 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         public void test()
         {
             ILogger logger = LinuxDeviceNodeTestAction.this.logger;
+
             try
             {
                 /* 1) Test the device node file exists. */
@@ -278,6 +422,7 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                 {
                     
                     logger.debug("Failing device node test for " + this.nodePath + " because the file does not exist.");
+                    this.failureReason = "Does not exist.";
                     this.fails++;
                     return;
                 }
@@ -285,21 +430,21 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                 /* Get the output of `ls`. */
                 String lsParts[] = null;
                 LinuxDeviceNodeTestAction.this.ls.command().add(this.nodePath);
-                Process proc = LinuxDeviceNodeTestAction.this.ls.start();
+                Process lsProc = LinuxDeviceNodeTestAction.this.ls.start();
                 LinuxDeviceNodeTestAction.this.ls.command().remove(this.nodePath);
-                if (proc.waitFor() != 0)
+                if (lsProc.waitFor() != 0)
                 {
                     /* ls doesn't detect this file... Bizarre, Java detects is... */
                     logger.debug("Failing device node test for " + this.nodePath + " becase the file does not exist " +
-                    		"('ls' returned a non-zero (" + proc.exitValue() + ") return code.");
+                    		"('ls' returned a non-zero (" + lsProc.exitValue() + ") return code.");
                     this.fails++;
                     this.failureReason = "Does not exist.";
                     return;
                 }
                 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-                lsParts = reader.readLine().split("\\s");
-                reader.close();
+                BufferedReader lsReader = new BufferedReader(new InputStreamReader(lsProc.getInputStream()));
+                lsParts = lsReader.readLine().split("\\s");
+                lsReader.close();
                 
                 /* 2) Test the file type. */
                 if (this.fileType != '\0' && this.fileType != lsParts[0].charAt(0))
@@ -307,13 +452,13 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                     logger.debug("Failed device node test for " + this.nodePath + " becase the file type (" 
                             + lsParts[0].charAt(0) + ") is not " + this.fileType + '.');
                     this.fails++;
-                    this.failureReason = "Not of type " + this.fileType + '.';
+                    this.failureReason = "Not of type '" + this.fileType + "'.";
                     return;
                 }
                 
-                /* 3) Test the device file permission (can include on exclude file type prefix). */
+                /* 3) Test the device file permission (can include or exclude file type prefix). */
                 if (this.permissionStr != null && 
-                        (this.permissionStr.equals(lsParts[0]) || this.permissionStr.equals(lsParts[0].substring(1))))
+                        !(this.permissionStr.equals(lsParts[0]) || this.permissionStr.equals(lsParts[0].substring(1))))
                 {
                     logger.debug("Failed device node test for " + this.nodePath + " because the file permissions are " +
                     		"incorrect (" + lsParts[0].substring(1) + " is not " + this.permissionStr + ").");
@@ -322,14 +467,147 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                     return;
                 }
                 
+                /* 4) Test the device file permission using octal number permission. */
+                if (this.octalPermissions >= 0)
+                {
+                    List<String> command = LinuxDeviceNodeTestAction.this.stat.command();
+                    command.add("%a"); // From man 1 stat %a is access permissions in octal
+                    command.add(this.nodePath);
+                    Process statProc = LinuxDeviceNodeTestAction.this.stat.start();
+                    command.remove("%a");
+                    command.remove(this.nodePath);
+                    if (statProc.waitFor() != 0)
+                    {
+                        logger.debug("Failed device node test for " + this.nodePath + " because stat returned " +
+                        		"a non-zero exit code (" + statProc.exitValue() + ").");
+                        this.fails++;
+                        this.failureReason = "Stat returned a non-zero exit code.";
+                        return;
+                    }
+                    
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(statProc.getInputStream()));
+                    String statPerm = reader.readLine();
+                    if (Integer.parseInt(statPerm) != this.octalPermissions)
+                    {
+                        logger.debug("Failed device node test for " + this.nodePath + " because the octal number " +
+                        		"permission (" + statPerm + ") is not " + this.octalPermissions + '.');
+                        this.fails++;
+                        this.failureReason = "Incorrect permission (octal).";
+                        return;
+                    }
+                }
                 
+                /* 5) Device node owner. */
+                if (this.owner != null && !this.owner.equalsIgnoreCase(lsParts[2]))
+                {
+                    logger.debug("Failed device node test for " + this.nodePath + " because the owning user (" + 
+                            lsParts[2] + ") is not " + this.owner + '.');
+                    this.fails++;
+                    this.failureReason = "Incorrect owner.";
+                    return;
+                }
                 
-                /* All good!. */
+                /* 6) Device node uid owner. */
+                if (this.uid >= 0)
+                {
+                    List<String> command = LinuxDeviceNodeTestAction.this.stat.command();
+                    command.add("%u"); // From man 1 stat, %u is user id of owner
+                    command.add(this.nodePath);
+                    Process statProc = LinuxDeviceNodeTestAction.this.stat.start();
+                    command.remove("%u");
+                    command.remove(this.nodePath);
+                    if (statProc.waitFor() != 0)
+                    {
+                        logger.debug("Failed device node test for " + this.nodePath + " because stat returned " +
+                                "a non-zero exit code (" + statProc.exitValue() + ").");
+                        this.fails++;
+                        this.failureReason = "Stat returned a non-zero exit code.";
+                        return;
+                    }
+                    
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(statProc.getInputStream()));
+                    String statRet = reader.readLine();
+                    if (Integer.parseInt(statRet) != this.uid)
+                    {
+                        logger.debug("Failed device node test for " + this.nodePath + " because the owner uid " +
+                                "(" + statRet + ") is not " + this.uid + '.');
+                        this.fails++;
+                        this.failureReason = "Incorrect owner (uid).";
+                        return;
+                    }
+                }
+                
+                /* 7) Device node group. */
+                if (this.owner != null && !this.group.equalsIgnoreCase(lsParts[3]))
+                {
+                    logger.debug("Failed device node test for " + this.nodePath + " because the owning group (" + 
+                            lsParts[3] + ") is not " + this.group + '.');
+                    this.fails++;
+                    this.failureReason = "Incorrect group.";
+                    return;
+                }
+                
+                /* 8) Device node gid owner. */
+                if (this.gid >= 0)
+                {
+                    List<String> command = LinuxDeviceNodeTestAction.this.stat.command();
+                    command.add("%g"); // From man 1 stat, %g is group id of owner
+                    command.add(this.nodePath);
+                    Process statProc = LinuxDeviceNodeTestAction.this.stat.start();
+                    command.remove("%g");
+                    command.remove(this.nodePath);
+                    if (statProc.waitFor() != 0)
+                    {
+                        logger.debug("Failed device node test for " + this.nodePath + " because stat returned " +
+                                "a non-zero exit code (" + statProc.exitValue() + ").");
+                        this.fails++;
+                        this.failureReason = "Stat returned a non-zero exit code.";
+                        return;
+                    }
+                    
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(statProc.getInputStream()));
+                    String statRet = reader.readLine();
+                    if (Integer.parseInt(statRet) != this.gid)
+                    {
+                        logger.debug("Failed device node test for " + this.nodePath + " because the owner gid " +
+                                "(" + statRet + ") is not " + this.gid + '.');
+                        this.fails++;
+                        this.failureReason = "Incorrect owner (gid).";
+                        return;
+                    }
+                }
+                
+                /* 9) Major number test. */
+                if (this.majorNumber >= 0 && this.majorNumber != 
+                        Integer.parseInt(lsParts[4].substring(0, lsParts[4].length() - 1)))
+                {
+                    logger.debug("Failed device node test for " + this.nodePath + " because the major number is " +
+                    		"incorrect. Detected " + lsParts[4].substring(0, lsParts[4].length() - 1) + " which is " +
+                    		"not " + this.majorNumber + '.');
+                    this.fails++;
+                    this.failureReason = "Incorrect major number.";
+                    return;
+                }
+                
+                /* 10) Minor number test. */
+                if (this.minorNumber >= 0 && this.minorNumber != Integer.parseInt(lsParts[5]))
+                {
+                    logger.debug("Failed device node test for " + this.nodePath + " because the minor number is " +
+                    		"incorrect. Detected " + lsParts[5] + " which is not " + this.minorNumber + '.');
+                    this.fails++;
+                    this.failureReason = "Incorrect minor number.";
+                    return;
+                }
+                
+                /* 11) Device driver name. */
+                
+                /* All good -> clear fails. */
                 this.fails = 0;
             }
             catch (IOException ex)
             {
                 // TODO io exception
+                ex.printStackTrace();
             }
             catch (InterruptedException e)
             {
@@ -343,6 +621,16 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         public int getFails()
         {
             return this.fails;
+        }
+        
+        public String getPath()
+        {
+            return this.nodePath;
+        }
+        
+        public String getReason()
+        {
+            return this.failureReason;
         }
     }
 
