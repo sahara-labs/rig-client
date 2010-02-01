@@ -146,7 +146,7 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         this.isPeriodic = true;
         this.isSetIntervalHonoured = false;
         this.doLightDarkSchedule = false;
-        this.runInterval = 60;
+        this.runInterval = 300;
         
         this.deviceNodes = new ArrayList<DeviceNode>();
         this.ls = new ProcessBuilder("/bin/ls", "-l");
@@ -160,7 +160,29 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         String tmp;
         
         /* Common configuration.*/
-        // TODO common configuration
+        try
+        {
+            this.runInterval = Integer.parseInt(this.config.getProperty("LinuxDeviceNode_Test_Interval", "300"));
+            this.logger.info("The Linux device node test will run every " + this.runInterval + " seconds.");
+        }
+        catch (NumberFormatException ex)
+        {
+            this.runInterval = 300;
+            this.logger.warn("Invalid Linux device node test interval value, using the default of running every " +
+                    "300 seconds.");
+        }
+        
+        try
+        {
+            this.failThreshold = Integer.parseInt(this.config.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3"));
+            this.logger.info("The Linux device node test fail threshold is " + this.failThreshold + " times.");
+        }
+        catch (NumberFormatException ex)
+        {
+            this.failThreshold = 3;
+            this.logger.warn("Invalid Linux device node test fail threshold value, using the default of 3 failures.");
+        }
+
         
         /* Load each node. */
         int i = 1;

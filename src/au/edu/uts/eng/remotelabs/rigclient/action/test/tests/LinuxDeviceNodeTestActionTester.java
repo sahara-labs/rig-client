@@ -54,6 +54,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.action.test.AbstractTestAction;
 import au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction;
 import au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction.DeviceNode;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
@@ -99,10 +100,56 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
         this.test = new LinuxDeviceNodeTestAction();
     }
 
+    @SuppressWarnings("unchecked")
     @Test
-    public void testSetUp()
+    public void testSetUp() throws Exception
     {
-        fail("Not yet implemented");
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn("1800");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn("10");
+        
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn("rw-rw-rw-");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn("666");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn("mdiponio");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn("1001");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn("10");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn("1");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn("3");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn("mem");
+        
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn("/dev/random");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_2")).andReturn("b");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_2")).andReturn("rwxrwxrwx");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_2")).andReturn("777");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_2")).andReturn("foo");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_2")).andReturn("11");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_2")).andReturn("bar");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_2")).andReturn("12");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_2")).andReturn("2");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_2")).andReturn("4");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_2")).andReturn("rand");
+        
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_3")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        Field fi = LinuxDeviceNodeTestAction.class.getDeclaredField("deviceNodes");
+        fi.setAccessible(true);
+        List<DeviceNode> nodes = (List<DeviceNode>) fi.get(this.test);
+        assertNotNull(nodes);
+        assertEquals(2, nodes.size());
+        
+        fi = AbstractTestAction.class.getDeclaredField("runInterval");
+        fi.setAccessible(true);
+        assertEquals(1800, fi.getInt(this.test));
+        
+        fi = LinuxDeviceNodeTestAction.class.getDeclaredField("failThreshold");
+        fi.setAccessible(true);
+        assertEquals(10, fi.getInt(this.test));
     }
     
     /**
@@ -113,6 +160,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testNodeSetup() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn("rw-rw-rw-");
@@ -243,8 +293,10 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTest() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
-
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn("rw-rw-rw-");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn("666");
@@ -286,6 +338,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFile() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -319,7 +374,7 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
         assertNull(node.getReason());
     }
 
-        /**
+    /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
      */
     @Test
@@ -327,6 +382,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileNotExist() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/does_not_exist");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -373,6 +431,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileType() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
@@ -414,6 +475,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileWrongType() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("b");
@@ -460,6 +524,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFilePermission() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -501,6 +568,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileWrongPermission() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -546,6 +616,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileOctalPermissions() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -587,6 +660,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileWrongOctalPermissions() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -632,6 +708,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileUser() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -673,6 +752,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileWrongUser() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -719,6 +801,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileUid() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -760,6 +845,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileWrongUid() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -805,6 +893,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileGroup() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -846,6 +937,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileWrongGroup() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -892,6 +986,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileGid() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -933,6 +1030,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileWrongGid() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -978,6 +1078,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileMajor() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
@@ -1019,6 +1122,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileWrongMajor() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
@@ -1056,7 +1162,7 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
         assertNotNull(node.getReason());
     }
 
-        /**
+    /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction#doTest()}.
      */
     @Test
@@ -1064,6 +1170,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileMinor() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
@@ -1105,6 +1214,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileWrongMinor() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
@@ -1150,6 +1262,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileIgnoreWrongMajor() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -1195,6 +1310,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestFileIgnoreWrongMinor() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -1240,6 +1358,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestDevice() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
@@ -1285,6 +1406,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestNoDevice() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
@@ -1330,6 +1454,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestWrongDeviceMajor() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
@@ -1375,6 +1502,9 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     public void testDoTestIgnoreDevice() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn(null);
+        
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn(null);
         expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn(null);
@@ -1418,7 +1548,49 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     @Test
     public void testGetReason()
     {
-        fail("Not yet implemented");
+           reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn("5");
+        
+        /* This device node is correct!. */
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn("rw-rw-rw-");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn("666");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn("1");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn("3");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn("mem");
+        
+        /* This device node is incorrect -> Wrong device driver. */
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn("/dev/random");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_2")).andReturn("c");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_2")).andReturn("/dev/random");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_2")).andReturn("666");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_2")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_2")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_2")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_2")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_2")).andReturn("1");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_2")).andReturn("8");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_2")).andReturn("rand");
+        
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_3")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        for (int i = 0; i < 5; i++)
+        {
+            this.test.doTest();
+            assertNull(this.test.getReason());
+        }
+        
+        this.test.doTest();
+        assertNotNull(this.test.getReason());
     }
 
     /**
@@ -1427,7 +1599,49 @@ public class LinuxDeviceNodeTestActionTester extends TestCase
     @Test
     public void testGetStatus()
     {
-        fail("Not yet implemented");
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Interval", "300")).andReturn(null);
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Fail_Threshold", "3")).andReturn("5");
+        
+        /* This device node is correct!. */
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_1")).andReturn("/dev/null");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_1")).andReturn("c");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_1")).andReturn("rw-rw-rw-");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_1")).andReturn("666");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_1")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_1")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_1")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_1")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_1")).andReturn("1");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_1")).andReturn("3");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_1")).andReturn("mem");
+        
+        /* This device node is incorrect -> Wrong device driver. */
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_2")).andReturn("/dev/random");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Type_2")).andReturn("c");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Permission_2")).andReturn("/dev/random");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Octal_Permission_2")).andReturn("666");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_User_2")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_UID_2")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Group_2")).andReturn("root");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_GID_2")).andReturn("0");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Major_Number_2")).andReturn("1");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Minor_Number_2")).andReturn("8");
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Driver_2")).andReturn("rand");
+        
+        expect(this.mockConfig.getProperty("LinuxDeviceNode_Test_Path_3")).andReturn(null);
+        replay(this.mockConfig);
+        
+        this.test.setUp();
+        
+        for (int i = 0; i < 5; i++)
+        {
+            this.test.doTest();
+            assertTrue(this.test.getStatus());
+        }
+        
+        this.test.doTest();
+        assertFalse(this.test.getStatus());
     }
 
     /**
