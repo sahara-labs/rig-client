@@ -329,9 +329,11 @@ public abstract class AbstractTestAction implements ITestAction
         }
         catch (NumberFormatException ex)
         {
-            this.logger.warn("Incorrect configuration for " + (light ? "light" : "dark") + " time start. It should " +
-            		" in the 24 hour notation with a column (':') separating the hour and minute portions.");
             arr = def;
+            this.logger.warn("Incorrect configuration for " + (light ? "light" : "dark") + " time start. It should " +
+            		"in the 24 hour notation with a column (':') separating the hour and minute portions. Using " +
+            		"the default of " + arr[0] + ':' + arr[1] + '.');
+            
         }
     }
 }

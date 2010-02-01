@@ -43,6 +43,7 @@ package au.edu.uts.eng.remotelabs.rigclient.action.test;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -230,6 +231,9 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
      */
     public class DeviceNode
     {
+        /** Linux Devices file. */
+        public static final String DEVICES_FILE = "/proc/devices";
+        
         /** The device node file path. */
         private final String nodePath;
         
@@ -413,6 +417,10 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         public void test()
         {
             ILogger logger = LinuxDeviceNodeTestAction.this.logger;
+            BufferedReader lsReader = null;
+            BufferedReader statOctalReader = null;
+            BufferedReader statUidReader = null;
+            BufferedReader statGidReader = null;
 
             try
             {
@@ -442,9 +450,8 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                     return;
                 }
                 
-                BufferedReader lsReader = new BufferedReader(new InputStreamReader(lsProc.getInputStream()));
+                lsReader = new BufferedReader(new InputStreamReader(lsProc.getInputStream()));
                 lsParts = lsReader.readLine().split("\\s");
-                lsReader.close();
                 
                 /* 2) Test the file type. */
                 if (this.fileType != '\0' && this.fileType != lsParts[0].charAt(0))
@@ -485,9 +492,9 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                         return;
                     }
                     
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(statProc.getInputStream()));
-                    String statPerm = reader.readLine();
-                    if (Integer.parseInt(statPerm) != this.octalPermissions)
+                    statOctalReader = new BufferedReader(new InputStreamReader(statProc.getInputStream()));
+                    String statPerm = statOctalReader.readLine();
+                    if (statPerm == null || Integer.parseInt(statPerm) != this.octalPermissions)
                     {
                         logger.debug("Failed device node test for " + this.nodePath + " because the octal number " +
                         		"permission (" + statPerm + ") is not " + this.octalPermissions + '.');
@@ -525,9 +532,9 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                         return;
                     }
                     
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(statProc.getInputStream()));
-                    String statRet = reader.readLine();
-                    if (Integer.parseInt(statRet) != this.uid)
+                    statUidReader = new BufferedReader(new InputStreamReader(statProc.getInputStream()));
+                    String statRet = statUidReader.readLine();
+                    if (statRet == null || Integer.parseInt(statRet) != this.uid)
                     {
                         logger.debug("Failed device node test for " + this.nodePath + " because the owner uid " +
                                 "(" + statRet + ") is not " + this.uid + '.');
@@ -538,7 +545,7 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                 }
                 
                 /* 7) Device node group. */
-                if (this.owner != null && !this.group.equalsIgnoreCase(lsParts[3]))
+                if (this.group != null && !this.group.equalsIgnoreCase(lsParts[3]))
                 {
                     logger.debug("Failed device node test for " + this.nodePath + " because the owning group (" + 
                             lsParts[3] + ") is not " + this.group + '.');
@@ -565,9 +572,9 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                         return;
                     }
                     
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(statProc.getInputStream()));
-                    String statRet = reader.readLine();
-                    if (Integer.parseInt(statRet) != this.gid)
+                    statGidReader = new BufferedReader(new InputStreamReader(statProc.getInputStream()));
+                    String statRet = statGidReader.readLine();
+                    if (statRet == null || Integer.parseInt(statRet) != this.gid)
                     {
                         logger.debug("Failed device node test for " + this.nodePath + " because the owner gid " +
                                 "(" + statRet + ") is not " + this.gid + '.');
@@ -600,22 +607,48 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
                 }
                 
                 /* 11) Device driver name. */
+                if (this.driverName != null && (this.fileType == 'c' || this.fileType == 'b') && 
+                        !this.testDriverName(Integer.parseInt(lsParts[4].substring(0, lsParts[4].length() - 1))))
+                {
+                    this.fails++;
+                    return;
+                }
                 
                 /* All good -> clear fails. */
                 this.fails = 0;
             }
             catch (IOException ex)
             {
-                // TODO io exception
-                ex.printStackTrace();
+                logger.debug("IO exception thrown in device node test for " + this.nodePath + ", this is treated as a " +
+                		"test failure. Exception message is: " + ex.getMessage() + '.');
+                this.fails++;
+                this.failureReason = "IO exception with messsage " + ex.getMessage() + '.';
             }
             catch (InterruptedException e)
             {
                Thread.currentThread().interrupt();
             }
+            finally
+            {
+                try
+                {
+                    if (lsReader != null) lsReader.close();
+                    if (statOctalReader != null) statOctalReader.close();
+                    if (statUidReader != null) statUidReader.close();
+                    if (statGidReader != null) statGidReader.close();
+                }
+                catch (IOException e)
+                {
+                    logger.error("Failed closing a process stream from a device node test.");
+                }
             
-            /* Last chance cleanup. */
-            LinuxDeviceNodeTestAction.this.ls.command().remove(this.nodePath);
+                /* Last chance cleanup. */
+                LinuxDeviceNodeTestAction.this.ls.command().remove(this.nodePath);
+                LinuxDeviceNodeTestAction.this.stat.command().remove(this.nodePath);
+                LinuxDeviceNodeTestAction.this.stat.command().remove("%a");
+                LinuxDeviceNodeTestAction.this.stat.command().remove("%u");
+                LinuxDeviceNodeTestAction.this.stat.command().remove("%g");
+            }
         }
         
         public int getFails()
@@ -631,6 +664,53 @@ public class LinuxDeviceNodeTestAction extends AbstractTestAction
         public String getReason()
         {
             return this.failureReason;
+        }
+        
+        /**
+         * Tests if the driver name is in '/proc/devices' and if the 
+         * '/proc/devices' major number is the same as the 'ls' detected
+         * major number of the device node.
+         * 
+         * @param majorNumber ls major number
+         * @return true if driver test is successful
+         */
+        private boolean testDriverName(final int majorNumber) throws IOException
+        {
+            BufferedReader reader = null;
+            String tmp;
+            try
+            {
+                reader = new BufferedReader(new FileReader(DeviceNode.DEVICES_FILE));
+                while ((tmp = reader.readLine()) != null)
+                {
+                    if (tmp.contains(this.driverName))
+                    {
+                        String parts[] = tmp.trim().split("\\s");
+                        if (Integer.parseInt(parts[0]) == majorNumber)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            LinuxDeviceNodeTestAction.this.logger.debug("Failed device node test for " + this.nodePath +
+                                    " because the major number of " + this.driverName + " does not match the device " +
+                                    "node major number " + majorNumber + '.');
+                            this.failureReason = "Major of device node does not match device major number.";
+                            return false;
+                        }
+                    }
+                }
+
+            }
+            finally
+            {
+                if (reader != null) reader.close();
+            }
+            
+            LinuxDeviceNodeTestAction.this.logger.debug("Failed device node test for " + this.nodePath + " because " +
+            		"the device " + this.driverName + " not found in " + DeviceNode.DEVICES_FILE + '.');
+            this.failureReason = "Device not found in " + DeviceNode.DEVICES_FILE + '.';
+            return false;
         }
     }
 
