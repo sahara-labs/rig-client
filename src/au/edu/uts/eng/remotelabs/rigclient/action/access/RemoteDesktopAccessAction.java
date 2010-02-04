@@ -41,6 +41,10 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 
 /**
@@ -84,7 +88,12 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     /** user name to be assigned access. */
     protected String userName;
     
+    /** session check process builder. */
+    private final ProcessBuilder sessionBuilder;
    
+    /** Session ID for this user's session */
+    private int sessionID;
+
     /**
      * Constructor.
      */
@@ -109,6 +118,8 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
             //Set up command command and arguments for remote access
             this.setupAccessAction();
             
+            //Set up ProcesBulilder for checking user session status
+            this.sessionBuilder = new ProcessBuilder();
         }
         else
         {
@@ -116,6 +127,34 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
         }
     }
     
+    /**
+     * Get the sessionID of the remote desktop session using the qwinsta 
+     * command line program
+     * 
+     * @return sessionID
+     */
+    private int getSessionID()
+    {
+        // TODO read session ID from qwinsta output
+        final List<String> sessionCommand = new ArrayList<String>();
+        sessionCommand.add("qwinsta");
+        
+        sessionCommand.add(this.userName);
+        
+        try
+        {
+            final Process proc = this.sessionBuilder.start();
+        } 
+        catch(IOException e)
+        {
+            //TODO this 
+        }
+        
+                
+
+        return 0;
+    }
+
     /* *
      * The action to assign users to a Remote Desktop session is done by adding them to 
      * a configurable user group that has permissions for the Remote Desktop.
@@ -132,7 +171,7 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     @Override
     public boolean assign(String name)
     {
-        final boolean failed;
+        final boolean failedFlag;
         
         this.userName = name;
 
@@ -155,39 +194,36 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
             if(!this.executeAccessAction())
             {
                 this.logger.error("Remote Desktop Access action failed, command unsuccessful");
-                failed = true;
+                failedFlag = true;
             }
             else
             {
                 if(!this.verifyAccessAction())
                 {
                     this.logger.error("Remote Desktop Access revoke action failed, exit code is" + this.getExitCode());
-                    failed = true;
+                    this.sessionID = getSessionID();
+                    failedFlag = true;
                 }
                 else
                 {
-                    failed = false;
+                    failedFlag = false;
                 }
             }
             
-            if(failed == true)
+            /* Remove the command arguments user name (with the Domain name if it is configured) and /ADD */
+            if (this.domainName != null)
             {
-                return false;
+                this.commandArguments.remove(this.domainName + "\\" + this.userName);
             }
             else
             {
-                /* Remove the command arguments user name (with the Domain name if it is configured) and /ADD */
-                if (this.domainName != null)
-                {
-                    this.commandArguments.remove(this.domainName + "\\" + this.userName);
-                }
-                else
-                {
-                    this.commandArguments.remove(this.userName);
-                }                
-                this.commandArguments.remove("/ADD");
-                return true;
-            }
+                this.commandArguments.remove(this.userName);
+            }                
+            this.commandArguments.remove("/ADD");
+
+            
+            return failedFlag;
+            
         }
         else
         {
@@ -217,13 +253,23 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
 
     }
 
-    /* 
+    /*
+     * This method terminates a user's session if they are still logged on
+     * using the <code>qwinsta</code> and <code>logoff</code> command line
+     * programs, and then revokes their user privileges for Remote Desktop so
+     * that they cannot log on again 
+     * 
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction#revoke(java.lang.String)
      */
     @Override
     public boolean revoke(String name)
     {
         final boolean failed;
+
+        /* End user's session using qwinsta command line program*/
+        if (userSessionActive()){
+            // end session
+        }
         
         /* Add the command argument user name (with the Domain name if it is configured) and /DELETE */
         if (this.domainName != null)
@@ -276,6 +322,18 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
             return true;
         }
         
+    }
+
+    /**
+     * Check using qwinsta whether the user's session is active
+     * @return
+     */
+    private boolean userSessionActive()
+    {
+        // TODO check user session
+
+        
+        return false;
     }
 
     /* 
