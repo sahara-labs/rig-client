@@ -161,12 +161,12 @@ public abstract class ExecAccessAction implements IAccessAction
             this.logger.info("Adding access action environment variable " + e.getKey() + " with value " + e.getValue());
             env.put(e.getKey(), e.getValue());
         }
-        this.logger.info("Access action environment variables: " + env.toString());
+        this.logger.debug("Access action environment variables: " + env.toString());
 
         try
         {
             this.accessActionProcess = builder.start();
-            this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
+            this.logger.info("Invoked access action command at " + this.getTimeStamp('/', ' ', ':'));
             this.exitCode = this.accessActionProcess.waitFor();
             this.outputString = this.getAccessOutputString();
             this.errorString = this.getAccessErrorString();
@@ -176,8 +176,8 @@ public abstract class ExecAccessAction implements IAccessAction
         }
         catch (Exception ex)
         {
-            this.logger.warn("Access Action failed with exception of type " + ex.getClass().getName() + " and with " +
-                    "message " + ex.getMessage());
+            this.logger.error("Access Action failed with exception of type " + ex.getClass().getName() + " and with " +
+                    "message: " + ex.getMessage());
             return false;
             
         }

@@ -66,13 +66,8 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     protected void setupAccessAction()
     {
-        // set up action to echo out comment
-        this.command = "echo";
-        this.commandArguments.add("testing");
-        this.commandArguments.add("testing");
-        this.commandArguments.add("123");
-        
-        this.workingDirectory = "/tmp";
+        // Do Nothing
+ 
         
     }
 
@@ -83,6 +78,7 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     protected boolean verifyAccessAction()
     {
+        /* does nothing */
         return false;
     }
 
@@ -92,6 +88,7 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     public boolean assign(String name)
     {
+        /* does nothing */
         return false;
     }
 
@@ -101,6 +98,7 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     public boolean revoke(String name)
     {
+        /* does nothing */
         return false;
     }
 
@@ -110,6 +108,7 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     public String getActionType()
     {
+        /* does nothing */
         return null;
     }
 
@@ -119,6 +118,7 @@ public class MockAccessAction extends ExecAccessAction
     @Override
     public String getFailureReason()
     {
+        /* does nothing */
         return null;
     }
 

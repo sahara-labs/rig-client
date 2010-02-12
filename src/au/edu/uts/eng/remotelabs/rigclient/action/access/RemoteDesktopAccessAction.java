@@ -41,9 +41,13 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 
@@ -88,11 +92,6 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     /** user name to be assigned access. */
     protected String userName;
     
-    /** session check process builder. */
-    private final ProcessBuilder sessionBuilder;
-   
-    /** Session ID for this user's session */
-    private int sessionID;
 
     /**
      * Constructor.
@@ -104,7 +103,7 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
         // RDP access only valid for WIndows - chack that the OS is windows
         if (os.startsWith("Windows"))
         {
-            // Get domain if it is confirgured
+            // Get domain if it is configured
             this.domainName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain");
             if (this.domainName == null)
             {
@@ -118,8 +117,6 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
             //Set up command command and arguments for remote access
             this.setupAccessAction();
             
-            //Set up ProcesBulilder for checking user session status
-            this.sessionBuilder = new ProcessBuilder();
         }
         else
         {
@@ -127,33 +124,6 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
         }
     }
     
-    /**
-     * Get the sessionID of the remote desktop session using the qwinsta 
-     * command line program
-     * 
-     * @return sessionID
-     */
-    private int getSessionID()
-    {
-        // TODO read session ID from qwinsta output
-        final List<String> sessionCommand = new ArrayList<String>();
-        sessionCommand.add("qwinsta");
-        
-        sessionCommand.add(this.userName);
-        
-        try
-        {
-            final Process proc = this.sessionBuilder.start();
-        } 
-        catch(IOException e)
-        {
-            //TODO this 
-        }
-        
-                
-
-        return 0;
-    }
 
     /* *
      * The action to assign users to a Remote Desktop session is done by adding them to 
@@ -201,7 +171,6 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
                 if(!this.verifyAccessAction())
                 {
                     this.logger.error("Remote Desktop Access revoke action failed, exit code is" + this.getExitCode());
-                    this.sessionID = getSessionID();
                     failedFlag = true;
                 }
                 else
@@ -267,10 +236,8 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
         final boolean failed;
 
         /* End user's session using qwinsta command line program*/
-        if (userSessionActive()){
-            // end session
-        }
-        
+        endUsersSession();
+
         /* Add the command argument user name (with the Domain name if it is configured) and /DELETE */
         if (this.domainName != null)
         {
@@ -325,16 +292,106 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     }
 
     /**
-     * Check using qwinsta whether the user's session is active
-     * @return
+     * Ends the users session by cheking using <code> qwinsta username </code> whether
+     * the session exists and then logging the user off.
+     * 
+     * @return boolean result of loggoffs
      */
-    private boolean userSessionActive()
+    private boolean endUsersSession()
     {
-        // TODO check user session
-
+        //Set up process to run qwinsta command and get user sessions 
+        final ProcessBuilder sessionBuilder = new ProcessBuilder();
+        final List<String> sessionCommand = new ArrayList<String>();
+        sessionCommand.add("qwinsta");
+        sessionCommand.add(this.userName);
         
-        return false;
+        try
+        {
+            // Start the process
+            final Process proc = sessionBuilder.start();
+            this.logger.debug("Session ID command invoked at " + this.getTimeStamp('/', ' ', ':'));
+            if (proc.waitFor() == 0)
+            {
+                //Read process output
+                InputStream is = proc.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+                String line = null;
+                String[] qwinstaSplit;
+
+                try
+                {
+                    while ( (line = br.readLine()) != null )
+                    {
+                        //Split result of process output to get sessionID
+                        if (line.contains(this.userName))
+                        {
+                            qwinstaSplit = line.split("\\s");
+                            String sessionID = qwinstaSplit[2];
+                            this.logger.debug("Session ID read is " + sessionID);
+                            
+                            //Logoff all found sessions
+                            if (logoffSession(sessionID))
+                            {
+                                this.logger.debug("Session ID ended is " + sessionID);
+                            }
+                            
+                        }
+                    }
+
+
+                }
+                catch (IOException e)
+                {
+                    this.logger.warn("Could not read qwinsta output. Error message " + e.getMessage() + ".");
+                    return false;
+                }
+            }
+            
+            return true;
+        } 
+        catch(Exception e)
+        {
+            this.logger.warn("Checking for Session ID with exception of type " + e.getClass().getName() + " and with " +
+                    "message " + e.getMessage());
+            return false;
+        }
+        
     }
+
+    /**
+     * Use the windows "logoff" command to end a session with the given
+     * session ID
+     * 
+     * @param sessionID
+     * @return boolean result of logoff command
+     */
+    private boolean logoffSession(String sessionID)
+    {
+        final ProcessBuilder logoffBuilder = new ProcessBuilder();
+        final List<String> logoffCommand = new ArrayList<String>();
+        logoffCommand.add("logoff");
+        logoffCommand.add(sessionID);
+        
+        try
+        {
+            final Process proc = logoffBuilder.start();
+            this.logger.debug("Logoff command invoked at " + this.getTimeStamp('/', ' ', ':'));
+            if(proc.waitFor() !=0 )
+            {
+                this.logger.warn("Logoff command returned unexpected result");
+                return false;
+            }
+            return true;
+        } 
+        catch(Exception e)
+        {
+            this.logger.warn("Logoff command failed with exception of type " + e.getClass().getName() + " and with " +
+                    "message " + e.getMessage());
+            return false;
+        }
+    }
+
 
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAction#getFailureReason()

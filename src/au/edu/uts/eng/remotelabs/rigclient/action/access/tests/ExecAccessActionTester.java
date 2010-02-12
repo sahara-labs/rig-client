@@ -44,8 +44,14 @@ package au.edu.uts.eng.remotelabs.rigclient.action.access.tests;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -53,8 +59,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction;
+import au.edu.uts.eng.remotelabs.rigclient.action.test.AbstractTestAction;
+import au.edu.uts.eng.remotelabs.rigclient.rig.control.AbstractBatchRunner;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * @author tmachet
@@ -95,9 +105,11 @@ public class ExecAccessActionTester extends TestCase
         Field configField = ConfigFactory.class.getDeclaredField("instance");
         configField.setAccessible(true);
         configField.set(null, this.mockConfig);
+
+        LoggerFactory.getLoggerInstance(); 
+        this.action = new MockAccessAction();
         
-       //this.action = new MockAccessAction();
-        
+       
     }
 
     /**
@@ -113,12 +125,88 @@ public class ExecAccessActionTester extends TestCase
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction#executeAccessAction()}.
+     * @throws IllegalAccessException 
+     * @throws IllegalArgumentException 
      */
     @Test
-    public void testExecuteAccessAction()
+    public void testExecuteActionNoCommand() throws Exception
     {
-        // if config needed mock config is creaTED AND values set (not here)
-        //fail("Not yet implemented");
+        reset(this.mockConfig);
+        replay(this.mockConfig);
+
+        Field f = ExecAccessAction.class.getDeclaredField("command");
+        f.setAccessible(true);
+        f.set(this.action, null);
+
+        Method testMe = ExecAccessAction.class.getDeclaredMethod("executeAccessAction");
+        testMe.setAccessible(true);
+        boolean result = (Boolean)testMe.invoke(this.action);
+        
+        assertFalse(result);
+        
+    }
+
+    @Test
+    public void testExecuteActionRun() throws Exception
+    {
+        reset(this.mockConfig);
+        replay(this.mockConfig);
+
+        // Sets command to echo out a string
+        Field f = ExecAccessAction.class.getDeclaredField("command");
+        f.setAccessible(true);
+        f.set(this.action, "net" );
+
+        final List<String> args = new ArrayList<String>();
+        args.add("user");
+        f = ExecAccessAction.class.getDeclaredField("commandArguments");
+        f.setAccessible(true);
+        f.set(this.action, args);
+        
+        f = ExecAccessAction.class.getDeclaredField("workingDirectory");
+        f.setAccessible(true);
+        f.set(this.action, null);
+
+        Method testMe = ExecAccessAction.class.getDeclaredMethod("executeAccessAction");
+        testMe.setAccessible(true);
+        boolean result = (Boolean)testMe.invoke(this.action);
+        
+        assertTrue(result);
+    }
+
+    @Test
+    public void testExecuteActionGetOutput() throws Exception
+    {
+        reset(this.mockConfig);
+        replay(this.mockConfig);
+
+        // Sets command to echo out a string
+        Field f = ExecAccessAction.class.getDeclaredField("command");
+        f.setAccessible(true);
+        f.set(this.action, "net" );
+
+        final List<String> args = new ArrayList<String>();
+        args.add("user");
+        args.add("tmachet");
+        f = ExecAccessAction.class.getDeclaredField("commandArguments");
+        f.setAccessible(true);
+        f.set(this.action, args);
+        
+        f = ExecAccessAction.class.getDeclaredField("workingDirectory");
+        f.setAccessible(true);
+        f.set(this.action, null);
+
+        Method testMe = ExecAccessAction.class.getDeclaredMethod("executeAccessAction");
+        testMe.setAccessible(true);
+        boolean result = (Boolean)testMe.invoke(this.action);
+
+        Method testOut = ExecAccessAction.class.getDeclaredMethod("getAccessOutputString");
+        testOut.setAccessible(true);
+        String outString = (String) testOut.invoke(this.action);
+        
+        assertTrue(result);
+        assertNotNull(outString);
+        
     }
 
 }
