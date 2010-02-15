@@ -170,9 +170,11 @@ public class ExecAccessActionTester extends TestCase
             Method testMe = ExecAccessAction.class.getDeclaredMethod("executeAccessAction");
             testMe.setAccessible(true);
             boolean result = (Boolean)testMe.invoke(this.action);
-            
+
             assertTrue(result);
-        }    
+            
+        } 
+
     }
 
     @Test

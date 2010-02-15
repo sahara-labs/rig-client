@@ -289,7 +289,7 @@ public abstract class ExecAccessAction implements IAccessAction
         
         try
         {
-            while ( (line = br.readLine()) != null )
+            while ( br.ready() && ((line = br.readLine()) != null ))
             {
                 buf.append(line);
                 buf.append(System.getProperty("line.separator"));
@@ -321,7 +321,7 @@ public abstract class ExecAccessAction implements IAccessAction
 
         try
         {
-            while ((line = br.readLine()) != null )
+            while (br.ready() &&(line = br.readLine()) != null )
             {
                 buf.append(line);
                 buf.append(System.getProperty("line.separator"));

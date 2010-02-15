@@ -100,7 +100,7 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     {
         final String os = System.getProperty("os.name");
 
-        // RDP access only valid for WIndows - chack that the OS is windows
+        // RDP access only valid for WIndows - check that the OS is windows
         if (os.startsWith("Windows"))
         {
             // Get domain if it is configured
@@ -141,63 +141,66 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     @Override
     public boolean assign(String name)
     {
-        final boolean failedFlag;
-        
-        this.userName = name;
-
-        // Check whether this user already belongs to the group, if so continue
-        if(!this.checkUserInGroup())
-        {
-            /* Add the command argument user name (with the Domain name if it is configured) and /ADD */
-            if (this.domainName != null)
-            {
-                this.commandArguments.add(this.domainName + "\\" + this.userName);
-            }
-            else
-            {
-                 this.commandArguments.add(this.userName);
-            }
-            this.commandArguments.add("/ADD");
-            this.logger.debug("Remote Desktop Access assign - arguments are"  + this.commandArguments.toString());
+        synchronized(this){
             
-            // Execute the command ie net localgroup groupname (domain/)username /ADD
-            if(!this.executeAccessAction())
+            final boolean failedFlag;
+            
+            this.userName = name;
+    
+            // Check whether this user already belongs to the group, if so continue
+            if(!this.checkUserInGroup())
             {
-                this.logger.error("Remote Desktop Access action failed, command unsuccessful");
-                failedFlag = true;
-            }
-            else
-            {
-                if(!this.verifyAccessAction())
+                /* Add the command argument user name (with the Domain name if it is configured) and /ADD */
+                if (this.domainName != null)
                 {
-                    this.logger.error("Remote Desktop Access revoke action failed, exit code is" + this.getExitCode());
+                    this.commandArguments.add(this.domainName + "\\" + this.userName);
+                }
+                else
+                {
+                     this.commandArguments.add(this.userName);
+                }
+                this.commandArguments.add("/ADD");
+                this.logger.debug("Remote Desktop Access assign - arguments are"  + this.commandArguments.toString());
+                
+                // Execute the command ie net localgroup groupname (domain/)username /ADD
+                if(!this.executeAccessAction())
+                {
+                    this.logger.error("Remote Desktop Access action failed, command unsuccessful");
                     failedFlag = true;
                 }
                 else
                 {
-                    failedFlag = false;
+                    if(!this.verifyAccessAction())
+                    {
+                        this.logger.error("Remote Desktop Access revoke action failed, exit code is" + this.getExitCode());
+                        failedFlag = true;
+                    }
+                    else
+                    {
+                        failedFlag = false;
+                    }
                 }
-            }
-            
-            /* Remove the command arguments user name (with the Domain name if it is configured) and /ADD */
-            if (this.domainName != null)
-            {
-                this.commandArguments.remove(this.domainName + "\\" + this.userName);
+                
+                /* Remove the command arguments user name (with the Domain name if it is configured) and /ADD */
+                if (this.domainName != null)
+                {
+                    this.commandArguments.remove(this.domainName + "\\" + this.userName);
+                }
+                else
+                {
+                    this.commandArguments.remove(this.userName);
+                }                
+                this.commandArguments.remove("/ADD");
+    
+                
+                return failedFlag;
+                
             }
             else
             {
-                this.commandArguments.remove(this.userName);
-            }                
-            this.commandArguments.remove("/ADD");
-
-            
-            return failedFlag;
-            
-        }
-        else
-        {
-            this.logger.info("User " + this.userName + " is already in the group " + this.groupName);
-            return true;
+                this.logger.info("User " + this.userName + " is already in the group " + this.groupName);
+                return true;
+            }
         }
     }
 
@@ -233,60 +236,62 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     @Override
     public boolean revoke(String name)
     {
-        final boolean failed;
+        synchronized(this){
+            final boolean failed;
 
-        /* End user's session using qwinsta command line program*/
-        endUsersSession();
-
-        /* Add the command argument user name (with the Domain name if it is configured) and /DELETE */
-        if (this.domainName != null)
-        {
-            this.commandArguments.add(this.domainName + "\\" + this.userName);
-        }
-        else
-        {
-             this.commandArguments.add(this.userName);
-        }
-        this.commandArguments.add("/DELETE");
-        this.logger.debug("Remote Desktop Access revoke - arguments are"  + this.commandArguments.toString());
-        
-
-        // Execute the command ie net localgroup groupname (domain/)username /DELETE
-        if(!this.executeAccessAction())
-        {
-            this.logger.error("Remote Desktop Access revoke action failed, command unsuccessful");
-            failed = true;
-        }
-        else
-        {
-            if(this.checkUserInGroup())
+            /* End user's session using qwinsta command line program*/
+            endUsersSession();
+    
+            /* Add the command argument user name (with the Domain name if it is configured) and /DELETE */
+            if (this.domainName != null)
             {
-                this.logger.error("Remote Desktop Access revoke action failed, user " + this.userName + " still in group.");
+                this.commandArguments.add(this.domainName + "\\" + this.userName);
+            }
+            else
+            {
+                 this.commandArguments.add(this.userName);
+            }
+            this.commandArguments.add("/DELETE");
+            this.logger.debug("Remote Desktop Access revoke - arguments are"  + this.commandArguments.toString());
+            
+    
+            // Execute the command ie net localgroup groupname (domain/)username /DELETE
+            if(!this.executeAccessAction())
+            {
+                this.logger.error("Remote Desktop Access revoke action failed, command unsuccessful");
                 failed = true;
             }
             else
             {
-                failed = false;
+                if(this.checkUserInGroup())
+                {
+                    this.logger.error("Remote Desktop Access revoke action failed, user " + this.userName + " still in group.");
+                    failed = true;
+                }
+                else
+                {
+                    failed = false;
+                }
             }
-        }
-
-        if(failed == true)
-        {
-            return false;
-        }
-        else
-        {
-            /* Remove the command arguments user name (with the Domain name if it is configured) and /DELETE */
-            if (this.domainName != null)
+    
+            if(failed == true)
             {
-                this.commandArguments.remove(this.domainName + "\\" + this.userName);
+                return false;
             }
             else
             {
-                this.commandArguments.remove(this.userName);
-            }                
-            this.commandArguments.remove("/DELETE");
-            return true;
+                /* Remove the command arguments user name (with the Domain name if it is configured) and /DELETE */
+                if (this.domainName != null)
+                {
+                    this.commandArguments.remove(this.domainName + "\\" + this.userName);
+                }
+                else
+                {
+                    this.commandArguments.remove(this.userName);
+                }                
+                this.commandArguments.remove("/DELETE");
+                return true;
+            }
         }
         
     }
