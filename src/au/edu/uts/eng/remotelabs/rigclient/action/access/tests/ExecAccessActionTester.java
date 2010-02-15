@@ -181,32 +181,37 @@ public class ExecAccessActionTester extends TestCase
         reset(this.mockConfig);
         replay(this.mockConfig);
 
-        // Sets command to echo out a string
-        Field f = ExecAccessAction.class.getDeclaredField("command");
-        f.setAccessible(true);
-        f.set(this.action, "net" );
+        final String os = System.getProperty("os.name");
 
-        final List<String> args = new ArrayList<String>();
-        args.add("user");
-        args.add("tmachet");
-        f = ExecAccessAction.class.getDeclaredField("commandArguments");
-        f.setAccessible(true);
-        f.set(this.action, args);
-        
-        f = ExecAccessAction.class.getDeclaredField("workingDirectory");
-        f.setAccessible(true);
-        f.set(this.action, null);
-
-        Method testMe = ExecAccessAction.class.getDeclaredMethod("executeAccessAction");
-        testMe.setAccessible(true);
-        boolean result = (Boolean)testMe.invoke(this.action);
-
-        Method testOut = ExecAccessAction.class.getDeclaredMethod("getAccessOutputString");
-        testOut.setAccessible(true);
-        String outString = (String) testOut.invoke(this.action);
-        
-        assertTrue(result);
-        assertNotNull(outString);
+        if (os.startsWith("Windows"))
+        {
+          // Sets command to echo out a string
+            Field f = ExecAccessAction.class.getDeclaredField("command");
+            f.setAccessible(true);
+            f.set(this.action, "net" );
+    
+            final List<String> args = new ArrayList<String>();
+            args.add("user");
+            args.add("tmachet");
+            f = ExecAccessAction.class.getDeclaredField("commandArguments");
+            f.setAccessible(true);
+            f.set(this.action, args);
+            
+            f = ExecAccessAction.class.getDeclaredField("workingDirectory");
+            f.setAccessible(true);
+            f.set(this.action, null);
+    
+            Method testMe = ExecAccessAction.class.getDeclaredMethod("executeAccessAction");
+            testMe.setAccessible(true);
+            boolean result = (Boolean)testMe.invoke(this.action);
+    
+            Method testOut = ExecAccessAction.class.getDeclaredMethod("getAccessOutputString");
+            testOut.setAccessible(true);
+            String outString = (String) testOut.invoke(this.action);
+            
+            assertTrue(result);
+            assertNotNull(outString);
+        }
         
     }
 
