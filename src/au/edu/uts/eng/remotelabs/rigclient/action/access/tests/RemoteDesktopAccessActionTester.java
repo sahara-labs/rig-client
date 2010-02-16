@@ -65,13 +65,16 @@ import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
+import junit.framework.TestCase;
+
+
 /**
  * Test class for testing Remote Desktop Access action
  * 
  * @author tmachet
  *
  */
-public class RemoteDesktopAccessActionTester
+public class RemoteDesktopAccessActionTester extends TestCase
 {
     /** Object of class under test. */
     private RemoteDesktopAccessAction action;
@@ -83,6 +86,7 @@ public class RemoteDesktopAccessActionTester
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -116,7 +120,7 @@ public class RemoteDesktopAccessActionTester
     @After
     public void tearDown() throws Exception
     {
-        
+        // Do nothing yet
     }
 
     /**
@@ -125,6 +129,8 @@ public class RemoteDesktopAccessActionTester
     @Test
     public void testSetupAccessAction() throws Exception
     {
+        // Do nothing yet
+
     }
 
     /**
