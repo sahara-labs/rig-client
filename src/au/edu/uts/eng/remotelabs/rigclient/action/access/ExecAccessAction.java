@@ -83,15 +83,6 @@ public abstract class ExecAccessAction implements IAccessAction
     /** Environment variables for access command */
     protected final Map<String, String> environmentVariables;
 
-    /** Access Action process exit code. */
-    protected int exitCode;
-
-    /** Command output string */
-    protected String outputString;
-
-    /** Error string */
-    protected String errorString;
-    
     /** Working directory for access command */
     protected String workingDirectory;
 
@@ -116,18 +107,23 @@ public abstract class ExecAccessAction implements IAccessAction
      * its arguments, environment variables and directory
      * specified
      * 
-     * @return true if operation successful, false otherwise
+     * @return String return the exitcode of the executed command
+     *    null returned if failed
      */
-    protected boolean executeAccessAction() 
+    protected String executeAccessAction() 
     {
+        /** Access Action process exit code. */
+        Integer exitCode;
+
         if (this.command == null)
         {
+            //TODO COrrect - return cvalues.
             this.logger.warn("No command file has been specified for the access action.  Access action failed.");
-            return false;
+            return null;
         }
         
         final List<String> processCommand = new ArrayList<String>();
-        processCommand.add(this.command);
+        processCommand.add(this.command); 
         
         if (this.commandArguments == null)
         {
@@ -167,18 +163,16 @@ public abstract class ExecAccessAction implements IAccessAction
         {
             this.accessActionProcess = builder.start();
             this.logger.info("Invoked access action command at " + this.getTimeStamp('/', ' ', ':'));
-            this.exitCode = this.accessActionProcess.waitFor();
-            this.outputString = this.getAccessOutputString();
-            this.errorString = this.getAccessErrorString();
+            exitCode = this.accessActionProcess.waitFor();
             
-            return true;
+            return exitCode.toString();
             
         }
         catch (Exception ex)
         {
             this.logger.error("Access Action failed with exception of type " + ex.getClass().getName() + " and with " +
                     "message: " + ex.getMessage());
-            return false;
+            return null;
             
         }
         finally
@@ -244,7 +238,7 @@ public abstract class ExecAccessAction implements IAccessAction
      * 
      * @return true if successful, false otherwise
      */
-    protected abstract boolean verifyAccessAction();
+    protected abstract boolean verifyAccessAction(String exitCode);
 
     /**
      * Gets a formatted time stamp with day, month, year, hour, minute
@@ -281,6 +275,7 @@ public abstract class ExecAccessAction implements IAccessAction
      */
     protected String getAccessOutputString()
     {
+
         InputStream is = this.accessActionProcess.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         
@@ -337,15 +332,5 @@ public abstract class ExecAccessAction implements IAccessAction
         
     }
     
-    /**
-     * Gets the exit code of the access action process. If the access action process has not
-     * completed, the returned exit code is 0.
-     * 
-     * @return exit code
-     */
-    public int getExitCode()
-    {
-        return this.exitCode;
-    }
 
  }

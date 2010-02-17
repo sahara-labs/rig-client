@@ -144,6 +144,7 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
         synchronized(this){
             
             final boolean failedFlag;
+            final String exitCode;
             
             this.userName = name;
     
@@ -162,17 +163,19 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
                 this.commandArguments.add("/ADD");
                 this.logger.debug("Remote Desktop Access assign - arguments are"  + this.commandArguments.toString());
                 
-                // Execute the command ie net localgroup groupname (domain/)username /ADD
-                if(!this.executeAccessAction())
+                /* Execute the command ie net localgroup groupname (domain/)username /ADD */
+                exitCode = this.executeAccessAction();
+                
+                if(exitCode == null)
                 {
                     this.logger.error("Remote Desktop Access action failed, command unsuccessful");
                     failedFlag = true;
                 }
                 else
                 {
-                    if(!this.verifyAccessAction())
+                    if(!this.verifyAccessAction(exitCode))
                     {
-                        this.logger.error("Remote Desktop Access revoke action failed, exit code is" + this.getExitCode());
+                        this.logger.error("Remote Desktop Access revoke action failed, exit code is" + exitCode);
                         failedFlag = true;
                     }
                     else
@@ -238,6 +241,7 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
     {
         synchronized(this){
             final boolean failed;
+            final String exitCode;
 
             /* End user's session using qwinsta command line program*/
             endUsersSession();
@@ -256,7 +260,9 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
             
     
             // Execute the command ie net localgroup groupname (domain/)username /DELETE
-            if(!this.executeAccessAction())
+            exitCode = this.executeAccessAction();
+            
+            if(exitCode == null)
             {
                 this.logger.error("Remote Desktop Access revoke action failed, command unsuccessful");
                 failed = true;
@@ -442,9 +448,9 @@ public class RemoteDesktopAccessAction extends ExecAccessAction
      * This is done using the Windows exit code recieved from the last command.
      */
     @Override
-    public boolean  verifyAccessAction()
+    public boolean verifyAccessAction(String exitCode)
     {
-        if(this.getExitCode() != 0)
+        if(exitCode != null)
         {
             this.logger.warn("Verifying Access Action, output is " + this.getAccessOutputString());
             this.logger.warn("Verifying Access Action, std error is " + this.getAccessErrorString());
