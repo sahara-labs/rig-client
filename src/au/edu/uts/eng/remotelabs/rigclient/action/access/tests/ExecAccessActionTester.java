@@ -136,9 +136,10 @@ public class ExecAccessActionTester extends TestCase
 
         Method testMe = ExecAccessAction.class.getDeclaredMethod("executeAccessAction");
         testMe.setAccessible(true);
-        boolean result = (Boolean)testMe.invoke(this.action);
+        String result = (String)testMe.invoke(this.action);
+
+        assertNull(result);
         
-        assertFalse(result);
         
     }
 
@@ -169,9 +170,9 @@ public class ExecAccessActionTester extends TestCase
     
             Method testMe = ExecAccessAction.class.getDeclaredMethod("executeAccessAction");
             testMe.setAccessible(true);
-            boolean result = (Boolean)testMe.invoke(this.action);
+            String result = (String)testMe.invoke(this.action);
 
-            assertTrue(result);
+            assertNotNull(result);
             
         } 
 

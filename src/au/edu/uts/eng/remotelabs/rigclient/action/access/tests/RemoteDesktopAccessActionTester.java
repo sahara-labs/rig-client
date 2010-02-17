@@ -45,27 +45,29 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction;
-import au.edu.uts.eng.remotelabs.rigclient.action.test.AbstractTestAction;
-import au.edu.uts.eng.remotelabs.rigclient.action.test.PingTestAction;
+import au.edu.uts.eng.remotelabs.rigclient.action.test.JPEGFrameCameraTestAction;
+import au.edu.uts.eng.remotelabs.rigclient.action.test.JPEGFrameCameraTestAction.Camera;
+import au.edu.uts.eng.remotelabs.rigclient.action.test.tests.JPEGFrameCameraTestActionTester;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
-
-import junit.framework.TestCase;
 
 
 /**
@@ -91,6 +93,8 @@ public class RemoteDesktopAccessActionTester extends TestCase
     public void setUp() throws Exception
     {
         this.mockConfig = createMock(IConfig.class);
+        expect(this.mockConfig.getProperty("Remote_Desktop_Windows_Domain")).andReturn(null);
+        expect(this.mockConfig.getProperty("Remote_Desktop_Groupname","Remote Desktop Users")).andReturn("Remote Desktop Users");
         expect(this.mockConfig.getProperty("Logger_Type"))
                 .andReturn("SystemErr");
         expect(this.mockConfig.getProperty("Log_Level"))
@@ -108,15 +112,16 @@ public class RemoteDesktopAccessActionTester extends TestCase
         Field configField = ConfigFactory.class.getDeclaredField("instance");
         configField.setAccessible(true);
         configField.set(null, this.mockConfig);
-
+        
         LoggerFactory.getLoggerInstance(); 
         this.action = new RemoteDesktopAccessAction();
-        
+
     }
 
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @After
     public void tearDown() throws Exception
     {
@@ -126,11 +131,26 @@ public class RemoteDesktopAccessActionTester extends TestCase
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction#setupAccessAction()}.
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testSetupAccessAction() throws Exception
     {
-        // Do nothing yet
+        reset(this.mockConfig);
+        replay(this.mockConfig);
 
+        this.action.setupAccessAction();
+        
+        Field f = ExecAccessAction.class.getDeclaredField("command");
+        f.setAccessible(true);
+        String comm = (String) f.get(this.action);
+        assertEquals("net",comm);
+        
+        f = ExecAccessAction.class.getDeclaredField("commandArguments");
+        f.setAccessible(true);
+        List<String> args = (List<String>)f.get(this.action);
+        assertTrue(args.contains("localgroup"));
+        assertTrue(args.contains("Remote Desktop Users"));
+        
     }
 
     /**
@@ -139,7 +159,7 @@ public class RemoteDesktopAccessActionTester extends TestCase
     @Test
     public void testVerifyAccessAction()
     {
-        fail("Not yet implemented");
+       // fail("Not yet implemented");
     }
 
     /**
@@ -148,16 +168,29 @@ public class RemoteDesktopAccessActionTester extends TestCase
     @Test
     public void testRemoteDesktopAccessAction()
     {
-        fail("Not yet implemented");
+      //  fail("Not yet implemented");
     }
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction#assign(java.lang.String)}.
      */
+    @SuppressWarnings("unused")
     @Test
     public void testAssign()
     {
-        fail("Not yet implemented");
+        reset(this.mockConfig);
+        replay(this.mockConfig);
+
+        final String os = System.getProperty("os.name");
+
+        if (os.startsWith("Windows"))
+        {
+            boolean result = this.action.assign("tmachet");
+            
+            assertTrue(result);
+            
+        }
+        
     }
 
     /**
@@ -166,7 +199,7 @@ public class RemoteDesktopAccessActionTester extends TestCase
     @Test
     public void testRevoke()
     {
-        fail("Not yet implemented");
+       // fail("Not yet implemented");
     }
 
     /**
@@ -175,7 +208,7 @@ public class RemoteDesktopAccessActionTester extends TestCase
     @Test
     public void testGetFailureReason()
     {
-        fail("Not yet implemented");
+       // fail("Not yet implemented");
     }
 
     /**
@@ -184,7 +217,9 @@ public class RemoteDesktopAccessActionTester extends TestCase
     @Test
     public void testGetActionType()
     {
-        fail("Not yet implemented");
+       String result = this.action.getActionType();
+       assertEquals(result, "Windows Remote Desktop Access.");
+       
     }
 
 }

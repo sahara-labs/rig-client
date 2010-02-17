@@ -76,7 +76,7 @@ public class MockAccessAction extends ExecAccessAction
      * @see au.edu.uts.eng.remotelabs.rigclient.action.access.ExecAccessAction#verifyAccessAction()
      */
     @Override
-    protected boolean verifyAccessAction()
+    protected boolean verifyAccessAction(String exitCode)
     {
         /* does nothing */
         return false;
