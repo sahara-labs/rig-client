@@ -153,14 +153,11 @@ public class ExecAccessActionTester extends TestCase
 
         if (os.startsWith("Windows"))
         {
-            // Sets command to echo out a string
+            /* Sets command to "net" */
             Field f = ExecAccessAction.class.getDeclaredField("command");
-            f.setAccessible(true);
-            f.set(this.action, "net" );
-
             final List<String> args = new ArrayList<String>();
+            args.add("net");
             args.add("user");
-            f = ExecAccessAction.class.getDeclaredField("commandArguments");
             f.setAccessible(true);
             f.set(this.action, args);
             
@@ -188,15 +185,12 @@ public class ExecAccessActionTester extends TestCase
 
         if (os.startsWith("Windows"))
         {
-          // Sets command to echo out a string
+            /* Sets command to "net" */
             Field f = ExecAccessAction.class.getDeclaredField("command");
-            f.setAccessible(true);
-            f.set(this.action, "net" );
-    
             final List<String> args = new ArrayList<String>();
+            args.add("net");
             args.add("user");
             args.add("tmachet");
-            f = ExecAccessAction.class.getDeclaredField("commandArguments");
             f.setAccessible(true);
             f.set(this.action, args);
             

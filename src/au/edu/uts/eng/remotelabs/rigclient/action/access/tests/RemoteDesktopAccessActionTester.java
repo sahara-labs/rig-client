@@ -94,7 +94,6 @@ public class RemoteDesktopAccessActionTester extends TestCase
     {
         this.mockConfig = createMock(IConfig.class);
         expect(this.mockConfig.getProperty("Remote_Desktop_Windows_Domain")).andReturn(null);
-        expect(this.mockConfig.getProperty("Remote_Desktop_Groupname","Remote Desktop Users")).andReturn("Remote Desktop Users");
         expect(this.mockConfig.getProperty("Logger_Type"))
                 .andReturn("SystemErr");
         expect(this.mockConfig.getProperty("Log_Level"))
@@ -107,6 +106,7 @@ public class RemoteDesktopAccessActionTester extends TestCase
         expect(this.mockConfig.getProperty("WARN_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("Remote_Desktop_Groupname","Remote Desktop Users")).andReturn("Remote Desktop Users");
         replay(this.mockConfig);
         
         Field configField = ConfigFactory.class.getDeclaredField("instance");
@@ -115,7 +115,7 @@ public class RemoteDesktopAccessActionTester extends TestCase
         
         LoggerFactory.getLoggerInstance(); 
         this.action = new RemoteDesktopAccessAction();
-
+        
     }
 
     /**
@@ -131,25 +131,21 @@ public class RemoteDesktopAccessActionTester extends TestCase
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction#setupAccessAction()}.
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void testSetupAccessAction() throws Exception
     {
         reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Remote_Desktop_Groupname","Remote Desktop Users")).andReturn("Remote Desktop Users");
         replay(this.mockConfig);
 
         this.action.setupAccessAction();
         
         Field f = ExecAccessAction.class.getDeclaredField("command");
         f.setAccessible(true);
-        String comm = (String) f.get(this.action);
-        assertEquals("net",comm);
-        
-        f = ExecAccessAction.class.getDeclaredField("commandArguments");
-        f.setAccessible(true);
-        List<String> args = (List<String>)f.get(this.action);
-        assertTrue(args.contains("localgroup"));
-        assertTrue(args.contains("Remote Desktop Users"));
+        String comm = f.get(this.action).toString();
+        assertTrue(comm.contains("net"));
+        assertTrue(comm.contains("localgroup"));
+        assertTrue(comm.contains("Remote Desktop Users"));
         
     }
 

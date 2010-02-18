@@ -44,9 +44,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.Map.Entry;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
@@ -70,22 +71,6 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 public abstract class ExecAccessAction implements IAccessAction 
 {
-    
-    /** Arguments for access command */
-    protected final List<String> commandArguments;
-
-    /** Access Action process. */
-    private Process accessActionProcess;
-    
-    /** Command to execute */
-    protected String command;
-    
-    /** Environment variables for access command */
-    protected final Map<String, String> environmentVariables;
-
-    /** Working directory for access command */
-    protected String workingDirectory;
-
     /** Logger. */
     protected ILogger logger;    
 
@@ -95,11 +80,6 @@ public abstract class ExecAccessAction implements IAccessAction
     public ExecAccessAction() 
     {
         this.logger = LoggerFactory.getLoggerInstance();
-        this.logger.debug("Creating a new ExecAccessAction instance");
-        
-        this.commandArguments = new ArrayList<String>();
-        this.environmentVariables = new HashMap<String, String>();
-        
     }
     
     /**
@@ -107,107 +87,78 @@ public abstract class ExecAccessAction implements IAccessAction
      * its arguments, environment variables and directory
      * specified
      * 
-     * @return String return the exitcode of the executed command
+     * @param command and arguments, working directory and environment variables
+     * @return return the exitCode of the executed command
      *    null returned if failed
+     * @throws Exception 
      */
-    protected String executeAccessAction() 
+    protected int executeAccessAction(List<String> command, String workingDirectory, Map<String, String> environmentVariables) throws Exception   
     {
-        /** Access Action process exit code. */
-        Integer exitCode;
-
-        if (this.command == null)
+        if (command == null)
         {
-            //TODO COrrect - return cvalues.
             this.logger.warn("No command file has been specified for the access action.  Access action failed.");
-            return null;
+            throw new Exception();
         }
-        
-        final List<String> processCommand = new ArrayList<String>();
-        processCommand.add(this.command); 
-        
-        if (this.commandArguments == null)
-        {
-            this.logger.info("No arguments have been specified for the access action command " + this.command + 
-                    ". This is unusual, please check.");
-        }
-        else
-        {
-            processCommand.addAll(this.commandArguments);
-            this.logger.info("Access action command arguments are " + this.commandArguments.toString());
-        }
+        this.logger.debug("Access action commands and arguments are " + command.toString());
 
-        final ProcessBuilder builder = new ProcessBuilder(processCommand);
-        
-        if (this.workingDirectory == null)
+        final ProcessBuilder builder = new ProcessBuilder(command);
+        if (workingDirectory == null)
         {
-            this.workingDirectory = System.getProperty("java.io.tmpdir");
-            this.logger.warn("No working directory set-up, using tmp directory " + this.workingDirectory
+            workingDirectory = System.getProperty("java.io.tmpdir");
+            this.logger.info("No working directory set-up, using tmp directory " + workingDirectory
                     + " as default.");
         }
         else
         {
-            this.logger.info("User set action access command working directory is " + this.workingDirectory);
+            this.logger.info("User set action access command working directory is " + workingDirectory);
         }
-        final File workingDir = new File(this.workingDirectory);
+        final File workingDir = new File(workingDirectory);
         builder.directory(workingDir);
         
         final Map<String, String> env = builder.environment();
-        for (Entry<String, String> e : this.environmentVariables.entrySet())
+        for (Entry<String, String> e : environmentVariables.entrySet())
         {
             this.logger.info("Adding access action environment variable " + e.getKey() + " with value " + e.getValue());
             env.put(e.getKey(), e.getValue());
         }
         this.logger.debug("Access action environment variables: " + env.toString());
 
+        Process accessProc = null;
         try
         {
-            this.accessActionProcess = builder.start();
+            accessProc = builder.start();
             this.logger.info("Invoked access action command at " + this.getTimeStamp('/', ' ', ':'));
-            exitCode = this.accessActionProcess.waitFor();
-            
-            return exitCode.toString();
-            
-        }
-        catch (Exception ex)
-        {
-            this.logger.error("Access Action failed with exception of type " + ex.getClass().getName() + " and with " +
-                    "message: " + ex.getMessage());
-            return null;
-            
+            return accessProc.waitFor();
         }
         finally
         {
             /* Cleanup. */
-            this.cleanup();
+            this.cleanup(accessProc);
         }
-       
     }
 
     /**
      * Cleans up access action invocation
      */
-    private void cleanup()
+    private void cleanup(Process proc)
     {
         this.logger.debug("Cleaning a access action control invocation.");
+        
         try
         {
-            if (this.accessActionProcess.getInputStream() != null) 
+            if (proc.getInputStream() != null) 
             {
-                this.accessActionProcess.getInputStream().close();
+                proc.getInputStream().close();
             }
-            
-            if (this.accessActionProcess.getErrorStream() != null) 
+            if (proc.getErrorStream() != null) 
             {
-                this.accessActionProcess.getErrorStream().close();
+                proc.getErrorStream().close();
             }
         }
         catch (IOException ex)
         {
             this.logger.warn("Failed to clean a batch control invocation because of error " + ex.getMessage());
         }
-        
-
-        
     }
 
     /**
@@ -216,11 +167,7 @@ public abstract class ExecAccessAction implements IAccessAction
      * 
      * <ul>
      *     <li><strong><code>command</code></strong> - The executable command
-     *     name.</li>
-     *     <li><strong><code>commandArguments</code></strong> - The command line 
-     *     arguments for the access command in the order they are entered. 
-     *     They are provided in the order they are entered into the
-     *     <code>commandArgumentss</code> list. 
+     *     name and its arguments</li>
      *     <li><strong><code>workingDirectory</code></strong> - The working
      *     directory access command. 
      *     <li><strong><code>environmentVariables</code></strong> - Environment variable
@@ -238,7 +185,7 @@ public abstract class ExecAccessAction implements IAccessAction
      * 
      * @return true if successful, false otherwise
      */
-    protected abstract boolean verifyAccessAction(String exitCode);
+    protected abstract boolean verifyAccessAction();
 
     /**
      * Gets a formatted time stamp with day, month, year, hour, minute
@@ -273,12 +220,10 @@ public abstract class ExecAccessAction implements IAccessAction
      * 
      * @return String input string of subprocess
      */
-    protected String getAccessOutputString()
+    protected String getAccessOutputString(Process proc)
     {
-
-        InputStream is = this.accessActionProcess.getInputStream();
+        InputStream is = proc.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        
         String line = null;
         final StringBuilder buf = new StringBuilder();
         
@@ -295,9 +240,7 @@ public abstract class ExecAccessAction implements IAccessAction
             this.logger.warn("Reading access action input stream failed with error " + e.getMessage() + ".");
             return null;
         }
-
         return buf.toString();
-        
     }
     
 
@@ -306,11 +249,10 @@ public abstract class ExecAccessAction implements IAccessAction
      * 
      * @return String error string of subprocess
      */
-    protected String getAccessErrorString()
+    protected String getAccessErrorString(Process proc)
     {
-        InputStream is = this.accessActionProcess.getErrorStream();
+        InputStream is = proc.getErrorStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        
         String line = null;
         final StringBuilder buf = new StringBuilder();
 
@@ -327,10 +269,6 @@ public abstract class ExecAccessAction implements IAccessAction
             this.logger.warn("Reading access action input stream failed with error " + e.getMessage() + ".");
             return null;
         }
-
         return buf.toString();
-        
     }
-    
-
  }
