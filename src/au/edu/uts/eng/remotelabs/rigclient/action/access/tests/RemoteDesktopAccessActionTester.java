@@ -44,12 +44,20 @@ package au.edu.uts.eng.remotelabs.rigclient.action.access.tests;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.reset;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
+
+import org.junit.Test;
+
 import au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction;
+import au.edu.uts.eng.remotelabs.rigclient.action.test.JPEGFrameCameraTestAction;
+import au.edu.uts.eng.remotelabs.rigclient.action.test.JPEGFrameCameraTestAction.Camera;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
@@ -104,6 +112,20 @@ public class RemoteDesktopAccessActionTester extends TestCase
     protected void tearDown() throws Exception
     {
         super.tearDown();
+        List<String> comm = new ArrayList<String>();
+        comm.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
+        comm.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
+        comm.add(RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
+        comm.add("/DELETE");
+        comm.add("tmachet");
+        final String os = System.getProperty("os.name");
+
+        if (os.startsWith("Windows"))
+        {
+                Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                me.invoke(this.action, comm);
+        }
     }
 
     /**
@@ -119,10 +141,48 @@ public class RemoteDesktopAccessActionTester extends TestCase
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction#assign(java.lang.String)}.
+     * @throws Exception 
      */
-    public void testAssign()
+    public void testAssign() throws Exception
     {
-        fail("Not yet implemented");
+        List<String> comm = new ArrayList<String>();
+        comm.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
+        comm.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
+        comm.add(RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
+        String name = "tmachet";
+        final String os = System.getProperty("os.name");
+
+        if (os.startsWith("Windows"))
+        {
+                Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                Process proc = (Process) me.invoke(this.action, comm);
+                assertNotNull(proc);
+        
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class,String.class);
+                me.setAccessible(true);
+                Boolean result = (Boolean) me.invoke(this.action, proc, name);
+                assertFalse(result);
+                
+                comm.add("/ADD");
+                comm.add(name);
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                Process procAdd = (Process) me.invoke(this.action, comm);
+                assertNotNull(procAdd);
+                
+                comm.remove(name);
+                comm.remove("/ADD");                
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                proc = (Process) me.invoke(this.action, comm);
+                assertNotNull(proc);
+
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class,String.class);
+                me.setAccessible(true);
+                result = (Boolean) me.invoke(this.action, proc, name);
+                assertTrue(result);
+        }
     }
 
     /**
@@ -135,18 +195,65 @@ public class RemoteDesktopAccessActionTester extends TestCase
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction#getActionType()}.
+     * @throws Exception 
      */
-    public void testGetActionType()
+    public void testGetActionType() throws Exception
     {
-        fail("Not yet implemented");
+        Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("getActionType");
+        me.setAccessible(true);
+        String type = (String) me.invoke(this.action);
+        
+        assertEquals(type,"Windows Remote Desktop Access");
     }
 
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction#getFailureReason()}.
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction#executeCommand()}.
+     * @throws Exception 
      */
-    public void testGetFailureReason()
+    public void testExecuteCommand() throws Exception
     {
-        fail("Not yet implemented");
-    }
+        List<String> comm = new ArrayList<String>();
+        comm.add("net");
+        comm.add("localgroup");
+        comm.add("\"Remote Desktop Users\"");
+        
+        final String os = System.getProperty("os.name");
 
+        if (os.startsWith("Windows"))
+        {
+            Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+            me.setAccessible(true);
+            Process proc = (Process) me.invoke(this.action, comm);
+            
+            assertNotNull(proc);
+        }
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction#isUserInGroup()}.
+     * @throws Exception 
+     */
+    public void testIsUserInGroup() throws Exception
+    {
+        List<String> comm = new ArrayList<String>();
+        comm.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
+        comm.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
+        comm.add(RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
+        String name = "tmachet";
+        final String os = System.getProperty("os.name");
+
+        if (os.startsWith("Windows"))
+        {
+                Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                Process proc = (Process) me.invoke(this.action, comm);
+                assertNotNull(proc);
+        
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class,String.class);
+                me.setAccessible(true);
+                Boolean result = (Boolean) me.invoke(this.action, proc, name);
+                assertFalse(result);
+        }
+
+    }
 }
