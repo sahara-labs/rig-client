@@ -41,12 +41,16 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.easymock.internal.matchers.Contains;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
@@ -82,7 +86,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
     protected ILogger logger;    
     
     /** Default user group for remote desktop access. */
-    public static final String DEFAULT_GROUPNAME = "Remote Desktop Users";
+    public static final String DEFAULT_GROUPNAME = "\"Remote Desktop Users\"";
 
     /** Default command for changing user groups for windows */
     public static final String DEFAULT_COMMAND = "net";
@@ -109,10 +113,6 @@ public class RemoteDesktopAccessAction implements IAccessAction
         {
             /* Get domain if it is configured */
             this.domainName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain");
-            if (this.domainName == null)
-            {
-                this.logger.info("Windows domain name not found, so not using a domain name.");
-            }
         }
         else
         {
@@ -142,43 +142,172 @@ public class RemoteDesktopAccessAction implements IAccessAction
             try
             {
                 Process proc = executeCommand(command);
-                
-                
+                if (!isUserInGroup(proc, name))
+                {
+                    cleanup(proc);
+                    /* --------------------------------------------------------------------
+                     * 2. If not, add user to group
+                     * a. sets up net add process
+                     * b. executes process
+                    /* --------------------------------------------------------------------*/
+                    
+                    command.add("/ADD");
+                    if (this.domainName != null)
+                    {
+                        command.add(this.domainName + "\\");
+                    }
+                    else
+                    {
+                        command.add(name);
+                    }    
+                    this.logger.debug("Command is " + command.toString());
+                    
+                    proc = executeCommand(command);
+                    cleanup(proc);
+
+                    /* --------------------------------------------------------------------
+                    * 3. Check whether user is in RDP user group
+                    * a. sets up net process
+                    * b. executes process
+                    * c. check output to see whether user is in the group
+                    /* --------------------------------------------------------------------*/
+                    command.remove(name);
+                    if (this.domainName != null)
+                    {
+                        command.remove(this.domainName + "\\" + name);
+                    } 
+                    else
+                    {
+                        command.remove(name);
+                    }
+                    command.remove("/ADD");
+                    proc = executeCommand(command);
+                    if (!isUserInGroup(proc, name))
+                    {
+                        cleanup(proc);
+                        this.logger.info("User could not be successfully added to the group " + command.toString());
+                        return false;
+                    }
+                }
+                cleanup(proc);
             }
             catch (Exception e)
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                this.logger.info("Executing command " + command.toString() + " failed with error " + e.getMessage());
+                return false;
             }
-
-            
-
-            
+            return true;
         }
-         
-        
-         
-        
-        
-        /* --------------------------------------------
-         * 2. If not, add user to group
-         * a. sets up net add process
-         * b. executes process
-         * --------------------------------------------
-         * 
-         * --------------------------------------------
-         * 3. Check whether user is in RDP user group
-         * a. sets up net process
-         * b. executes process
-         * c. check output to see whether user is in the group
-         * --------------------------------------------
-         * 
-         * 
-         */
-        // TODO Auto-generated method stub
-        return false;
     }
 
+    /* (non-Javadoc)
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction#revoke(java.lang.String)
+     */
+    @Override
+    public boolean revoke(String name)
+    {
+        synchronized(this){
+             /* --------------------------------------------------------------------
+             * 1. End users sessions
+             * a. Set up process for qwinsta
+             * b. Execute process
+             * --------------------------------------------------------------------*/
+            List<String> command = new ArrayList<String>();
+            
+            command.add("qwinsta");
+            command.add(name);
+            
+            Process proc;
+            try
+            {
+                proc = executeCommand(command);
+                InputStream is = proc.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                String line = null;
+                
+                /* --------------------------------------------------------------------
+                 * c. Check user session exists using qwinsta output
+                 * d. for each session, set up process for log-off
+                 * e. execute log-off process
+                 * --------------------------------------------------------------------*/
+                while (br.ready() && (line = br.readLine()) != null)
+                {
+                    if (line.contains(name))
+                    {
+                        String qwinstaSplit[] = line.split("\\s");
+                        
+                        List<String> logoffCommand = new ArrayList<String>();
+                        logoffCommand.add("logoff");
+                        logoffCommand.add(qwinstaSplit[2]);
+    
+                        Process procLogoff;
+                        procLogoff = executeCommand(logoffCommand);
+                        if (procLogoff.exitValue() != 0)
+                        {
+                            this.logger.warn("Log off for user " + name + " returned an unexpected result.");
+                            return false;
+                        }
+                        cleanup(procLogoff);
+                    }
+                }
+                cleanup(proc);
+                
+                /* --------------------------------------------------------------------
+                 * 2. Check whether user is in RDP user group
+                 * a. sets up net process
+                 * b. executes process
+                 * c. check output to see whether user is in the group
+                 * --------------------------------------------------------------------*/
+                
+                List<String> checkCommand = new ArrayList<String>();
+                checkCommand.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
+                checkCommand.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
+                checkCommand.add(ConfigFactory.getInstance().getProperty("Remote_Desktop_Groupname",RemoteDesktopAccessAction.DEFAULT_GROUPNAME));
+                
+                Process procCheck = executeCommand(checkCommand);
+                if(isUserInGroup(procCheck, name))
+                {
+                    cleanup(procCheck);
+                    /* --------------------------------------------------------------------
+                     * 3. If yes, remove user from group
+                     * a. sets up net delete process
+                     * b. executes process
+                     * --------------------------------------------------------------------*/
+                    checkCommand.add("/DELETE");
+                    checkCommand.add(name);
+                    procCheck = executeCommand(checkCommand);
+                    if (procCheck.exitValue() != 0)
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                this.logger.warn("Revoke action failed with exception of type " + e.getClass().getName() + " and with " +
+                        "message " + e.getMessage() + ".");            }
+            }
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAction#getActionType()
+     */
+    @Override
+    public String getActionType()
+    {
+        return "Windows Remote Desktop Access";
+    }
+
+    /* (non-Javadoc)
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAction#getFailureReason()
+     */
+    @Override
+    public String getFailureReason()
+    {
+        return this.failureReason;
+    }
+    
     /**
      * Executes the access action specified using the command and working directory
      * 
@@ -202,18 +331,40 @@ public class RemoteDesktopAccessAction implements IAccessAction
         final Map<String, String> env = builder.environment();
 
         Process accessProc = null;
-        try
-        {
-            accessProc = builder.start();
-            this.logger.info("Invoked access action command");
-            accessProc.waitFor();
-        }
-        finally
-        {
-            this.cleanup(accessProc);
-        }
+
+        accessProc = builder.start();
+        this.logger.info("Invoked access action command");
+        accessProc.waitFor();
         
         return accessProc;
+    }
+
+
+    /**
+     * Method to check that a user belongs to the user group.
+     * 
+     * @param proc proccess whose input stream should be searched
+     * @param name of user to be checked
+     * @return true if user is in group
+     * @throws IOException 
+     */
+    private boolean isUserInGroup(Process proc, String name) throws IOException
+    {
+        InputStream is = proc.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        String line = null;
+        
+        while (br.ready() && (line = br.readLine()) != null)
+        {
+            this.logger.debug(line);
+            
+            if (line.contains(name))
+            {
+                this.logger.debug("Name found");
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -223,91 +374,22 @@ public class RemoteDesktopAccessAction implements IAccessAction
     private void cleanup(Process proc)
     {
         this.logger.debug("Cleaning a access action control invocation.");
-        
         try
         {
             if (proc.getInputStream() != null) 
             {
                 proc.getInputStream().close();
             }
-            if (proc.getErrorStream() != null) 
+            if(proc.getErrorStream() != null) 
             {
                 proc.getErrorStream().close();
             }
         }
         catch (IOException ex)
         {
-            this.logger.warn("Failed to clean a batch control invocation because of error " + ex.getMessage());
+            this.logger.warn("Failed to clean a process because of error " + ex.getMessage());
         }
         
-    }
-
-    /* (non-Javadoc)
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction#revoke(java.lang.String)
-     */
-    @Override
-    public boolean revoke(String name)
-    {
-        /* 
-         * --------------------------------------------
-         * 1. End users sessions
-         * a. Set up process for qwinsta
-         * b. Execute process
-         * c. Check user session exists using qwinsta output
-         * d. for each session, set up process for log-off
-         * e. execute log-off process
-         * --------------------------------------------
-         * 
-         * --------------------------------------------
-         * 2. Check whether user is in RDP user group
-         * a. sets up net process
-         * b. executes process
-         * c. check output to see whether user is in the group
-         * --------------------------------------------
-         * 
-         * --------------------------------------------
-         * 3. If yes, remove user from group
-         * a. sets up net delete process
-         * b. executes process
-         * --------------------------------------------
-         * 
-         */
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /* (non-Javadoc)
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAction#getActionType()
-     */
-    @Override
-    public String getActionType()
-    {
-        // TODO Auto-generated method stub
-        /* return string for remote desktop access action */
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAction#getFailureReason()
-     */
-    @Override
-    public String getFailureReason()
-    {
-        // TODO Auto-generated method stub
-        /* get instance variable for failure reason */
-        return null;
-    }
-    
-    /**
-     * Method to check that a user is not already assigned to a user group
-     * before adding them.
-     * 
-     * @param name of user to be checked
-     * @return true if user is in group
-     */
-    private boolean isUserInGroup(String name)
-    {
-        return false;
     }
 
     /**
@@ -320,4 +402,6 @@ public class RemoteDesktopAccessAction implements IAccessAction
     {
         return null;
     }
+    
+    
 }
