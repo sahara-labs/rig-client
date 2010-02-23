@@ -77,10 +77,10 @@ import au.edu.uts.eng.remotelabs.rigclient.status.types.UpdateRigStatus;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.UpdateRigStatusResponse;
 
 /**
- * LocalRigProviderStub implementation.
+ * Scheduling Server local rig provider client SOAP implementation.
  */
 @SuppressWarnings("unchecked")
-public class LocalRigProviderStub extends Stub
+public class SchedulingServerProviderStub extends Stub
 {
     protected AxisOperation[] _operations;
 
@@ -97,29 +97,29 @@ public class LocalRigProviderStub extends Stub
      * Uses <tt>http://remotelabs.eng.uts.edu.au:8080/schedserver/localrigprovider</tt>
      * as the end point.
      */
-    public LocalRigProviderStub() throws AxisFault
+    public SchedulingServerProviderStub() throws AxisFault
     {
         this("http://remotelabs.eng.uts.edu.au:8080/schedserver/localrigprovider");
     }
 
-    public LocalRigProviderStub(final String targetEndpoint) throws AxisFault
+    public SchedulingServerProviderStub(final String targetEndpoint) throws AxisFault
     {
         this(null, targetEndpoint);
     }
 
-    public LocalRigProviderStub(final ConfigurationContext configurationContext)
+    public SchedulingServerProviderStub(final ConfigurationContext configurationContext)
             throws AxisFault
     {
         this(configurationContext, "http://remotelabs.eng.uts.edu.au:8080/schedserver/localrigprovider");
     }
 
-    public LocalRigProviderStub(final ConfigurationContext configurationContext,
+    public SchedulingServerProviderStub(final ConfigurationContext configurationContext,
             final String targetEndpoint) throws AxisFault
     {
         this(configurationContext, targetEndpoint, false);
     }
     
-    public LocalRigProviderStub(ConfigurationContext configurationContext,
+    public SchedulingServerProviderStub(ConfigurationContext configurationContext,
             final String targetEndpoint, final boolean useSeparateListener) throws AxisFault
     {
         this.populateAxisService();
@@ -134,12 +134,12 @@ public class LocalRigProviderStub extends Stub
     
     private static synchronized String getUniqueSuffix()
     {
-        if (LocalRigProviderStub.counter > 99999)
+        if (SchedulingServerProviderStub.counter > 99999)
         {
-            LocalRigProviderStub.counter = 0;
+            SchedulingServerProviderStub.counter = 0;
         }
-        LocalRigProviderStub.counter = LocalRigProviderStub.counter + 1;
-        return Long.toString(System.currentTimeMillis()) + "_" + LocalRigProviderStub.counter;
+        SchedulingServerProviderStub.counter = SchedulingServerProviderStub.counter + 1;
+        return Long.toString(System.currentTimeMillis()) + "_" + SchedulingServerProviderStub.counter;
     }
 
     private Object fromOM(final OMElement param, final Class type,
@@ -217,7 +217,7 @@ public class LocalRigProviderStub extends Stub
 
     private void populateAxisService() throws AxisFault
     {
-        this._service = new AxisService("LocalRigProvider" + LocalRigProviderStub.getUniqueSuffix());
+        this._service = new AxisService("LocalRigProvider" + SchedulingServerProviderStub.getUniqueSuffix());
         this.addAnonymousOperations();
 
         AxisOperation __operation;

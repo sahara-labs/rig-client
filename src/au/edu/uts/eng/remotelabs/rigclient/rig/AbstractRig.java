@@ -463,7 +463,6 @@ public abstract class AbstractRig implements IRig
             buf.append(tokens[i]);
             if (i != tokens.length - 1) buf.append(", ");
         }
-        this.logger.info(buf.toString());
         
         return tokens;
     }
@@ -482,10 +481,7 @@ public abstract class AbstractRig implements IRig
                     "at " + this.configuration.getConfigurationInfomation() + " and ensure the field " +
                     "'Rig_Name' is present and populated with a rig name string.");
         }
-        else
-        {
-            this.logger.info("Rig name is " + name + ".");
-        }
+
         return name;
     }
 
@@ -537,10 +533,7 @@ public abstract class AbstractRig implements IRig
                     "at " + this.configuration.getConfigurationInfomation() + " and ensure the field " +
                     "'Rig_Type' is present and populated with a rig type string.");
         }
-        else
-        {
-            this.logger.info("Rig type is " + type + ".");
-        }
+
         return type;
     }
 
