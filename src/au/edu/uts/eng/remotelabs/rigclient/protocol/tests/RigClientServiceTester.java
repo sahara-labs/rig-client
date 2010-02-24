@@ -112,6 +112,7 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchResults;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
+import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
@@ -150,6 +151,12 @@ public class RigClientServiceTester extends TestCase
         f = RigFactory.class.getDeclaredField("rig");
         f.setAccessible(true);
         f.set(null, (IRig)m.invoke(null));
+        
+        /* Set identity token to abc123. */
+        f = StatusUpdater.class.getDeclaredField("identToks");
+        f.setAccessible(true);
+        String toks[] = (String[])f.get(null);
+        toks[0] = "abc123";
         
         
         this.rig = RigFactory.getRigInstance();

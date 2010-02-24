@@ -44,6 +44,7 @@ package au.edu.uts.eng.remotelabs.rigclient.main;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 import au.edu.uts.eng.remotelabs.rigclient.server.EmbeddedJettyServer;
 import au.edu.uts.eng.remotelabs.rigclient.server.IServer;
+import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
@@ -65,6 +66,9 @@ public class RigClient
     /** Listening server. */
     private final IServer server;
     
+    /** Status updater. */
+    private Thread statusThread;
+    
     /** Shutdown flag. */
     private static boolean shutdown;
     
@@ -82,6 +86,7 @@ public class RigClient
         this.logger = LoggerFactory.getLoggerInstance();
         this.config = ConfigFactory.getInstance();
         this.server = new EmbeddedJettyServer();
+        
     }
     
     /**
@@ -118,10 +123,25 @@ public class RigClient
                 System.exit(3);
             }
             
+            while (!this.server.isListening())
+            {
+                Thread.sleep(1000);
+            }
+            
             /* ------------------------------------------------------------------
              * ---- 3. Start the registration and status notification service. --
              * ----------------------------------------------------------------*/
-            // TODO Registration and status notification service.
+            try
+            {
+                StatusUpdater statusUpdater = new StatusUpdater(this.server.getAddress()[0]);
+                this.statusThread = new Thread(statusUpdater);
+                this.statusThread.start();
+            }
+            catch (Exception ex)
+            {
+                this.logger.fatal("Unable to start the status updater because " + ex.getMessage() + '.');
+                System.exit(4);
+            }
             
             /* ------------------------------------------------------------------
              * ---- 4. Enter the run loop and wait for shutdown. ----------------
@@ -146,11 +166,16 @@ public class RigClient
             {
                 rig.revoke();
             }
+            
+            /* Shutdown registration and status update service. 30 seconds 
+             * *should* be enough time to remove rig registration, but 
+             * we can't wait any longer because services have an expectation
+             * shutting down quickly.  */ 
+            this.statusThread.interrupt();
+            this.statusThread.join(30000);
+            
             /* Stop exerciser tests. */
             rig.stopTests();
-            
-            /* Shutdown registration and status update service 
-            // TODO shutdown registration and status update service
             
             /* Stop server. */
             this.server.stopListening();

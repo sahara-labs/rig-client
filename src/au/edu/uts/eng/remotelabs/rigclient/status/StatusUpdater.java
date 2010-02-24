@@ -38,8 +38,11 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.status;
 
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.Arrays;
+import java.util.Calendar;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.databinding.types.URI;
@@ -49,6 +52,9 @@ import au.edu.uts.eng.remotelabs.rigclient.status.types.ProviderResponse;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.RegisterRig;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.RegisterRigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.RegisterRigType;
+import au.edu.uts.eng.remotelabs.rigclient.status.types.RemoveRig;
+import au.edu.uts.eng.remotelabs.rigclient.status.types.RemoveRigResponse;
+import au.edu.uts.eng.remotelabs.rigclient.status.types.RemoveRigType;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.StatusType;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.UpdateRigStatus;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.UpdateRigStatusResponse;
@@ -76,7 +82,7 @@ public class StatusUpdater implements Runnable
     public static final int DEFAULT_UPDATE_PERIOD = 30;
     
     /** Scheduling server SOAP stub. */
-    private SchedulingServerProviderStub soapStub;
+    private SchedulingServerProviderStub schedServerStub;
     
     /** Scheduling server end point. */
     private final String endPoint;
@@ -93,7 +99,7 @@ public class StatusUpdater implements Runnable
     /** The identity tokens from registration. The 0th value is current 
      *  identity token, the 1st identity token is the identity token 
      *  directly before the current identity token. */
-    public final static String identToks[] = new String[2];
+    private final static String identToks[] = new String[2];
                         
     /** Whether the rig client is registered. */
     private static boolean isRegistered;
@@ -160,13 +166,13 @@ public class StatusUpdater implements Runnable
     @Override
     public void run()
     {
-//        while (!Thread.interrupted())
+        while (!Thread.interrupted())
         {
             try
             {
-                if (this.soapStub == null)
+                if (this.schedServerStub == null)
                 {
-                    this.soapStub = new SchedulingServerProviderStub(this.endPoint);
+                    this.schedServerStub = new SchedulingServerProviderStub(this.endPoint);
                 }
                 
                 ProviderResponse provResp;
@@ -187,7 +193,7 @@ public class StatusUpdater implements Runnable
                     if (!this.rig.isMonitorStatusGood()) status.setOfflineReason(this.rig.getMonitorReason());
                     
                     /* 2) Send message. */
-                    UpdateRigStatusResponse response = this.soapStub.updateRigStatus(request);
+                    UpdateRigStatusResponse response = this.schedServerStub.updateRigStatus(request);
                     provResp = response.getUpdateRigStatusResponse();
                 }
                 else
@@ -218,7 +224,7 @@ public class StatusUpdater implements Runnable
                     status.setOfflineReason(this.rig.getMonitorReason());
                     
                     /* 2) Send message. */
-                    RegisterRigResponse response = this.soapStub.registerRig(request);
+                    RegisterRigResponse response = this.schedServerStub.registerRig(request);
                     provResp = response.getRegisterRigResponse();
                 }
                 
@@ -236,7 +242,7 @@ public class StatusUpdater implements Runnable
                             StatusUpdater.identToks[1] = StatusUpdater.identToks[0];
                             StatusUpdater.identToks[0] = identTok;
                         }
-                        this.logger.debug("Obtained new identity token with value '" + StatusUpdater.identToks[0] + "'.");
+                        this.logger.info("Obtained new identity token with value '" + StatusUpdater.identToks[0] + "'.");
                         StatusUpdater.isRegistered = true;
                     }
                 }
@@ -256,26 +262,91 @@ public class StatusUpdater implements Runnable
             }
             catch (AxisFault ex)
             {
-                this.logger.error("SOAP fault trying to " + (StatusUpdater.isRegistered ? " update the rigs status" : 
-                    " register the rig") + ". Fault reason is " + ex.getReason() + '.');
-                System.out.println(ex.getCause().getClass().getName());
-                System.out.println(ex.getFaultAction());
-                System.out.println(ex.getFaultNode());
-                System.out.println(ex.getReason());
-                System.out.println(ex.getFaultType());
-                System.out.println(ex.getMessage());
+                synchronized (StatusUpdater.class)
+                {
+                    StatusUpdater.identToks[1] = null;
+                    StatusUpdater.identToks[0] = null;
+                }
+                StatusUpdater.isRegistered = false;
+                this.schedServerStub = null;
+                
+                if (ex.getCause() instanceof ConnectException)
+                {
+                    this.logger.error("SOAP fault trying to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                            " register the rig") + ". Fault reason is connection error with reason: " + ex.getMessage() +
+                            ". Ensure the Scheduling Server is running and listening on the configured port number.");
+                }
+                else if (ex.getCause() instanceof UnknownHostException)
+                {
+                    this.logger.error("SOAP fault trying to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                            " register the rig") + ". Fault reason is unknown host " + ex.getMessage() + ". " +
+                            "Configure the scheduling server host as a valid host name.");
+                }
+                else
+                {
+                    this.logger.error("SOAP fault trying to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                    " register the rig") + ". Fault reason is '" + ex.getReason() + "'.");
+                }
+                
             }
             catch (RemoteException ex)
             {
-                // TODO Auto-generated catch block
-                ex.printStackTrace();
+                synchronized (StatusUpdater.class)
+                {
+                    StatusUpdater.identToks[1] = null;
+                    StatusUpdater.identToks[0] = null;
+                }
+                StatusUpdater.isRegistered = false;
+                this.schedServerStub = null;
+                
+                this.logger.error("Remote exception when trying to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                " register the rig") + ". Exception message is '" + ex.getMessage() + "'.");
+            }
+            
+            try
+            {
+                Thread.sleep(this.updatePeriod * 1000);
+            }
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
             }
         }
         
         /* --------------------------------------------------------------------
          * -- 3) Unregister the rig.                                         --
          * ------------------------------------------------------------------*/
-
+        this.logger.debug("Received interrupt for the status updater, removing the rig client's registration.");
+        
+        /* 1) Set up message. */
+        RemoveRig request = new RemoveRig();
+        RemoveRigType removeType = new RemoveRigType();
+        request.setRemoveRig(removeType);
+        removeType.setName(this.rig.getName());
+        Calendar cal = Calendar.getInstance();
+        removeType.setRemovalReason("Shutting down at time " + cal.get(Calendar.HOUR_OF_DAY) + ':' + 
+                cal.get(Calendar.MINUTE) + ':' + cal.get(Calendar.SECOND) + " on " + cal.get(Calendar.DAY_OF_MONTH) +
+                '/' + (cal.get(Calendar.MONTH) + 1) + '/' + cal.get(Calendar.YEAR) + '.');
+        
+        /* 2) Send message. */
+        try
+        {
+            RemoveRigResponse response = this.schedServerStub.removeRig(request);
+            if (response.getRemoveRigResponse().getSuccessful())
+            {
+                this.logger.info("Successfully removed the rig client's scheduling server registration.");
+            }
+            else
+            {
+                this.logger.error("Failed to remove the rig client's scheduling server registration with provided " +
+                		"error '" + this.getNiceErrorMessage(response.getRemoveRigResponse().getErrorReason()) + "'.");
+            }
+        }
+        catch (RemoteException e)
+        {
+            this.logger.error("Failed to remove the scheduling servers registration because of remote exception " + 
+                    " with error message '" + e.getMessage() + "'.");
+        }
     }
     
     /**
@@ -288,7 +359,7 @@ public class StatusUpdater implements Runnable
      * 
      * @return current and last identity token
      */
-    public static String[] getServerIdentityToken()
+    public static String[] getServerIdentityTokens()
     {
         synchronized (StatusUpdater.class)
         {

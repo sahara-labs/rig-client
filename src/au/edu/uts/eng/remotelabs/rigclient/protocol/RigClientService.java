@@ -101,6 +101,7 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchResults;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
+import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
@@ -130,10 +131,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         this.rig = RigFactory.getRigInstance();
         this.config = ConfigFactory.getInstance();
     }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#allocate(Allocate)
-     */
+
     @Override
     public AllocateResponse allocate(final Allocate allocRequest)
     {   
@@ -188,10 +186,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
 
         return response;
     }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#release(Release)
-     */
+
     @Override
     public ReleaseResponse release(final Release relRequest)
     {
@@ -246,10 +241,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         
         return response;
     }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#slaveAllocate(SlaveAllocate)
-     */
+
     @Override
     public SlaveAllocateResponse slaveAllocate(final SlaveAllocate slaveRequest)
     {
@@ -326,9 +318,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         return response;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#slaveRelease(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveRelease)
-     */
     @Override
     public SlaveReleaseResponse slaveRelease(final SlaveRelease slaveRequest)
     {
@@ -378,10 +367,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         
         return response;
     }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#notify(Notify)
-     */
+
     @Override
     public NotifyResponse notify(final Notify notify)
     {
@@ -430,10 +416,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
 
         return response;
     }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#performBatchControl(PerformBatchControl)
-     */
+
     @Override
     public PerformBatchControlResponse performBatchControl(final PerformBatchControl batchRequest)
     {
@@ -625,10 +608,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         
         return response;
     }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#abortBatchControl(AbortBatchControl)
-     */
+
     @Override
     public AbortBatchControlResponse abortBatchControl(final AbortBatchControl abortRequest)
     {
@@ -682,10 +662,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         return response;
     }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getBatchControlStatus(GetBatchControlStatus)
-     */
+
     @Override
     public GetBatchControlStatusResponse getBatchControlStatus(final GetBatchControlStatus statusRequest)
     {
@@ -754,9 +731,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         return response;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#performPrimitiveControl(PerformPrimitiveControl)
-     */
     @Override
     public PerformPrimitiveControlResponse performPrimitiveControl(final PerformPrimitiveControl primRequest)
     {
@@ -846,9 +820,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         return response;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getAttribute(GetAttribute)
-     */
     @Override
     public GetAttributeResponse getAttribute(final GetAttribute attrRequest)
     {
@@ -896,9 +867,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         return response;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getStatus(GetStatus)
-     */
     @Override
     public GetStatusResponse getStatus(final GetStatus statusRequest)
     {
@@ -946,9 +914,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         return statusResponse;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#setMaintenance(SetMaintenance)
-     */
     @Override
     public SetMaintenanceResponse setMaintenance(final SetMaintenance maintenRequest)
     {
@@ -992,9 +957,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         return response;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#setTestInterval(SetTestInterval)
-     */
     @Override
     public SetTestIntervalResponse setTestInterval(final SetTestInterval interRequest)
     {
@@ -1035,9 +997,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         return response;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#isActivityDetectable(IsActivityDetectable)
-     */
     @Override
     public IsActivityDetectableResponse isActivityDetectable(final IsActivityDetectable detectRequest)
     {
@@ -1053,21 +1012,28 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     }
 
     /**
-     * If the source is the requested scheduling server.
+     * If the source is the scheduling server that is currently registered.
      * 
      * @param identTok identity token of requestor
-     * @return
+     * @return true if the token is that provided by the scheduling server
      */
     private boolean isSourceAuthenticated(final String identTok)
     {
-        if (identTok == null)
+        String toks[] = StatusUpdater.getServerIdentityTokens();
+        
+        /* The normal case of the scheduling server identification. */
+        if ((toks[0] != null && toks[0].equals(identTok)) ||   // The currently registered identity token
+                (toks[1] != null && toks[1].equals(identTok))) // The token previously registered
         {
-            return false;
+            return true;
         }
         
-        // TODO Authentication implementation
-        if ("abc123".equals(identTok))
+        /* If not registered, accept messages from all. */
+        if (!StatusUpdater.isRegistered())
         {
+            this.logger.info("Authenticated message because the rig client is not registered with a scheduling " +
+            		"server. Be wary using this, it may leave the rig client in an inconsistent state when " +
+            		"registered when the rig client does register.");
             return true;
         }
         
