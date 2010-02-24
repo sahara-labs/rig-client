@@ -158,6 +158,10 @@ public class RigClientServiceTester extends TestCase
         String toks[] = (String[])f.get(null);
         toks[0] = "abc123";
         
+        f = StatusUpdater.class.getDeclaredField("isRegistered");
+        f.setAccessible(true);
+        f.setBoolean(null, true);
+        
         
         this.rig = RigFactory.getRigInstance();
         this.service = new RigClientService();
