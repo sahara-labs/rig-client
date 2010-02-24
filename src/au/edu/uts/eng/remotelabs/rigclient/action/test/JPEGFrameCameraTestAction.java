@@ -151,13 +151,11 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
     @Override
     public void setUp()
     {
-        String cnf;
-        
-        cnf = this.config.getProperty("Camera_Test_Fail_Threshold", "3");
+        String cnf = this.config.getProperty("Camera_Test_Fail_Threshold", "3");
         try
         {
             this.failThreshold = Integer.parseInt(cnf);
-            this.logger.debug("Camera test fail threshold is " + this.failThreshold + ".");
+            this.logger.info("Camera test fail threshold is " + this.failThreshold + '.');
         }
         catch (NumberFormatException ex)
         {
@@ -216,7 +214,7 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
         try
         {
             this.maxUniqFrames = Integer.parseInt(cnf);
-            this.logger.info("The maximum number of unique frames is " + this.maxUniqFrames + ".");
+            this.logger.info("The maximum number of unique frames is " + this.maxUniqFrames + '.');
             this.maxUniqFrames += 1;
         }
         catch (NumberFormatException ex)
@@ -242,7 +240,7 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
             }
             catch (NoSuchAlgorithmException e)
             {
-                this.logger.error("BUG: Using an invalid hash type in camera test. Please fill a bug report.");
+                this.logger.fatal("BUG: Using an invalid hash type in camera test. Please fill a bug report.");
                 throw new IllegalStateException("Unknown camera frame hash has type.");
             }
             ++c;

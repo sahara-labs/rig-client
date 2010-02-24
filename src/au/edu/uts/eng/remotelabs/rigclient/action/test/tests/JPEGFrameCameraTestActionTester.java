@@ -300,8 +300,6 @@ public class JPEGFrameCameraTestActionTester extends TestCase
         assertNotNull(cam);
         assertEquals(0, cam.getFails());
         
-        
-        
         hashes = cam.getFrameHashes();
         assertEquals(4, hashes.length);
         
