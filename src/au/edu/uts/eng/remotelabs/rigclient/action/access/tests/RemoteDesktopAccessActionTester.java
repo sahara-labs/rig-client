@@ -200,12 +200,78 @@ public class RemoteDesktopAccessActionTester extends TestCase
     /**
      * Test method for
      * {@link au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction#revoke(java.lang.String)}.
+     * @throws Exception 
      */
-    public void testRevoke()
+    public void testRevoke() throws Exception
     {
-        Assert.fail("Not yet implemented");
-    }
+        final List<String> comm = new ArrayList<String>();
+        comm.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
+        comm.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
+        comm.add(RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
+        final String name = "tmachet";
+        final String os = System.getProperty("os.name");
 
+        if (os.startsWith("Windows"))
+        {
+            Method me = RemoteDesktopAccessAction.class.getDeclaredMethod(
+                    "executeCommand", List.class);
+            me.setAccessible(true);
+            Process proc = (Process) me.invoke(this.action, comm);
+            Assert.assertNotNull(proc);
+
+            me = RemoteDesktopAccessAction.class.getDeclaredMethod(
+                    "isUserInGroup", Process.class, String.class);
+            me.setAccessible(true);
+            Boolean result = (Boolean) me.invoke(this.action, proc, name);
+            Assert.assertFalse(result);
+
+            comm.add("/ADD");
+            comm.add(name);
+            me = RemoteDesktopAccessAction.class.getDeclaredMethod(
+                    "executeCommand", List.class);
+            me.setAccessible(true);
+            final Process procAdd = (Process) me.invoke(this.action, comm);
+            Assert.assertNotNull(procAdd);
+
+            comm.remove(name);
+            comm.remove("/ADD");
+            me = RemoteDesktopAccessAction.class.getDeclaredMethod(
+                    "executeCommand", List.class);
+            me.setAccessible(true);
+            proc = (Process) me.invoke(this.action, comm);
+            Assert.assertNotNull(proc);
+
+            me = RemoteDesktopAccessAction.class.getDeclaredMethod(
+                    "isUserInGroup", Process.class, String.class);
+            me.setAccessible(true);
+            result = (Boolean) me.invoke(this.action, proc, name);
+            Assert.assertTrue(result);
+
+            comm.add("/DELETE");
+            comm.add(name);
+            me = RemoteDesktopAccessAction.class.getDeclaredMethod(
+                    "executeCommand", List.class);
+            me.setAccessible(true);
+            final Process procDel = (Process) me.invoke(this.action, comm);
+            Assert.assertNotNull(procDel);
+
+            comm.remove(name);
+            comm.remove("/DELETE");
+            me = RemoteDesktopAccessAction.class.getDeclaredMethod(
+                    "executeCommand", List.class);
+            me.setAccessible(true);
+            proc = (Process) me.invoke(this.action, comm);
+            Assert.assertNotNull(proc);
+
+            me = RemoteDesktopAccessAction.class.getDeclaredMethod(
+                    "isUserInGroup", Process.class, String.class);
+            me.setAccessible(true);
+            result = (Boolean) me.invoke(this.action, proc, name);
+            Assert.assertFalse(result);
+        }
+
+    }
+    
     /**
      * Test method for
      * {@link au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction#getActionType()}.

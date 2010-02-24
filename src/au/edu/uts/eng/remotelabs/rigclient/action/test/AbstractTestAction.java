@@ -265,7 +265,7 @@ public abstract class AbstractTestAction implements ITestAction
         int currentHour = cal.get(Calendar.HOUR_OF_DAY);
         int currentMin = cal.get(Calendar.MINUTE);
         
-        /* Whether the dark time is earlier than the light time. */
+        /* Whether the dark time is later than the light time. */
         if (this.darkTime[0] > this.lightTime[0] || 
                 (this.darkTime[0] == this.lightTime[0] && this.darkTime[1] > this.lightTime[1]))
         {

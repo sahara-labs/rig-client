@@ -61,12 +61,15 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * This action only works for Windows, on other platforms a {@link IllegalStateException} will be thrown on
  * construction.
  * <p>
+ * Note that the implementation assumes that the "net" command is in the PATH.
+ * <p>
  * The configuration properties for RemoteDesktopAccessAction are:
  * <ul>
- * <li><tt>Remote_Desktop_Windows_Domain</tt> - specifies the Windows/ Samba domain the user is part of (i.e their name
- * is '\\&lt;Windows_Domain&gt;\&lt;name&gt;') Access is granted with the <code>assign</code> method that adds users to
- * the user group if they do not exist there yet. Access is revoked with the <code>revoke</code> method that removes the
- * user from the group
+ *   <li><tt>Remote_Desktop_Windows_Domain</tt> - specifies the Win NT4 domain the user is part of (i.e their name is
+ *      '\\&lt;Windows_Domain&gt;\&lt;name&gt;') Access is granted with the <code>assign</code> method that adds users to the
+ *      user group if they do not exist there yet. Access is revoked with the <code>revoke</code> method that removes the
+ *      user from the group.</li>
+ * </ul>
  */
 public class RemoteDesktopAccessAction implements IAccessAction
 {
@@ -98,17 +101,22 @@ public class RemoteDesktopAccessAction implements IAccessAction
         this.logger = LoggerFactory.getLoggerInstance();
 
         /* RDP access only valid for Windows - check that the OS is windows */
-        if (os.startsWith("Windows"))
+        if ("Windows".equals(os.substring(0, 6)))
         {
             /* Get domain if it is configured */
-            this.domainName = ConfigFactory.getInstance().getProperty(
-                    "Remote_Desktop_Windows_Domain");
+            if (ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain").equals(""))
+            {
+                this.domainName =  null;
+            }
+            else
+            {
+                this.domainName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain", null);
+                this.logger.info("The Remote Desktopp Windows Domain has been set to " + this.domainName + '.');
+            }
         }
         else
         {
-            throw new IllegalStateException(
-                    "Remote Desktop Action is only valid for WINDOWS platforms not "
-                            + os);
+            throw new IllegalStateException("Remote Desktop Action is only valid for WINDOWS platforms not " + os);
         }
     }
 
@@ -133,9 +141,11 @@ public class RemoteDesktopAccessAction implements IAccessAction
 
             command.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
             command.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
-            command.add(ConfigFactory.getInstance().getProperty(
-                    "Remote_Desktop_Groupname",
-                    RemoteDesktopAccessAction.DEFAULT_GROUPNAME));
+            String groupName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Groupname",
+                    RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
+            //TODO add check for quotes
+            command.add(groupName);
+            
 
             try
             {
@@ -163,12 +173,14 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     proc = this.executeCommand(command);
                     this.cleanup(proc);
 
-                    /* --------------------------------------------------------------------
+                    /*
+                     * --------------------------------------------------------------------
                      * 3. Check whether user is in RDP user group
                      * a. sets up net process
                      * b. executes process
                      * c. check output to see whether user is in the group
-                     * --------------------------------------------------------------------*/
+                     * --------------------------------------------------------------------
+                     */
                     command.remove(name);
                     if (this.domainName != null)
                     {
@@ -183,9 +195,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     if (!this.isUserInGroup(proc, name))
                     {
                         this.cleanup(proc);
-                        this.logger
-                                .info("User could not be successfully added to the group "
-                                        + command.toString());
+                        this.logger.info("User could not be successfully added to the group " + command.toString());
                         return false;
                     }
                 }
@@ -193,8 +203,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
             }
             catch (final Exception e)
             {
-                this.logger.info("Executing command " + command.toString()
-                        + " failed with error " + e.getMessage());
+                this.logger.info("Executing command " + command.toString() + " failed with error " + e.getMessage());
                 return false;
             }
             return true;
@@ -225,15 +234,16 @@ public class RemoteDesktopAccessAction implements IAccessAction
             {
                 proc = this.executeCommand(command);
                 final InputStream is = proc.getInputStream();
-                final BufferedReader br = new BufferedReader(
-                        new InputStreamReader(is));
+                final BufferedReader br = new BufferedReader(new InputStreamReader(is));
                 String line = null;
 
-                /* --------------------------------------------------------------------
+                /*
+                 * --------------------------------------------------------------------
                  * c. Check user session exists using qwinsta output
                  * d. for each session, set up process for log-off
                  * e. execute log-off process
-                 * --------------------------------------------------------------------*/
+                 * --------------------------------------------------------------------
+                 */
                 while (br.ready() && (line = br.readLine()) != null)
                 {
                     if (line.contains(name))
@@ -248,8 +258,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
                         procLogoff = this.executeCommand(logoffCommand);
                         if (procLogoff.exitValue() != 0)
                         {
-                            this.logger.warn("Log off for user " + name
-                                    + " returned an unexpected result.");
+                            this.logger.warn("Log off for user " + name + " returned an unexpected result.");
                             return false;
                         }
                         this.cleanup(procLogoff);
@@ -267,19 +276,20 @@ public class RemoteDesktopAccessAction implements IAccessAction
                 final List<String> checkCommand = new ArrayList<String>();
                 checkCommand.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
                 checkCommand.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
-                checkCommand.add(ConfigFactory.getInstance().getProperty(
-                        "Remote_Desktop_Groupname",
+                checkCommand.add(ConfigFactory.getInstance().getProperty("Remote_Desktop_Groupname",
                         RemoteDesktopAccessAction.DEFAULT_GROUPNAME));
 
                 Process procCheck = this.executeCommand(checkCommand);
                 if (this.isUserInGroup(procCheck, name))
                 {
                     this.cleanup(procCheck);
-                    /* --------------------------------------------------------------------
+                    /*
+                     * --------------------------------------------------------------------
                      * 3. If yes, remove user from group
                      * a. sets up net delete process
                      * b. executes process
-                     * --------------------------------------------------------------------*/
+                     * --------------------------------------------------------------------
+                     */
                     checkCommand.add("/DELETE");
                     checkCommand.add(name);
                     procCheck = this.executeCommand(checkCommand);
@@ -291,9 +301,8 @@ public class RemoteDesktopAccessAction implements IAccessAction
             }
             catch (final Exception e)
             {
-                this.logger.warn("Revoke action failed with exception of type "
-                        + e.getClass().getName() + " and with " + "message "
-                        + e.getMessage() + ".");
+                this.logger.warn("Revoke action failed with exception of type " + e.getClass().getName() + " and with "
+                        + "message " + e.getMessage() + ".");
             }
         }
         return true;
@@ -331,12 +340,10 @@ public class RemoteDesktopAccessAction implements IAccessAction
         //*Check that the command was passed */
         if (command == null)
         {
-            this.logger
-                    .warn("No command file has been specified for the access action.  Access action failed.");
+            this.logger.warn("No command file has been specified for the access action.  Access action failed.");
             throw new Exception("No command to exectue!");
         }
-        this.logger.debug("Access action commands and arguments are "
-                + command.toString());
+        this.logger.debug("Access action commands and arguments are " + command.toString());
 
         final ProcessBuilder builder = new ProcessBuilder(command);
         final File workingDir = new File(System.getProperty("java.io.tmpdir"));
@@ -362,8 +369,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
      * @return true if user is in group
      * @throws IOException
      */
-    private boolean isUserInGroup(final Process proc, final String name)
-            throws IOException
+    private boolean isUserInGroup(final Process proc, final String name) throws IOException
     {
         final InputStream is = proc.getInputStream();
         final BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -404,8 +410,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
         }
         catch (final IOException ex)
         {
-            this.logger.warn("Failed to clean a process because of error "
-                    + ex.getMessage());
+            this.logger.warn("Failed to clean a process because of error " + ex.getMessage());
         }
     }
 }
