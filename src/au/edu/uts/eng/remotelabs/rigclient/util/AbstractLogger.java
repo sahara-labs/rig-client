@@ -43,6 +43,9 @@ package au.edu.uts.eng.remotelabs.rigclient.util;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.varia.NullAppender;
+
 /**
  * Abstract logger, fills in some boilerplate code.
  */
@@ -65,6 +68,9 @@ abstract class AbstractLogger implements ILogger
         this.logLevel = LoggerFactory.getLoggingLevel();
         this.formatStrings = LoggerFactory.getFormatStrings();
         this.formatter = new LogFormatter();
+        
+        /* Set up log4j loggers. */
+        Logger.getRootLogger().addAppender(new NullAppender());
      }
 
     @Override

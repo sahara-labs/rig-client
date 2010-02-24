@@ -50,12 +50,11 @@ import org.apache.log4j.Logger;
 */
 abstract class AbstractLog4JLogger extends AbstractLogger
 {
-   /**
-     * 
-     */
+    /** Logger to just print the specified message. */
     protected static final String PATTERN_LAYOUT = "%m%n";
-/** Log4j logger. */
-   protected Logger logger;
+    
+    /** Log4j logger. */
+    protected Logger logger;
    
    /**
     * Constructor.
@@ -64,25 +63,25 @@ abstract class AbstractLog4JLogger extends AbstractLogger
     */
    public AbstractLog4JLogger() 
    {
+       super();
        this.logger = Logger.getLogger("ISG Client");
 
-       // Logging level
        switch(LoggerFactory.getLoggingLevel())
        {
-       case ILogger.DEBUG:
-           this.logger.setLevel(Level.DEBUG);
-           break;
-       case ILogger.INFO:
-           this.logger.setLevel(Level.INFO);
-           break;
-       case ILogger.WARN:
-           this.logger.setLevel(Level.WARN);
-           break;
-       case ILogger.ERROR:
-           this.logger.setLevel(Level.ERROR);
-           break;
-       default:
-           this.logger.setLevel(Level.INFO);
+           case ILogger.DEBUG:
+               this.logger.setLevel(Level.DEBUG);
+               break;
+           case ILogger.INFO:
+               this.logger.setLevel(Level.INFO);
+               break;
+           case ILogger.WARN:
+               this.logger.setLevel(Level.WARN);
+               break;
+           case ILogger.ERROR:
+               this.logger.setLevel(Level.ERROR);
+               break;
+           default:
+               this.logger.setLevel(Level.INFO);
        }   
        
        this.setAppeneder();
