@@ -95,7 +95,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
         this.logger = LoggerFactory.getLoggerInstance();
 
         /* RDP access only valid for Windows - check that the OS is windows */
-        if (os.length() > 6)
+        if (os.length() > 7)
         {
             if ("Windows".equals(os.substring(0,7)))
             {
