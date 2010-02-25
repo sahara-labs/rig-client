@@ -95,23 +95,30 @@ public class RemoteDesktopAccessAction implements IAccessAction
         this.logger = LoggerFactory.getLoggerInstance();
 
         /* RDP access only valid for Windows - check that the OS is windows */
-        if ("Windows".equals(os.substring(0,7)))
+        if (os.length() > 6)
         {
-            /* Get domain if it is configured */
-            if (ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain","").equals(""))
+            if ("Windows".equals(os.substring(0,7)))
             {
-                this.domainName = null;
+                /* Get domain if it is configured */
+                if (ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain","").equals(""))
+                {
+                    this.domainName = null;
+                }
+                else
+                {
+                    this.domainName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain");
+                }
+                this.logger.info("The Remote Desktop Windows Domain has been set to " + this.domainName
+                        + " for the Remote Desktop Access Action.");
             }
             else
             {
-                this.domainName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain");
+                throw new IllegalStateException("Remote Desktop Action is only valid for a WINDOWS platforms not " + os);
             }
-            this.logger.info("The Remote Desktop Windows Domain has been set to " + this.domainName
-                    + " for the Remote Desktop Access Action.");
         }
         else
         {
-            throw new IllegalStateException("Remote Desktop Action is only valid for a WINDOWS platforms not " + os);
+            this.domainName = null;
         }
     }
 
