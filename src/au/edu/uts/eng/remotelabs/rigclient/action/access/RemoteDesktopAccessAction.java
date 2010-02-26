@@ -133,16 +133,18 @@ public class RemoteDesktopAccessAction implements IAccessAction
             commandBase.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
             final String groupName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Groupname",
                     RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
-            final Character f = groupName.charAt(0);
-            if (f.equals('"'))
+            if (groupName.charAt(0) == '"' && groupName.charAt(groupName.length()) == '"')
             {
                 commandBase.add(groupName);
             }
-            else
+            else if (groupName.charAt(0) == '"')
             {
-                commandBase.add('"' + groupName + '"');
+                commandBase.add('"' + groupName);
             }
-
+            else if (groupName.charAt(groupName.length()) == '"')
+            {
+                commandBase.add(groupName + '"');
+            }
             try
             {
                 Process proc = this.executeCommand(commandBase);
