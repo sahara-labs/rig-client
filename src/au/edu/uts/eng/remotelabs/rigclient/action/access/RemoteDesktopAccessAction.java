@@ -91,34 +91,26 @@ public class RemoteDesktopAccessAction implements IAccessAction
      */
     public RemoteDesktopAccessAction()
     {
-        final String os = System.getProperty("os.name");
         this.logger = LoggerFactory.getLoggerInstance();
 
         /* RDP access only valid for Windows - check that the OS is windows */
-        if (os.length() > 7)
+        if (System.getProperty("os.name").startsWith("Windows"))
         {
-            if ("Windows".equals(os.substring(0,7)))
+            /* Get domain if it is configured */
+            if (ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain","").equals(""))
             {
-                /* Get domain if it is configured */
-                if (ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain","").equals(""))
-                {
-                    this.domainName = null;
-                }
-                else
-                {
-                    this.domainName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain");
-                }
-                this.logger.info("The Remote Desktop Windows Domain has been set to " + this.domainName
-                        + " for the Remote Desktop Access Action.");
+                this.domainName = null;
             }
             else
             {
-                throw new IllegalStateException("Remote Desktop Action is only valid for a WINDOWS platforms not " + os);
+                this.domainName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Windows_Domain");
             }
+            this.logger.info("The Remote Desktop Windows Domain has been set to " + this.domainName
+                    + " for the Remote Desktop Access Action.");
         }
         else
         {
-            this.domainName = null;
+            throw new IllegalStateException("Remote Desktop Action is only valid for a WINDOWS platforms not " + System.getProperty("os.name"));
         }
     }
 
@@ -173,12 +165,9 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     commandAdd.add("/ADD");
                     if (this.domainName != null)
                     {
-                        commandAdd.add(this.domainName + '\\');
+                        commandAdd.add("/DOMAIN " + this.domainName);
                     }
-                    else
-                    {
-                        commandAdd.add(name);
-                    }
+                    commandAdd.add(name);
                     this.logger.debug("The command to be executed to add a user to the Remote Desktop Users group is "
                             + commandAdd.toString());
 
@@ -300,12 +289,10 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     commandDelete.add("/DELETE");
                     if (this.domainName != null)
                     {
-                        commandDelete.add(this.domainName + "\\");
+                        commandDelete.add("/DOMAIN " + this.domainName);
                     }
-                    else
-                    {
-                        commandDelete.add(name);
-                    }
+                    commandDelete.add(name);
+
                     if (procCheck.exitValue() != 0)
                     {
                         return false;
