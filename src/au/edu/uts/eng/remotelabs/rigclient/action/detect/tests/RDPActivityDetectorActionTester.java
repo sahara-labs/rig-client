@@ -33,24 +33,24 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @author Tania Machet(tmachet)
- * @date 26th February 2010
+ * @author <First> <Last> (tmachet)
+ * @date <Day> <Month> 2010
  *
  * Changelog:
- * - 26/02/2010 - tmachet - Initial file creation.
+ * - 01/03/2010 - tmachet - Initial file creation.
  */
-package au.edu.uts.eng.remotelabs.rigclient.action.notify.test;
-
-import static org.easymock.EasyMock.reset;
+package au.edu.uts.eng.remotelabs.rigclient.action.detect.tests;
 
 import java.lang.reflect.Field;
 
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction;
-import au.edu.uts.eng.remotelabs.rigclient.action.notify.WindowsMsgNotifyAction;
+import au.edu.uts.eng.remotelabs.rigclient.action.detect.RDPActivityDetectorAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
@@ -59,19 +59,21 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * @author tmachet
  *
  */
-public class WindowsMsgNotifyActionTester extends TestCase
+public class RDPActivityDetectorActionTester extends TestCase
 {
+
     /** Object of class under test. */
-    private WindowsMsgNotifyAction notification;
+    private RDPActivityDetectorAction RDPDetect;
 
     /** Mock configuration class. */
     private IConfig mockConfig;
     
-    /* (non-Javadoc)
-     * @see junit.framework.TestCase#setUp()
+/**
+     * @throws java.lang.Exception
      */
     @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
         this.mockConfig = EasyMock.createMock(IConfig.class);
         EasyMock.expect(this.mockConfig.getProperty("Logger_Type")).andReturn("SystemErr");
@@ -91,53 +93,36 @@ public class WindowsMsgNotifyActionTester extends TestCase
         configField.set(null, this.mockConfig);
 
         LoggerFactory.getLoggerInstance();
-        this.notification = new WindowsMsgNotifyAction();
-    }
+        this.RDPDetect = new RDPActivityDetectorAction();
+}
 
-    /* (non-Javadoc)
-     * @see junit.framework.TestCase#tearDown()
+    /**
+     * @throws java.lang.Exception
      */
-    protected void tearDown() throws Exception
+    @Override
+    @After
+    public void tearDown() throws Exception
     {
         super.tearDown();
     }
 
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.notify.WindowsMsgNotifyAction#notify(java.lang.String, java.lang.String[])}.
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.detect.RDPActivityDetectorAction#detectActivity()}.
      */
-    public void testNotifyStringStringArray()
+    @Test
+    public void testDetectActivity()
     {
-        String message = "Testing";
-        String users[] = new String[] {"tmachet"};
-        
-        Boolean result = this.notification.notify(message, users);
-        assertTrue(result);
-    }
-
-    public void testNotifyStringStringArrayMultipleNames()
-    {
-        String message = "Testing";
-        String users[] = new String[] {"tmachet","tmachet"};
-        
-        Boolean result = this.notification.notify(message, users);
+        Boolean result = this.RDPDetect.detectActivity();
         assertTrue(result);
     }
 
     /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.notify.WindowsMsgNotifyAction#getActionType()}.
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.detect.RDPActivityDetectorAction#getActionType()}.
      */
+    @Test
     public void testGetActionType()
     {
-        String out = this.notification.getActionType();
-        assertEquals(out,"Windows Message Notification Action");
+        String result = RDPDetect.getActionType();
+        assertEquals(result,"RDP Activity Detector Action");
     }
-
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.action.notify.WindowsMsgNotifyAction#getFailureReason()}.
-     */
-    public void testGetFailureReason()
-    {
-        fail("Not yet implemented");
-    }
-
 }

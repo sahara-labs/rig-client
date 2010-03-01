@@ -41,32 +41,24 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.notify;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.INotifyAction;
-import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
- * This class allows notification to be sent to users for Windows (XP, NT, 2000, 2003
- * Me, 98 and 95). The notification is sent using the <code>net send</code> command.
+ * This class allows notification to be sent to users for Windows Users.
+ * The notification is sent using the <code>msg</code> command.
  * The implementation assumes that the messenger service is enabled on the computer.
  * <p>
- * This notification action does not work for Windows Vista.  
- * <p>
  * @author tmachet
- *
  */
 public class WindowsMsgNotifyAction implements INotifyAction
 {
     /** Default command for changing user groups for windows */
-    public static final String DEFAULT_COMMAND = "net";
-
-    /** Default command for changing user groups for windows */
-    public static final String DEFAULT_ACTION = "send";
+    public static final String DEFAULT_COMMAND = "msg";
 
     /** Default user group for remote desktop access. */
     private String failureReason;
@@ -82,7 +74,7 @@ public class WindowsMsgNotifyAction implements INotifyAction
         this.logger = LoggerFactory.getLoggerInstance();
 
         /* Windows notification only valid for windows and not for Vista */
-        if (System.getProperty("os.name").startsWith("Windows") && !System.getProperty("os.name").contains("Vista"))
+        if (System.getProperty("os.name").startsWith("Windows"))
         {
             this.logger.info("Preparing to send notification.");
         }
@@ -97,42 +89,38 @@ public class WindowsMsgNotifyAction implements INotifyAction
     {
         synchronized (this)
         {
-            Boolean hasSucceeded = true;
-            final List<String> command = new ArrayList<String>();
-
+            ProcessBuilder builder = new ProcessBuilder();
+            List<String> command = builder.command();
             command.add(WindowsMsgNotifyAction.DEFAULT_COMMAND);
-            command.add(WindowsMsgNotifyAction.DEFAULT_ACTION);
-            
-            for (String us : users)
-            {
-                try
-                {
-                    List<String> commandNotify = command;
-                    commandNotify.add(us);
-                    commandNotify.add(message);
-                    
-                    this.logger.debug("Command to be executed is " + commandNotify.toString());
 
-                    ProcessBuilder builder = new ProcessBuilder(commandNotify);
+            try
+            {
+                for (String us : users)
+                {
+                    command.add(us);
+                    command.add(message);
+                    
+                    this.logger.debug("Command to be executed is " + command.toString());
                     int result = builder.start().waitFor();
                     
                     if (result != 0)
                     {
-                        hasSucceeded = false;
-                        this.failureReason = "Unable to send Windows notification " + message + " to all users";
-                        this.logger.info("Attempt to send notification message " + message + " to the user " 
-                                + us + "failed with error code " + result + '.');
+                        this.logger.debug("Attempt to send notification message " + message + " to the user " 
+                                + us + " failed with error code " + result + '.');
                     }
+
+                    command.remove(message);
+                    command.remove(us);
                 }
-                catch (final Exception e)
-                {
-                    this.failureReason = "Unable to send Windows notification " + message + " to all users";
-                    this.logger.info("Attempt to send notification meassage " + message + " to the user " 
-                            + us + "failed with error " + e.getMessage() + '.');
-                    hasSucceeded = false;
-                }
+                return true;
             }
-            return hasSucceeded;
+            catch (final Exception e)
+            {
+                this.failureReason = "Unable to send Windows notification " + message + " to all users";
+                this.logger.info("Attempt to send notification meassage " + message + " to the users " 
+                        + Arrays.toString(users) + " failed with error " + e.getMessage() + '.');
+                return false;
+            }
         }
     }
 
