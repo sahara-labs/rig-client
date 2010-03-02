@@ -88,6 +88,7 @@ public class RDPActivityDetectorAction implements IActivityDetectorAction
         }
         else
         {
+            this.failureReason = "RDP Activity Detector is valid only for WINDOWS platforms";
             throw new IllegalStateException("RDP Activity Detector Action is only valid for a WINDOWS platforms not " + System.getProperty("os.name"));
         }
     }
@@ -127,29 +128,22 @@ public class RDPActivityDetectorAction implements IActivityDetectorAction
         }
         catch (Exception e)
         {
+            this.failureReason = "RDP Activity Detector could not check status";
             this.logger.error("The RDP Activity Detector failed with exception " + e.getMessage());
             return isActive;
         }
     }
 
-    /* (non-Javadoc)
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAction#getActionType()
-     */
     @Override
     public String getActionType()
     {
-        // TODO Auto-generated method stub
         return "RDP Activity Detector Action";
     }
 
-    /* (non-Javadoc)
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAction#getFailureReason()
-     */
     @Override
     public String getFailureReason()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return this.failureReason;
     }
 
 }

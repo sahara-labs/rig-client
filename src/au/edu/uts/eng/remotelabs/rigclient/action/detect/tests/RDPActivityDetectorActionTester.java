@@ -122,7 +122,7 @@ public class RDPActivityDetectorActionTester extends TestCase
     @Test
     public void testGetActionType()
     {
-        String result = RDPDetect.getActionType();
+        String result = this.RDPDetect.getActionType();
         assertEquals(result,"RDP Activity Detector Action");
     }
 }
