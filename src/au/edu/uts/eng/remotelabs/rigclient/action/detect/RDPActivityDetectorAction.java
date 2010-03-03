@@ -60,8 +60,6 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * <p>
  * This command is only valid for Windows systems
  * <p>
- * @author tmachet
- *
  */
 public class RDPActivityDetectorAction implements IActivityDetectorAction
 {
@@ -88,8 +86,11 @@ public class RDPActivityDetectorAction implements IActivityDetectorAction
         }
         else
         {
-            this.failureReason = "RDP Activity Detector is valid only for WINDOWS platforms";
-            throw new IllegalStateException("RDP Activity Detector Action is only valid for a WINDOWS platforms not " + System.getProperty("os.name"));
+            this.logger.error("Unable to instantiate the Remote Desktop Activity Detector Action (" 
+                    + this.getClass().getName() + ") becuase the detected platform is not Windows. Detected platform is '"
+                    + System.getProperty("os.name") + "'.");
+            throw new IllegalStateException("RDP Activity Detector Action is only valid for a WINDOWS platforms not " 
+                    + System.getProperty("os.name") + '.');
         }
     }
 
@@ -98,9 +99,7 @@ public class RDPActivityDetectorAction implements IActivityDetectorAction
     {
         Boolean isActive = false;
         try{
-            ProcessBuilder builder = new ProcessBuilder();
-            List<String> command = builder.command();
-            command.add(RDPActivityDetectorAction.DEFAULT_COMMAND);
+            ProcessBuilder builder = new ProcessBuilder(RDPActivityDetectorAction.DEFAULT_COMMAND);
             Process proc = builder.start();
     
             if (proc.waitFor() != 0)
@@ -129,7 +128,7 @@ public class RDPActivityDetectorAction implements IActivityDetectorAction
         catch (Exception e)
         {
             this.failureReason = "RDP Activity Detector could not check status";
-            this.logger.error("The RDP Activity Detector failed with exception " + e.getMessage());
+            this.logger.error("The RDP Activity Detector failed with exception " + e.getMessage() + '.');
             return isActive;
         }
     }

@@ -76,11 +76,15 @@ public class WindowsMsgNotifyAction implements INotifyAction
         /* Windows notification only valid for windows and not for Vista */
         if (System.getProperty("os.name").startsWith("Windows"))
         {
-            this.logger.info("Preparing to send notification.");
+            this.logger.debug("Preparing to send notification.");
         }
         else
         {
-            throw new IllegalStateException("Windows Message Notify Action is only valid for a WINDOWS platforms not " + System.getProperty("os.name"));
+            this.logger.error("Unable to instantiate the Windows Message Notify Action (" + this.getClass().getName() 
+                    + ") becuase the detected platform is not Windows. Detected platform is '" + 
+                    System.getProperty("os.name") + "'.");
+            throw new IllegalStateException("Windows Message Notify Action is only valid for a WINDOWS platforms not " 
+                    + System.getProperty("os.name") + '.');
         }
     }
 

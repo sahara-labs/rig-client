@@ -112,7 +112,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
         }
         else
         {
-	    this.logger.error("Unable to instantiate the Remote Desktop Action (" + this.getClass().getName() + 
+            this.logger.error("Unable to instantiate the Remote Desktop Action (" + this.getClass().getName() + 
                     ") becuase the detected platform is not Windows. Detected platform is '" + 
                     System.getProperty("os.name") + "'.");
             throw new IllegalStateException("Remote Desktop Action is only valid for a WINDOWS platforms not " + System.getProperty("os.name"));
