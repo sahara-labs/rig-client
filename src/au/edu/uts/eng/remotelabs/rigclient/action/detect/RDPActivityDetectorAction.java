@@ -97,7 +97,7 @@ public class RDPActivityDetectorAction implements IActivityDetectorAction
     @Override
     public boolean detectActivity()
     {
-        Boolean isActive = false;
+        boolean isActive = false;
         try{
             ProcessBuilder builder = new ProcessBuilder(RDPActivityDetectorAction.DEFAULT_COMMAND);
             Process proc = builder.start();

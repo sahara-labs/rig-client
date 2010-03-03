@@ -146,7 +146,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
             {
                 commandBase.add('"' + groupName);
             }
-            else if (groupName.charAt(groupName.length()) == '"')
+            else if (groupName.charAt(groupName.length()-1) == '"')
             {
                 commandBase.add(groupName + '"');
             }
