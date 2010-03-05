@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
@@ -138,18 +139,25 @@ public class RemoteDesktopAccessAction implements IAccessAction
             commandBase.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
             final String groupName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Groupname",
                     RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
-            if (groupName.charAt(0) == '"' && groupName.charAt(groupName.length()) == '"')
+            this.logger.debug("The group name read is " + groupName + '.');
+            if (groupName.charAt(0) == '"' && groupName.charAt(groupName.length()-1) == '"')
             {
                 commandBase.add(groupName);
             }
-            else if (groupName.charAt(0) == '"')
+            else if (groupName.charAt(0) != '"' && groupName.charAt(groupName.length()-1) == '"')
             {
                 commandBase.add('"' + groupName);
             }
-            else if (groupName.charAt(groupName.length()-1) == '"')
+            else if (groupName.charAt(0) == '"' && groupName.charAt(groupName.length()-1) != '"')
             {
                 commandBase.add(groupName + '"');
             }
+            else
+            {
+                commandBase.add('"' + groupName + '"');
+            }
+            this.logger.debug("The base command is " + commandBase.toString() + '.');
+
             try
             {
                 Process proc = this.executeCommand(commandBase);
@@ -202,7 +210,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
             catch (final Exception e)
             {
                 this.logger.info("Executing the command to add user " + name + " to the Remote Desktop users group " 
-                        + groupName + "failed with error " + e.getMessage() + '.');
+                        + groupName + " failed with error " + e.getMessage() + '.');
                 return false;
             }
         }
@@ -241,7 +249,8 @@ public class RemoteDesktopAccessAction implements IAccessAction
                 {
                     if (line.contains(name))
                     {
-                        final String qwinstaSplit[] = line.split("\\s");
+                        final String qwinstaSplit[] = line.split("\\s+");
+                        this.logger.debug("The split qwinsta command is: " + Arrays.toString(qwinstaSplit) + '.');
 
                         final List<String> logoffCommand = new ArrayList<String>();
                         logoffCommand.add("logoff");
@@ -271,15 +280,24 @@ public class RemoteDesktopAccessAction implements IAccessAction
                 commandBase.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
                 final String groupName = ConfigFactory.getInstance().getProperty("Remote_Desktop_Groupname",
                         RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
-                final Character f = groupName.charAt(0);
-                if (f.equals('"'))
+                this.logger.debug("The group name read is " + groupName + '.');
+                if (groupName.charAt(0) == '"' && groupName.charAt(groupName.length()-1) == '"')
                 {
                     commandBase.add(groupName);
+                }
+                else if (groupName.charAt(0) != '"' && groupName.charAt(groupName.length()-1) == '"')
+                {
+                    commandBase.add('"' + groupName);
+                }
+                else if (groupName.charAt(0) == '"' && groupName.charAt(groupName.length()-1) != '"')
+                {
+                    commandBase.add(groupName + '"');
                 }
                 else
                 {
                     commandBase.add('"' + groupName + '"');
                 }
+                this.logger.debug("The base command is " + commandBase.toString() + '.');
 
                 Process procCheck = this.executeCommand(commandBase);
                 if (this.isUserInGroup(procCheck, name))
