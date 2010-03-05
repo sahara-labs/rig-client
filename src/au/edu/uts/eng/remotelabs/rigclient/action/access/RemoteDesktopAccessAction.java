@@ -251,10 +251,20 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     {
                         final String qwinstaSplit[] = line.split("\\s+");
                         this.logger.debug("The split qwinsta command is: " + Arrays.toString(qwinstaSplit) + '.');
+                        String logoffID = null;
+                        
+                        for (int i=0; i<qwinstaSplit.length-1; i++)
+                        {
+                            if (qwinstaSplit[i].trim().equals(name))
+                            {
+                                logoffID = qwinstaSplit[i+1]; 
+                            }
+                        }
+                        if (logoffID == null) continue;
 
                         final List<String> logoffCommand = new ArrayList<String>();
                         logoffCommand.add("logoff");
-                        logoffCommand.add(qwinstaSplit[2]);
+                        logoffCommand.add(logoffID);
 
                         Process procLogoff;
                         procLogoff = this.executeCommand(logoffCommand);
