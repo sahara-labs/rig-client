@@ -317,7 +317,9 @@ public class RemoteDesktopAccessAction implements IAccessAction
                         commandDelete.add("/DOMAIN " + this.domainName);
                     }
                     commandDelete.add(name);
-
+                    
+                    procCheck = this.executeCommand(commandDelete);
+                    
                     if (procCheck.exitValue() != 0)
                     {
                         return false;
