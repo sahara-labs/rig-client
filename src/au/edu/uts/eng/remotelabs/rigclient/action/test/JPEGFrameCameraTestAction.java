@@ -398,6 +398,8 @@ public class JPEGFrameCameraTestAction extends AbstractTestAction
                 Thread.currentThread().interrupt();
             }
         }
+        
+        System.gc();
     }
 
     @Override
