@@ -50,6 +50,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.action.detect.RDPActivityDetectorAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
@@ -93,7 +94,15 @@ public class RDPActivityDetectorActionTester extends TestCase
         configField.set(null, this.mockConfig);
 
         LoggerFactory.getLoggerInstance();
-        this.RDPDetect = new RDPActivityDetectorAction();
+        final String os = System.getProperty("os.name");
+        if (os.startsWith("Windows"))
+        {
+            this.RDPDetect = new RDPActivityDetectorAction();
+        }
+        else
+        {
+            this.RDPDetect = null;
+        }
 }
 
     /**
@@ -112,8 +121,11 @@ public class RDPActivityDetectorActionTester extends TestCase
     @Test
     public void testDetectActivity()
     {
-        Boolean result = this.RDPDetect.detectActivity();
-        assertTrue(result);
+        if (this.RDPDetect != null)
+        {
+            Boolean result = this.RDPDetect.detectActivity();
+            assertTrue(result);
+        }
     }
 
     /**
@@ -122,7 +134,10 @@ public class RDPActivityDetectorActionTester extends TestCase
     @Test
     public void testGetActionType()
     {
-        String result = this.RDPDetect.getActionType();
-        assertEquals(result,"RDP Activity Detector Action");
+        if (this.RDPDetect != null)
+        {
+            String result = this.RDPDetect.getActionType();
+            assertEquals(result,"RDP Activity Detector Action");
+        }
     }
 }

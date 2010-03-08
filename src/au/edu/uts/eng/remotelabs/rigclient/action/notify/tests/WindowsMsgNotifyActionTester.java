@@ -47,6 +47,7 @@ import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
 
+import au.edu.uts.eng.remotelabs.rigclient.action.detect.RDPActivityDetectorAction;
 import au.edu.uts.eng.remotelabs.rigclient.action.notify.WindowsMsgNotifyAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
@@ -88,7 +89,15 @@ public class WindowsMsgNotifyActionTester extends TestCase
         configField.set(null, this.mockConfig);
 
         LoggerFactory.getLoggerInstance();
-        this.notification = new WindowsMsgNotifyAction();
+        final String os = System.getProperty("os.name");
+        if (os.startsWith("Windows"))
+        {
+            this.notification = new WindowsMsgNotifyAction();
+        }
+        else
+        {
+            this.notification = null;
+        }
     }
 
     /* (non-Javadoc)
@@ -105,20 +114,26 @@ public class WindowsMsgNotifyActionTester extends TestCase
      */
     public void testNotifyStringStringArray()
     {
-        String message = "Testing";
-        String users[] = new String[] {"tmachet"};
-        
-        Boolean result = this.notification.notify(message, users);
-        assertTrue(result);
+        if (this.notification != null)
+        {
+            String message = "Testing";
+            String users[] = new String[] {"tmachet"};
+            
+            Boolean result = this.notification.notify(message, users);
+            assertTrue(result);
+        }
     }
 
     public void testNotifyStringStringArrayMultipleNames()
     {
-        String message = "Testing 1";
-        String users[] = new String[] {"tmachet","tmachet"};
-        
-        Boolean result = this.notification.notify(message, users);
-        assertTrue(result);
+        if (this.notification != null)
+        {
+            String message = "Testing 1";
+            String users[] = new String[] {"tmachet","tmachet"};
+            
+            Boolean result = this.notification.notify(message, users);
+            assertTrue(result);
+        }
     }
 
     /**
@@ -126,8 +141,11 @@ public class WindowsMsgNotifyActionTester extends TestCase
      */
     public void testGetActionType()
     {
-        String out = this.notification.getActionType();
-        assertEquals(out,"Windows Message Notification Action");
+        if (this.notification != null)
+        {
+            String out = this.notification.getActionType();
+            assertEquals(out,"Windows Message Notification Action");
+        }
     }
 
     /**
@@ -135,7 +153,10 @@ public class WindowsMsgNotifyActionTester extends TestCase
      */
     public void testGetFailureReasonSuccess()
     {
-        String out = this.notification.getFailureReason();
-        assertNull(out);
+        if (this.notification != null)
+        {
+            String out = this.notification.getFailureReason();
+            assertNull(out);
+        }
     }
 }
