@@ -84,7 +84,16 @@ public class RemoteDesktopAccessActionTester extends TestCase
         configField.set(null, this.mockConfig);
 
         LoggerFactory.getLoggerInstance();
-        this.action = new RemoteDesktopAccessAction();
+        final String os = System.getProperty("os.name");
+        if (os.startsWith("Windows"))
+        {
+            this.action = new RemoteDesktopAccessAction();
+        }
+        else
+        {
+            this.action = null;
+        }
+            
     }
 
     /*
@@ -120,14 +129,17 @@ public class RemoteDesktopAccessActionTester extends TestCase
      */
     public void testRemoteDesktopAccessAction() throws Exception
     {
-        reset(this.mockConfig);
-        EasyMock.expect(this.mockConfig.getProperty("Remote_Desktop_Groupname","\"Remote Desktop Users\""))
-        .andReturn("Remote Desktop Users");
-        EasyMock.replay(this.mockConfig);
-        
-        Field f = RemoteDesktopAccessAction.class.getDeclaredField("domainName");
-        f.setAccessible(true);
-        assertNull(f.get(this.action));
+        if (this.action != null)
+        {
+            reset(this.mockConfig);
+            EasyMock.expect(this.mockConfig.getProperty("Remote_Desktop_Groupname","\"Remote Desktop Users\""))
+            .andReturn("Remote Desktop Users");
+            EasyMock.replay(this.mockConfig);
+            
+            Field f = RemoteDesktopAccessAction.class.getDeclaredField("domainName");
+            f.setAccessible(true);
+            assertNull(f.get(this.action));
+        }
     }
 
     /**
@@ -138,42 +150,45 @@ public class RemoteDesktopAccessActionTester extends TestCase
      */
     public void testAssign() throws Exception
     {
-        reset(this.mockConfig);
-        EasyMock.expect(this.mockConfig.getProperty("Remote_Desktop_Groupname","\"Remote Desktop Users\""))
-        .andReturn("Remote Desktop Users");
-        EasyMock.replay(this.mockConfig);
-        
-        final List<String> comm = new ArrayList<String>();
-        comm.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
-        comm.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
-        comm.add(RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
-        final String name = "tmachet";
-        final String os = System.getProperty("os.name");
-
-        if (os.startsWith("Windows"))
+        if (this.action != null)
         {
-            Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
-            me.setAccessible(true);
-            Process proc = (Process) me.invoke(this.action, comm);
-            Assert.assertNotNull(proc);
-
-            me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
-            me.setAccessible(true);
-            Boolean result = (Boolean) me.invoke(this.action, proc, name);
-            Assert.assertFalse(result);
-
-            Boolean assign = this.action.assign(name);
-            Assert.assertTrue(assign);
-
-            me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
-            me.setAccessible(true);
-            proc = (Process) me.invoke(this.action, comm);
-            Assert.assertNotNull(proc);
-
-            me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
-            me.setAccessible(true);
-            result = (Boolean) me.invoke(this.action, proc, name);
-            Assert.assertTrue(result);
+            reset(this.mockConfig);
+            EasyMock.expect(this.mockConfig.getProperty("Remote_Desktop_Groupname","\"Remote Desktop Users\""))
+            .andReturn("Remote Desktop Users");
+            EasyMock.replay(this.mockConfig);
+            
+            final List<String> comm = new ArrayList<String>();
+            comm.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
+            comm.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
+            comm.add(RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
+            final String name = "tmachet";
+            final String os = System.getProperty("os.name");
+    
+            if (os.startsWith("Windows"))
+            {
+                Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                Process proc = (Process) me.invoke(this.action, comm);
+                Assert.assertNotNull(proc);
+    
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
+                me.setAccessible(true);
+                Boolean result = (Boolean) me.invoke(this.action, proc, name);
+                Assert.assertFalse(result);
+    
+                Boolean assign = this.action.assign(name);
+                Assert.assertTrue(assign);
+    
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                proc = (Process) me.invoke(this.action, comm);
+                Assert.assertNotNull(proc);
+    
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
+                me.setAccessible(true);
+                result = (Boolean) me.invoke(this.action, proc, name);
+                Assert.assertTrue(result);
+            }
         }
     }
 
@@ -185,55 +200,58 @@ public class RemoteDesktopAccessActionTester extends TestCase
      */
     public void testRevoke() throws Exception
     {
-        reset(this.mockConfig);
-        EasyMock.expect(this.mockConfig.getProperty("Remote_Desktop_Groupname","\"Remote Desktop Users\""))
-        .andReturn("Remote Desktop Users");
-        EasyMock.replay(this.mockConfig);
-
-        final List<String> comm = new ArrayList<String>();
-        comm.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
-        comm.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
-        comm.add(RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
-        final String name = "tmachet";
-        final String os = System.getProperty("os.name");
-
-        if (os.startsWith("Windows"))
+        if (this.action != null)
         {
-            Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
-            me.setAccessible(true);
-            Process proc = (Process) me.invoke(this.action, comm);
-            Assert.assertNotNull(proc);
-
-            me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
-            me.setAccessible(true);
-            Boolean result = (Boolean) me.invoke(this.action, proc, name);
-            Assert.assertFalse(result);
-
-            Boolean assign = this.action.assign(name);
-            Assert.assertTrue(assign);
-
-            me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
-            me.setAccessible(true);
-            proc = (Process) me.invoke(this.action, comm);
-            Assert.assertNotNull(proc);
-
-            me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
-            me.setAccessible(true);
-            result = (Boolean) me.invoke(this.action, proc, name);
-            Assert.assertTrue(result);
-
-            Boolean revoke = this.action.revoke(name);
-            Assert.assertTrue(revoke);
-
-            me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
-            me.setAccessible(true);
-            proc = (Process) me.invoke(this.action, comm);
-            Assert.assertNotNull(proc);
-
-            me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
-            me.setAccessible(true);
-            result = (Boolean) me.invoke(this.action, proc, name);
-            Assert.assertFalse(result);
+            reset(this.mockConfig);
+            EasyMock.expect(this.mockConfig.getProperty("Remote_Desktop_Groupname","\"Remote Desktop Users\""))
+            .andReturn("Remote Desktop Users");
+            EasyMock.replay(this.mockConfig);
+    
+            final List<String> comm = new ArrayList<String>();
+            comm.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
+            comm.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
+            comm.add(RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
+            final String name = "tmachet";
+            final String os = System.getProperty("os.name");
+    
+            if (os.startsWith("Windows"))
+            {
+                Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                Process proc = (Process) me.invoke(this.action, comm);
+                Assert.assertNotNull(proc);
+    
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
+                me.setAccessible(true);
+                Boolean result = (Boolean) me.invoke(this.action, proc, name);
+                Assert.assertFalse(result);
+    
+                Boolean assign = this.action.assign(name);
+                Assert.assertTrue(assign);
+    
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                proc = (Process) me.invoke(this.action, comm);
+                Assert.assertNotNull(proc);
+    
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
+                me.setAccessible(true);
+                result = (Boolean) me.invoke(this.action, proc, name);
+                Assert.assertTrue(result);
+    
+                Boolean revoke = this.action.revoke(name);
+                Assert.assertTrue(revoke);
+    
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                proc = (Process) me.invoke(this.action, comm);
+                Assert.assertNotNull(proc);
+    
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
+                me.setAccessible(true);
+                result = (Boolean) me.invoke(this.action, proc, name);
+                Assert.assertFalse(result);
+            }
         }
 
     }
@@ -246,11 +264,14 @@ public class RemoteDesktopAccessActionTester extends TestCase
      */
     public void testGetActionType() throws Exception
     {
-        final Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("getActionType");
-        me.setAccessible(true);
-        final String type = (String) me.invoke(this.action);
-
-        Assert.assertEquals(type, "Windows Remote Desktop Access");
+        if (this.action != null)
+        {
+            final Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("getActionType");
+            me.setAccessible(true);
+            final String type = (String) me.invoke(this.action);
+    
+            Assert.assertEquals(type, "Windows Remote Desktop Access");
+        }
     }
 
     /**
@@ -261,20 +282,23 @@ public class RemoteDesktopAccessActionTester extends TestCase
      */
     public void testExecuteCommand() throws Exception
     {
-        final List<String> comm = new ArrayList<String>();
-        comm.add("net");
-        comm.add("localgroup");
-        comm.add("\"Remote Desktop Users\"");
-
-        final String os = System.getProperty("os.name");
-
-        if (os.startsWith("Windows"))
+        if (this.action != null)
         {
-            final Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
-            me.setAccessible(true);
-            final Process proc = (Process) me.invoke(this.action, comm);
-
-            Assert.assertNotNull(proc);
+            final List<String> comm = new ArrayList<String>();
+            comm.add("net");
+            comm.add("localgroup");
+            comm.add("\"Remote Desktop Users\"");
+    
+            final String os = System.getProperty("os.name");
+    
+            if (os.startsWith("Windows"))
+            {
+                final Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                final Process proc = (Process) me.invoke(this.action, comm);
+    
+                Assert.assertNotNull(proc);
+            }
         }
     }
 
@@ -286,25 +310,28 @@ public class RemoteDesktopAccessActionTester extends TestCase
      */
     public void testIsUserInGroup() throws Exception
     {
-        final List<String> comm = new ArrayList<String>();
-        comm.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
-        comm.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
-        comm.add(RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
-        final String name = "tmachet";
-        final String os = System.getProperty("os.name");
-
-        if (os.startsWith("Windows"))
+        if (this.action != null)
         {
-            Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
-            me.setAccessible(true);
-            final Process proc = (Process) me.invoke(this.action, comm);
-            Assert.assertNotNull(proc);
-
-            me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
-            me.setAccessible(true);
-            final Boolean result = (Boolean) me.invoke(this.action, proc, name);
-            Assert.assertFalse(result);
+            final List<String> comm = new ArrayList<String>();
+            comm.add(RemoteDesktopAccessAction.DEFAULT_COMMAND);
+            comm.add(RemoteDesktopAccessAction.DEFAULT_LOCALGROUP);
+            comm.add(RemoteDesktopAccessAction.DEFAULT_GROUPNAME);
+            final String name = "tmachet";
+            final String os = System.getProperty("os.name");
+    
+            if (os.startsWith("Windows"))
+            {
+                Method me = RemoteDesktopAccessAction.class.getDeclaredMethod("executeCommand", List.class);
+                me.setAccessible(true);
+                final Process proc = (Process) me.invoke(this.action, comm);
+                Assert.assertNotNull(proc);
+    
+                me = RemoteDesktopAccessAction.class.getDeclaredMethod("isUserInGroup", Process.class, String.class);
+                me.setAccessible(true);
+                final Boolean result = (Boolean) me.invoke(this.action, proc, name);
+                Assert.assertFalse(result);
+            }
+    
         }
-
     }
  }
