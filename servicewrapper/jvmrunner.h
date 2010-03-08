@@ -51,17 +51,19 @@ extern "C"
 #include <stdarg.h>
 
 #ifdef WIN32
+#include <windows.h>
+#include <winbase.h>
 #include <direct.h>
 #define getCWDir  _getcwd
-#else
-#include <unistd.h>
-#define getCWDir getcwd
 
+#else
 #include <dirent.h>
 #include <dlfcn.h>
+#include <unistd.h>
+#define getCWDir getcwd
 #endif
 
- #include "jni.h"
+#include "jni.h"
 
 /******************************************************************************
  ** Constants                                                                **
