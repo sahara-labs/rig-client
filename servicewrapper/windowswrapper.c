@@ -42,30 +42,84 @@
 
 int main(int argc, char* argv[])
 {
-    initService();
+	char *arg;
+
+    if (!initService())
+	{
+		logMessage("Failed to initialise service.\n");
+		return 1;
+	}
     
     if (!loadConfig())
     {
-	printf("Unable to load configuration.\n");
-	return 1;
+		logMessage("Unable to load configuration.\n");
+		return 2;
     }
 
+	if (argc == 1)
+	{
+		/* Start service. */
+	}
+
+	arg = argv[1];
+	while (*arg != '\0' && *arg == '-') arg++;
+	if (strcmp("install", arg) == 0)
+	{
+		/* Install the service. */
+	}
+	else if (strcmp("uninstall", arg)  == 0)
+	{
+		/* Remove the service. */
+	}
+	else if (stricmp("help", arg) == 0 || *arg == 'h')
+	{		
+		/* Print help. */
+		printf("Usage: %s [install]|[uninstall]\n\n", argv[0]);
+		printf("\t- install   - Installs the %s service. For installation to\n", SERVICE_NAME);
+		printf("\t              succeed the service must not be currently install.\n");
+		printf("\t- uninstall - Removes the service %s.\n\n", SERVICE_NAME);
+		printf("Once the service is installed the following Windows commands allow\n");
+		printf("the %s service to started and stopped\n\n", SERVICE_NAME);
+		printf("\t- Start %s: net start \"%s\"\n", SERVICE_NAME, SERVICE_NAME);
+		printf("\t- Stop %s:  net stop \"%s\"\n\n", SERVICE_NAME, SERVICE_NAME);
+		printf("Alternatively, the %s service may be started or stopped using the\n", SERVICE_NAME);
+		printf("Windows Services Administrative Tool, located in:\n\n");
+		printf("\tControl Panel -> Administrative Tools -> Services\n\n");
+	}
 }
 
+/**
+ * Initialises the service, by setting the working directory of the service from
+ * 'C:/Windows/system32' to the directory te executable is in.
+ */
 int initService()
 {
-    char currentDir[FILENAME_MAX], *lastSl;
-    memset(currentDir, 0, FILE_MAX);
+	char currentDir[FILENAME_MAX + 1], *lastSl;
+	memset(currentDir, 0, FILENAME_MAX + 1);
 
-    /* Work out the current directory based on this files location. */
-    GetModuleFileName(NULL, currentDir, MAX_PATH);
+	GetModuleFileName(NULL, currentDir, FILENAME_MAX);
+	
+	lastSl = strrchr(currentDir, '\\');
+	if (lastSl == NULL)
+	{
+		logMessage("Unable to determine current directory.\n");
+		return 0;
+	}
 
-    lastBSl = strrchr(currentDir, '\\');
-    *lastBSl = '\\';
-    lastBSl++;
-    lastBSl = '\0';
+	*lastSl = '\\';
+	lastSl++;
+	*lastSl = '\0';
 
-    SetCurrentDirectory(currentDir);
+	logMessage("Setting current working directory to %s.\n", currentDir);
+	SetCurrentDirectory(currentDir);
+	return 1;
+}
+
+/**
+ * Function called be the OS when the service is started.
+ */
+void WINAPI ServiceMain(DWORD dwArgc, LPTSTR *lpszArgv) 
+{
 }
 
 

@@ -51,11 +51,11 @@ extern "C"
 #include <stdarg.h>
 
 #ifdef WIN32
+#define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
 #include <winbase.h>
 #include <direct.h>
 #define getCWDir  _getcwd
-
 #else
 #include <dirent.h>
 #include <dlfcn.h>

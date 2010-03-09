@@ -54,76 +54,76 @@ int loadConfig(void)
 
     memset(buf, 0, 201);
    
-    if ((config = fopen(CONFIG_FILE, "r")) == NULL)
-    {
-	logMessage("Unable to open configuration file %s.\n", CONFIG_FILE);
-	perror("Failed to open configuration file because");
-	return 0;
-    }
-    logMessage("Opened log file '%s' successfully.\n", CONFIG_FILE);
-
-    while (fgets(buf, 200, config) != NULL)
-    {
-	line = buf;
-	memset(prop, 0, 201);
-
-	line = trim(line);
-	if (strlen(line) == 0) continue; /* Empty line.    */
-	if (line[0] == '#') continue;    /* Comment line. */
-
-	val = line;
-	while (!isspace(*val) && *val != '\0') val++;
-	if (*val == '\0')
+	if ((config = fopen(CONFIG_FILE, "r")) == NULL)
 	{
-	    logMessage("No value for prop %s.\n", line);
-	    continue;
+		logMessage("Unable to open configuration file %s.\n", CONFIG_FILE);
+		perror("Failed to open configuration file because");
+		return 0;
+	}
+	logMessage("Opened log file '%s' successfully.\n", CONFIG_FILE);
+
+	while (fgets(buf, 200, config) != NULL)
+	{
+		line = buf;
+		memset(prop, 0, 201);
+
+		line = trim(line);
+		if (strlen(line) == 0) continue; /* Empty line.    */
+		if (line[0] == '#') continue;    /* Comment line. */
+
+		val = line;
+		while (!isspace(*val) && *val != '\0') val++;
+		if (*val == '\0')
+		{
+			logMessage("No value for prop %s.\n", line);
+			continue;
+		}
+
+		strncpy(prop, line, val - line);
+		val = val + 1;
+		logMessage("Prop=%s Value=%s\n", prop, val);
+
+		if (strcmp("JVM_Location", prop) == 0)
+		{
+			FILE *file = fopen(val, "r");
+			if (file == NULL)
+			{
+				logMessage("Unable to use configured JVM location '%s' as the file does not exist.\n", val);
+				perror("Failed opening JVM library");
+				return 0;
+			}
+
+			logMessage("Using '%s' as the JVM to load.\n", val);
+			jvmSo = (char *)malloc(sizeof(char) * strlen(val));
+			memset(jvmSo, 0, strlen(val));
+			strcpy(jvmSo, val);
+			fclose(file);
+		}
+		else if (strcmp("Extra_Lib", prop) == 0)
+		{
+			if (classPathExt == NULL)
+			{
+				classPathExt = (char *)malloc(strlen(val) + 1);
+				memset(classPathExt, 0, strlen(val) + 1);
+				strcat(classPathExt, val);
+			}
+			else
+			{
+				char *tmp = (char *)malloc(strlen(val) + 1 + strlen(classPathExt));
+				strcpy(tmp, classPathExt);
+				strcat(tmp, CLASS_PATH_DELIM);
+				strcat(tmp, val);
+				free(classPathExt);
+				classPathExt = tmp;
+			}
+		}
+		else
+		{
+			logMessage("Unknown property %s.\n", prop);
+		}
 	}
 
-	strncpy(prop, line, val - line);
-	val = val + 1;
-	logMessage("Prop=%s Value=%s\n", prop, val);
-	
-	if (strcmp("JVM_Location", prop) == 0)
-	{
-	    FILE *file = fopen(val, "r");
-	    if (file == NULL)
-	    {
-	    	logMessage("Unable to use configured JVM location '%s' as the file does not exist.\n", val);
-		perror("Failed opening JVM library");
-	    	return 0;
-	    }
-	    
-	    logMessage("Using '%s' as the JVM to load.\n", val);
-	    jvmSo = (char *)malloc(sizeof(char) * strlen(val));
-	    memset(jvmSo, 0, strlen(val));
-	    strcpy(jvmSo, val);
-	    fclose(file);
-	}
-	else if (strcmp("Extra_Lib", prop) == 0)
-	{
-	    if (classPathExt == NULL)
-	    {
-	    	classPathExt = (char *)malloc(strlen(val) + 1);
-		memset(classPathExt, 0, strlen(val) + 1);
-	    	strcat(classPathExt, val);
-	    }
-	    else
-	    {
-	    	char *tmp = (char *)malloc(strlen(val) + 1 + strlen(classPathExt));
-	    	strcpy(tmp, classPathExt);
-	    	strcat(tmp, CLASS_PATH_DELIM);
-	    	strcat(tmp, val);
-	    	free(classPathExt);
-	    	classPathExt = tmp;
-	    }
-	}
-	else
-	{
-	    logMessage("Unknown property %s.\n", prop);
-	}
-    }
-    
-    return jvmSo != NULL;
+	return jvmSo != NULL;
 }
 
 /**

@@ -70,19 +70,21 @@ void installService();
 void uninstallService();
 
 /**
- * Initialises the service, by doing the following:
- * 
- *    - Sets the current working directory to the directory
- *      of the executable. (With Windows Services the 
- *      inital working directory is 'C:\Windows\System32')
+ * Initialises the service, by setting the working directory of the service from
+ * 'C:/Windows/system32' to the directory te executable is in.
  */
-void initService();
+int initService();
 
-HANDLE  stopEvent;
+/**
+ * Function called be the OS when the service is started.
+ */
+void WINAPI ServiceMain(DWORD dwArgc, LPTSTR *lpszArgv);
 
 /*******************************************************************************
  ** Globals                                                                   **
  ******************************************************************************/
+
+HANDLE stopEvent;
 
 SERVICE_STATUS_HANDLE serviceStatusHandle; 
 SERVICE_STATUS serviceStatus;
