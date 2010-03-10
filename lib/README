@@ -4,24 +4,24 @@ Directory for Rig Client libraries. The required libraries:
                     Logging library which outputs log statements to a variety of 
                     output targets.
                     Released under the Apache Software License, Version 2.0.
-					- Download compressed file from site.  
-					- Copy the log4j-*.jar file into the RigClient/lib/ directory.
-					- Copy the NTEventLogAppender.dll into the WINDOWS/System32 directory 
-					  for Windows OS.
+                        - Download compressed file from site.  
+                        - Copy the log4j-*.jar file into the RigClient/lib/ directory.
+                        - Copy the NTEventLogAppender.dll into the WINDOWS/System32 directory 
+                          for Windows OS.
   - Apache Axis 2 - Apache Axis2/Java (http://ws.apache.org/axis2/)
                     Apache Axis2 is a Java-based implementation of both the client 
                     and server sides of the Web services equation.
                     Release under the Apache Software License, Version 2.0.
-					- Download the compressed file from the site.
-					- Create a folder called Axis2 in the RigClient/lib/ directory
-					- Copy all files from the dowloaded axis2-*/lib directory (*.jar files) 
-						into the newly created RigClient/lib/Axis2 directory
+                        - Download the compressed file from the site.
+                        - Create a folder called Axis2 in the RigClient/lib/ directory
+                        - Copy all files from the dowloaded axis2-*/lib directory (*.jar files) 
+                          into the newly created RigClient/lib/Axis2 directory
   - Jetty 6 	  - Jetty (http://dist.codehaus.org/jetty/) version 6
                     Jetty is a Java-based HTTP server, HTTP client and javax.servlet
-					container.  
-					- Download the compressed file from the site.
-					- Create a folder called Jetty in the RigClient/lib/ directory
-					- Copy the jetty-6.1.*.jar, jetty-util-6.1.*.jar and 
-					  servlet-api-2.5-*.jar into the newly created RigClient/lib/Jetty
-					  directory
+                    container.  
+                        - Download the compressed file from the site.
+                        - Create a folder called Jetty in the RigClient/lib/ directory
+                        - Copy the jetty-6.1.*.jar, jetty-util-6.1.*.jar and 
+                          servlet-api-2.5-*.jar into the newly created RigClient/lib/Jetty
+                          directory
 					
