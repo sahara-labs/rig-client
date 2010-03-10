@@ -316,6 +316,7 @@ public class StatusUpdater implements Runnable
         /* --------------------------------------------------------------------
          * -- 3) Unregister the rig.                                         --
          * ------------------------------------------------------------------*/
+        if (!StatusUpdater.isRegistered) return;
         this.logger.debug("Received interrupt for the status updater, removing the rig client's registration.");
         
         /* 1) Set up message. */
