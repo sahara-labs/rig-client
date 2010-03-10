@@ -140,11 +140,7 @@ public class LoggerFactory
         
         if (type == null)
         {
-            System.err.println("FATAL: Failed loading configuration of logger type (Logger_Type).");
-            System.err.println("This specifies the destination of logging messages and is needed for correct" +
-            		" operation of the rig client.");
-            System.err.println("Shutting down...");
-            System.exit(-1);            
+            LoggerFactory.printFatalLogConfigurationError("Logger_Type");
         }
         
         if (type.equalsIgnoreCase("SystemErr")) return LoggerType.SYSTEM_ERROR;
@@ -152,7 +148,37 @@ public class LoggerFactory
         else if (type.equalsIgnoreCase("RolledFile")) return LoggerType.ROLLED_FILE;
         else if (type.equalsIgnoreCase("Syslog")) return LoggerType.SYSLOG;
         else if (type.equalsIgnoreCase("WinEvents")) return LoggerType.WINEVENTS;
-        else return LoggerType.SYSTEM_ERROR;
+        else
+        {
+            LoggerFactory.printFatalLogConfigurationError("Logger_Type");
+            
+            /* This is to satisfy the compiler, but the rig client should crash out. */
+            return LoggerType.SYSTEM_ERROR;
+        }
+    }
+
+    /**
+     * Prints a message to stderr to specify some mandatory parameter is missing.
+     */
+    private static void printFatalLogConfigurationError(String prop)
+    {
+        System.err.println("FATAL: Failed loading configuration of logger type ('" + prop + "').");
+        System.err.println("'Logger_Type' specifies the destination of logging messages, with the options:");
+        System.err.println("\t* SystemErr - System error stream.");
+        System.err.println("\t* File - Text file.");
+        System.err.println("\t* Rolled - Text file, rolled for maximum size.");
+        System.err.println("\t* Syslog - Unix UDP Syslog server.");
+        System.err.println("\t* WinEvents - Windows Event Log (only works on Windows).");
+        System.err.println("'Log_Level' specifies the level to log messages at, with the options:");
+        System.err.println("\t* ERROR - events that cause unexpected results and stop the expected program");
+        System.err.println("\t          execution sequence");
+        System.err.println("\t* WARN  - events that cause undesired results.");
+        System.err.println("\t* INFO  - events that are regular in occurrence, however are useful for");
+        System.err.println("\t          audit trails.");
+        System.err.println("\t* DEBUG - debugging messages.");
+        System.err.println("Shutting down...");
+        
+        System.exit(2);
     }
     
     /**
@@ -166,18 +192,20 @@ public class LoggerFactory
         final String type = ConfigFactory.getInstance().getProperty("Log_Level");
         if (type == null)
         {
-            System.err.println("FATAL: Failed loading configuration of logging level (Log_Level).");
-            System.err.println("This specifies the level of logging messages to provide and is needed for correct" +
-            		" operation of the rig client.");
-            System.err.println("Shutting down...");
-            System.exit(-1);
+            LoggerFactory.printFatalLogConfigurationError("Log_Level");
         }
             
         
         if (type.equalsIgnoreCase("ERROR")) return ILogger.ERROR;
         else if (type.equalsIgnoreCase("WARN")) return ILogger.WARN;
         else if (type.equalsIgnoreCase("INFO")) return ILogger.INFO;
-        else return ILogger.DEBUG;
+        else
+        {
+            LoggerFactory.printFatalLogConfigurationError("Log_Level");
+            
+            /* This is to satisfy the compiler, but the rig client should crash out. */
+            return ILogger.DEBUG;
+        }
     }
     
     /**
