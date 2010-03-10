@@ -97,7 +97,20 @@ public class RigClient
         try
         {
             this.logger.priority("Rig client is starting up...");
+            if (this.config.getProperty("Rig_Name") == null)
+            {
+                this.logger.fatal("Unable to load the rig's name. Unrecoverable, please check configuration to " +
+                        "ensure a valid rig name is specified ('Rig_Name' property).");
+                System.exit(2);
+            }
             this.logger.priority("Rig name: " + this.config.getProperty("Rig_Name"));
+            
+            if (this.config.getProperty("Rig_Type") == null)
+            {
+                this.logger.fatal("Unable to load the rig's type. Unrecoverable, please check configuration to " +
+                        "ensure a valid rig type is specified ('Rig_Type' property).");
+                System.exit(2);
+            }
             this.logger.priority("Rig type: " + this.config.getProperty("Rig_Type"));
 
             /* ------------------------------------------------------------------
