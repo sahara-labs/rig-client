@@ -174,6 +174,7 @@ public class RigClient
             /* ------------------------------------------------------------------
              * ---- 5. Cleanup and shutdown all services. -----------------------
              * ----------------------------------------------------------------*/
+            this.logger.priority("Received shut down request, shutting down...");
             /* Purge all sessions (if running). */
             if (rig.isSessionActive())
             {
