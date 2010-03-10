@@ -1030,7 +1030,7 @@ public abstract class AbstractRig implements IRig
     public boolean revokeSlave(final String name)
     {
         boolean ret = true;
-        this.logger.debug("Attempting to revoke slave access from: " + name);
+        this.logger.info("Revoking slave access from: " + name + '.');
         
         Session perm = Session.NOT_IN;
         synchronized (this.sessionUsers)
