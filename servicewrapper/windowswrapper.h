@@ -41,7 +41,7 @@
 #define WindowsWrapper_H
 
 #pragma comment(lib, "advapi32.lib")
-#define _CRT_SECURE_NO_
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <windows.h>
 #include <winbase.h>
@@ -55,19 +55,27 @@
 
 #define SERVICE_NAME "RigClient"
 
+#define SERVICE_DESC "Software abstraction of physical rig to provide rig session \
+control and rig device control. Automatically tests rig hardware \
+and reports the rig status to ensure rig goodness."
+
 /*******************************************************************************
  ** Functions                                                                 **
  ******************************************************************************/
 
 /**
- * Install the service as a Windows NT service.
+ * Installs the windows service into the service control manager.
+ *
+ * @return 0 on success, error code for error.
  */
-void installService();
+int installService();
 
 /**
- * Remove the service from the system.
+ * Removes the service from the service control manager.
+ *
+ * @return 0 on success, error code for error
  */
-void uninstallService();
+int uninstallService();
 
 /**
  * Initialises the service, by setting the working directory of the service from
@@ -80,21 +88,30 @@ int initService();
  */
 void WINAPI ServiceMain(DWORD dwArgc, LPTSTR *lpszArgv);
 
+/**
+ * Receives control requests for the service.
+ */
+void WINAPI ServiceHandler(DWORD control);
+
+DWORD WINAPI threadMain(LPVOID lpParam);
+
 /*******************************************************************************
  ** Globals                                                                   **
  ******************************************************************************/
 
+/** Event to notify the ServiceMain function to terminate. */
 HANDLE stopEvent;
 
-SERVICE_STATUS_HANDLE serviceStatusHandle; 
+/** Handle for the status structure. */
+SERVICE_STATUS_HANDLE serviceHandle; 
+
+/** Structure used to set the services status. */
 SERVICE_STATUS serviceStatus;
 
-CRITICAL_SECTION lock;
+/** JVM thread handle. */
+HANDLE threadHandle;
 
-SERVICE_TABLE_ENTRY lpServiceStartTable[] = 
-{
-	{SERVICE_NAME, ServiceMain},
-	{0, 0}
-};
+/** JVM thread ID. */
+DWORD threadID;
 
 #endif

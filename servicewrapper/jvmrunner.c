@@ -49,11 +49,11 @@
  */
 int loadConfig(void)
 {
-    char buf[201], prop[201], *line, *val;
-    FILE *config;
+	char buf[201], prop[201], *line, *val;
+	FILE *config, *jvmPath;
 
-    memset(buf, 0, 201);
-   
+	memset(buf, 0, 201);
+
 	if ((config = fopen(CONFIG_FILE, "r")) == NULL)
 	{
 		logMessage("Unable to open configuration file %s.\n", CONFIG_FILE);
@@ -85,19 +85,9 @@ int loadConfig(void)
 
 		if (strcmp("JVM_Location", prop) == 0)
 		{
-			FILE *file = fopen(val, "r");
-			if (file == NULL)
-			{
-				logMessage("Unable to use configured JVM location '%s' as the file does not exist.\n", val);
-				perror("Failed opening JVM library");
-				return 0;
-			}
-
-			logMessage("Using '%s' as the JVM to load.\n", val);
 			jvmSo = (char *)malloc(sizeof(char) * strlen(val));
 			memset(jvmSo, 0, strlen(val));
 			strcpy(jvmSo, val);
-			fclose(file);
 		}
 		else if (strcmp("Extra_Lib", prop) == 0)
 		{
@@ -123,7 +113,71 @@ int loadConfig(void)
 		}
 	}
 
-	return jvmSo != NULL;
+#ifdef WIN32
+	/* If on Windows attempt to use the registry to determine if Java is installed, 
+	 * what version and where the runtime DLL is installed. The keys used are:
+	 *    - [HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\CurrentVersion]
+	 *    - [HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\1.6\RuntimeLib] */
+	if (jvmSo == NULL)
+	{
+		HKEY regKey;
+		char regData[FILENAME_MAX], errMessage[255];
+		DWORD regDataSize = FILENAME_MAX, err;
+		float version;
+
+		if ((err = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\JavaSoft\\Java Runtime Environment", 0, KEY_READ, &regKey)) == ERROR_SUCCESS &&
+			(err = RegQueryValueEx(regKey, "CurrentVersion", NULL, NULL, regData, &regDataSize)) == ERROR_SUCCESS)
+		{
+			RegCloseKey(regKey);
+
+			version = atof(regData);
+			if (atof(regData) >= 1.6)
+			{
+				/* Version is installed and OK, so now need to find the RuntimeDLL location. */
+				regDataSize = FILENAME_MAX;
+				if ((err = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\JavaSoft\\Java Runtime Environment\\1.6", 0, KEY_READ, &regKey)) == ERROR_SUCCESS &&
+					(err = RegQueryValueEx(regKey, "RuntimeLib", NULL, NULL, regData, &regDataSize)) == ERROR_SUCCESS &&
+					regDataSize > 0)
+				{
+					regData[regDataSize + 1] = '\0';
+					jvmSo = (char *)malloc(strlen(regData));
+					strcpy(jvmSo, regData);
+					logMessage("The detected Java runtime library location is '%s'.\n", jvmSo);
+					RegCloseKey(regKey);
+				}
+			}
+			else
+			{
+				logMessage("The version of Java you have installed (%.2f) is too old. It must be at least version 1.6.", atof(regData));
+			}
+		}
+		else
+		{
+			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, FORMAT_MESSAGE_FROM_HMODULE, err, 0, errMessage, 255, NULL);
+			logMessage("Failed to read registry key (HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\Java Runtime Environment"
+				"\\CurrentVersion). %s", errMessage);
+		}
+	}
+#endif
+
+	/* The Java installation path is mandatory so ensure it was properly loaded or detected. */
+	if (jvmSo == NULL)
+	{
+		logMessage("The JVM location was not found.");
+		return 0;
+	}
+	else if ((jvmPath = fopen(jvmSo, "r")) == NULL)
+	{
+		logMessage("Unable to use configured JVM location '%s' as the file does not exist.\n", val);
+		perror("Failed opening JVM library");
+		free(jvmSo);
+		jvmSo = NULL;
+		return 0;
+	}
+
+	logMessage("Using '%s' as the JVM to load.\n", jvmSo);
+	fclose(jvmPath);
+	return 1;
 }
 
 /**
@@ -138,65 +192,94 @@ int loadConfig(void)
  */
 int generateClassPath(void)
 {
-    char currentDir[FILENAME_MAX];
+	char currentDir[FILENAME_MAX];
 
-    memset(currentDir, 0, FILENAME_MAX);
-    if (getCWDir(currentDir, sizeof(currentDir)) == NULL)
-    {
-    	logMessage("Unable to detect current working directory, failing...\n");
-    	return 0;
-    }
-        
-    classPath = (char *)malloc(strlen(CLASS_PATH) + strlen(currentDir) + 1 + strlen(JAR_FILE));
-    strcpy(classPath, CLASS_PATH);
+	memset(currentDir, 0, FILENAME_MAX);
+	if (getCWDir(currentDir, sizeof(currentDir)) == NULL)
+	{
+		logMessage("Unable to detect current working directory, failing...\n");
+		return 0;
+	}
 
-    /* Rig Client library. */
-    strcat(classPath, currentDir);
-    strcat(classPath, "/");
-    strcat(classPath, JAR_FILE);
-    
-    /* Configured extension libraries. */
-    if (classPathExt != NULL)
-    {
-    	classPath = (char *)realloc(classPath, strlen(classPath) + 1 + strlen(classPathExt));
-    	strcat(classPath, CLASS_PATH_DELIM);
-    	strcat(classPath, classPathExt);
-    }
+	classPath = (char *)malloc(strlen(CLASS_PATH) + strlen(currentDir) + 1 + strlen(JAR_FILE));
+	strcpy(classPath, CLASS_PATH);
+
+	/* Rig Client library. */
+	strcat(classPath, currentDir);
+	strcat(classPath, "/");
+	strcat(classPath, JAR_FILE);
+
+	/* Configured extension libraries. */
+	if (classPathExt != NULL)
+	{
+		classPath = (char *)realloc(classPath, strlen(classPath) + 1 + strlen(classPathExt));
+		strcat(classPath, CLASS_PATH_DELIM);
+		strcat(classPath, classPathExt);
+	}
 
 #ifdef WIN32
-#else
-    {
-	DIR *dir;
-	struct dirent *dp;
-	size_t size = strlen(classPath);
+	{
+		HANDLE fileHandle;
+		WIN32_FIND_DATA fileData;
+		DWORD size = strlen(classPath), oldSize;
 
-	if (!(dir = opendir("lib/")))
-	{
-	    logMessage("Unable to open directory '%s/lib'. Not adding JARs in that directory.\n", currentDir);
-	    perror("Unable to open 'lib/'");
-	}
-	else
-	{
-	    while (dp = readdir(dir))
-	    {
-		if (strstr(dp->d_name, ".jar") == (dp->d_name + strlen(dp->d_name) - 4))
+		if ((fileHandle = FindFirstFile("lib/*.jar", &fileData)) != INVALID_HANDLE_VALUE)
 		{
-		    logMessage("Adding JAR with path %s.\n", dp->d_name);
-		    
-		    size += 7 + strlen(currentDir) + strlen(dp->d_name);
-		    classPath = (char *)realloc(classPath, size);
-		    strcat(classPath, CLASS_PATH_DELIM);
-		    strcat(classPath, currentDir);
-		    strcat(classPath, "/lib/");
-		    strcat(classPath, dp->d_name);
+			do
+			{
+				oldSize = strlen(classPath);
+				size += 7 + strlen(currentDir) + strlen(fileData.cFileName);
+				if ((classPath = (char *)realloc(classPath, size)) == NULL)
+				{
+					printf("realloc failed\n");
+				}
+				classPath[oldSize] = '\0';
+
+				strcat(classPath, CLASS_PATH_DELIM);
+				strcat(classPath, currentDir);
+				strcat(classPath, "/lib/");
+				strcat(classPath, fileData.cFileName);
+			}
+			while (FindNextFile(fileHandle, &fileData));
+			FindClose(fileHandle);
 		}
-	    }
 	}
-    }
+#else
+	{
+		DIR *dir;
+		struct dirent *dp;
+		size_t size = strlen(classPath), oldSize;
+
+		if (!(dir = opendir("lib/")))
+		{
+			logMessage("Unable to open directory '%s/lib'. Not adding JARs in that directory.\n", currentDir);
+			perror("Unable to open 'lib/'");
+		}
+		else
+		{
+			while (dp = readdir(dir))
+			{
+				if (strstr(dp->d_name, ".jar") == (dp->d_name + strlen(dp->d_name) - 4))
+				{
+					logMessage("Adding JAR with path %s.\n", dp->d_name);
+					
+					oldSize = strlen(classPath);
+					size += 7 + strlen(currentDir) + strlen(dp->d_name);
+					classPath = (char *)realloc(classPath, size);
+					classPath[oldSize] = '\0';
+
+					strcat(classPath, CLASS_PATH_DELIM);
+					strcat(classPath, currentDir);
+					strcat(classPath, "/lib/");
+					strcat(classPath, dp->d_name);
+				}
+			}
+		}
+	}
 #endif
 
-    logMessage("Class path argument for Java virtual machine is '%s'.\n", classPath);
-    return 1;
+	logMessage("Class path argument for Java virtual machine is '%s'.\n", classPath);
+	return 1;
 }
 
 /**
@@ -204,82 +287,80 @@ int generateClassPath(void)
  *
  * @return true if successful, false otherwise
  */
-int startJVM(void)
+int startJVM()
 {
-    JavaVMInitArgs vm_args;
-    JavaVMOption options[2];
-    jint res;
-    JNIEnv *env;
-    jclass clazz;
-    jmethodID method;
+	JavaVMInitArgs vm_args;
+	JavaVMOption options[2];
+	jint res;
+	JNIEnv *env;
+	jclass clazz;
+	jmethodID method;
 
 #ifdef WIN32
-    HINSTANCE hVM;
+	HINSTANCE hVM;
 #else
-    void *libVM;
+	void *libVM;
 #endif
 
-    /* Set the classpath. */
-    options[0].optionString = classPath;
-    options[1].optionString = "-Xrs";
-    vm_args.options = options;
-    vm_args.nOptions = 2;
-    vm_args.ignoreUnrecognized = JNI_FALSE;
-    vm_args.version = JNI_VERSION_1_4;
+	/* Set the classpath. */
+	options[0].optionString = classPath;
+	options[1].optionString = "-Xrs";
+	vm_args.options = options;
+	vm_args.nOptions = 2;
+	vm_args.ignoreUnrecognized = JNI_FALSE;
+	vm_args.version = JNI_VERSION_1_4;
 
-    /* Load the JVM library and find the JNI_CreateJavaVM function. */
+	/* Load the JVM library and find the JNI_CreateJavaVM function. */
 #ifdef WIN32
-    hVM = LoadLibrary(jvmSo);
-    if (hVM == NULL)
-    {
-	logMessage("Unable to load library %s.\n", jvmSo);
-	return 0;
-    }
-    createJVM = (CreateJavaVM)GetProcAddress(hVM, "JNI_CreateJavaVM");
+	hVM = LoadLibrary(jvmSo);
+	if (hVM == NULL)
+	{
+		logMessage("Unable to load library %s.\n", jvmSo);
+		return 0;
+	}
+	createJVM = (CreateJavaVM)GetProcAddress(hVM, "JNI_CreateJavaVM");
 #else
-    libVM = dlopen(jvmSo, RTLD_LAZY);
-    if (libVM == NULL)
-    {	
-	logMessage("Unable to load library %s.\n", jvmSo);
-	perror("Error loading JVM library");
-	return 0;
-    }
-    createJVM = (CreateJavaVM)dlsym(libVM, "JNI_CreateJavaVM");
+	libVM = dlopen(jvmSo, RTLD_LAZY);
+	if (libVM == NULL)
+	{	
+		logMessage("Unable to load library %s.\n", jvmSo);
+		perror("Error loading JVM library");
+		return 0;
+	}
+	createJVM = (CreateJavaVM)dlsym(libVM, "JNI_CreateJavaVM");
 #endif
 
-    /* Create the JVM. */
-    res = createJVM(&vm, (void **)&env, &vm_args);
-    if (res < 0)
-    {
-	logMessage("Failed to create JVM, response code is %i.\n", res);
-	return 0;
-    }
-    logMessage("Successfully created Java virtual machine.\n");
+	/* Create the JVM. */
+	res = createJVM(&vm, (void **)&env, &vm_args);
+	if (res < 0)
+	{
+		logMessage("Failed to create JVM, response code is %i.\n", res);
+		return 0;
+	}
+	logMessage("Successfully created Java virtual machine.\n");
 
-    /* Find the start up class. */
-    if ((clazz = (*env)->FindClass(env, CLASS_NAME)) == NULL)
-    {
-	logMessage("Unable to find class %s.\n", CLASS_NAME);
-	return 0;
-    }
+	/* Find the start up class. */
+	if ((clazz = (*env)->FindClass(env, CLASS_NAME)) == NULL)
+	{
+		logMessage("Unable to find class %s.\n", CLASS_NAME);
+		return 0;
+	}
 
-    /* Find start up method and invoke it. */
-    if ((method = (*env)->GetStaticMethodID(env, clazz, STARTUP_METHOD, "()V")) == NULL)
-    {
-	logMessage("Unable to find method %s in class %s.\n", STARTUP_METHOD, CLASS_NAME);
-	return 0;
-    }
-    (*env)->CallStaticVoidMethod(env, clazz, method, NULL);
+	/* Find start up method and invoke it. */
+	if ((method = (*env)->GetStaticMethodID(env, clazz, STARTUP_METHOD, "()V")) == NULL)
+	{
+		logMessage("Unable to find method %s in class %s.\n", STARTUP_METHOD, CLASS_NAME);
+		return 0;
+	}
+	(*env)->CallStaticVoidMethod(env, clazz, method, NULL);
 
-    if ((*env)->ExceptionCheck(env))
-    {
-	logMessage("Exception thrown starting up rig client (called method %s on %s).\n", STARTUP_METHOD, CLASS_NAME);
-	return 0;
-    }
+	if ((*env)->ExceptionCheck(env))
+	{
+		logMessage("Exception thrown starting up rig client (called method %s on %s).\n", STARTUP_METHOD, CLASS_NAME);
+		return 0;
+	}
 
-    logMessage("Started up rig client...!");
-    printf("Started up rig client...");
-    return 1;
+	return 1;
 }
 
 /**
@@ -287,31 +368,30 @@ int startJVM(void)
  *
  * @return true if successful, false otherwise
  */
-int shutDownJVM(void)
+int shutDownJVM()
 {
-    JNIEnv *env;
-    jclass clazz;
-    jmethodID method;
+	JNIEnv *env;
+	jclass clazz;
+	jmethodID method;
 
+	(*vm)->AttachCurrentThread(vm, (void **)&env, NULL);
 
-    (*vm)->AttachCurrentThread(vm, (void **)&env, NULL);
+	clazz = (*env)->FindClass(env, CLASS_NAME);
+	if ((method = (*env)->GetStaticMethodID(env, clazz, SHUTDOWN_METHOD, "()V")) == NULL)
+	{
+		logMessage("Unable to find shutdown method %s in class %s.\n", SHUTDOWN_METHOD, CLASS_NAME);
+		return 0;
+	}
 
-    clazz = (*env)->FindClass(env, CLASS_NAME);
-    if ((method = (*env)->GetStaticMethodID(env, clazz, SHUTDOWN_METHOD, "()V")) == NULL)
-    {
-	logMessage("Unable to find shutdown method %s in class %s.\n", SHUTDOWN_METHOD, CLASS_NAME);
-	return 0;
-    }
+	printf("Calling shutdown...\n");
+	(*env)->CallStaticVoidMethod(env, clazz, method, NULL);
+	if ((*env)->ExceptionCheck(env))
+	{
+		logMessage("Exception thrown shutting down rig client.\n");
+		return 0;
+	}
 
-    printf("Calling shutdown...\n");
-    (*env)->CallStaticVoidMethod(env, clazz, method, NULL);
-    if ((*env)->ExceptionCheck(env))
-    {
-	logMessage("Exception thrown shutting down rig client.\n");
-	return 0;
-    }
-    
-    return 1;
+	return 1;
 }
 /**
  * Logs messages to a file. This function has the same format as
@@ -322,22 +402,22 @@ int shutDownJVM(void)
  */
 void logMessage(char *fmt, ...)
 {
-    static FILE* logFile;
-    va_list argp;
+	static FILE* logFile;
+	va_list argp;
 
-    if (logFile == NULL)
-    {
-	logFile = fopen(LOG_FILE, "a");
 	if (logFile == NULL)
 	{
-	    printf("Unable to open log file %s.", LOG_FILE);
-	    printf("Unable to log %s.", fmt);
+		logFile = fopen(LOG_FILE, "a");
+		if (logFile == NULL)
+		{
+			printf("Unable to open log file %s.", LOG_FILE);
+			printf("Unable to log %s.", fmt);
+		}
 	}
-    }
 
-    va_start(argp, fmt);
-    vfprintf(logFile, fmt, argp);
-    va_end(argp);
+	va_start(argp, fmt);
+	vfprintf(logFile, fmt, argp);
+	va_end(argp);
 }
 
 /** 
@@ -347,15 +427,15 @@ void logMessage(char *fmt, ...)
  */
 char *trim(char *tmp)
 {
-    char *end;
+	char *end;
 
-    /* Trim leading whitespace. */
-    while (*tmp != '\0' && isspace(*tmp)) tmp++;
+	/* Trim leading whitespace. */
+	while (*tmp != '\0' && isspace(*tmp)) tmp++;
 
-    /* Trim trailing whitespace. */
-    end = tmp + strlen(tmp) - 1;
-    while (end > tmp && isspace(*end)) end--;
-    *(end + 1) = '\0';
+	/* Trim trailing whitespace. */
+	end = tmp + strlen(tmp) - 1;
+	while (end > tmp && isspace(*end)) end--;
+	*(end + 1) = '\0';
 
-    return tmp;
+	return tmp;
 }

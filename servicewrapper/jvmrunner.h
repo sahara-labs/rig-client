@@ -151,14 +151,14 @@ int generateClassPath(void);
  *
  * @return true if successful, false otherwise
  */
-int startJVM(void);
+int startJVM();
 
 /**
  * Shuts down the Java virtual machine.
  *
  * @return true if successful, false otherwise
  */
-int shutDownJVM(void);
+int shutDownJVM();
 
 /**
  * Logs messages to a file. This function has the same format as
