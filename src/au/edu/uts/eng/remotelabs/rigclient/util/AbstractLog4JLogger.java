@@ -111,6 +111,12 @@ abstract class AbstractLog4JLogger extends AbstractLogger
        case ILogger.ERROR:
            this.logger.error(message);
            break;
+       case ILogger.FATAL:
+           this.logger.fatal(message);
+           break;
+       case ILogger.PRIORITY:
+           this.logger.fatal(message);
+           break;
        default:    
            this.logger.debug(message);
            break;
