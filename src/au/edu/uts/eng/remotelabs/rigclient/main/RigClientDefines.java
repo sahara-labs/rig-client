@@ -45,9 +45,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Calendar;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Map.Entry;
 
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * Global definitions and convenient functions.
@@ -55,10 +59,11 @@ import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 public class RigClientDefines
 {
     /** Bug reporting email. */
-    public static final String RC_BUG_REPORTING_TO = "mdiponio@eng.uts.edu.au";
+    public static final String RC_BUG_REPORTING_TO = "tmachet@eng.uts.edu.au (Software Engineer)\n" +
+    		                                         "or mdiponio@eng.uts.edu.au (Developer)";
     
     /** Rig Client version. */
-    public static final String RC_VERSION = "0.0.1 Pre-Alpha";
+    public static final String RC_VERSION = "0.2 Alpha";
     
     /** Rig client SOAP interface name space. */
     public static final String NAME_SPACE = "http://remotelabs.eng.uts.edu.au/rigclient/protocol";
@@ -72,47 +77,82 @@ public class RigClientDefines
     public static void reportBug(final String code, final Throwable thr)
     {
         final Calendar cal = Calendar.getInstance();
-
-        System.out.println();
-        System.out.println("Rig Client says CRAP!");
-        System.out.println();
-        System.out.println("Congratulations, you are one of the privileged people to possibly");
-        System.out.println("find an actual bug!");
-        System.out.println();
-        System.out.println("If you could be so kind to email a bug report to " + RigClientDefines.RC_BUG_REPORTING_TO);
-        System.out.println("with the following attached:");
-        System.out.println();
-        System.out.println("================================================================================");
-        System.out.println("== Rig Client v" + RigClientDefines.RC_VERSION);
-        System.out.println("== " + cal.get(Calendar.DAY_OF_MONTH) + "/" + (cal.get(Calendar.MONTH) + 1) + "/" + cal.get(Calendar.YEAR)
-                + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND));
-        System.out.println("================================================================================");
-        System.out.println();
-        System.out.println("Error code: " + code);
-        System.out.println();
         
+        StringBuilder builder = new StringBuilder();
+        builder.append('\n');
+        builder.append("Oh, No! - Serious FATAL error.\n");
+        builder.append('\n');
+        builder.append("If this is not caused by using an action class that isn't valid on your platform,\n");
+        builder.append("could you please file a bug report to " + RigClientDefines.RC_BUG_REPORTING_TO + ' ');
+        builder.append("with the following attached:\n");
+        builder.append('\n');
+        builder.append("================================================================================\n");
+        builder.append("== Rig Client v" + RigClientDefines.RC_VERSION + '\n');
+        builder.append("== " + cal.get(Calendar.DAY_OF_MONTH) + "/" + (cal.get(Calendar.MONTH) + 1) + "/" + cal.get(Calendar.YEAR)
+                + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND) + '\n');
+        builder.append("================================================================================\n");
+        builder.append('\n');
+        builder.append("Error code: " + code + '\n');
+        builder.append('\n');
+        
+        /* Stack track stanza. */
         if (thr != null)
         {
-            System.out.println("------------------------------------------------------------------------------------------");
-            System.out.println("Exception: " + thr.getClass().getCanonicalName());
+            builder.append("--------------------------------------------------------------------------------\n");
+            builder.append("Exception: " + thr.getClass().getCanonicalName() + '\n');
             if (thr.getMessage() != null)
             {
-                System.out.println("Message: " + thr.getMessage());
+                builder.append("Message: " + thr.getMessage() + '\n');
             }
-            System.out.println("Stacktrace:");
+            builder.append("Stacktrace:\n");
             final Writer result = new StringWriter();
             final PrintWriter printWriter = new PrintWriter(result);
             thr.printStackTrace(printWriter);
-            System.out.println(result.toString());
+            builder.append(result.toString() + '\n');
         }
         
-        System.out.println();
-        System.out.println("--------------------------------------------------------------------------------");
+        builder.append('\n');
+        builder.append("--------------------------------------------------------------------------------\n");
+        builder.append('\n');
+        
+        /* Configuration stanza. */
+        builder.append("################################################################################\n");
         final IConfig conf = ConfigFactory.getInstance();
-        System.out.println("Configuration, " + conf.getConfigurationInfomation() + ":");
-        System.out.println(conf.dumpConfiguration());
-        System.out.println();
-        System.out.println("################################################################################");
+        builder.append("## Configuration, " + conf.getConfigurationInfomation() + ":\n");
+        builder.append('\n');
+        builder.append(conf.dumpConfiguration() + '\n');
+        builder.append('\n');
+        builder.append("################################################################################\n");
+        builder.append('\n');
+        
+        /* System properties stanza. */
+        builder.append("################################################################################\n");
+        builder.append("## System properties: \n");
+        builder.append('\n');
+        Properties sysProps = System.getProperties();
+        for (Entry<Object, Object> prop : sysProps.entrySet())
+        {
+            builder.append(prop.getKey() + "=" + prop.getValue() + '\n');
+        }
+        builder.append('\n');
+        builder.append("################################################################################\n");
+        builder.append('\n');
+        
+        /* Environment variables stanza. */
+        builder.append("################################################################################\n");
+        builder.append("## Environment variables: \n");
+        builder.append('\n');
+        Map<String, String> env = System.getenv();
+        for (Entry<String, String> e : env.entrySet())
+        {
+            builder.append(e.getKey() + "=" + e.getValue() + '\n');
+        }
+        builder.append('\n');
+        builder.append("################################################################################\n");
+        builder.append('\n');
+        
+        System.out.println(builder.toString());
+        LoggerFactory.getLoggerInstance().fatal(builder.toString());
     }
     
     /**

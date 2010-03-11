@@ -206,8 +206,19 @@ public class RigClient
         } 
         catch (Throwable thr)
         {
-            this.logger.fatal("Unhandled exception " + thr.getClass().getSimpleName() + " with error message " +
-                    thr.getMessage() + ". This is a proverbial blue screen of death, so please file a bug report.");
+            if (thr.getCause() != null)
+            {
+                Throwable cause = thr.getCause();
+                this.logger.fatal("Unhandled exception '" + cause.getClass().getSimpleName() + "' with error message '" +
+                        cause.getMessage() + "'. This is a proverbial blue screen of death. It may be caused by using " +
+                        "an action class that isn't valid for your platform or a bug.");
+            }
+            else
+            {
+                this.logger.fatal("Unhandled exception '" + thr.getClass().getSimpleName() + "' with error message '" +
+                        thr.getMessage() + "'. This is a proverbial blue screen of death. It may be caused by using " +
+                        "an action class that isn't valid for your platform or a bug.");
+            }
             RigClientDefines.reportBug("Unhandled exception which popped the stack.", thr);
             System.exit(1);
         }
