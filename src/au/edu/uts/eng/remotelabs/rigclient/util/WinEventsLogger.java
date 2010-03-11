@@ -64,8 +64,7 @@ public class WinEventsLogger extends AbstractLog4JLogger
 
         this.stackLevel = 4;
 
-        NTEventLogAppender appender = new NTEventLogAppender(new PatternLayout(AbstractLog4JLogger.PATTERN_LAYOUT));
-        appender.setSource("Rig Client");
+        NTEventLogAppender appender = new NTEventLogAppender("Rig Client", new PatternLayout(AbstractLog4JLogger.PATTERN_LAYOUT));
         this.logger.addAppender(appender);
     }
 
