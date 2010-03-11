@@ -373,6 +373,7 @@ public abstract class AbstractBatchRunner implements Runnable
         {
             this.logger.info("User set batch working directory base is " + this.workingDirBase);
         }
+        this.workingDirBase = new File(this.workingDirBase).getCanonicalPath();
         
         if (Boolean.parseBoolean(config.getProperty("Batch_Create_Nested_Dir", "true")))
         {
@@ -832,18 +833,7 @@ public abstract class AbstractBatchRunner implements Runnable
             		"located in " + this.workingDirBase);
             return;
         }
-        
-        /* Try to detect symbolic links so some mischievous moron doesn't 
-         * symlink to their  server root directory or some other 
-         * inconvenient place and end up potentially deleting the rig client
-         * server. */
-        /* DODGY This apparently works according to Java Bug ID: 4313887. */
-        if (!file.getCanonicalPath().equals(file.getAbsolutePath()))
-        {
-            this.logger.warn("Not deleting " + file.getAbsolutePath() + " as it appears to a symbolic link.");
-            return;
-        }
-        
+
         if (file.isDirectory())
         {
             /* Delete all the nested directories and files. */
