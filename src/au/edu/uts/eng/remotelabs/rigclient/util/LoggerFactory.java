@@ -199,6 +199,7 @@ public class LoggerFactory
         if (type.equalsIgnoreCase("ERROR")) return ILogger.ERROR;
         else if (type.equalsIgnoreCase("WARN")) return ILogger.WARN;
         else if (type.equalsIgnoreCase("INFO")) return ILogger.INFO;
+        else if (type.equalsIgnoreCase("DEBUG")) return ILogger.DEBUG;
         else
         {
             LoggerFactory.printFatalLogConfigurationError("Log_Level");
