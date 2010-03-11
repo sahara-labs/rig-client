@@ -62,7 +62,10 @@ public class WinEventsLogger extends AbstractLog4JLogger
             throw new RuntimeException("Unable to load Windows Events logger on a non windows platform.");
         }
 
+        this.stackLevel = 4;
+
         NTEventLogAppender appender = new NTEventLogAppender(new PatternLayout(AbstractLog4JLogger.PATTERN_LAYOUT));
+        appender.setSource("Rig Client");
         this.logger.addAppender(appender);
     }
 

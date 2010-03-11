@@ -76,6 +76,9 @@ public class RolledFileLogger extends AbstractLog4JLogger
         final int fileSize = this.getConfigInt(conf.getProperty("Log_File_Max_Size", "10"), 10);
         final int numBackups = this.getConfigInt(conf.getProperty("Log_File_Backups", "5"), 5);
         
+        /** Frustratingly this is different on Windows and Linux. */
+        if (System.getProperty("os.name").startsWith("Windows")) this.stackLevel = 4;
+        
         try
         {
             RollingFileAppender appender = new RollingFileAppender(
