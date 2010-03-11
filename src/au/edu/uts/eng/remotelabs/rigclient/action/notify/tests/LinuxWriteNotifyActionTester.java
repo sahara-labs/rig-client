@@ -97,7 +97,15 @@ public class LinuxWriteNotifyActionTester extends TestCase
     {
         if (this.writeAction == null) return;
         
-        assertTrue(this.writeAction.notify("Write Message", new String[] {"mdiponio"}));
+        assertTrue(this.writeAction.notify("Write Message", new String[] {"mdiponio", "tmachet", "teja"}));
     }
+    
+    @Test
+    public void testGetType()
+    {
+        if (this.writeAction == null) return;
+        assertEquals("Linux write notify action", this.writeAction.getActionType());
+    }
+    
 
 }

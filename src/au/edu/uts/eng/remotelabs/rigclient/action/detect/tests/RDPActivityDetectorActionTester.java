@@ -50,7 +50,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.action.detect.RDPActivityDetectorAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;

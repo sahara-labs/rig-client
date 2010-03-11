@@ -47,7 +47,6 @@ import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
 
-import au.edu.uts.eng.remotelabs.rigclient.action.detect.RDPActivityDetectorAction;
 import au.edu.uts.eng.remotelabs.rigclient.action.notify.WindowsMsgNotifyAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;

@@ -117,6 +117,7 @@ public class LinuxWriteNotifyAction implements INotifyAction
                     /* Empirical wait which should give plenty of time for a program 
                      * to crash out. */
                     Thread.sleep(250);
+                    
                     try
                     {
                         proc.exitValue();
@@ -124,19 +125,20 @@ public class LinuxWriteNotifyAction implements INotifyAction
                          * because the user doesn't exist as a console user.  */
                         this.logger.debug("Unable to send a console message to " + us + " because they don't have " +
                                 "a console session.");
-                        continue;
                     }
                     catch (IllegalThreadStateException thrEx)
-                    { /* This exception being thrown is what we want, it means write is waiting
-                       * for a message to send. */ }
+                    { 
+                        /* This exception being thrown is what we want, it means write is waiting
+                         * for a message to send. */
+                        PrintWriter writeStdIn = new PrintWriter(proc.getOutputStream());
+                        writeStdIn.write(message);
+                        writeStdIn.write("\n\n");
+
+                        writeStdIn.close();
+                        proc.waitFor();
+                    }                    
                     
-                    PrintWriter writeStdIn = new PrintWriter(proc.getOutputStream());
-                    writeStdIn.write(message);
-                    /* Set a EOF (EOT) to tell write the conversation is finished. */
-                    writeStdIn.write(4);
-                    writeStdIn.close();
-                    
-                    proc.waitFor();
+                    command.remove(us);
                 }
                 
                 return true;
@@ -148,6 +150,9 @@ public class LinuxWriteNotifyAction implements INotifyAction
             }
             catch (IOException ex)
             {
+                this.logger.error("Unable to invoke the 'write' command (using " + this.writeCommand + "). Exception " +
+                        "message is '" + ex.getMessage() + "'.");
+                this.failureReason = "Failed to invoke write.";
                 return false;
             }
         }
