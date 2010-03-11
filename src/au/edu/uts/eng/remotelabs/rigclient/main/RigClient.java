@@ -41,6 +41,8 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.main;
 
+import java.io.File;
+
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 import au.edu.uts.eng.remotelabs.rigclient.server.EmbeddedJettyServer;
 import au.edu.uts.eng.remotelabs.rigclient.server.IServer;
@@ -193,6 +195,14 @@ public class RigClient
             
             /* Stop server. */
             this.server.stopListening();
+            
+            /* Cleanup the '_axis2' folder if it exists. */
+            File file = new File("_axis2");
+            if (file.exists())
+            {
+                file.delete();
+            }
+            
         } 
         catch (Throwable thr)
         {
