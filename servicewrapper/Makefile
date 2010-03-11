@@ -42,7 +42,7 @@ CCOPTS=-g
 INCS=-I linux
 LIBS=-L /usr/lib/jvm/java-6-sun/lib -ldl -lpthread
 
-EXE_NAME=rigclient
+EXE_NAME=rigclientservice
 
 all: unixwrapper
 
