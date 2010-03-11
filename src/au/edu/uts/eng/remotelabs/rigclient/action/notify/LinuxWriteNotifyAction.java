@@ -38,9 +38,12 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.notify;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
 import au.edu.uts.eng.remotelabs.rigclient.rig.INotifyAction;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
-import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -92,10 +95,8 @@ public class LinuxWriteNotifyAction implements INotifyAction
         else
         {
             this.writeCommand = LinuxWriteNotifyAction.DEFAULT_WRITE_COMMAND;
-            this.logger.info("Using the default write command '" + LinuxWriteNotifyAction.DEFAULT_WRITE_COMMAND + 
-                    "'.");
+            this.logger.info("Using the default write command '" + LinuxWriteNotifyAction.DEFAULT_WRITE_COMMAND + "'.");
         }
- 
     }
 
     @Override
@@ -104,14 +105,51 @@ public class LinuxWriteNotifyAction implements INotifyAction
         synchronized (this)
         {
             ProcessBuilder procBuilder = new ProcessBuilder(this.writeCommand);
+            List<String> command = procBuilder.command();
             
-            for (String us : users)
+            try
             {
+                for (String us : users)
+                {
+                    command.add(us);
+                    Process proc = procBuilder.start();
+                    
+                    /* Empirical wait which should give plenty of time for a program 
+                     * to crash out. */
+                    Thread.sleep(250);
+                    try
+                    {
+                        proc.exitValue();
+                        /* Not throwing a exception means write crashed out, most likely 
+                         * because the user doesn't exist as a console user.  */
+                        this.logger.debug("Unable to send a console message to " + us + " because they don't have " +
+                                "a console session.");
+                        continue;
+                    }
+                    catch (IllegalThreadStateException thrEx)
+                    { /* This exception being thrown is what we want, it means write is waiting
+                       * for a message to send. */ }
+                    
+                    PrintWriter writeStdIn = new PrintWriter(proc.getOutputStream());
+                    writeStdIn.write(message);
+                    /* Set a EOF (EOT) to tell write the conversation is finished. */
+                    writeStdIn.write(4);
+                    writeStdIn.close();
+                    
+                    proc.waitFor();
+                }
                 
+                return true;
             }
-            
-            this.logger.debug("Going to provide notification message " + message + '.');
-            return false;
+            catch (InterruptedException ex)
+            {
+                Thread.currentThread().interrupt();
+                return true;
+            }
+            catch (IOException ex)
+            {
+                return false;
+            }
         }
     }
 
