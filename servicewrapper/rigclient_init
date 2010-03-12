@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+# Starts the Sahara RigClient 
+#
+# description: rigclient_init
+# processname: rigclient_init
+#
+# author: tmachet (tania.machet@eng.uts.edu.au
+# date: 12/03/2010
+
+# Source function library.
+if [ -f /etc/init.d/functions ]; then
+  . /etc/init.d/functions
+fi
+
+. /lib/lsb/init-functions
+
+
+INST_DIR=/usr/local
+test -d $INST_DIR || exit 0
+
+# Executables
+EXEC=rigclientservice
+LOG=/var/log/rigclientservice
+
+RETVAL=0
+
+start() {
+    echo "Starting rigclient..."
+    # -d automatically forks
+    
+    pushd .
+	cd $INST_DIR
+	$INST_DIR/$EXEC & > $LOG 
+	popd
+	
+}
+
+stop() {
+    echo "Shutting down rigclient..."
+    PID=`ps -C rigclient | grep rigclient | cut -d ' ' -f1`
+    if [ $PID > 0 ]; then
+		echo PID
+		#kill -SIGTERM $PID &> /dev/null
+    fi
+}
+
+
+restart() {
+    echo "Restarting rigclient..."
+    stop
+    start
+}	
+
+reload() {
+	restart
+}	
+
+
+case "$1" in
+start)
+	start
+	;;
+stop)
+	stop
+	;;
+reload|restart)
+	restart
+	;;
+*)
+	echo $"Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
+exit $RETVAL
+
+
