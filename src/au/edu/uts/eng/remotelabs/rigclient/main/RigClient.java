@@ -99,7 +99,11 @@ public class RigClient
         try
         {
             this.logger.priority("Rig client is starting up...");
-            if (this.config.getProperty("Rig_Name") == null)
+            
+            /* Pre-Start, make sure the required properties are valid. */
+            String name = this.config.getProperty("Rig_Name");
+            String type = this.config.getProperty("Rig_Type");
+            if (name == null || name.length() == 0)
             {
                 this.logger.fatal("Unable to load the rig's name. Unrecoverable, please check configuration to " +
                         "ensure a valid rig name is specified ('Rig_Name' property).");
@@ -107,7 +111,7 @@ public class RigClient
             }
             this.logger.priority("Rig name: " + this.config.getProperty("Rig_Name"));
             
-            if (this.config.getProperty("Rig_Type") == null)
+            if (type == null || type.length() == 0)
             {
                 this.logger.fatal("Unable to load the rig's type. Unrecoverable, please check configuration to " +
                         "ensure a valid rig type is specified ('Rig_Type' property).");
