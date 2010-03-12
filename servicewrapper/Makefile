@@ -37,7 +37,7 @@
 # @date 8th March 2010
 #
 
-CCOPTS=-g
+CCOPTS=
 
 INCS=-I linux
 LIBS=-L /usr/lib/jvm/java-6-sun/lib -ldl -lpthread
@@ -50,10 +50,10 @@ unixwrapper: jvmrunner.o unixwrapper.o
 	cc ${CCOPTS} ${INCS} ${LIBS} jvmrunner.o unixwrapper.o -o ${EXE_NAME}
 
 unixwrapper.o: unixwrapper.c
-	cc -c ${CCOPTS} ${INCS} ${LIBS} unixwrapper.c
+	cc -c ${CCOPTS} ${INCS} unixwrapper.c
 
 jvmrunner.o: jvmrunner.c
-	cc -c ${CCOPTS} ${INCS} ${LIBS} jvmrunner.c
+	cc -c ${CCOPTS} ${INCS} jvmrunner.c
 
 clean:
 	 rm -rf *.o *~ ${EXE_NAME}
