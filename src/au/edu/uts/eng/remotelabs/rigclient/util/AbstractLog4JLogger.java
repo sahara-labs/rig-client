@@ -64,7 +64,7 @@ abstract class AbstractLog4JLogger extends AbstractLogger
    public AbstractLog4JLogger() 
    {
        super();
-       this.logger = Logger.getLogger("ISG Client");
+       this.logger = Logger.getLogger("Rig Client");
 
        switch(LoggerFactory.getLoggingLevel())
        {
