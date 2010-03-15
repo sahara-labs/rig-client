@@ -332,7 +332,7 @@ Changelog:
     
             <xsd:complexType name="NullType">
             	<xsd:sequence>
-            		<xsd:element name="void" type="xsd:string"></xsd:element>
+            		<xsd:element name="void" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
     

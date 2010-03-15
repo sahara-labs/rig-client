@@ -302,7 +302,7 @@ public class NullType implements ADBBean
                 }
                 else
                 {
-                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                   // throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
