@@ -94,7 +94,6 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         if (this.isBatchRunning())
         {
             this.logger.warn("Attempting to start a new batch control invocation, cannot start a new invocation.");
-            this.logger.debug("Tania, congraulations! You have found a debugging message to delete.");
             return false;
         }
         
