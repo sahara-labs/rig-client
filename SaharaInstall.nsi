@@ -25,8 +25,7 @@ Name "Sahara"
 OutFile "SaharaRigClient.exe"
 
 ; The default installation directory
-;InstallDir "C:\Program Files\Sahara"
-InstallDir "D:\Sahara"
+InstallDir "C:\Program Files\"
 
 BrandingText "$(^Name)"
 WindowIcon off
@@ -60,6 +59,7 @@ Var DirHeaderSubText
 !define MUI_PAGE_CUSTOMFUNCTION_Pre DirectoryPagePre
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW DirectoryPageShow
 !insertmacro MUI_PAGE_DIRECTORY
+!define MUI_PAGE_CUSTOMFUNCTION_Pre SetInstallDir
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
@@ -77,25 +77,38 @@ Var DirHeaderSubText
 
 Var DisplayText
 Var NoSectionSelectedUninstall 
+Var SaharaAlreadyInstalled ;0=Not installed, 1=Installed but different version, 2=installed and same version 
 
 Function DirectoryPagePre
 	; If there is already an installation of Sahara, use the same folder for this installation. Else let the user select the installation folder
-	ReadRegStr $R0 HKLM "${REGKEY}" "Path"
-	${If} $R0 S!= ""
+ 	${If} $SaharaAlreadyInstalled S== "0"
+		StrCpy $DirHeaderText "Choose Install Location"
+		StrCpy $DirHeaderSubText "Choose the folder in which to install $(^Name)"
+	${ElseIf} $SaharaAlreadyInstalled S== "2" 
 		StrCpy $DirHeaderText "Using existing Sahara installation forlder"
 		StrCpy $DirHeaderSubText "One or more components of $(^Name) are already installed on this machine. Installer will use same destination folder"
 		StrCpy $INSTDIR $R0
+	${EndIf}
+
+FunctionEnd
+
+Function CheckSaharaVersion
+	ReadRegStr $R0 HKLM "${REGKEY}" "CurrentVersion"
+	${If} $R0 S== ""
+		StrCpy $SaharaAlreadyInstalled "0"
+	${ElseIf} $R0 S!=  ${Version} 
+		StrCpy $SaharaAlreadyInstalled "1"
 	${Else}
-		StrCpy $DirHeaderText "Choose Install Location"
-		StrCpy $DirHeaderSubText "Choose the folder in which to install $(^Name)"
+		StrCpy $SaharaAlreadyInstalled "2"
 	${EndIf}
 FunctionEnd
+
 
 Function DirectoryPageShow
 
 	; If there is already an installation of Sahara, disable the destination folder selection and use the same folder for this installation. 
 	; Else let the user select the installation folder
-	ReadRegStr $R0 HKLM "${REGKEY}" "Path"
+	ReadRegStr $R0 HKLM "${REGKEY}" "CurrentVersion"
 	${If} $R0 S!= ""
 		StrCpy $INSTDIR $R0
 		; Disable the page
@@ -108,11 +121,22 @@ Function DirectoryPageShow
 	${EndIf}
 FunctionEnd
 
+Function SetInstallDir
+	StrCpy $INSTDIR "$INSTDIR\Sahara"
+	MessageBox MB_OK "Inst dir is $INSTDIR"
+FunctionEnd
 
 Function .onInit
 	; Splash screen 
 	advsplash::show 1000 1000 1000 -1 labshare
  	StrCpy $skipSection "false"
+ 	StrCpy $SaharaAlreadyInstalled "-1"
+	call CheckSaharaVersion
+	${If} $SaharaAlreadyInstalled S== "1"
+		MessageBox MB_OK|MB_ICONSTOP "A different version of Sahara is already installed on this machine. $\nPlease uninstall the existing Sahara software before continuing the installation"
+		Abort 
+	${EndIf}
+
 FunctionEnd
 
 Function checkJREVersion
@@ -164,7 +188,7 @@ Function checkIfServiceInstalled
 	Found:
 FunctionEnd
 
-; Check if teh installation should continue if Rig Client is not selected and/or not installed already
+; Check if the installation should continue if Rig Client is not selected and/or not installed already
 !macro checkIfRCInstalledOrSelected thisSection
     	${IfNot} ${SectionIsSelected} ${RigClient}
 		ClearErrors
@@ -309,6 +333,7 @@ Section -createUninstaller
 	ABort
 	createUninstaller:
 	WriteRegStr HKLM "${REGKEY}" Path $INSTDIR
+	WriteRegStr HKLM "${REGKEY}" CurrentVersion  ${Version}
 	SetOutPath $INSTDIR
 	WriteUninstaller $INSTDIR\uninstallSaharaRigClient.exe
 SectionEnd
@@ -452,7 +477,7 @@ Section -un.postactions
 
 
 
-	; Check if all teh components are deleted. If they are, delete the main installation directory and uninstaller
+	; Check if all the components are deleted. If they are, delete the main installation directory and uninstaller
 	ReadRegStr $R0 HKLM "${REGKEY}" "Path"
 	${If} $R0 S== ""
 		DeleteRegKey /IfEmpty HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
