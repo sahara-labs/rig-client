@@ -212,7 +212,7 @@ public class StatusUpdater implements Runnable
                     StringBuilder capBuilder = new StringBuilder();
                     for (int i = 0; i < caps.length; i++)
                     {
-                        capBuilder.append(caps[0]);
+                        capBuilder.append(caps[i]);
                         if ((i + 1) != caps.length) capBuilder.append(',');
                     }
                     registerType.setCapabilities(capBuilder.toString());
