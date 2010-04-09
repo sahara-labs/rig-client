@@ -609,7 +609,7 @@ public abstract class AbstractRig implements IRig
     @Override
     public boolean setInterval(final int interval)
     {
-        this.logger.info("Setting test interval to " + interval + " minutes.");
+        this.logger.info("Setting test interval to " + (interval) + " minutes.");
         
         synchronized (this.testActions)
         {

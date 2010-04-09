@@ -983,7 +983,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         else if (this.rig.setInterval(request.getInterval()))
         {
-            this.logger.info("Successfully set the test interval to " + request.getInterval() + ".");
+            this.logger.info("Successfully set the test interval to " + request.getInterval() + " minutes.");
             operation.setSuccess(true);
         }
         else

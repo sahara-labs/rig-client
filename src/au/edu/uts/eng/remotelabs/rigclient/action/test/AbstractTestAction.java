@@ -222,13 +222,13 @@ public abstract class AbstractTestAction implements ITestAction
     {
         if (this.isSetIntervalHonoured)
         {
-            this.logger.info("Changing the test interval for " + this.getActionType() + " to " + interval + ".");
-            this.runInterval = interval;
+            this.logger.info("Changing the test interval for " + this.getActionType() + " to " + interval + " minutes.");
+            this.runInterval = interval * 60;
         }
         else
         {
             this.logger.info("Ignoring request to change test interval for " + this.getActionType() + " to "
-                    + interval + ". Keeping test interval at " + this.runInterval + ".");
+                    + interval + " minutes. Keeping test interval at " + this.runInterval + ".");
         }
     }
 
