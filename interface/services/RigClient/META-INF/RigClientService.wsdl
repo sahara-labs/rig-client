@@ -86,7 +86,6 @@ Changelog:
       <xsd:element name="setTestIntervalResponse"
       	type="rigclient:OperationResponseType">
       </xsd:element>
-
       <xsd:complexType name="UserType">
       	<xsd:annotation>
       		<xsd:documentation>
@@ -105,7 +104,6 @@ Changelog:
       	</xsd:complexContent>
       </xsd:complexType>
       <xsd:element name="in" type="rigclient:UserType"></xsd:element>
-    
             <xsd:complexType name="OperationResponseType">
                 <xsd:annotation>
                 	<xsd:documentation>Response from performing a request.</xsd:documentation>
@@ -301,7 +299,6 @@ Changelog:
             		<xsd:element name="stdout" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
             		<xsd:element name="stderr" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
             	</xsd:sequence>
-            	NewOperation
             </xsd:complexType>
     
             <xsd:complexType name="AttributeRequestType">
