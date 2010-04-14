@@ -1,6 +1,6 @@
 /**
  * Sahara Rig Client - Service Wrapper
- * 
+ *
  * Software abstraction of physical rig to provide rig session control
  * and rig device control. Automatically tests rig hardware and reports
  * the rig status to ensure rig goodness.
@@ -10,27 +10,27 @@
  * Copyright (c) 2009, University of Technology, Sydney
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- *  * Redistributions of source code must retain the above copyright notice, 
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in the 
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- *  * Neither the name of the University of Technology, Sydney nor the names 
- *    of its contributors may be used to endorse or promote products derived from 
+ *  * Neither the name of the University of Technology, Sydney nor the names
+ *    of its contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
@@ -44,15 +44,18 @@
  *  * JVM_Location - 1      - Path to the Java virtual machine library.
  *  * Extra_Lib    - 0 .. * - List of extra JAR libraries to load to add to
  *                            classpath.
- * 
+ *  * Max_Memory   -        - The maximum heap memory to set on the Java
+ *                            machine (-Xmx JVM option) in megabytes.
+ *  * Java_Options -        - An option string to provide to JVM.
+ *
  * @return true if successful, false otherwise
  */
 int loadConfig(void)
 {
-	char buf[201], prop[201], *line, *val;
+	char buf[1024], prop[1024], *line, *val;
 	FILE *config, *jvmPath;
 
-	memset(buf, 0, 201);
+	memset(buf, 0, 1024);
 
 	if ((config = fopen(CONFIG_FILE, "r")) == NULL)
 	{
@@ -62,17 +65,18 @@ int loadConfig(void)
 	}
 	logMessage("Opened log file '%s' successfully.\n", CONFIG_FILE);
 
-	while (fgets(buf, 200, config) != NULL)
+	while (fgets(buf, 1023, config) != NULL)
 	{
 		line = buf;
-		memset(prop, 0, 201);
+		memset(prop, 0, 1024);
 
 		line = trim(line);
 		if (strlen(line) == 0) continue; /* Empty line.    */
 		if (line[0] == '#') continue;    /* Comment line. */
 
 		val = line;
-		while (!isspace(*val) && *val != '\0') val++;
+		/* The ini format prop to value delimiter is an equal sign. */
+		while (*val != '=' && *val != '\0') val++;
 		if (*val == '\0')
 		{
 			logMessage("No value for prop %s.\n", line);
@@ -80,7 +84,11 @@ int loadConfig(void)
 		}
 
 		strncpy(prop, line, val - line);
-		val = val + 1;
+		trim(prop);
+		trim(val);
+		val = val + 1;                               /* Equals sign. */
+		while (*val != '\0' && isspace(*val)) val++; /* Remaining left whitespace. */
+
 		logMessage("Prop=%s Value=%s\n", prop, val);
 
 		if (strcmp("JVM_Location", prop) == 0)
@@ -88,6 +96,7 @@ int loadConfig(void)
 			jvmSo = (char *)malloc(sizeof(char) * strlen(val));
 			memset(jvmSo, 0, strlen(val));
 			strcpy(jvmSo, val);
+			printf("JVM location is %s\n", jvmSo);
 		}
 		else if (strcmp("Extra_Lib", prop) == 0)
 		{
@@ -99,13 +108,23 @@ int loadConfig(void)
 			}
 			else
 			{
-				char *tmp = (char *)malloc(strlen(val) + 1 + strlen(classPathExt));
+				char *tmp = (char *)malloc(sizeof(char) * (strlen(val) + 1 + strlen(classPathExt)));
+				memset(tmp, 0, strlen(val) + 1 + strlen(classPathExt));
 				strcpy(tmp, classPathExt);
 				strcat(tmp, CLASS_PATH_DELIM);
 				strcat(tmp, val);
 				free(classPathExt);
 				classPathExt = tmp;
 			}
+		}
+		else if (strcmp("Max_Memory", prop) == 0)
+		{
+		    int len = 7 + strlen(val);
+			maxHeap = (char *)malloc(sizeof(char) * len);
+			memset(maxHeap, 0, len);
+			strcat(maxHeap, "-Xmx");
+			strcat(maxHeap, val);
+			*(maxHeap + 4 + strlen(val)) = 'm';
 		}
 		else
 		{
@@ -114,7 +133,7 @@ int loadConfig(void)
 	}
 
 #ifdef WIN32
-	/* If on Windows attempt to use the registry to determine if Java is installed, 
+	/* If on Windows attempt to use the registry to determine if Java is installed,
 	 * what version and where the runtime DLL is installed. The keys used are:
 	 *    - [HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\CurrentVersion]
 	 *    - [HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\1.6\RuntimeLib] */
@@ -168,7 +187,7 @@ int loadConfig(void)
 	}
 	else if ((jvmPath = fopen(jvmSo, "r")) == NULL)
 	{
-		logMessage("Unable to use configured JVM location '%s' as the file does not exist.\n", val);
+		logMessage("Unable to use configured JVM location '%s' as the file does not exist.\n", jvmSo);
 		perror("Failed opening JVM library");
 		free(jvmSo);
 		jvmSo = NULL;
@@ -262,7 +281,7 @@ int generateClassPath(void)
 				if (strstr(dp->d_name, ".jar") == (dp->d_name + strlen(dp->d_name) - 4))
 				{
 					logMessage("Adding JAR with path %s.\n", dp->d_name);
-					
+
 					oldSize = strlen(classPath);
 					size += 7 + strlen(currentDir) + strlen(dp->d_name);
 					classPath = (char *)realloc(classPath, size);
@@ -290,7 +309,7 @@ int generateClassPath(void)
 int startJVM()
 {
 	JavaVMInitArgs vm_args;
-	JavaVMOption options[2];
+	JavaVMOption *options;
 	jint res;
 	JNIEnv *env;
 	jclass clazz;
@@ -302,11 +321,25 @@ int startJVM()
 	void *libVM;
 #endif
 
-	/* Set the classpath. */
-	options[0].optionString = classPath;
-	options[1].optionString = "-Xrs";
+	if (maxHeap == NULL)
+	{
+	    options = (JavaVMOption *) malloc(sizeof(JavaVMOption) * 2);
+	}
+	else
+	{
+		options = (JavaVMOption *) malloc(sizeof(JavaVMOption) * 3);
+	}
+
+	/* Set up Java options. */
+	options[0].optionString = classPath; /* Sets the Java classpath. */
+	options[1].optionString = "-Xrs";    /* Set Java to not use a signal handler, (we use our own). */
+	if (maxHeap != NULL)
+	{
+		options[2].optionString = maxHeap;
+	}
+
 	vm_args.options = options;
-	vm_args.nOptions = 2;
+	vm_args.nOptions = maxHeap == NULL ? 2 : 3;
 	vm_args.ignoreUnrecognized = JNI_FALSE;
 	vm_args.version = JNI_VERSION_1_4;
 
@@ -322,7 +355,7 @@ int startJVM()
 #else
 	libVM = dlopen(jvmSo, RTLD_LAZY);
 	if (libVM == NULL)
-	{	
+	{
 		logMessage("Unable to load library %s.\n", jvmSo);
 		perror("Error loading JVM library");
 		return 0;
@@ -420,9 +453,9 @@ void logMessage(char *fmt, ...)
 	va_end(argp);
 }
 
-/** 
+/**
  * Trims leading and trailing whitespace from a string.
- * 
+ *
  * @param *tmp string to trim
  */
 char *trim(char *tmp)

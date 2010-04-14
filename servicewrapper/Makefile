@@ -37,7 +37,7 @@
 # @date 8th March 2010
 #
 
-CCOPTS=
+CCOPTS= -O0 -g
 
 INCS=-I linux
 LIBS=-L /usr/lib/jvm/java-6-sun/lib -ldl -lpthread
