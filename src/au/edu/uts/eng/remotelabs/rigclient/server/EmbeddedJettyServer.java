@@ -269,9 +269,10 @@ public class EmbeddedJettyServer implements IServer
      * @param port port number 
      * @param post resource name
      * @return generated address
+     * @throws UnknownHostException 
      * @throws UnknownHostException error finding local IP.
      */
-    private String generateAddress(final String proto, final int port, final String post) throws SocketException
+    private String generateAddress(final String proto, final int port, final String post) throws SocketException, UnknownHostException
     {
         StringBuilder builder = new StringBuilder();
         
@@ -298,6 +299,12 @@ public class EmbeddedJettyServer implements IServer
                 {
                     continue;
                 }
+                
+                /* If the network device is the loopback address, continue searching. */
+                if (nic.isLoopback())
+                {
+                	continue;
+                }
 
                 Enumeration<InetAddress> boundAddrs = nic.getInetAddresses();
                 InetAddress addr = null;
@@ -315,7 +322,9 @@ public class EmbeddedJettyServer implements IServer
             /* Check to see if an address was found. */ 
             if (!found)
             {
-                throw new SocketException("Unable to find a viable listening address");
+            	/* No external addresses were found so fall back to the listening loopback address, provided it is not
+            	 * the configured nic. */
+            	builder.append(Inet4Address.getLocalHost().getCanonicalHostName());
             }
         }
         else
