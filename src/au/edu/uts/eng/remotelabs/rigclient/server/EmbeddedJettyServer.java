@@ -324,7 +324,7 @@ public class EmbeddedJettyServer implements IServer
             {
             	/* No external addresses were found so fall back to the listening loopback address, provided it is not
             	 * the configured nic. */
-            	builder.append(Inet4Address.getLocalHost().getCanonicalHostName());
+            	builder.append(InetAddress.getLocalHost().getCanonicalHostName());
             }
         }
         else
