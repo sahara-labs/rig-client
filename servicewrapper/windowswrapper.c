@@ -138,15 +138,6 @@ void WINAPI ServiceMain(DWORD dwArgc, LPTSTR *lpszArgv)
 	serviceStatus.dwControlsAccepted = 0;
 	SetServiceStatus(serviceHandle, &serviceStatus);
 
-	/* Create event that will be fired with the service is to stop. */
-	if ((stopEvent = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL)
-	{
-		logMessage("Failed to create service stop event with error code %i.\n", GetLastError());
-		serviceStatus.dwCurrentState = SERVICE_STOPPED;
-		SetServiceStatus(serviceHandle, &serviceStatus);
-		return;
-	}
-
 	/* Start the JVM in it's own thread. */
 	threadHandle = CreateThread(
 		NULL,       /* Default security attributes. */
@@ -170,12 +161,15 @@ void WINAPI ServiceMain(DWORD dwArgc, LPTSTR *lpszArgv)
 	serviceStatus.dwWaitHint = 0;
 	SetServiceStatus(serviceHandle, &serviceStatus);
 
-	/* Wait for stop to be fired. */
-	WaitForSingleObject(stopEvent, INFINITE);
+	/* Wait forver for the rig client thread to terminate. */
+	WaitForSingleObject(threadHandle, INFINITE);
+
+	logMessage("Rig client service has successfully shutdown...\n\n");
 
 	/* Shutdown service. */	
 	serviceStatus.dwCurrentState = SERVICE_STOPPED;
 	SetServiceStatus(serviceHandle, &serviceStatus);
+
 	return;
 }
 
@@ -189,16 +183,16 @@ void WINAPI ServiceHandler(DWORD control)
 		/* Shutdown the service. */
 		case SERVICE_CONTROL_STOP:
 		case SERVICE_CONTROL_SHUTDOWN:
-			logMessage("Handling a stop/shutdown control request, shutting down...");
+			logMessage("Handling a stop/shutdown control request, shutting down...\n");
 
 			/* Set the status to stop pending and shutdown JVM. */
 			serviceStatus.dwCurrentState = SERVICE_STOP_PENDING;
 			serviceStatus.dwControlsAccepted = 0;
-			serviceStatus.dwWaitHint = 30000;
+			serviceStatus.dwWaitHint = 60000;
 			SetServiceStatus(serviceHandle, &serviceStatus);
+
+			/* Notify the Rig Client to shutdown. */
 			shutDownJVM();
-		
-			SetEvent(stopEvent);
 			break;
 		default:
 			break;
@@ -220,7 +214,9 @@ DWORD WINAPI threadMain(LPVOID lpParam)
 		logMessage("Unable to generate classpath.");
 		return 0;
 	}
-	return startJVM();
+	
+	startJVM();
+	return 1;
 }
 
 /**

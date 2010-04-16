@@ -416,7 +416,7 @@ int shutDownJVM()
 		return 0;
 	}
 
-	printf("Calling shutdown...\n");
+	logMessage("Calling shutdown...\n");
 	(*env)->CallStaticVoidMethod(env, clazz, method, NULL);
 	if ((*env)->ExceptionCheck(env))
 	{

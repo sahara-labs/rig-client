@@ -99,9 +99,6 @@ DWORD WINAPI threadMain(LPVOID lpParam);
  ** Globals                                                                   **
  ******************************************************************************/
 
-/** Event to notify the ServiceMain function to terminate. */
-HANDLE stopEvent;
-
 /** Handle for the status structure. */
 SERVICE_STATUS_HANDLE serviceHandle; 
 
