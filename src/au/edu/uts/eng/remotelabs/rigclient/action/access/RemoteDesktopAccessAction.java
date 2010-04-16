@@ -201,6 +201,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     {
                         this.logger.info("The user " + name + " could not be added to the user group " + groupName
                                 + "for Remote Desktop Access using the command " + commandAdd.toString() + '.');
+                        this.failureReason = "User could not be added to Remote Desktop Users group.";
                         return false;
                     }
                     
@@ -211,6 +212,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
             {
                 this.logger.info("Executing the command to add user " + name + " to the Remote Desktop users group " 
                         + groupName + " failed with error " + e.getMessage() + '.');
+                this.failureReason = "Command to add user to Remote Desktop Users group has failed.";
                 return false;
             }
         }
@@ -272,6 +274,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
                         {
                             this.logger.warn("Attempt to log off Remote Desktop session ID " + qwinstaSplit[2] + 
                                     " for user " + name + " returned unexpected result " + procLogoff.exitValue() + '.');
+                            this.failureReason = "User session could not be ended - user acces revoke failed.";
                             return false;
                         }
                     }
@@ -332,6 +335,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     
                     if (procCheck.exitValue() != 0)
                     {
+                        this.failureReason = "User could not be be removed from Remote Desktop Users group.";
                         return false;
                     }
                 }
