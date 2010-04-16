@@ -107,7 +107,7 @@ public class RigClient
             {
                 this.logger.fatal("Unable to load the rig's name. Unrecoverable, please check configuration to " +
                         "ensure a valid rig name is specified ('Rig_Name' property).");
-                System.exit(2);
+                return;
             }
             this.logger.priority("Rig name: " + this.config.getProperty("Rig_Name"));
             
@@ -115,7 +115,7 @@ public class RigClient
             {
                 this.logger.fatal("Unable to load the rig's type. Unrecoverable, please check configuration to " +
                         "ensure a valid rig type is specified ('Rig_Type' property).");
-                System.exit(2);
+                return;
             }
             this.logger.priority("Rig type: " + this.config.getProperty("Rig_Type"));
 
@@ -139,7 +139,7 @@ public class RigClient
                 this.logger.fatal("Unable to start the rig client server. Unrecoverable, please check configuration," +
                 		" to ensure a valid port number and the operating system process list to ensure no other" +
                 		" rig clients are running.");
-                System.exit(3);
+                return;
             }
             
             while (!this.server.isListening())
@@ -159,7 +159,7 @@ public class RigClient
             catch (Exception ex)
             {
                 this.logger.fatal("Unable to start the status updater because " + ex.getMessage() + '.');
-                System.exit(4);
+                return;
             }
             
             /* ------------------------------------------------------------------
@@ -224,11 +224,11 @@ public class RigClient
                         "an action class that isn't valid for your platform or a bug.");
             }
             RigClientDefines.reportBug("Unhandled exception which popped the stack.", thr);
-            System.exit(1);
+            return;
         }
         
         /* Sorry to see you go... */
-        System.exit(0);
+        this.logger.priority("Rig client shutdown successfully completed...");
     }
     
     /**
