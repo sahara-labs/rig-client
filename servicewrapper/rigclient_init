@@ -8,7 +8,7 @@
 # author: tmachet (tania.machet@eng.uts.edu.au)
 # date: 12/03/2010
 
-INST_DIR=/usr/stest/rigclient
+INST_DIR=/usr/local/rigclient
 test -d $INST_DIR || exit 0
 
 # Executables
@@ -17,8 +17,8 @@ EXEC=rigclientservice
 RETVAL=0
 
 start() {
-    PID=`ps -C $EXEC | grep rigclient | cut -d ' ' -f1`
-    if [ $PID > 0 ]; then
+    PID=`ps -C $EXEC | grep rigclient | awk -F ' ' '{prinf $1}' `
+    if [[ ! "$PID" > 0 ]]; then
 		echo "Starting the Rig Client..."
 		pushd .
 		cd $INST_DIR
@@ -30,11 +30,10 @@ start() {
 }
 
 stop() {
-    echo "Shutting down rigclient..."
-    PID=`ps -C $EXEC | grep rigclient | cut -d ' ' -f1`
-    if [ $PID > 0 ]; then
-    	echo $PID
-		//kill -SIGTERM $PID &> /dev/null
+    PID=`ps -C $EXEC | grep rigclient | awk -F ' ' '{prinf $1}' `
+    if [[ "$PID" > 0 ]]; then
+    	echo "Shutting down rigclient with PID "$PID"..."
+		kill -SIGTERM $PID &> /dev/null
     fi
 }
 
@@ -42,6 +41,7 @@ stop() {
 restart() {
     echo "Restarting rigclient..."
     stop
+    sleep 5
     start
 }	
 
