@@ -46,7 +46,6 @@
  *                            classpath.
  *  * Max_Memory   -        - The maximum heap memory to set on the Java
  *                            machine (-Xmx JVM option) in megabytes.
- *  * Java_Options -        - An option string to provide to JVM.
  *
  * @return true if successful, false otherwise
  */
@@ -93,10 +92,10 @@ int loadConfig(void)
 
 		if (strcmp("JVM_Location", prop) == 0)
 		{
-			jvmSo = (char *)malloc(sizeof(char) * strlen(val));
-			memset(jvmSo, 0, strlen(val));
+			jvmSo = (char *)malloc(sizeof(char) * (strlen(val) + 1));
+			memset(jvmSo, 0, strlen(val) + 1);
 			strcpy(jvmSo, val);
-			printf("JVM location is %s\n", jvmSo);
+			logMessage("JVM location is '%s'.\n", jvmSo);
 		}
 		else if (strcmp("Extra_Lib", prop) == 0)
 		{
@@ -345,11 +344,36 @@ int startJVM()
 
 	/* Load the JVM library and find the JNI_CreateJavaVM function. */
 #ifdef WIN32
+	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
 	hVM = LoadLibrary(jvmSo);
 	if (hVM == NULL)
 	{
-		logMessage("Unable to load library %s.\n", jvmSo);
-		return 0;
+		char *pch = jvmSo, *bch = NULL, *javaBin;
+
+		/* Add the Java installation bin directory to the DLL search path so msvcr71.dll
+		 * can be loaded when java.dll is loaded. See Java bug #6509291. */
+		while ((pch = strstr(pch, "bin")) != NULL) bch = pch++;
+		if (bch == NULL)
+		{
+			logMessage("Unable to find 'bin/' directory in the Java installaion directory. This is "
+				       "most likely a bug caused by a change in the Java installation layout. Please "
+					   "report this with the Java version in use.");
+			return 0;
+		}
+
+		javaBin = (char *) malloc(bch - jvmSo + 5);
+		memset(javaBin, 0, bch - jvmSo + 5);
+		strncpy(javaBin, jvmSo, bch - jvmSo);
+		strcat(javaBin, "bin");
+
+		logMessage("Adding '%s' to the DLL search path.\n");
+		SetDllDirectory(javaBin);
+		hVM = LoadLibraryEx(jvmSo, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+		if (hVM == NULL)
+		{
+			logMessage("Unable to load library %s, error code %i.\n", jvmSo, GetLastError());
+			return 0;
+		}
 	}
 	createJVM = (CreateJavaVM)GetProcAddress(hVM, "JNI_CreateJavaVM");
 #else
