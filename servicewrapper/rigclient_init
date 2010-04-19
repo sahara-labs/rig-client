@@ -17,23 +17,25 @@ EXEC=rigclientservice
 RETVAL=0
 
 start() {
-    PID=`ps -C $EXEC | grep rigclient | awk -F ' ' '{prinf $1}' `
+    PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
     if [[ ! "$PID" > 0 ]]; then
 		echo "Starting the Rig Client..."
 		pushd .
 		cd $INST_DIR
 		$INST_DIR/$EXEC &
 		popd
-	lse
+	else
 		echo "Rig Client has already started. Process ID "$PID
     fi
 }
 
 stop() {
-    PID=`ps -C $EXEC | grep rigclient | awk -F ' ' '{prinf $1}' `
+    PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
     if [[ "$PID" > 0 ]]; then
     	echo "Shutting down rigclient with PID "$PID"..."
 		kill -SIGTERM $PID &> /dev/null
+	else
+		echo "No Rig Client found to shut down"
     fi
 }
 
