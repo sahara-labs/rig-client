@@ -7,8 +7,12 @@
 #
 # author: tmachet (tania.machet@eng.uts.edu.au)
 # date: 12/03/2010
+#
+# chkconfig: 345 95 5
+# description: Rig Client service for Sahara rig client
 
-INST_DIR=/usr/local/rigclient
+
+INST_DIR=/usr/lib/rigclient
 test -d $INST_DIR || exit 0
 
 # Executables
