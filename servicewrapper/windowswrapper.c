@@ -130,7 +130,6 @@ void WINAPI ServiceMain(DWORD dwArgc, LPTSTR *lpszArgv)
 	/* Initialise the service status structure. */
 	serviceStatus.dwServiceSpecificExitCode = 0;
 	serviceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
-	serviceStatus.dwWin32ExitCode = NOERROR;
 	serviceStatus.dwWaitHint = 30000;
 
 	/* Set the service start to start pending. */
@@ -157,7 +156,7 @@ void WINAPI ServiceMain(DWORD dwArgc, LPTSTR *lpszArgv)
 
 	/* Set the service start to running. */
 	serviceStatus.dwCurrentState = SERVICE_RUNNING;
-	serviceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP;
+	serviceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
 	serviceStatus.dwWaitHint = 0;
 	SetServiceStatus(serviceHandle, &serviceStatus);
 
