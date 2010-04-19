@@ -96,6 +96,10 @@ extern "C"
 /** Configuration file containing location. */
 #define CONFIG_FILE "config/rigclient_service.ini"
 
+/** Name of the environment variable which may contain the JVM shared object
+ *  location. */
+#define JVM_SO_ENV "JVM_SO"
+
 /******************************************************************************
  ** Global variables.                                                        **
  *****************************************************************************/

@@ -177,11 +177,11 @@ int loadConfig(void)
 		}
 	}
 #endif
-
-	/* The Java installation path is mandatory so ensure it was properly loaded or detected. */
-	if (jvmSo == NULL)
+	/* If the JVM location still isn't found, use an environment variable to
+	 * attempt to locate the JVM library. */
+	if (jvmSo == NULL && (jvmSo = getenv(JVM_SO_ENV)) == NULL)
 	{
-		logMessage("The JVM location was not found.");
+		logMessage("The JVM location was not found.\n");
 		return 0;
 	}
 	else if ((jvmPath = fopen(jvmSo, "r")) == NULL)
