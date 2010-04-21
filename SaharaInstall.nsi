@@ -35,24 +35,7 @@
  * @date 12th March 2010
  */
  
- /*
- * The installer script expects that the source files/directories are available in the same  
- * directory as this script. The  expected directory structure is -
- * Main directory 
- *     | 
- *     |
- *     ---- SaharaInstall.nsi - this script
- *     |
- *     ---- RigClient/ - directory containg Rig Client and Rig Client CLI 
- *     |                 executables/directories
- *     ---- SchedulingServer/ - directory containg Scheduling Server 
- *     |                        executables/directories
- *     ---- WI/ - cdirectory ontaing Web Interface executables/directories
- *     |
- *     ---- RigClientSource/ - directory containg Rig Client Source code
- *     |
- *     ---- SchedulingServerSource/ - directory containg Scheduling Server Source code
- */
+
 ; SaharaInstall.nsi
 ;
 ;--------------------------------
@@ -67,7 +50,7 @@
 
 
 ; The name of the installer
-Name "Sahara"
+Name "SaharaRigClient"
 
 !define REGKEY "SOFTWARE\$(^Name)"
 
@@ -90,13 +73,13 @@ Var skipSection
 ;Interface Settings
  
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "labshare.bmp"
-!define MUI_ICON "labshare.ico"
+!define MUI_HEADERIMAGE_BITMAP "installerFiles\labshare.bmp"
+!define MUI_ICON "installerFiles\labshare.ico"
 !define MUI_ABORTWARNING
   
-!define MUI_UNICON win-install.ico
+!define MUI_UNICON "installerFiles\win-install.ico"
 
-!define Sahara_Windows_Service "RigClient"
+!define Sahara_RCWindows_Service "RigClient"
 
 ;--------------------------------
 
@@ -179,7 +162,7 @@ FunctionEnd
 
 Function SetInstallDir
 	${If} $SaharaAlreadyInstalled S== "0"
-		StrCpy $INSTDIR "$INSTDIR\Sahara"
+		StrCpy $INSTDIR "$INSTDIR\SaharaRigClient"
 	${EndIf}
 FunctionEnd
 
@@ -229,7 +212,7 @@ Function checkIfServiceInstalled
 	; - If the function "WordReplace" is not successful and the errorlevel (value of $R0) is anything other than 1 then some error has occured in
 	;   executing function "WordReplace"
 	
-	nsExec::ExecToStack /OEM '"sc" query ${Sahara_Windows_Service}'
+	nsExec::ExecToStack /OEM '"sc" query ${Sahara_RCWindows_Service}'
 	Pop $0	; $0 contains return value/error/timeout
 	Pop $1	; $1 contains printed text, up to ${NSIS_MAX_STRLEN}
 
@@ -237,10 +220,10 @@ Function checkIfServiceInstalled
 	${WordReplace} '$1' 'FAILED' 'FAILED' 'E+1' $R0
 	IfErrors 0 Found
 	StrCmp $R0 '1' 0 Error
-	MessageBox MB_OK "RigClient service is already installed.  please stop the RigClient service if it is running (Windows Control Panel->Administrative Tools->Services) $\n$\nUse rigclientservice.exe to uninstall the previous version (rigclientservice.exe uninstall)"
+	MessageBox MB_OK "'${Sahara_RCWindows_Service}' service is already installed.  please stop the '${Sahara_RCWindows_Service}' service if it is running (Windows Control Panel->Administrative Tools->Services) $\n$\nUse rigclientservice.exe to uninstall the previous version (rigclientservice.exe uninstall)"
 	Abort
 	Error:
-	MessageBox MB_OK "Error is detecting if RigClient service is installed"
+	MessageBox MB_OK "Error is detecting if '${Sahara_RCWindows_Service}' service is installed"
 	Abort
 	Found:
 FunctionEnd
@@ -256,7 +239,7 @@ FunctionEnd
 			; Section RigClient is not selected in this installation but same version of RigClient is already installed
 			Goto EndMacro
 		${Else}
-			MessageBox MB_OK|MB_ICONSTOP  "Version of Rig Client installed on this machine is different that the current version of ${thisSection}.$\nSkipping ${thisSection} installation. $\n$\nPlease select Rig Client in the installation or install Rig Client version ${Version} separately and retry ${thisSection} installation"
+			MessageBox MB_OK|MB_ICONSTOP  "Version of Rig Client installed on this machine is different than the current version of ${thisSection}.$\nSkipping ${thisSection} installation. $\n$\nPlease select Rig Client in the installation or install Rig Client version ${Version} separately and retry ${thisSection} installation"
 			StrCpy $skipSection "true"
 			Goto EndMacro
 		${EndIf}
@@ -282,26 +265,21 @@ EndMacro:
 	userInfo::getAccountType
 	pop $0
 	strCmp $0 "Admin" AdminUser
-	MessageBox MB_OK "Rig Client ${operation} requires administrative privileges"
+	MessageBox MB_OK "$(^Name) ${operation} requires administrative privileges"
 	Abort
 	AdminUser:
 !macroend
 
 ; Installer group. It contains following sub sections -
-; 1. Admin check
-; 2. Rig Client
-; 3. Rig Client CLI
-SectionGroup /e "Sahara Rig Client" RigClientGrp
-
-Section 
-	!insertmacro checkAdminUser "installation"
-SectionEnd
+; 1. Rig Client
+; 2. Rig Client CLI
 
 ;--------------------------------
 ; Install Rig Client
 
 Section "Sahara Rig Client" RigClient
 
+    !insertmacro checkAdminUser "installation"
 	call checkJREVersion	
 	call checkIfServiceInstalled 
 	
@@ -309,10 +287,10 @@ Section "Sahara Rig Client" RigClient
 	SetOutPath $INSTDIR\RigClient
   
 	; Copy the component files/directories
-	File RigClient\rigclient.jar
-	File /r RigClient\config
-	File /r RigClient\interface
-	File RigClient\rigclientservice.exe
+	File dist\rigclient.jar
+	File /r /x *.svn  config
+	File /r /x *.svn interface
+	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
 
 	; Add the RigClient service to the windows services
 	ExecWait '"$INSTDIR\RigClient\rigclientservice" install'
@@ -335,7 +313,7 @@ Section "Sahara Rig Client CLI" RCCLI
 		SetOutPath $INSTDIR\RigClient
   		
 		; Copy the component files/directories
-		File RigClient\rigclientcli.jar
+		File ..\RigClientCLI\builds\rigclientcli.jar
 		WriteRegStr HKLM "${REGKEY}\RigClientCLI" Path $INSTDIR\RigClient
 		WriteRegStr HKLM "${REGKEY}\RigClientCLI" CurrentVersion  ${Version}
 	${Else}
@@ -343,63 +321,7 @@ Section "Sahara Rig Client CLI" RCCLI
 	${EndIf}
 SectionEnd 
 
-SectionGroupEnd
 
-;--------------------------------
-; Install Scheduling Server
-Section "Sahara Scheduling Server" SchedServer
-
-    ; Set output path to the installation directory.
-    SetOutPath $INSTDIR\SchedulingServer
-    
-    ; Copy the component files/directories
-    File /r SchedulingServer\*.*  
-    WriteRegStr HKLM "${REGKEY}\SchedulingServer" Path $INSTDIR\SchedulingServer
-    WriteRegStr HKLM "${REGKEY}\SchedulingServer" CurrentVersion  ${Version}
-
-SectionEnd
-
-;--------------------------------
-; Install Web Interface
-Section "Sahara Web Interface" WI
-
-    ; Set output path to the installation directory.
-    SetOutPath $INSTDIR\WI
-    
-    ; Copy the component files/directories
-    File /r WI\*.*  
-    WriteRegStr HKLM "${REGKEY}\WI" Path $INSTDIR\WI
-    WriteRegStr HKLM "${REGKEY}\WI" CurrentVersion  ${Version}
-
-SectionEnd
-
-;--------------------------------
-; Install Rig Client source code
-Section "Sahara Rig Client source code" RCSource
-
-	; Set output path to the installation directory.
-	SetOutPath $INSTDIR\RigClientSource
-  
-	; Copy the component files/directories
-	File /r RigClient\*.*
-	WriteRegStr HKLM "${REGKEY}\RigClientSource" Path $INSTDIR\RigClientSource
-	WriteRegStr HKLM "${REGKEY}\RigClientSource" CurrentVersion  ${Version}
-  
-SectionEnd
-
-;--------------------------------
-; Install Scheduling Server source code
-Section "Sahara Scheduling Server source code" SSSource
-
-    ; Set output path to the installation directory.
-    SetOutPath $INSTDIR\SchedulingServerSource
-  
-    ; Copy the component files/directories
-    File /r SchedulingServerSource\*.*
-    WriteRegStr HKLM "${REGKEY}\SchedulingServerSource" Path $INSTDIR\SchedulingServerSource
-    WriteRegStr HKLM "${REGKEY}\SchedulingServerSource" CurrentVersion  ${Version}
-  
-SectionEnd 
 
 ;--------------------------------
 
@@ -444,14 +366,13 @@ SectionEnd
 ; 1. Admin check
 ; 2. Rig Client
 ; 3. Rig Client CLI
-SectionGroup /e "un.Sahara Rig Client" un.RigClientGrp 
 
 ; Uninstall Rig Client CLI
 Section "un.Sahara Rig Client CLI" un.RCCLI
-	; Delete the component files/directories
-	ReadRegStr $2 HKLM "${REGKEY}\RigClientCLI" "Path"
-	Delete $2\rigclientcli.jar
-	DeleteRegKey /IfEmpty HKLM "${REGKEY}\RigClientCLI"
+    ; Delete the component files/directories
+    ReadRegStr $2 HKLM "${REGKEY}\RigClientCLI" "Path"
+    Delete $2\rigclientcli.jar
+    DeleteRegKey /IfEmpty HKLM "${REGKEY}\RigClientCLI"
 SectionEnd 
 
 Section "un.Sahara Rig Client" un.RigClient 
@@ -488,59 +409,7 @@ Section "un.Sahara Rig Client" un.RigClient
 	DeleteRegKey /IfEmpty HKLM "${REGKEY}\RigClient"
 SectionEnd ; end the section
 
-SectionGroupEnd
 
-;--------------------------------
-; Uninstall Scheduling Server
-Section "un.Sahara Scheduling Server" un.SchedulingServer
-	Push $R1
-	ReadRegStr $R1 HKLM "${REGKEY}\SchedulingServer" "Path"
-	RMDir /r $R1
-	ifErrors 0 Deleted
-	MessageBox MB_OK "Error in deleting the directory $R1. Please delete the directory manually"
-	Deleted:
-	DeleteRegKey /IfEmpty HKLM "${REGKEY}\SchedulingServer"
-	Pop $R1
-SectionEnd 
-
-;--------------------------------
-; Uninstall web Interface
-Section "un.Sahara Web Interface" un.WI
-	Push $R1
-	ReadRegStr $R1 HKLM "${REGKEY}\WI" "Path"
-	RMDir /r $R1
-	ifErrors 0 Deleted
-	MessageBox MB_OK "Error in deleting the directory $R1. Please delete the directory manually"
-	Deleted:
-	DeleteRegKey /IfEmpty HKLM "${REGKEY}\WI"
-	Pop $R1
-SectionEnd 
-
-;--------------------------------
-; Uninstall Rig Client source code
-Section "un.Sahara Rig Client source code" un.RCSource
-	Push $R1
-	ReadRegStr $R1 HKLM "${REGKEY}\RigClientSource" "Path"
-	RMDir /r $R1
-	ifErrors 0 Deleted
-	MessageBox MB_OK "Error in deleting the directory $R1. Please delete the directory manually"
-	Deleted:
-	DeleteRegKey /IfEmpty HKLM "${REGKEY}\RigClientSource"
-	Pop $R1
-SectionEnd 
-
-;--------------------------------
-; Uninstall Scheduling Server source code
-Section "un.Sahara Scheduling Server source code" un.SSSource
-	Push $R1
-	ReadRegStr $R1 HKLM "${REGKEY}\SchedulingServerSource" "Path"
-	RMDir /r $R1
-	ifErrors 0 Deleted
-	MessageBox MB_OK "Error in deleting the directory $R1. Please delete the directory manually"
-	Deleted:
-	DeleteRegKey /IfEmpty HKLM "${REGKEY}\SchedulingServerSource"
-	Pop $R1
-SectionEnd 
 
 ;--------------------------------
 ; Uninstaller functions
@@ -561,27 +430,6 @@ Function un.onInit
 	      	!insertmacro disableSection ${un.RCCLI}
 	${EndIf}
 	
-	ReadRegStr $R0 HKLM "${REGKEY}\SchedulingServer" "Path"
-	${If} $R0 S== ""
-	      	!insertmacro disableSection ${un.SchedulingServer}
-	${EndIf}
-    
-    	ReadRegStr $R0 HKLM "${REGKEY}\WI" "Path"
-	    ${If} $R0 S== ""
-        	    !insertmacro disableSection ${un.Wi}
-	    ${EndIf}
-    
-	ReadRegStr $R0 HKLM "${REGKEY}\RigClientSource" "Path"
-	${If} $R0 S== ""
-        	!insertmacro disableSection ${un.RCSource}
-	${EndIf}
-    
-	ReadRegStr $R0 HKLM "${REGKEY}\SchedulingServerSource" "Path"
-	${If} $R0 S== ""
-        	!insertmacro disableSection ${un.SSSource}
-	${EndIf}
-
-    
 	StrCpy $DisplayText ""
 	StrCpy $NoSectionSelectedUninstall "true"
 
@@ -601,7 +449,7 @@ Function un.CheckSlectedComponents
 		${IfNot} ${SectionIsSelected} ${un.RCCLI}
 			ReadRegStr $R0 HKLM "${REGKEY}\RigClientCLI" "Path"
 			${If} $R0 S!= ""
-			StrCpy $DisplayText "$DisplayText$\nRig Client CLI (Rig Client CLI will also be selected for uninstallation as it depends on Rig Client)"
+			StrCpy $DisplayText "$DisplayText$\n(Rig Client CLI will also be selected for uninstallation as it depends on Rig Client)"
 			StrCpy $SelectRCCLI "true"
 			SectionGetFlags ${un.RCCLI} $0
 			IntOp $0 $0 | ${SF_SELECTED}
@@ -613,25 +461,6 @@ Function un.CheckSlectedComponents
 
 	${If} ${SectionIsSelected} ${un.RCCLI}
 		StrCpy $DisplayText "$DisplayText$\nRig Client CLI"
-		StrCpy $NoSectionSelectedUninstall "false"
-	${EndIf}
-
-	${If} ${SectionIsSelected} ${un.SchedulingServer}
-		StrCpy $DisplayText "$DisplayText$\nScheduling Server"
-		StrCpy $NoSectionSelectedUninstall "false"
-	${EndIf}
-
-	${If} ${SectionIsSelected} ${un.WI}
-		StrCpy $DisplayText "$DisplayText$\nWeb Interface"
-		StrCpy $NoSectionSelectedUninstall "false"
-	${EndIf}
-	${If} ${SectionIsSelected} ${un.RCSource}
-		StrCpy $DisplayText "$DisplayText$\nRig Client Source"
-		StrCpy $NoSectionSelectedUninstall "false"
-	${EndIf}
-
-	${If} ${SectionIsSelected} ${un.SSSource}
-		StrCpy $DisplayText "$DisplayText$\nScheduling Server Source"
 		StrCpy $NoSectionSelectedUninstall "false"
 	${EndIf}
 
@@ -649,8 +478,6 @@ Section -un.postactions
 	
 	; Delete the main registry entry for Sahara if all the subkeys (RigClient, RigClientCLI and RigClientSource are deleted)
 	DeleteRegKey /IfEmpty HKLM "${REGKEY}"
-
-
 
 	; Check if all the components are deleted. If they are, delete the main installation directory and uninstaller
 	ReadRegStr $R0 HKLM "${REGKEY}" "Path"
@@ -681,29 +508,17 @@ SectionEnd
 ; Language strings
 LangString DESC_SecRC ${LANG_ENGLISH} "Sahara Rig Client"
 LangString DESC_SecRCCLI ${LANG_ENGLISH} "Sahara Rig Client Command Line Interface"
-LangString DESC_SecSS ${LANG_ENGLISH} "Sahara Scheduling Server"
-LangString DESC_SecWI ${LANG_ENGLISH} "Sahara Web Interface"
-LangString DESC_SecRCSource ${LANG_ENGLISH} "Sahara Rig Client source code"
-LangString DESC_SecSSSource ${LANG_ENGLISH} "Sahara Scheduling Server source code"
 
 
 ; Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${RigClient} $(DESC_SecRC)
 !insertmacro MUI_DESCRIPTION_TEXT ${RCCLI} $(DESC_SecRCCLI)
-!insertmacro MUI_DESCRIPTION_TEXT ${SchedServer} $(DESC_SecSS)
-!insertmacro MUI_DESCRIPTION_TEXT ${WI} $(DESC_SecWI)
-!insertmacro MUI_DESCRIPTION_TEXT ${RCSource} $(DESC_SecRCSource)
-!insertmacro MUI_DESCRIPTION_TEXT ${SSSource} $(DESC_SecSSSource)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${un.RigClient} $(DESC_SecRC)
 !insertmacro MUI_DESCRIPTION_TEXT ${un.RCCLI} $(DESC_SecRCCLI)
-!insertmacro MUI_DESCRIPTION_TEXT ${un.SchedulingServer} $(DESC_SecSS)
-!insertmacro MUI_DESCRIPTION_TEXT ${un.WI} $(DESC_SecWI)
-!insertmacro MUI_DESCRIPTION_TEXT ${un.RCSource} $(DESC_SecRCSource)
-!insertmacro MUI_DESCRIPTION_TEXT ${un.SSSource} $(DESC_SecSSSource)
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
 
 ;--------------------------------
