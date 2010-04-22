@@ -460,21 +460,33 @@ int shutDownJVM()
 void logMessage(char *fmt, ...)
 {
 	static FILE* logFile;
+	static int prevErr = 0;
 	va_list argp;
 
 	if (logFile == NULL)
 	{
 		logFile = fopen(LOG_FILE, "a");
-		if (logFile == NULL)
+		if (logFile == NULL && !prevErr)
 		{
-			printf("Unable to open log file %s.", LOG_FILE);
-			printf("Unable to log %s.", fmt);
+			printf("Unable to open log file %s.\n", LOG_FILE);
+			perror("Log file error");
+			prevErr = 1;
+			return;
 		}
 	}
 
-	va_start(argp, fmt);
-	vfprintf(logFile, fmt, argp);
-	va_end(argp);
+	if (logFile != NULL)
+	{
+		va_start(argp, fmt);
+		vfprintf(logFile, fmt, argp);
+		va_end(argp);
+	}
+	else
+	{
+		va_start(argp, fmt);
+		vprintf(fmt, argp);
+		va_end(argp);
+	}
 }
 
 /**
