@@ -47,7 +47,7 @@ License: BSD
 Group: Sahara
 
 URL: http://sourceforge.net/projects/labshare-sahara/
-Distribution: RHEL
+Distribution: Redhat, SuSE
 Vendor: University of Technology, Sydney
 Packager: Tania Machet <tmachet@eng.uts.edu.au>, Michael Diponio <mdiponio@eng.uts.edu.au>
 
@@ -94,7 +94,7 @@ else
         ln -sf /etc/init.d/rigclient /etc/rc.d/rc${i}.d/S90rigclient
    done
    for i in 1 6; do
-        ln -sf /etc/init.d/novell-httpd /etc/rc.d/rc${i}.d/K10rigclient
+        ln -sf /etc/init.d/rigclient /etc/rc.d/rc${i}.d/K10rigclient
    done
 fi
 
@@ -107,7 +107,7 @@ ln -sf %{installdir}/config /etc/Sahara/RigClient
 if [ $1 = 0 ]; then
   /etc/init.d/rigclient stop  > /dev/null 2>&1
   if [ -x /usr/lib/lsb/remove_initd ]; then
-    /usr/lib/lsb/install_initd /etc/init.d/rigclient
+    /usr/lib/lsb/remove_initd /etc/init.d/rigclient
   elif [ -x /sbin/chkconfig ]; then
     /sbin/chkconfig --del rigclient
   else
