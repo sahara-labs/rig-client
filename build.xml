@@ -5,27 +5,27 @@
 Copyright (c) 2009, University of Technology, Sydney
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice, 
+    * Redistributions of source code must retain the above copyright notice,
       this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright 
-      notice, this list of conditions and the following disclaimer in the 
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of the University of Technology, Sydney nor the names 
-      of its contributors may be used to endorse or promote products derived from 
+    * Neither the name of the University of Technology, Sydney nor the names
+      of its contributors may be used to endorse or promote products derived from
       this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Author: Michael Diponio (mdiponio)
@@ -58,7 +58,7 @@ Changelog:
 	<property name="reports.pmd.xml.dir" location="test/reports/pmd" /> <!-- PMD reports -->
 	<property name="reports.bugs.xml.dir" location="test/reports/bugs" /> <!-- Findbugs reports -->
 	<property name="reports.emma.dir" location="test/reports/coverage" /> <!-- Emma coverage report -->
-	
+
 	<!-- Classpath -->
 	<path id="project.classpath">
 		<pathelement location="${build.classes.dir}" />
@@ -69,17 +69,24 @@ Changelog:
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
-	
+
 	<!-- Tools classpath -->
 	<path id="project.tools">
 		<fileset dir="${tool.lib.dir}">
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
-	
+
+	<!-- Sets the isNotWindows if the operating system isn't Windows. -->
+	<condition property="isNotWindows">
+		<not>
+			<os family="windows" />
+		</not>
+	</condition>
+
 	<!-- Everything! -->
 	<target name="all" depends="clean,build,dist,test,pmd,bugs,doc"/>
-	
+
 	<!-- Code compilation -->
 	<target name="build">
 		<mkdir dir="${build.classes.dir}" />
@@ -89,40 +96,40 @@ Changelog:
 		</javac>
 		<echo>The ${component.name} has been successfully built.</echo>
 	</target>
-	
+
 	<!-- Generate an executable bundle. -->
 	<target name="dist" depends="build">
 		<mkdir dir="${dist.dir}"/>
 		<jar destfile="${dist.dir}/${dist.jar}">
-		            <manifest>
-		                <attribute name="Main-Class" value="${main.class}"/>
-		                <attribute name="Class-Path" value="."/>
-		            </manifest>
-		            <fileset dir="${build.classes.dir}"/>
-					<zipgroupfileset dir="${lib.dir}">
-						<exclude name="**/NOTICE.txt" />
-					    <include name="**/*.jar" />
-					    <exclude name="**/manifest.mf"/>
-						<exclude name="**/META-INF/*.SF" />
-						<exclude name="**/*.txt" />
-					</zipgroupfileset>
-					<zipgroupfileset dir="${lib.dir}/Axis2/">
-						<exclude name="**/NOTICE.txt" />
-			            <include name="**/*.jar" />
-			            <exclude name="**/manifest.mf"/>
-						<exclude name="**/META-INF/*.SF" />
-						<exclude name="**/*.txt" />
-			        </zipgroupfileset>
-					<zipgroupfileset dir="${lib.dir}/Jetty/">
-						<exclude name="**/NOTICE.txt" />
-			            <include name="**/*.jar" />
-			            <exclude name="**/manifest.mf"/>
-						<exclude name="**/META-INF/*.SF" />
-						<exclude name="**/*.txt" />
-					</zipgroupfileset>
-		        </jar>
+			<manifest>
+				<attribute name="Main-Class" value="${main.class}"/>
+				<attribute name="Class-Path" value="."/>
+			</manifest>
+			<fileset dir="${build.classes.dir}"/>
+			<zipgroupfileset dir="${lib.dir}">
+				<exclude name="**/NOTICE.txt" />
+				<include name="**/*.jar" />
+				<exclude name="**/manifest.mf"/>
+				<exclude name="**/META-INF/*.SF" />
+				<exclude name="**/*.txt" />
+			</zipgroupfileset>
+			<zipgroupfileset dir="${lib.dir}/Axis2/">
+				<exclude name="**/NOTICE.txt" />
+				<include name="**/*.jar" />
+				<exclude name="**/manifest.mf"/>
+				<exclude name="**/META-INF/*.SF" />
+				<exclude name="**/*.txt" />
+			</zipgroupfileset>
+			<zipgroupfileset dir="${lib.dir}/Jetty/">
+				<exclude name="**/NOTICE.txt" />
+				<include name="**/*.jar" />
+				<exclude name="**/manifest.mf"/>
+				<exclude name="**/META-INF/*.SF" />
+				<exclude name="**/*.txt" />
+			</zipgroupfileset>
+		</jar>
 	</target>
-	
+
 	<!-- Clean previously built code. -->
 	<target name="clean">
 		<delete dir="${build.classes.dir}" verbose="no" />
@@ -142,8 +149,9 @@ Changelog:
 		<delete dir="${reports.emma.dir}" verbose="no" />
 		<delete dir="${dist.dir}" />
 		<delete dir="_axis2" />
+		<delete dir="package" />
 	</target>
-	
+
 	<!-- Execute unit test suite with EMMA code coverage. -->
 	<property name="instr.dir" location="test/reports/instr" />
 	<path id="project.emma.classpath">
@@ -162,12 +170,12 @@ Changelog:
 		<mkdir dir="${instr.dir}" />
 		<mkdir dir="${reports.junit.html.dir}" />
 		<mkdir dir="${reports.junit.xml.dir}" />
-		
+
 		<!-- Set up EMMA for code instrumentation. -->
 		<emma enabled="true" >
 		     <instr instrpathref="emma.instrumented" destdir="${instr.dir}" metadatafile="${reports.emma.dir}/metadata.emma" />
 	    </emma>
-			
+
 		<!-- Execute JUnit test cases. -->
 		<junit printsummary="on" fork="on" failureproperty="junit.failure">
 			<classpath refid="project.emma.classpath" />
@@ -179,13 +187,13 @@ Changelog:
 				</fileset>
 			</batchtest>
 		</junit>
-		
+
 		<!-- Generate JUnit report. -->
 		<junitreport>
 			 <fileset dir="${reports.junit.xml.dir}"/>
 			 <report todir="${reports.junit.html.dir}"/>
 		</junitreport>
-			 	
+
 		<!-- Generate EMMA reports. -->
 		<emma enabled="true" >
 			<report sourcepath="${src.dir}" >
@@ -197,11 +205,11 @@ Changelog:
 			 	<xml outfile="${reports.emma.dir}/coverage.xml" depth="method" />
 			</report>
 		</emma>
-			 	        	
+
 		<delete file="TESTS-TestSuites.xml" />
 		<delete dir="${instr.dir}" />
 	</target>
-	
+
 	<!-- PMD results. -->
 	<target name="pmd" depends="build">
 		<mkdir dir="${reports.pmd.xml.dir}"/>
@@ -224,25 +232,25 @@ Changelog:
 		<xslt in="${reports.pmd.xml.dir}/pmd_report.xml" style="${tool.lib.dir}/pmd-4.2.5/etc/xslt/pmd-report-per-class.xslt" out="${reports.pmd.xml.dir}/pmd_report.html" />
 		<echo>PMD execution successful, report ${pmd-report} generated</echo>
 	</target>
-	
+
 	<!-- Find bugs -->
 	<property name="findbugs.report.xml" value="${reports.bugs.xml.dir}/bug_report.xml" />
 	<property name="findbugs.report.html" value="${reports.bugs.xml.dir}/bug_report.html" />
 	<property name="findbugs.home" value="${tool.lib.dir}/findbugs-1.3.9" />
 	<target name="bugs" depends="build">
 		<mkdir dir="${reports.bugs.xml.dir}"/>
-		<taskdef name="findbugs" classpathref="project.tools" 
+		<taskdef name="findbugs" classpathref="project.tools"
 				classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
 		<findbugs home="${findbugs.home}" output="xml:withMessages" outputFile="${findbugs.report.xml}">
-		    <sourcePath path="${src.dir}" /> 
+		    <sourcePath path="${src.dir}" />
 			<class location="${build.classes.dir}" />
 		</findbugs>
 	<findbugs home="${findbugs.home}" output="html" stylesheet="fancy-hist.xsl" outputFile="${findbugs.report.html}">
-			<sourcePath path="${src.dir}" /> 
+			<sourcePath path="${src.dir}" />
 			<class location="${build.classes.dir}" />
 		</findbugs>
 	</target>
-	
+
 	<!-- Javadoc -->
 	<target name="doc">
 		<javadoc access="public" destdir="${javadoc.dir}" classpathref="project.classpath" version="true" use="true" windowtitle="Sahara Rig Client">
@@ -253,5 +261,20 @@ Changelog:
 				<exclude name="**/Mock*.java" />
 			</fileset>
 		</javadoc>
+	</target>
+
+	<!-- Generates an RPM installer. -->
+	<target name="rpm-package" depends="dist" if="isNotWindows">
+		<exec executable="make" dir="servicewrapper" failonerror="true" />
+		<mkdir dir="rpmtmp" />
+		<rpm specFile="../../rigclient.spec" topDir="rpmtmp" failonerror="true" />
+		<mkdir dir="package" />
+		<copy todir="package" overwrite="true" flatten="true">
+			<fileset dir="rpmtmp/RPMS" includes="**/*.rpm" />
+		</copy>
+		<delete dir="rpmtmp" />
+		<exec executable="make" dir="servicewrapper" failonerror="true">
+			<arg value="clean" />
+		</exec>
 	</target>
 </project>
