@@ -50,6 +50,7 @@ Changelog:
 	<property name="javadoc.dir" location="doc" /> <!-- Javadoc location. -->
 	<property name="src.dir" location="src" /> <!-- Source code locatiom. -->
 	<property name="dist.dir" location="dist" />
+	<property name="package.dir" location="package" />
 	<property name="dist.jar" value="rigclient.jar" />
 	<property name="test.lib.dir" location="test/lib" /> <!-- Test library location. -->
 	<property name="tool.lib.dir" location="test/tools" /> <!-- Static analysis tools. -->
@@ -262,6 +263,14 @@ Changelog:
 			</fileset>
 		</javadoc>
 	</target>
+	
+	<property name="NSIS_Install_Path" value="C:/Program Files/NSIS" />
+	<target name="package" depends="build,dist">
+		<mkdir dir="${package.dir}"/>
+	    <taskdef name="nsis" classpathref="project.tools" classname="net.sf.nsisant.Task" />
+	    <nsis script="SaharaInstall.nsi" verbosity="3" out="${package.dir}/SaharaInstaller.log" path="${NSIS_Install_Path}">
+	    </nsis>
+	</target>		
 
 	<!-- Generates an RPM installer. -->
 	<target name="rpm-package" depends="dist" if="isNotWindows">
