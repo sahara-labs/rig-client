@@ -33,8 +33,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# @author Michael Diponio (mdiponio)
-# @date 8th March 2010
+# @author Michael Diponio (mdiponio), Tania Machet (tmachet)
+# @date 23rd April 2010
 #
 
 # Spec file to generate the Rig Client RPM
@@ -50,6 +50,7 @@ URL: http://sourceforge.net/projects/labshare-sahara/
 Distribution: Redhat, SuSE
 Vendor: University of Technology, Sydney
 Packager: Tania Machet <tmachet@eng.uts.edu.au>, Michael Diponio <mdiponio@eng.uts.edu.au>
+Requires: jre >= 1.6.0
 
 %define installdir /usr/lib/rigclient
 
@@ -63,7 +64,7 @@ the rig status to ensure rig goodness.
 # Executables
 mkdir -p  $RPM_BUILD_ROOT/%{installdir}
 cp $RPM_BUILD_DIR/../../dist/rigclient.jar $RPM_BUILD_ROOT/%{installdir}/rigclient.jar
-install -m 755 $RPM_BUILD_DIR/../../servicewrapper/rigclientservice $RPM_BUILD_ROOT/%{installdir}/rigclientservice
+install -m 700 $RPM_BUILD_DIR/../../servicewrapper/rigclientservice $RPM_BUILD_ROOT/%{installdir}/rigclientservice
 
 # Configuration files
 mkdir -p $RPM_BUILD_ROOT/%{installdir}/config
