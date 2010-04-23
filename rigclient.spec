@@ -62,9 +62,12 @@ the rig status to ensure rig goodness.
 %install
 
 # Executables
-mkdir -p  $RPM_BUILD_ROOT/%{installdir}
+mkdir -p $RPM_BUILD_ROOT/%{installdir}
 cp $RPM_BUILD_DIR/../../dist/rigclient.jar $RPM_BUILD_ROOT/%{installdir}/rigclient.jar
 install -m 700 $RPM_BUILD_DIR/../../servicewrapper/rigclientservice $RPM_BUILD_ROOT/%{installdir}/rigclientservice
+
+# Library directory to drop in other Jars
+mkdir -p $RPM_BUILD_ROOT/%{installdir}/lib
 
 # Configuration files
 mkdir -p $RPM_BUILD_ROOT/%{installdir}/config
@@ -127,5 +130,6 @@ rm -f  /etc/Sahara/RigClient
 %{installdir}/interface/services/RigClient/META-INF/services.xml
 %{installdir}/rigclient.jar
 %{installdir}/rigclientservice
+%{installdir}/lib
 /etc/init.d/rigclient
 /etc/Sahara
