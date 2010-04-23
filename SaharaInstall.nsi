@@ -51,8 +51,6 @@
 
 ; The name of the installer
 Name "Sahara Rig Client"
-!define RCCLIName "Rig Client CLI"
-!define RCName "Rig Client"
 
 !define REGKEY "SOFTWARE\$(^Name)"
 
@@ -62,7 +60,7 @@ Name "Sahara Rig Client"
 !define JREVersion "1.6"
 
 ; The file to write
-OutFile "SaharaRigClient.exe"
+OutFile "package\SaharaRigClient.exe"
 
 ; The default installation directory
 InstallDir "C:\Program Files\Sahara"
@@ -177,7 +175,7 @@ Function .onInit
  	StrCpy $RCAlreadyInstalled "-1"
 	call CheckRCVersion
 	${If} $RCAlreadyInstalled S== "1"
-		MessageBox MB_OK|MB_ICONSTOP "A different version of Sahara is already installed on this machine. $\nPlease uninstall the existing Sahara software before continuing the installation"
+		MessageBox MB_OK|MB_ICONSTOP "A different version of $(^Name) is already installed on this machine. $\nPlease uninstall the existing (^Name) software before continuing the installation"
 		Abort 
 	${EndIf}
 
@@ -232,27 +230,6 @@ Function checkIfServiceInstalled
 	Found:
 FunctionEnd
 
-; Check if the installation should continue if Rig Client is not selected and/or not installed already
-!macro checkIfRCInstalledOrSelected thisSection
-        ${IfNot} ${SectionIsSelected} ${RigClient}
-        ClearErrors
-        ; Compare the registry version of RigClient with the current version
-        ReadRegStr $1 HKLM "${REGKEY}\RigClient" CurrentVersion
-        ifErrors RCNotInstalled 0
-        ${If} $1 S== ${Version} 
-            ; Section RigClient is not selected in this installation but same version of RigClient is already installed
-            Goto EndMacro
-        ${Else}
-            MessageBox MB_OK|MB_ICONSTOP  "Version of Rig Client installed on this machine is different than the current version of ${thisSection}.$\nSkipping ${thisSection} installation. $\n$\nPlease select Rig Client in the installation or install Rig Client version ${Version} separately and retry ${thisSection} installation"
-            StrCpy $skipSection "true"
-            Goto EndMacro
-        ${EndIf}
-        RCNotInstalled:
-        MessageBox MB_OK|MB_ICONSTOP  "RigClient is not installed.$\nSkipping ${thisSection} installation. $\n$\nPlease select the RigClient in the installation or install Rig Client version ${Version} separately and retry ${thisSection} installation" 
-        StrCpy $skipSection "true"
-    ${EndIf}
-EndMacro:
-!macroend
 
 ; Disable the section so that user will not be able to select it
 ; This macro is used mainly for uninstallation. 
@@ -296,8 +273,7 @@ Section "Sahara Rig Client" RigClient
 	File /r /x *.svn interface
 	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
     
-    ;File ..\RigClientCLI\builds\rigclientcli.jar
-
+    
 	; Add the RigClient service to the windows services
 	ExecWait '"$INSTDIR\rigclientservice" install'
 	ifErrors 0 WinServiceNoError
@@ -305,28 +281,9 @@ Section "Sahara Rig Client" RigClient
 	; TODO  Revert back the installed RC in case of error?
 	Abort
 	WinServiceNoError:
-    WriteRegStr HKLM "${REGKEY}\${RCName}" Path $INSTDIR
-    WriteRegStr HKLM "${REGKEY}\${RCName}" CurrentVersion  ${Version}
+    WriteRegStr HKLM "${REGKEY}" Path $INSTDIR
+    WriteRegStr HKLM "${REGKEY}" CurrentVersion  ${Version}
 
-SectionEnd 
-
-;--------------------------------
-; Install Rig Client CLI
-Section "Sahara Rig Client CLI" RCCLI
-
-    !insertmacro checkIfRCInstalledOrSelected "Rig Client CLI"
-    ${IfNot} $skipSection S== "true"
-        ; Set output path to the installation directory.
-        SetOutPath $INSTDIR
-        
-        ; Copy the component files/directories
-        File ..\RigClientCLI\builds\rigclientcli.jar
-        
-        WriteRegStr HKLM "${REGKEY}\${RCCLIName}" Path $INSTDIR
-        WriteRegStr HKLM "${REGKEY}\${RCCLIName}" CurrentVersion  ${Version}
-    ${Else}
-        StrCpy $skipSection "false"
-    ${EndIf}
 SectionEnd 
 
 ;--------------------------------
@@ -340,7 +297,6 @@ Function .onInstSuccess
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" "DisplayName"  "$(^Name)"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" "DisplayVersion" "${VERSION}"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" "InstallLocation" "$INSTDIR"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" "Comments" "Uninstaller can be run directly by executing $\"$INSTDIR\uninstallSaharaRigClient.exe$\""
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" "UninstallString" "$\"$INSTDIR\uninstallSaharaRigClient.exe$\""
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" "NoModify" 1
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" "NoRepair" 1
@@ -366,15 +322,8 @@ SectionEnd
 
 
 ;--------------------------------
-; Uninstall Rig Client. It contains following sub sections -
+; Uninstall Rig Client. 
 
-; Uninstall Rig Client CLI
-Section "un.Sahara Rig Client CLI" un.RCCLI
-    ; Delete the component files/directories
-    ReadRegStr $2 HKLM "${REGKEY}\${RCCLIName}" "Path"
-    Delete $2\rigclientcli.jar
-    DeleteRegKey /IfEmpty HKLM "${REGKEY}\${RCCLIName}"
-SectionEnd 
 
 Section "un.Sahara Rig Client" un.RigClient 
     Push $R1
@@ -397,8 +346,7 @@ Section "un.Sahara Rig Client" un.RigClient
 	RMDir /r $R1\config
 	RMDir /r $R1\interface
 	Delete $R1\rigclientservice*
-    ;Delete $R1\rigclientcli.jar
-	DeleteRegKey /IfEmpty HKLM "${REGKEY}\${RCName}"
+	DeleteRegKey /IfEmpty HKLM "${REGKEY}"
     Pop $R1
 SectionEnd ; end the section
 
@@ -410,50 +358,22 @@ Function un.onInit
 
 	; Get the Rig Client path
 	ReadRegStr $INSTDIR HKLM "${REGKEY}" "Path"
-
-	; Check if the components are installed and enable only the installed components for uninstallation
-	Push $R0
-	ReadRegStr $R0 HKLM "${REGKEY}\${RCName}" "Path"
-	${If} $R0 S== ""
-	      	!insertmacro disableSection ${un.RigClient}
-	${EndIf}
-    
-    ReadRegStr $R0 HKLM "${REGKEY}\${RCCLIName}" "Path"
-    ${If} $R0 S== ""
-            !insertmacro disableSection ${un.RCCLI}
+    ; Check if the components are installed and enable only the installed components for uninstallation
+    ${If} $INSTDIR S== ""
+            !insertmacro disableSection ${un.RigClient}
     ${EndIf}
-    
+
 	StrCpy $DisplayText ""
 	StrCpy $NoSectionSelectedUninstall "true"
-
-	Pop $R0
 
 FunctionEnd
 
 Function un.CheckSlectedComponents
-    Var /GLOBAL SelectRCCLI
-    StrCpy $SelectRCCLI "false"
     StrCpy $DisplayText ""
-    ; Check if Rig Client is selected for uninstallation. If it is, Rig Client should also be selected
-    Push $0
+    ; Check if Rig Client is selected for uninstallation. 
     ${If} ${SectionIsSelected} ${un.RigClient} 
         ; Rig Client is selected
         StrCpy $DisplayText "$DisplayText$\nRig Client"
-        ${IfNot} ${SectionIsSelected} ${un.RCCLI}
-            ReadRegStr $R0 HKLM "${REGKEY}\RigClientCLI" "Path"
-            ${If} $R0 S!= ""
-            StrCpy $DisplayText "$DisplayText$\n(Rig Client CLI will also be selected for uninstallation as it depends on Rig Client)"
-            StrCpy $SelectRCCLI "true"
-            SectionGetFlags ${un.RCCLI} $0
-            IntOp $0 $0 | ${SF_SELECTED}
-            SectionSetFlags ${un.RCCLI} $0
-            ${EndIf}
-        ${EndIf}
-        StrCpy $NoSectionSelectedUninstall "false"
-    ${EndIf}
-
-    ${If} ${SectionIsSelected} ${un.RCCLI}
-        StrCpy $DisplayText "$DisplayText$\nRig Client CLI"
         StrCpy $NoSectionSelectedUninstall "false"
     ${EndIf}
 
@@ -468,10 +388,6 @@ selectionEnd:
 FunctionEnd
 
 Section -un.postactions 
-	
-    ; Delete the main registry entry for Rig Client 
-    ClearErrors
-    DeleteRegKey /IfEmpty HKLM "${REGKEY}"
 
     ; Check if all the components are deleted. If they are, delete the main installation directory and uninstaller
     ClearErrors
@@ -500,19 +416,15 @@ SectionEnd
 
 ; Language strings
 LangString DESC_SecRC ${LANG_ENGLISH} "Sahara Rig Client"
-LangString DESC_SecRCCLI ${LANG_ENGLISH} "Sahara Rig Client Command Line Interface"
-
 
 
 ; Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${RigClient} $(DESC_SecRC)
-!insertmacro MUI_DESCRIPTION_TEXT ${RCCLI} $(DESC_SecRCCLI)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${un.RigClient} $(DESC_SecRC)
-!insertmacro MUI_DESCRIPTION_TEXT ${un.RCCLI} $(DESC_SecRCCLI)
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
 
 ;--------------------------------
