@@ -79,10 +79,11 @@ Changelog:
 	</path>
 
 	<!-- Sets the isNotWindows if the operating system isn't Windows. -->
-	<condition property="isNotWindows">
-		<not>
-			<os family="windows" />
-		</not>
+	<condition property="isWindows">
+		<os family="windows" />
+	</condition>
+	<condition property="isUNIX">
+		<os family="unix" />
 	</condition>
 
 	<!-- Everything! -->
@@ -263,22 +264,25 @@ Changelog:
 			</fileset>
 		</javadoc>
 	</target>
-	
+
+	<!-- Depends packages depending on the target OS. -->
+	<target name="package" depends="win-package,rpm-package" />
+
 	<property name="NSIS_Install_Path" value="C:/Program Files/NSIS" />
-	<target name="package" depends="build,dist">
+	<target name="win-package" depends="build,dist" if="isWindows">
 		<mkdir dir="${package.dir}"/>
 	    <taskdef name="nsis" classpathref="project.tools" classname="net.sf.nsisant.Task" />
 	    <nsis script="SaharaInstall.nsi" verbosity="3" out="${package.dir}/SaharaInstaller.log" path="${NSIS_Install_Path}">
 	    </nsis>
-	</target>		
+	</target>
 
 	<!-- Generates an RPM installer. -->
-	<target name="rpm-package" depends="dist" if="isNotWindows">
+	<target name="rpm-package" depends="dist" if="isUNIX">
 		<exec executable="make" dir="servicewrapper" failonerror="true" />
 		<mkdir dir="rpmtmp" />
 		<rpm specFile="../../rigclient.spec" topDir="rpmtmp" failonerror="true" />
-		<mkdir dir="package" />
-		<copy todir="package" overwrite="true" flatten="true">
+		<mkdir dir="${package.dir}" />
+		<copy todir="${package.dir}" overwrite="true" flatten="true">
 			<fileset dir="rpmtmp/RPMS" includes="**/*.rpm" />
 		</copy>
 		<delete dir="rpmtmp" />
