@@ -752,8 +752,9 @@ public abstract class AbstractRig implements IRig
         
         synchronized (this.slaveActions)
         {
-            for (ISlaveAccessAction action : this.slaveActions)
+            for (int i = 0; i < this.slaveActions.size(); i++)
             {
+                ISlaveAccessAction action = this.slaveActions.get(i);
                 if (action == null) continue;
                 if (!action.assign(name, passive))
                 {
@@ -808,8 +809,9 @@ public abstract class AbstractRig implements IRig
             /* Stop tests. */
             this.stopTests();
 
-            for (IAccessAction action : this.accessActions)
+            for (int i = 0; i < this.accessActions.size(); i++)
             {
+                IAccessAction action = this.accessActions.get(i);
                 if (action == null) continue;            
                 if (!action.assign(name))
                 {
@@ -937,8 +939,9 @@ public abstract class AbstractRig implements IRig
                 if (perm == Session.MASTER) // If master, run revoke actions  
                 {
                     this.logger.info("Terminating and revoking master session user: " + user + "."); 
-                    for (IAccessAction action : this.accessActions)
+                    for (int i = 1; i <= this.accessActions.size(); i++)
                     {
+                        IAccessAction action = this.accessActions.get(this.accessActions.size() - i);
                         if (action == null) continue;
                         if (!action.revoke(user))
                         {
@@ -949,7 +952,6 @@ public abstract class AbstractRig implements IRig
                 }
                 else if ((perm == Session.SLAVE_ACTIVE || perm == Session.SLAVE_PASSIVE) && !this.revokeSlave(user))
                 {
-                    // If slave, invoke slave revoke
                     ret = false;
                 }
             }
@@ -962,8 +964,9 @@ public abstract class AbstractRig implements IRig
         synchronized (this.resetActions)
         {
             this.logger.debug("Running the rig reset actions.");
-            for (IResetAction action : this.resetActions)
+            for (int i = 0; i < this.resetActions.size(); i++)
             {
+                IResetAction action = this.resetActions.get(i);
                 if (action == null) continue;
                 if (!action.reset())
                 {
@@ -1050,8 +1053,9 @@ public abstract class AbstractRig implements IRig
         /* Run the slave revocation actions. */
         synchronized (this.slaveActions)
         {
-            for (ISlaveAccessAction action : this.slaveActions)
+            for (int i = 1; i <= this.slaveActions.size(); i++)
             {
+                ISlaveAccessAction action = this.slaveActions.get(this.slaveActions.size() - i);
                 if (action == null) continue;
                 if (!action.revoke(name, perm == Session.SLAVE_PASSIVE ? true : false))
                 {
