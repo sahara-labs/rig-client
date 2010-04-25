@@ -18,7 +18,10 @@ Directory for Rig Client test tools.  The required tools are:
                 EMMA is a Java code coverage tool.
                 Released under the Common Public License v1.0.
 
-  - NSIS      - NSIS (http://nsis.sourceforge.net/Main_Page)
-                NSIS generates the Rig Client Windows installation package from the 
-                SaharaInstall.nsi script.
-                Released under the General Public License v2.0
+  - NSIS ANT  - NSIS (http://nsisant.sourceforge.net/). Tested with version 1.2.
+                NSIS generates the Windows installation packages. The NSIS Ant task
+                allows NSIS to be invoked during an ANT build.
+		    NOTE: NSIS must also be installed to use the 'package' task that generates
+                a Windows installer on Windows. NSIS can be downloaded 
+                from http://sourceforge.net/projects/nsis/.
+                Released under the General Public License.
