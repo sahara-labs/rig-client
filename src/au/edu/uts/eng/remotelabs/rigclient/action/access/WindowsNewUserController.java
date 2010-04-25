@@ -69,9 +69,29 @@ public class WindowsNewUserController implements IPrimitiveController
      */
     public PrimitiveResponse getCredentialsAction(PrimitiveRequest request)
     {
+        String name = WindowsNewUserAccessAction.getUserName();
+        String pass = WindowsNewUserAccessAction.getUserPassword();
+        
         PrimitiveResponse resp = new PrimitiveResponse();
-        resp.addResult("username", WindowsNewUserAccessAction.getUserName());
-        resp.addResult("password", WindowsNewUserAccessAction.getUserPassword());
+        
+        if (name == null)
+        {
+            resp.setSuccessful(false);
+            resp.setErrorCode(1);
+            resp.setErrorReason("No user name is set.");
+        }
+        else if (pass == null)
+        {
+            resp.setSuccessful(false);
+            resp.setErrorCode(2);
+            resp.setErrorReason("No password is set.");
+        }
+        else
+        {
+            resp.setSuccessful(true);
+            resp.addResult("username", name);
+            resp.addResult("password", pass);
+        }
         return resp;
     }
     

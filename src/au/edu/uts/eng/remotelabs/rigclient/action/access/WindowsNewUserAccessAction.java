@@ -50,9 +50,9 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * Action which creates a new user on Windows. This action does assign
- * access to be able login remotely (i.e. 'Remote Desktop Users' group
- * membership, so the 'RemoteDesktopAccessAction' should be
- * subsequently chained.
+ * access to be able login remotely using the {@link RemoteDesktopAccessAction}
+ * class to add the newly created user to the "Remote Desktop Users"
+ * group.
  * <br />
  * The name of the new user is the name of the assigned user if it does not 
  * already exist, otherwise it is the name of the user with a incremented 
@@ -80,6 +80,9 @@ public class WindowsNewUserAccessAction implements IAccessAction
                                           "/PASSWORDCHG:NO",              /* The user may not change their password. */
                                           "/PASSWORDREQ:YES"};            /* Password is required for user. */
     
+    /** Assigns access to remote desktop sessions. */
+    private final RemoteDesktopAccessAction rdpAccess;
+    
     /** Random number generator. */
     private final Random random;
     
@@ -100,6 +103,8 @@ public class WindowsNewUserAccessAction implements IAccessAction
     {
         this.logger = LoggerFactory.getLoggerInstance();
         this.random = new Random();
+        
+        this.rdpAccess = new RemoteDesktopAccessAction();
     }
     
     @Override
@@ -160,7 +165,18 @@ public class WindowsNewUserAccessAction implements IAccessAction
                         "'.");
                 WindowsNewUserAccessAction.userName = winName;
                 WindowsNewUserAccessAction.userPassword = winPasswd;
-                return true;
+                
+                /* Assign access to Remote Desktop. */
+                if (this.rdpAccess.assign(winName))
+                {
+                    this.failureReason = null;
+                    return true;
+                }
+                else
+                {
+                    this.failureReason = this.rdpAccess.getFailureReason();
+                    return false;
+                }
             }
             
             this.logger.warn("Failed creating user '" + winName + "' with net user exit code " + exitVal + '.');
@@ -182,31 +198,38 @@ public class WindowsNewUserAccessAction implements IAccessAction
     {
         this.logger.debug("Assigning access to '" + name + "' using the " + this.getActionType() + " action.");
         
+        final String winName = WindowsNewUserAccessAction.userName;
+        
         int exitVal;
         
-        ProcessBuilder netUserCommand = new ProcessBuilder(this.netUser);
-        netUserCommand.command().add(WindowsNewUserAccessAction.userName);
-        netUserCommand.command().add("/REMOVE");
+        /* Clear the created crendentials. */
+        WindowsNewUserAccessAction.userName = null;
+        WindowsNewUserAccessAction.userPassword = null;
         
         try
         {
+            /* Revoke RDP access. */
+            this.rdpAccess.revoke(winName);
+            
+            ProcessBuilder netUserCommand = new ProcessBuilder(this.netUser);
+            netUserCommand.command().add(winName);
+            netUserCommand.command().add("/DELETE");
+            this.logger.debug("Command to delete " + winName + " is " + netUserCommand.command().toString() + ".");
+            
             /* Revoke access from user by deleting the users created user. */
             if ((exitVal = netUserCommand.start().waitFor()) == 0)
             {
-                this.logger.info("Deleting user " + WindowsNewUserAccessAction.userName + " to revoke access from " +
-                        name + '.');
+                this.logger.info("Deleting user " + winName + " to revoke access from " + name + '.');
                 return true;
             }
             
-            this.logger.warn("Failed deleting user " + WindowsNewUserAccessAction.userName + " with net user exit " +
-                    "code " + exitVal + ".");
-            this.failureReason = "net user for deleting " + WindowsNewUserAccessAction.userName + " failed with code " +
-                exitVal;
+            this.logger.warn("Failed deleting user " + winName + " with net user exit code " + exitVal + ".");
+            this.failureReason = "net user for deleting " + winName + " failed with code " + exitVal;
         }
         catch (Exception e)
         {
-            this.logger.warn("Failed deleting user " + WindowsNewUserAccessAction.userName + " with exception " + 
-                    e.getClass().getSimpleName() + " and message '" + e.getMessage() + "'.");
+            this.logger.warn("Failed deleting user " + winName + " with exception " +e.getClass().getSimpleName() + 
+                    " and message '" + e.getMessage() + "'.");
             this.failureReason = "Net user invocation failed with exception " + e.getClass().getSimpleName() + 
                     ", message " + e.getMessage(); 
         }
