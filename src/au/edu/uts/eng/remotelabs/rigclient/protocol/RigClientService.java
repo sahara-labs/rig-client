@@ -753,17 +753,20 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         
         /* Parameter list. */
         int pCount = 1;
-        for (ParamType param : request.getParam())
+        if (request.getParam() != null)
         {
-            builder.append(", param");
-            builder.append(pCount);
-            builder.append('=');
-            builder.append(param.getName());
-            builder.append(':');
-            builder.append(param.getValue());
-            primitiveRequest.addParameter(param.getName(), param.getValue());
-            ++pCount;
+            for (ParamType param : request.getParam())
+            {
+                builder.append(", param");
+                builder.append(pCount++);
+                builder.append('=');
+                builder.append(param.getName());
+                builder.append(':');
+                builder.append(param.getValue());
+                primitiveRequest.addParameter(param.getName(), param.getValue());
+            }
         }
+        this.logger.debug(builder.toString());
 
         /* Response parameters. */
         final PerformPrimitiveControlResponse response = new PerformPrimitiveControlResponse();
