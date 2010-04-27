@@ -269,11 +269,10 @@ Changelog:
 	<target name="package" depends="win-package,rpm-package" />
 
 	<property name="NSIS_Install_Path" value="C:/Program Files/NSIS" />
-	<target name="win-package" depends="build,dist" if="isWindows">
+	<target name="win-package" depends="dist" if="isWindows">
 		<mkdir dir="${package.dir}"/>
 	    <taskdef name="nsis" classpathref="project.tools" classname="net.sf.nsisant.Task" />
-	    <nsis script="SaharaInstall.nsi" verbosity="3" out="${package.dir}/SaharaInstaller.log" path="${NSIS_Install_Path}">
-	    </nsis>
+	    <nsis script="SaharaInstall.nsi" verbosity="3" out="${package.dir}/SaharaInstaller.log" path="${NSIS_Install_Path}" />
 	</target>
 
 	<!-- Generates an RPM installer. -->
