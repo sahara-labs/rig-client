@@ -265,11 +265,15 @@ Section "Sahara Rig Client" RigClient
 	call checkIfServiceInstalled 
 	
 	; Set output path to the installation directory
-    SetOutPath $INSTDIR
+    SetOutPath $INSTDIR\config
   
 	; Copy the component files/directories
+    File /oname=rigclient.properties config\rigclient.properties.win
+    File config\rigclient_service.ini
+    File config\batch.properties
+
+    SetOutPath $INSTDIR
 	File dist\rigclient.jar
-	File /r /x *.svn  config
 	File /r /x *.svn interface
 	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
     
