@@ -21,6 +21,11 @@ EXEC=rigclientservice
 RETVAL=0
 
 start() {
+	# Check whether user is root in order to stop or start tasks
+	if [[ `id - u` != 0 ]] ; then
+		echo "Only root may start the rig client"
+		return
+	fi 
     PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
     if [[ ! "$PID" > 0 ]]; then
 		echo "Starting the Rig Client..."
@@ -34,6 +39,11 @@ start() {
 }
 
 stop() {
+	# Check whether user is root in order to stop or start tasks
+	if [[ `id - u` != 0 ]] ; then
+		echo "Only root may stop the rig client"
+		return
+	fi 
     PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
     if [[ "$PID" > 0 ]]; then
     	echo "Shutting down rigclient with PID "$PID"..."
@@ -45,6 +55,11 @@ stop() {
 
 
 restart() {
+	# Check whether user is root in order to stop or start tasks
+	if [[ `id - u` != 0 ]] ; then
+		echo "Only root may restart the rig client"
+		return
+	fi 
     echo "Restarting rigclient..."
     stop
     sleep 10
@@ -54,6 +69,15 @@ restart() {
 reload() {
 	restart
 }	
+
+status() {
+    PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
+    if [[ ! "$PID" > 0 ]]; then
+		echo "Rig Client is running.  PID is "$PID"."
+	else
+		echo "Rig Client is not running."
+	fi
+}
 
 
 case "$1" in
@@ -66,8 +90,11 @@ stop)
 reload|restart)
 	restart
 	;;
+status)
+	status
+	;;
 *)
-	echo $"Usage: $0 {start|stop|restart}"
+	echo $"Usage: $0 {start|stop|restart|status}"
 	exit 1
 esac
 
