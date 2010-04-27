@@ -279,7 +279,16 @@ Changelog:
 	<target name="rpm-package" depends="dist" if="isUNIX">
 		<exec executable="make" dir="servicewrapper" failonerror="true" />
 		<mkdir dir="rpmtmp" />
-		<rpm specFile="../../rigclient.spec" topDir="rpmtmp" failonerror="true" />
+		<mkdir dir="rpmtmp/BUILD"/>
+		<mkdir dir="rpmtmp/BUILDROOT"/>
+		<mkdir dir="rpmtmp/RPMS"/>
+		<mkdir dir="rpmtmp/SOURCES"/>
+		<mkdir dir="rpmtmp/SPECS"/>
+		<mkdir dir="rpmtmp/SRPMS"/>
+		<rpm specFile="../../rigclient.spec"  
+ 			command="--buildroot=${basedir}/rpmtmp/BUILDROOT -bb"
+			topDir="${basedir}/rpmtmp"
+			failonerror="true" />
 		<mkdir dir="${package.dir}" />
 		<copy todir="${package.dir}" overwrite="true" flatten="true">
 			<fileset dir="rpmtmp/RPMS" includes="**/*.rpm" />
