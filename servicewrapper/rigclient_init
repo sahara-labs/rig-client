@@ -111,6 +111,10 @@ stop() {
     if [[ "$PID" > 0 ]]; then
     	echo "Shutting down rigclient with PID "$PID"..."
 		kill -SIGTERM $PID &> /dev/null
+		while [[ "PID" > 0 ]]; do
+			    PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
+				echo $PID
+		done
 	else
 		echo "No Rig Client found to shut down."
     fi
