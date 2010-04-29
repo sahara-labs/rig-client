@@ -94,7 +94,7 @@ start() {
 		echo "Starting the Rig Client..."
 		pushd . &> /dev/null 
 		cd $INST_DIR
-		$INST_DIR/$EXEC &> /dev/null 
+		$INST_DIR/$EXEC &> /dev/null &
 		popd &> /dev/null 
 	else
 		echo "Rig Client has already started. Process ID "$PID"."
