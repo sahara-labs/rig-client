@@ -38,6 +38,9 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.IPrimitiveController;
@@ -93,6 +96,70 @@ public class WindowsNewUserController implements IPrimitiveController
             resp.addResult("password", pass);
         }
         return resp;
+    }
+    
+    /**
+     * Forces logoff of the user who was created by the {@link WindowsNewUserAccessAction}
+     * access action.
+     * 
+     * @param request 
+     * @return response
+     */
+    public PrimitiveResponse forceLogoffAction(PrimitiveRequest request)
+    {
+        String name = WindowsNewUserAccessAction.getUserName();
+        
+        PrimitiveResponse response = new PrimitiveResponse();
+        response.setSuccessful(true);
+        
+        
+        if (name == null)
+        {
+            /* No user was created by WindowsNewUserAccessAction. */
+            response.setErrorCode(1);
+            response.setSuccessful(false);
+            response.setErrorReason("No user created by WindowsNewUserAccessAction.");
+            return response;
+        }
+        
+        try
+        {
+            /* 1) Find in progress sessions. */
+            Process proc = new ProcessBuilder("qwinsta", name).start();
+            proc.waitFor();
+            BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+            String line = null;
+            while (br.ready() && (line = br.readLine()) != null)
+            {
+                if (line.contains(name))
+                {
+                    final String qwinstaSplit[] = line.split("\\s+");
+                    String logoffID = null;
+
+                    for (int i = 0; i < qwinstaSplit.length - 1; i++)
+                    {
+                        if (qwinstaSplit[i].trim().equals(name))
+                        {
+                            logoffID = qwinstaSplit[i + 1]; 
+                        }
+                    }
+                    if (logoffID == null) continue;
+
+                    /* Run logoff for the detected user. */
+                    new ProcessBuilder("logoff", logoffID).start().waitFor();
+                }
+            }
+            br.close();
+        }
+        catch (Exception ex)
+        {
+            response.setSuccessful(false);
+            response.setErrorCode(2);
+            response.setErrorReason("Exception: '" + ex.getClass().getName() + "', message: '" + ex.getMessage() + "'.");
+        }
+
+        return response;
     }
     
     @Override

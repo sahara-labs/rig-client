@@ -102,6 +102,16 @@ public class WindowsNewUserAccessAction implements IAccessAction
     public WindowsNewUserAccessAction()
     {
         this.logger = LoggerFactory.getLoggerInstance();
+        
+        /* Fail construction on non-Windows operating systems because this
+         * action makes system calls that are only present on Windows. */
+        if (!System.getProperty("os.name").startsWith("Windows"))
+        {
+            this.logger.fatal("Unable to construct WindowsNewUserAccessAction because it only works on Windows " +
+                    "operating systems. Detected operating system is '" + System.getProperty("os.name") + "'.");
+            throw new IllegalStateException("WindowsNewUserAccessAction not valid on " + System.getProperty("os.name"));
+        }
+        
         this.random = new Random();
         
         this.rdpAccess = new RemoteDesktopAccessAction();
