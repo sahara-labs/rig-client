@@ -22,18 +22,18 @@ RETVAL=0
 
 function exportLibJvmLocation
 {
-    JAVAPATH=`which java`
-    if [ $? -eq 0 ] ; then
+	JAVAPATH=`which java`
+	if [ $? -eq 0 ] ; then
 	
 	# Check the version of java is atleast Java 6
 	if [[ `java -version 2>&1 | head -n 1 | awk -F'"' '{ printf $2 }' | cut -d '.' -f2` -lt 6 ]]; then
-	    echo "Java version isn't Java 6 or above, so unable to use it."
-	    return;
+		echo "Java version isn't Java 6 or above, so unable to use it."
+		return;
 	fi
 	
 	# Resolve symbloic links to the actual file. This is likely going to be:
 	#     1) /usr/bin/java               -> /etc/alternatives/java
-        #     2) /etc/alternatives/java -> <actual java executable>
+		#     2) /etc/alternatives/java -> <actual java executable>
 	JAVAPATH=`readlink -f $JAVAPATH`
 
 	# Finding the java executable path, now find the base of the
@@ -45,7 +45,7 @@ function exportLibJvmLocation
 	# If the 'jre' directory exists (i.e. this is a JDK installation),
 	# descend to the jre directory.
 	if [ -d $JAVAPATH/jre ]; then
-	    JAVAPATH=$JAVAPATH/jre
+		JAVAPATH=$JAVAPATH/jre
 	fi
 	
 	JAVAPATH=$JAVAPATH/lib
@@ -59,27 +59,27 @@ function exportLibJvmLocation
 	#     4) arm      : arm (atleast on my N900)
 	ARCHS="i386 amd64 sparc amd"
 	for ARCH in $ARCHS ; do
-	    if [ -d $JAVAPATH/$ARCH ] ; then
+		if [ -d $JAVAPATH/$ARCH ] ; then
 		JAVAPATH=$JAVAPATH/$ARCH
 		break;
-	    fi
+		fi
 	done
 	
 	# Different JVMs are provided in the arch directory.
 	JVMS="server client" 
 	for JVM in $JVMS; do
-	    if [ -d $JAVAPATH/$JVM ] ; then
+		if [ -d $JAVAPATH/$JVM ] ; then
 		JAVAPATH=$JAVAPATH/$JVM
 		break;
-	    fi
+		fi
 	done
-    fi
-    
-    # If 'libjvm.so' is present, export the location.
-    JVMSO=$JAVAPATH/libjvm.so
-    if [ -f $JVMSO ]; then	
-	export JVM_SO=$JVMSO
-    fi
+	fi
+	
+	# If 'libjvm.so' is present, export the location.
+	JVMSO=$JAVAPATH/libjvm.so
+	if [ -f $JVMSO ]; then	
+		export JVM_SO=$JVMSO
+	fi
 }
 
 start() {
@@ -89,8 +89,8 @@ start() {
 		return
 	fi 
 	exportLibJvmLocation
-    PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
-    if [[ ! "$PID" > 0 ]]; then
+	PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
+	if [[ ! "$PID" > 0 ]]; then
 		echo "Starting the Rig Client..."
 		pushd . &> /dev/null 
 		cd $INST_DIR
@@ -98,7 +98,7 @@ start() {
 		popd &> /dev/null 
 	else
 		echo "Rig Client has already started. Process ID "$PID"."
-    fi
+	fi
 }
 
 stop() {
@@ -107,17 +107,22 @@ stop() {
 		echo "Only root may stop the Rig Client."
 		return
 	fi 
-    PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
-    if [[ "$PID" > 0 ]]; then
-    	echo "Shutting down rigclient with PID "$PID"..."
+	
+	PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
+	if [[ "$PID" > 0 ]]; then
+		echo "Shutting down rigclient with PID "$PID"..."
 		kill -SIGTERM $PID &> /dev/null
-		while [[ "PID" > 0 ]]; do
-			    PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
-				echo $PID
+		
+		# Wait until the service has stopped.
+		ps -C $EXEC &> /dev/null
+		while [[ $? -eq 0 ]]; do
+			sleep 1
+			ps -C $EXEC &> /dev/null
 		done
+		echo "Rig Client has shutdown."
 	else
 		echo "No Rig Client found to shut down."
-    fi
+	fi
 }
 
 
@@ -128,8 +133,8 @@ restart() {
 		return
 	fi 
     echo "Restarting rigclient..."
+    
     stop
-    sleep 10
     start
 }	
 
@@ -138,8 +143,8 @@ reload() {
 }	
 
 status() {
-    PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
-    if [[ "$PID" > 0 ]]; then
+	PID=`ps -C $EXEC | grep rigclient | awk -F' ' '{ printf $1 }' `
+	if [[ "$PID" > 0 ]]; then
 		echo "Rig Client is running.  PID is "$PID"."
 	else
 		echo "Rig Client is not running."
