@@ -163,9 +163,19 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         while (this.runner.isRunning() && (termTimeCount < termTimeOut))
         {
             ++termTimeCount;
+            try
+            {
+                Thread.sleep(1000);
+            }
+            catch (InterruptedException e)
+            {
+                /* This could only occurr at rig client shutdown, so provide
+                 * immediate response to not hold up shutdown. */
+                return !this.isBatchRunning();
+            }
         }
         
-        return this.runner.isRunning() && this.runner.isKilled();
+        return !this.isBatchRunning();
     }
 
     /* 
