@@ -925,6 +925,9 @@ public abstract class AbstractRig implements IRig
                 this.logger.info("Aborting batch control because of session termination.");
                 controlRig.abortBatch();
             }
+            
+            /* Clear the primitive control cache. */
+            controlRig.expungePrimitiveControllerCache();
         }
 
         String user = null;

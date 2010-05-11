@@ -183,6 +183,48 @@ public class AbstractControlledRigTester extends TestCase
     }
 
     /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#expungePrimitiveControllerCache()}.
+     */
+    @Test
+    public void testExpungePrimitiveControllerOnRevokeCache()
+    {
+        assertTrue(this.rig.assign("testuser"));
+        PrimitiveRequest request = new PrimitiveRequest();
+        request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        request.setAction("callCount");
+
+        PrimitiveResponse resp = this.rig.performPrimitive(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(1, Integer.parseInt(resp.getResult("count")));
+        
+        resp = this.rig.performPrimitive(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(2, Integer.parseInt(resp.getResult("count")));
+        
+        resp = this.rig.performPrimitive(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(3, Integer.parseInt(resp.getResult("count")));
+        
+        this.rig.revoke();
+        
+        resp = this.rig.performPrimitive(request);
+        assertNotNull(resp);
+        assertTrue(resp.wasSuccessful());
+        assertEquals(0, resp.getErrorCode());
+        assertNull(resp.getErrorReason());
+        assertEquals(1, Integer.parseInt(resp.getResult("count")));
+    }
+
+    /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.AbstractControlledRig#performBatch(java.lang.String)}.
      */
     @Test
