@@ -65,6 +65,7 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.ISlaveAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.ITestAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
+import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
@@ -106,6 +107,7 @@ public class AbstractRigTester extends TestCase
         expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn("127.0.0.1");
         expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn(null);
+        expect(this.mockConfig.getProperty("Rig_Class")).andReturn("does.not.exist");
         
         replay(this.mockConfig);
         
@@ -114,6 +116,9 @@ public class AbstractRigTester extends TestCase
         configField.set(null, this.mockConfig);
         
         this.rig = new MockRig();
+        Field factField = RigFactory.class.getDeclaredField("rig");
+        factField.setAccessible(true);
+        factField.set(null, this.rig);
     }
     
     /**

@@ -55,7 +55,10 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter;
+import au.edu.uts.eng.remotelabs.rigclient.rig.tests.MockRig;
+import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
@@ -89,14 +92,21 @@ public class AttributeMacroSubstituterTester extends TestCase
         expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
         
-        expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn(null);
-        expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn(null);
+        expect(this.mockConfig.getProperty("Rig_Class")).andReturn("does.not.exist.MockRig");
+        expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn(null).times(2);
+        expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn(null).times(2);
+        expect(this.mockConfig.getProperty("Action_Failure_Threshold")).andReturn("3");
+        
         replay(this.mockConfig);
         
         ConfigFactory.getInstance();
         Field f = ConfigFactory.class.getDeclaredField("instance");
         f.setAccessible(true);
         f.set(null, this.mockConfig);
+        
+        f = RigFactory.class.getDeclaredField("rig");
+        f.setAccessible(true);
+        f.set(null, new MockRig());
         
         LoggerFactory.getLoggerInstance();
         
@@ -263,6 +273,56 @@ public class AttributeMacroSubstituterTester extends TestCase
         assertEquals("camera1", tok[2]);
         assertEquals(this.detectHostNameFromExec(null), tok[1]);
     }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter#substitueMacros(java.lang.String)}.
+     */
+    @Test
+    public void testSubstitueMacrosDetectUser() throws Exception
+    {
+        IRig rig = RigFactory.getRigInstance();
+        rig.assign("tuser");
+        
+        String str = this.subs.substitueMacros("IPR1 __USER__");
+
+        assertNotNull(str);
+        assertTrue(str.startsWith("IPR1"));
+        assertTrue(str.endsWith("tuser"));
+        assertFalse(str.contains("__"));
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter#substitueMacros(java.lang.String)}.
+     */
+    @Test
+    public void testSubstitueMacrosDetectRigName() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Rig_Name")).andReturn("Rig 1");
+        replay(this.mockConfig);
+
+        String str =this.subs.substitueMacros("Rig Name is __RIG_NAME__");
+        assertNotNull(str);
+        assertTrue(str.startsWith("Rig Name is"));
+        assertTrue(str.endsWith("Rig 1"));
+        assertFalse(str.contains("__"));
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter#substitueMacros(java.lang.String)}.
+     */
+    @Test
+    public void testSubstitueMacrosRigType() throws Exception
+    {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Rig_Type")).andReturn("Rig Type");
+        replay(this.mockConfig);
+        
+        String str = this.subs.substitueMacros("__RIG_TYPE__");
+
+        assertNotNull(str);
+        assertEquals("Rig Type", str);
+}
 
     /**
      * Attempt to determine the host name address of the specified network device. If

@@ -45,7 +45,11 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import java.util.Map.Entry;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
+import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -117,16 +121,35 @@ public class AttributeMacroSubstituter
     public String substitueMacros(String str) throws Exception
     {
         StringBuilder buf = new StringBuilder();
+        IRig rig = RigFactory.getRigInstance();
         
         for (String tok : str.split("__"))
         {
-            if (tok.equalsIgnoreCase("IP"))
+            if ("IP".equalsIgnoreCase(tok))
             {
                 buf.append(this.findNetworkMacroValue(false));
             }
-            else if (tok.equalsIgnoreCase("HOSTNAME"))
+            else if ("HOSTNAME".equalsIgnoreCase(tok))
             {
                 buf.append(this.findNetworkMacroValue(true));
+            }
+            else if ("USER".equalsIgnoreCase(tok))
+            {
+                for (Entry<String, Session> user : rig.getSessionUsers().entrySet())
+                {
+                    if (user.getValue() == Session.MASTER)
+                    {
+                        buf.append(user.getKey());
+                    }
+                }
+            }
+            else if ("RIG_NAME".equalsIgnoreCase(tok))
+            {
+                buf.append(rig.getName());
+            }
+            else if ("RIG_TYPE".equalsIgnoreCase(tok))
+            {
+                buf.append(rig.getType());
             }
             else
             {
