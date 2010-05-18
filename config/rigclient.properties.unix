@@ -50,27 +50,6 @@
 # and you don't put a valid integer as the value, tough, the rig client will  #
 # most likely crash. You have been warned!                                    #
 #                                                                             #
-# Rig client information discovery uses the following properties to determine #
-# information about the rig. When an information request is made, the         #
-# the configuration value of the requested key is parsed with a macro         #
-# substitute to replace tokens with runtime variables. This is to support the #
-# use of dynamic IPs for rig client servers. The following are a list of      #
-# marcos supported with their runtime substituted value:                      #
-#                                                                             #
-#      * __HOSTNAME__ : Server hostname                                       #
-#      * __IP__ : Server IP address                                           #
-#                                                                             #
-# The algorithm for determining the above values is:                          #
-#                                                                             #
-#      1. If the property 'Rig_Client_IP_Address' is set, the __IP__ value is #
-#         the configured value, and the __HOSTNAME__ value is determined from #
-#         that IP.                                                            #
-#      2. If the 'Listening_Network_Interface' property is set, the __IP__    #
-#         and __HOSTNAME__ values are determined from the configured network  #
-#          interface name.                                                    #  
-#      3. If neither are set, the __IP__ and __HOSTNAME__ are determined from #
-#         the first iterated network interface (eth0 on Linux systems).       #
-#                                                                             #
 ###############################################################################
 
 ###############################################################################
@@ -96,8 +75,20 @@ Rig_Capabilites tag1,tag2
 
 # Rig class - qualified class name of rig type class implementing rig client
 # required methods. Must be derived class of au.edu.uts.eng.remotelabs.rigclient.rig.IRig)
-# Rig_Class <String>
-# Rig_Class au.edu.uts.eng.remotelabs.rigclient.rig.configuredRig
+# Two common rig type classes which exist within the rig client main library are:.
+#
+#      * au.edu.uts.eng.remotelabs.rig.ConfiguredRig - Class which is
+#        configuered with the name of action classes. See the configuration
+#        'Configured Rig Type Configuration' stanza of this file.
+#      * au.edu.uts.eng.remotelabs.rig.ConfiguredControlledRig - Class
+#        which is configured with the name of action class and enables
+#        rig client control. For batch control, the ConfiguredBatchRunner
+#        is used. See the configuration 'Configured Rig Type Configuration'
+#        stanza of this file.
+#            
+# Rig_Class [au.edu.uts.eng.remotelabs.rig.ConfiguredRig] | \
+#           [au.edu.uts.eng.remotelabs.rig.ConfiguredControlledRig] | <String>
+# Rig_Class au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredRig 
 Rig_Class au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredRig
 
 ###############################################################################
@@ -659,31 +650,85 @@ Camera_Test_Enable_Uniqueness_Test false
 ###############################################################################
 ## Rig Attributes for the Web Interface                                      ##
 ###############################################################################
+#                                                                             #
+# Rig client attribute information discovery uses configured properties to of #
+# this file to determine information about the rig. When an information       #
+# request is made, the configuration value of the requested key is parsed     #
+# with a macro substitute to replace tokens with runtime variables. The       #
+# following are a list of marcos supported with their runtime substituted     #
+# value:                                                                      #
+#                                                                             #
+#      * __HOSTNAME__ : Server hostname                                       #
+#      * __IP__ : Server IP address                                           #
+#      * __USER__ : Master user assigned to rig (session user)                #
+#      * __RIG_NAME__ : Name of the rig (as configured in the property        #
+#                       'Rig_Name').                                          #
+#      * __RIG_TYPE__ : Type of the rig (as configured in the property        #
+#                       'Rig_Type').                                          #
+#                                                                             #
+# The algorithm for determining the above network values is:                  #
+#                                                                             #
+#      1. If the property 'Rig_Client_IP_Address' is set, the __IP__ value is #
+#         the configured value, and the __HOSTNAME__ value is determined from #
+#         that IP.                                                            #
+#      2. If the 'Listening_Network_Interface' property is set, the __IP__    #
+#         and __HOSTNAME__ values are determined from the configured network  #
+#          interface name.                                                    #  
+#      3. If neither are set, the __IP__ and __HOSTNAME__ are determined from #
+#         the first iterated network interface (eth0 on Linux systems).       #
+#                                                                             #
+###############################################################################
 
+###############################################################################
+#
+# Remote Desktop Options
+#
 # The hostname of *this* computer to display as the remote desktop. The options
 # are a manually entered IP or hostname or a macro to automatically try to
-# detect these - __IP__ or __HOSTNAME__. It does not make sense to use a
-# different computer's IP or hostname because the RemoteDesktopAccessAction
-# assigns and revokes access of the current machine.
+# detect these - __IP__ or __HOSTNAME__.  It should be this computer's IP
+# or hostname as the RemoteDesktopAccessAction assigns and revokes access
+# to the current machine.
 # Remote_Desktop_Host [<Display value>|__IP__|__HOSTNAME__]
 # Remote_Desktop_Host __IP__
 Remote_Desktop_Host __IP__
 
+# The options for the Sahara remote desktop Java applet. The options are in the form
+# -<character option>=<value>,-<character option>=<value>,... The list of options are:
+#
+#      * -g - THe size of the remote desktop window in <width>x<height> form.
+#      * -s - The shell program to run. If this isn't specified the default is
+#             'explorer.exe' which runs a normal desktop.
+#      * -d - Logon domain.
+#      * -o - Bits per pixel for display.
+#      * -f - Full screen mode.
+#      * -t - RDP port (default is 3389)
+#      * -T - Window title
+#
+# Remote_Desktop_Options -<character option>=<value>,-<character option>=<value>,...
+# Remote_Desktop_Options -g=1024x768,-s=C:\seamlessrdp\seamlessrdpshell.exe <Program>, \
+#                       -T=__USER__ __RIG_NAME__ session
+Remote_Desktop_Options -g=1024x768,-s=C:\seamlessrdp\seamlessrdpshell.exe <Program>, \
+                       -T=__USER__ __RIG_NAME__ session
+
+###############################################################################
+#
+# Camera options                   
 # The number of cameras that should be displayed. There should also be Camera_<N>
 # properties from 1 to specified number of cameras.
 # Number_of_Cameras <n>
 # Number_of_Cameras 1
 Number_of_Cameras 1
 
-# List of camera details from 1 to number of cameras. These camera details provide
-# information about how to generate the camera stream URL as given by the 'FORMART'
-# portion of the configuration string. On the web interface side, in the web interface 
-# configuration file 'config.ini', there should be properties named camera.<format>
-# containing the video stream URL template. To generate the stream URL, variables
-# within chevrons ('<', '>') are replaced with the corresponding value in the 
-# configuration string. Multiple formats can be listed, seperating each with a comma.
-
-# For example, the configuration string: 
+# List of camera details from 1 to number of cameras specified in Number_of_Cameras.
+# These camera details provide information about how to generate the camera stream
+# URL as given by the 'FORMAT' portion of the configuration string.
+# On the web interface side, in the 'config.ini' file, there should be properties named
+# 'camera.<format>' containing the video stream URL template.
+# To generate the stream URL, variables within chevrons ('<', '>') are replaced
+# with the corresponding value in the configuration string specified in 'config.ini'
+# Multiple formats can be listed, seperating each with a comma.
+#
+# For example, the configuration string:
 # HOST=shakermonitor1.eng.uts.edu.au,PORT=7070,NUM=2,SIZE=320x240,FORMAT=jpeg;mms;mmsh
 #
 # With web interface configuration:
@@ -696,11 +741,11 @@ Number_of_Cameras 1
 # mms://127.0.0.1:7070/stream2_v_medium.asf
 # mmsh://127.0.0.1:7070/stream2_v_medium.asf
 #
-# Each format is then listed in the camera panel as an option to select. Known
-# formats (listed below) are deployed using a predetermined browser plugin
-# client. Unknown formats are deployed with a detected plugin that *should* 
-# display the stream. Known formats:
-#   * jpeg - JPEG frames deployed with a slider to select the refresh period 
+# Each format specified in the 'config.ini' file is listed in the camera panel of the rig
+# interface as an option to select. Known  formats (listed below) are deployed using a
+# predetermined browser plugin client. Unknown formats are deployed with a
+# detected plugin that *should* display the stream. Known formats:
+#   * jpeg - JPEG frames deployed with a slider to select the refresh period
 #            (between 250ms and 2s).
 #   * mms  - Microsoft Media Server stream deployed using Window Media Player
 #            plugin.
@@ -711,7 +756,9 @@ Number_of_Cameras 1
 #   * SIZE   - The size of video frames in the format '<width>x<height>'.
 #   * HOST   - The host name or IP address of the camera server.
 #   * PORT   - The port number of the streaming server is listening on.
-#  
+#   * TITLE  - The camera panel title.
+#
 # Camera_1 FORMAT=<comma seperated list of formats>,SIZE=<width>x<height>
-# Camera_1 FORMAT=jpeg;mms;mmsh,SIZE=320x240,HOST=__IP__,PORT=7070,NUM=2
-Camera_1 FORMAT=jpeg;mms;mmsh,SIZE=320x240,HOST=__IP__,PORT=7070,NUM=2
+# Camera_1 FORMAT=jpeg;mms;mmsh,SIZE=320x240,HOST=__IP__,PORT=7070,NUM=2,TITLE=Fluid Camera
+Camera_1 FORMAT=jpeg;mms;mmsh,SIZE=320x240,HOST=__IP__,PORT=7070,NUM=2,TITLE=Fluid Camera
+
