@@ -75,11 +75,6 @@ cp $RPM_BUILD_DIR//../../config/batch.properties $RPM_BUILD_ROOT/%{installdir}/c
 cp $RPM_BUILD_DIR/../../config/rigclient.properties.unix $RPM_BUILD_ROOT/%{installdir}/config/rigclient.properties
 cp $RPM_BUILD_DIR/../../config/rigclient_service.ini $RPM_BUILD_ROOT/%{installdir}/config/rigclient_service.ini
 
-# Axis files
-mkdir -p $RPM_BUILD_ROOT/%{installdir}/interface/services/RigClient/META-INF/
-cp $RPM_BUILD_DIR/../../interface/services/RigClient/META-INF/RigClientService.wsdl $RPM_BUILD_ROOT/%{installdir}/interface/services/RigClient/META-INF/RigClientService.wsdl
-cp $RPM_BUILD_DIR/../../interface/services/RigClient/META-INF/services.xml $RPM_BUILD_ROOT/%{installdir}/interface/services/RigClient/META-INF/services.xml
-
 # Init script, install
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
 install -m 755 $RPM_BUILD_DIR/../../servicewrapper/rigclient_init  $RPM_BUILD_ROOT/etc/init.d/rigclient
@@ -126,8 +121,6 @@ rm -f  /etc/Sahara/RigClient
 %{installdir}/config/batch.properties
 %{installdir}/config/rigclient.properties
 %{installdir}/config/rigclient_service.ini
-%{installdir}/interface/services/RigClient/META-INF/RigClientService.wsdl
-%{installdir}/interface/services/RigClient/META-INF/services.xml
 %{installdir}/rigclient.jar
 %{installdir}/rigclientservice
 %{installdir}/lib
