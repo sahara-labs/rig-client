@@ -45,6 +45,7 @@ Changelog:
 	<!-- Properties -->
 	<property name="component.name" value="Rig Client" /> <!-- Rig Client component name. -->
 	<property name="main.class" value="au.edu.uts.eng.remotelabs.rigclient.main.RigClientMain" />
+	<property name="service.archive" value="RigClientService.aar" />
 	<property name="build.classes.dir" location="bin" /> <!-- Build classes location. -->
 	<property name="lib.dir" location="lib" /> <!-- Library location. -->
 	<property name="javadoc.dir" location="doc" /> <!-- Javadoc location. -->
@@ -100,7 +101,7 @@ Changelog:
 	</target>
 
 	<!-- Generate an executable bundle. -->
-	<target name="dist" depends="build">
+	<target name="dist" depends="build,servicearchive">
 		<mkdir dir="${dist.dir}"/>
 		<jar destfile="${dist.dir}/${dist.jar}">
 			<manifest>
@@ -129,6 +130,10 @@ Changelog:
 				<exclude name="**/META-INF/*.SF" />
 				<exclude name="**/*.txt" />
 			</zipgroupfileset>
+			<zipfileset dir="META-INF/repo/services"  prefix="META-INF/repo/services/">
+				<include name="*.aar" />
+				<include name="*.list" />
+			</zipfileset>
 		</jar>
 	</target>
 
@@ -298,4 +303,14 @@ Changelog:
 			<arg value="clean" />
 		</exec>
 	</target>
+	
+	<!-- Generates the Axis2 Service -->
+	<target name="servicearchive" >
+		<mkdir dir="META-INF/repo/services" />
+		<zip destfile="META-INF/repo/services/${service.archive}" update="true">
+			<zipfileset dir="resources" excludes=".svn" prefix="META-INF" />
+		</zip>
+		<concat destfile="META-INF/repo/services/services.list" eol="unix" append="false" fixlastline="true">${service.archive}</concat>
+	</target>
+	
 </project>
