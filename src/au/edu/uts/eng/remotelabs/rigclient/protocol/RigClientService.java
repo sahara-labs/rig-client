@@ -781,7 +781,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         control.setWasSuccessful("");
         
         if (!(this.isSourceAuthenticated(request.getIdentityToken()) || 
-                this.rig.hasPermission(requestor, Session.SLAVE_ACTIVE)))
+                this.rig.hasPermission(requestor, Session.SLAVE_PASSIVE)))
         {
             /* Requestor does not have permission to request primitive control. */
             this.logger.warn("Requestor " + requestor + " does not have permission to request primitive control.");

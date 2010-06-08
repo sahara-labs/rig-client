@@ -1363,15 +1363,8 @@ public class RigClientServiceTester extends TestCase
         PerformPrimitiveControlResponse response = this.service.performPrimitiveControl(performControl);
         PrimitiveControlResponseType cr = response.getPerformPrimitiveControlResponse();
         assertNotNull(cr);
-        assertFalse(cr.getSuccess());
-        assertFalse(Boolean.valueOf(cr.getWasSuccessful()));
-        
-        ErrorType err = cr.getError();
-        assertNotNull(err);
-        assertEquals(3, err.getCode());
-        assertNotNull(err.getReason());
-        assertNotNull(err.getOperation());
-        assertEquals("Invalid permission.", err.getReason());
+        assertTrue(cr.getSuccess());
+        assertTrue(Boolean.valueOf(cr.getWasSuccessful()));
     }
     
     /**
