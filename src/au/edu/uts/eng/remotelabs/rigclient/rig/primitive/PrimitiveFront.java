@@ -92,7 +92,7 @@ public class PrimitiveFront
         this.logger.debug("Requested controller is " + controllerName + ".");
         if (controllerName == null)
         {
-            this.logger.warn("The primitive control requested controller is null. Failing primitive control " +
+            this.logger.info("The primitive control requested controller is null. Failing primitive control " +
             		"with signature: " + request.toString() + ".");
             response.setErrorCode(-1);
             response.setErrorReason("The requested controller argument is null.");
@@ -109,7 +109,24 @@ public class PrimitiveFront
         }
         
         /* --------------------------------------------------------------------
-         * ---- 2. Get the requested controller action. -----------------------
+         * ---- 2. Run the ACL filter hook if the controller supports it. -----
+         * ------------------------------------------------------------------*/
+        if (controller instanceof IPrimitiveAcl)
+        {
+            IPrimitiveAcl acl = (IPrimitiveAcl)controller;
+            if (!acl.allowRole(request.getRole(), request.getAction()))
+            {
+                this.logger.info("Failing primitive control because the role " + request.getRole() + " does not " +
+                		"have permission to run " + request.getAction() + " on " + request.getController() + '.');
+                response.setErrorCode(-9);
+                response.setErrorReason("ACL check does not allow the role the perform the action.");
+                response.setSuccessful(false);
+                return response;
+            }
+        }
+        
+        /* --------------------------------------------------------------------
+         * ---- 3. Get the requested controller action. -----------------------
          * ------------------------------------------------------------------*/
         if (request.getAction() == null)
         {
@@ -124,7 +141,7 @@ public class PrimitiveFront
         this.logger.debug("Requested action is " + actionName + ".");
         
         /* --------------------------------------------------------------------
-         * ---- 3. Invoke the preRoute method. --------------------------------
+         * ---- 4. Invoke the preRoute method. --------------------------------
          * ------------------------------------------------------------------*/
         if (!controller.preRoute())
         {
@@ -143,7 +160,7 @@ public class PrimitiveFront
             this.logger.debug("Found action method has the signature: " + meth.toGenericString());
             
             /* ----------------------------------------------------------------
-             * ---- 4. Invoke the action method. ------------------------------
+             * ---- 5. Invoke the action method. ------------------------------
              * --------------------------------------------------------------*/
             /* Works for both static and instance methods. If it is a static 
              * method the instance parameter is ignored. */
@@ -208,7 +225,7 @@ public class PrimitiveFront
         }
         
         /* --------------------------------------------------------------------
-         * ---- 5. Invoke postRoute on the controller. ------------------------
+         * ---- 6. Invoke postRoute on the controller. ------------------------
          * ------------------------------------------------------------------*/
          if (!controller.postRoute())
          {

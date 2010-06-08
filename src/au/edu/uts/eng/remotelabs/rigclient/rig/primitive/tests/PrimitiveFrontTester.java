@@ -50,6 +50,7 @@ import org.junit.Test;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
 import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront;
 
 /**
@@ -221,6 +222,67 @@ public class PrimitiveFrontTester extends TestCase
        assertFalse(resp.wasSuccessful());
        assertEquals(-6, resp.getErrorCode());
        assertNotNull(resp.getErrorReason());
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront#routeRequest(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)}.
+     */
+    @Test
+    public void testRouteRequestAllowedMaster()
+    {
+       PrimitiveRequest request = new PrimitiveRequest();
+       request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MasterOnlyAclController");
+       request.setAction("test");
+       request.setRequestor("mdiponio");
+       request.setRole(Session.MASTER);
+       
+       PrimitiveResponse resp = this.front.routeRequest(request);
+       assertNotNull(resp);
+       assertTrue(resp.wasSuccessful());
+       assertEquals(0, resp.getErrorCode());
+       assertNull(resp.getErrorReason());
+       assertTrue(resp.getResults().containsKey("woot"));
+       assertEquals(resp.getResults().get("woot"), "woot");
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront#routeRequest(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)}.
+     */
+    @Test
+    public void testRouteRequestSlaveActiveNotAllowed()
+    {
+       PrimitiveRequest request = new PrimitiveRequest();
+       request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MasterOnlyAclController");
+       request.setAction("test");
+       request.setRequestor("mdiponio");
+       request.setRole(Session.SLAVE_ACTIVE);
+       
+       PrimitiveResponse resp = this.front.routeRequest(request);
+       assertNotNull(resp);
+       assertFalse(resp.wasSuccessful());
+       assertEquals(-9, resp.getErrorCode());
+       assertNotNull(resp.getErrorReason());
+       assertFalse(resp.getResults().containsKey("woot"));
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront#routeRequest(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)}.
+     */
+    @Test
+    public void testRouteRequestSlavePassiveNotAllowed()
+    {
+       PrimitiveRequest request = new PrimitiveRequest();
+       request.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MasterOnlyAclController");
+       request.setAction("test");
+       request.setRequestor("mdiponio");
+       request.setRole(Session.SLAVE_PASSIVE);
+       
+       PrimitiveResponse resp = this.front.routeRequest(request);
+       assertNotNull(resp);
+       assertFalse(resp.wasSuccessful());
+       assertEquals(-9, resp.getErrorCode());
+       assertNotNull(resp.getErrorReason());
+       assertFalse(resp.getResults().containsKey("woot"));
     }
 
     

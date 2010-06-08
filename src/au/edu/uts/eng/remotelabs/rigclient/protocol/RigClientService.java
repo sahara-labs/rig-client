@@ -767,6 +767,10 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             }
         }
         this.logger.debug(builder.toString());
+        
+        /* User information. */
+        primitiveRequest.setRequestor(requestor);
+        primitiveRequest.setRole(this.rig.isInSession(requestor));
 
         /* Response parameters. */
         final PerformPrimitiveControlResponse response = new PerformPrimitiveControlResponse();

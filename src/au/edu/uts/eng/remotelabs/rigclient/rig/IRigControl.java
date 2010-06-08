@@ -48,6 +48,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
+
 /**
  * Interface for rig client control. Rig client provide control takes
  * two forms:
@@ -346,6 +348,12 @@ public interface IRigControl
         /** Request parameters (name - value). */
         private Map<String, String> parameters;
         
+        /** User who requested primitive control. */
+        private String requestor;
+        
+        /** The requestors role. */
+        private Session role;
+        
         /**
          * Constructor.
          */
@@ -426,8 +434,37 @@ public interface IRigControl
         }
         
         /**
-         * String representation of this class.
+         * @return the requestor
          */
+        public String getRequestor()
+        {
+            return this.requestor;
+        }
+
+        /**
+         * @param requestor the requestor to set
+         */
+        public void setRequestor(String requestor)
+        {
+            this.requestor = requestor;
+        }
+
+        /**
+         * @return the role
+         */
+        public Session getRole()
+        {
+            return this.role;
+        }
+
+        /**
+         * @param role the role to set
+         */
+        public void setRole(Session role)
+        {
+            this.role = role;
+        }
+
         @Override
         public String toString()
         {
@@ -438,6 +475,10 @@ public interface IRigControl
             builder.append(this.action);
             builder.append(", Params:");
             builder.append(this.parameters.toString());
+            builder.append(", Requestor:");
+            builder.append(this.requestor);
+            builder.append(", Role:");
+            builder.append(this.role);
             return builder.toString();
         }
     }
@@ -458,6 +499,8 @@ public interface IRigControl
      *  take a <code>PrimitiveRequest</code> parameter.</li>
      *  <li><code>-7</code>: Action has thrown an exception.</li>
      *  <li><code>-8</code>: The <code>preRoute</code> method failed.</li>
+     *  <li><code>-9</code>: The ACL check does not allow the users role to
+     *  perform the action.</li>
      * </ul>
      */
     public class PrimitiveResponse
