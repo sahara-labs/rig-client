@@ -38,12 +38,6 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-
-import java.lang.reflect.Field;
-
 import junit.framework.TestCase;
 
 import org.junit.Before;
@@ -52,8 +46,6 @@ import org.junit.Test;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
 import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.IPrimitiveAcl;
 import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.SlaveActiveAllowed;
-import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
-import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 
 /**
  * Tests the {@link SlaveActiveAllowedAcl} class.
@@ -63,34 +55,10 @@ public class SlaveActiveAllowedTester extends TestCase
     /** Object of class under test. */
     private IPrimitiveAcl acl;
     
-    private IConfig mockConfig;
-
     @Override
     @Before
     public void setUp() throws Exception
     {
-        this.mockConfig = createMock(IConfig.class);
-        expect(this.mockConfig.getProperty("Logger_Type"))
-            .andReturn("SystemErr");
-        expect(this.mockConfig.getProperty("Log_Level"))
-            .andReturn("DEBUG");
-        expect(this.mockConfig.getProperty("Package_Prefixes"))
-            .andReturn("au.edu.uts.eng.remotelabs;au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests");
-        expect(this.mockConfig.getProperty("Default_Log_Format", "[__LEVEL__] - [__ISO8601__] - __MESSAGE__"))
-            .andReturn("[__LEVEL__] - [__ISO8601__] - __MESSAGE__");
-        expect(this.mockConfig.getProperty("FATAL_Log_Format")).andReturn(null);
-        expect(this.mockConfig.getProperty("PRIORITY_Log_Format")).andReturn(null);
-        expect(this.mockConfig.getProperty("ERROR_Log_Format")).andReturn(null);
-        expect(this.mockConfig.getProperty("WARN_Log_Format")).andReturn(null);
-        expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
-        expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
-        replay(this.mockConfig);
-        
-        ConfigFactory.getInstance();
-        Field field = ConfigFactory.class.getDeclaredField("instance");        
-        field.setAccessible(true);
-        field.set(null, this.mockConfig);
-        
         this.acl = new SlaveActiveAllowed();
     }
 

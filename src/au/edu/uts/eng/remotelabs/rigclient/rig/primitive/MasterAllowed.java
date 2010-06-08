@@ -39,8 +39,6 @@
 package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
-import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
-import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  *  Implementation of primitve control access control class which only allows 
@@ -48,14 +46,6 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  */
 public class MasterAllowed implements IPrimitiveAcl
 {
-    /** Logger. */
-    private ILogger logger;
-    
-    public MasterAllowed()
-    {
-        this.logger = LoggerFactory.getLoggerInstance();
-    }
-    
     @Override
     public boolean allowRole(Session session, String action)
     {
@@ -63,10 +53,6 @@ public class MasterAllowed implements IPrimitiveAcl
         {
             return true;
         }
-        
-        this.logger.debug("Prohibting access to run primitive control because the role " + session.toString() + " is " +
-        		"not allowed. Only the master role is allowed.");
         return false;
     }
-
 }

@@ -44,7 +44,21 @@ import java.util.List;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
 
 /**
- * 
+ * Implementation of primitve control access control class which filters access
+ * to actions for slave roles based on action control lists. The following list
+ * shows how access is determined on a per role basis:
+ * <ul>
+ *  <li><em>Master</em> - The master user has implicit access to all actions.</li>
+ *  <li><em>Slave Active</em> - Slave active users have explicit access to the 
+ *  actions in the slave active access control list and inherited access from the
+ *  slave passive access control list.</li>
+ *  <li><em>Slave Passive</em> - Slave passive users have explicit access to only 
+ *  the actions in the slave passive access control list.</li>
+ * </ul>
+ * To set up access, populate the lists <code>slaveActiveActions</code> and
+ * <code>slavePassiveActions</code> with the names of actions (not including the
+ * 'Action' method name suffix) for setting access for slave active and slave passive
+ * roles respectively.
  */
 public class RoleFilteredAcl implements IPrimitiveAcl 
 {
