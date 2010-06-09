@@ -323,7 +323,6 @@ Section "Sahara Rig Client" RigClient
 
     SetOutPath $INSTDIR
 	File dist\rigclient.jar
-	File /r /x *.svn interface
 	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
     
     
@@ -398,7 +397,6 @@ Section "un.Sahara Rig Client" un.RigClient
 	;Delete the component files/directories
 	Delete $R1\rigclient.jar
 	RMDir /r $R1\config
-	RMDir /r $R1\interface
 	Delete $R1\rigclientservice*
 	DeleteRegKey /IfEmpty HKLM "${REGKEY}"
     Pop $R1
