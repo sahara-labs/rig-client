@@ -388,20 +388,26 @@ public class RemoteDesktopAccessAction implements IAccessAction
      */
     private boolean isUserInGroup(final Process proc, final String name) throws IOException
     {
-        final InputStream is = proc.getInputStream();
-        final BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String line = null;
-
-        while (br.ready() && (line = br.readLine()) != null)
+        BufferedReader br = null;
+        try
         {
-            if (line.contains(name))
+            br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            String line = null;
+    
+            while (br.ready() && (line = br.readLine()) != null)
             {
-                this.logger.debug("The user " + name + " is in the user group.");
-                return true;
+                if (line.contains(name))
+                {
+                    this.logger.debug("The user " + name + " is in the user group.");
+                    return true;
+                }
             }
+            this.logger.debug("The user " + name + " is NOT in the user group.");
+            return false;
         }
-        br.close();
-        this.logger.debug("The user " + name + " is NOT in the user group.");
-        return false;
+        finally
+        {
+            if (br != null) br.close();
+        }
     }
 }
