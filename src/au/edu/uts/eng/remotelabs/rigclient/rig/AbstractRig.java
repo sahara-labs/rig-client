@@ -501,11 +501,12 @@ public abstract class AbstractRig implements IRig
         final String value = this.configuration.getProperty(key);
         if (value == null)
         {
-            this.logger.info("Rig attribute value for " + key + " not found.");
+            this.logger.debug("Rig attribute value for " + key + " not found.");
+            return null;
         }
         else
         {
-            this.logger.info("Found rig attribute value, value of " + key + " is " + value + ".");
+            this.logger.debug("Found rig attribute value, value of " + key + " is " + value + ".");
         }
         try
         {
