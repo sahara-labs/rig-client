@@ -134,6 +134,9 @@ Changelog:
 				<include name="*.aar" />
 				<include name="*.list" />
 			</zipfileset>
+			<zipfileset dir="META-INF/" prefix="META-INF/">
+				<include name="config-descriptions.xml" />
+			</zipfileset>
 		</jar>
 	</target>
 
