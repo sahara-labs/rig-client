@@ -126,7 +126,7 @@ public class SchedulingServerProviderStub extends Stub
         this.populateFaults();
 
         this._serviceClient = new ServiceClient(configurationContext, this._service);
-        configurationContext = this._serviceClient.getServiceContext().getConfigurationContext();
+        this._serviceClient.getServiceContext().getConfigurationContext();
 
         this._serviceClient.getOptions().setTo(new EndpointReference(targetEndpoint));
         this._serviceClient.getOptions().setUseSeparateListener(useSeparateListener);
