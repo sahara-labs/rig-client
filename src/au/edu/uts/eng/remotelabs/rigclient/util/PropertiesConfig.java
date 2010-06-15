@@ -43,9 +43,14 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -184,13 +189,47 @@ public class PropertiesConfig implements IConfig
     @Override
     public synchronized void serialise()
     {
+        OutputStream out = null;
+        InputStream in = null;
         try
         {
             this.propStream.close();
-            final FileOutputStream output = new FileOutputStream(this.configFile);
-            this.prop.store(output, "Sahara Rig Client Properties Configuration File");
-            output.flush();
-            output.close();
+            
+            /* First create a backup of the old file which has the name standard config name with a timestamp
+             * appended to it. */
+            final Calendar cal = Calendar.getInstance();
+            final StringBuilder backup = new StringBuilder(this.configFile);
+            backup.append(".old.");
+            backup.append(cal.get(Calendar.DAY_OF_MONTH));
+            backup.append('-');
+            backup.append(cal.get(Calendar.DATE) + 1);
+            backup.append('-');
+            backup.append(cal.get(Calendar.YEAR));
+            backup.append('T');
+            backup.append(Calendar.HOUR);
+            backup.append('-');
+            backup.append(Calendar.MINUTE);
+            backup.append('_');
+            backup.append(Calendar.SECOND);
+            backup.append('.');
+            backup.append(Calendar.MILLISECOND);
+            
+            out = new BufferedOutputStream(new FileOutputStream(backup.toString(), true));
+            in = new BufferedInputStream(new FileInputStream(this.configFile));
+            byte buf[] = new byte[1024];
+            int r;
+            while ((r = in.read(buf)) > 0)
+            {
+                out.write(buf, 0, r);
+            }
+            out.close();
+            in.close();
+            
+            /* Then store the new results. */
+            out = new FileOutputStream(this.configFile);
+            this.prop.store(out, "Sahara Rig Client Properties Configuration File");
+            out.flush();
+            out.close();
             
             this.propStream = new FileInputStream(this.configFile);
             this.prop = new Properties();
@@ -200,6 +239,15 @@ public class PropertiesConfig implements IConfig
         {
             System.err.println("Failed to seroalise configuration file (" + this.configFile + "). The error is of type" +
                     e.getClass().getCanonicalName() + " with message " + e.getMessage() + ".");
+        }
+        finally
+        {
+            try
+            {
+                if (in != null) in.close();
+                if (out != null) out.close();
+            }
+            catch (IOException ex) { /* Closing failed. */ }            
         }
     }
 
