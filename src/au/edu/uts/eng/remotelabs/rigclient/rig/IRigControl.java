@@ -491,8 +491,8 @@ public interface IRigControl
      *  <li><code>0</code>: No error</li>
      *  <li><code>-1</code>: Illegal controller or action argument.</li>
      *  <li><code>-2</code>: Controller class not found.</li>
-     *  <li><code>-3</code>: Action method not found.<li>
-     *  <li><code>-4</code>: Security exception accessing action.<li>
+     *  <li><code>-3</code>: Action method not found.</li>
+     *  <li><code>-4</code>: Security exception accessing action.</li>
      *  <li><code>-5</code>: Illegal access to the action (the action 
      *  method is not public).</li>
      *  <li><code>-6</code>: Invalid action signature (does not take, and only 
