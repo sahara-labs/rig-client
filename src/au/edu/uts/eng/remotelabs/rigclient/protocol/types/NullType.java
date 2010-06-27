@@ -118,6 +118,7 @@ public class NullType implements ADBBean
 
     }
 
+    @Override
     public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
 
@@ -129,10 +130,7 @@ public class NullType implements ADBBean
         {
             elementList.add(ConverterUtil.convertToString(this.local_void));
         }
-        else
-        {
-            throw new ADBException("void cannot be null!!");
-        }
+
         return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
     }
 
@@ -152,12 +150,14 @@ public class NullType implements ADBBean
         return prefix;
     }
 
+    @Override
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
+    @Override
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
             final boolean serializeType) throws XMLStreamException, ADBException
     {
@@ -225,7 +225,7 @@ public class NullType implements ADBBean
 
         if (this.local_void == null)
         {
-            throw new ADBException("void cannot be null!!");
+            xmlWriter.writeCharacters("");
         }
         else
         {
@@ -299,10 +299,6 @@ public class NullType implements ADBBean
                     final String content = reader.getElementText();
                     object.set_void(ConverterUtil.convertToString(content));
                     reader.next();
-                }
-                else
-                {
-                   // throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())

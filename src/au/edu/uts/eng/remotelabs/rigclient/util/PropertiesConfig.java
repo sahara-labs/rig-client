@@ -158,6 +158,7 @@ public class PropertiesConfig implements IConfig
     /* 
      * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#removeProperty(String key)
      */
+    @Override
     public void removeProperty(final String key)
     {
         this.prop.remove(key);

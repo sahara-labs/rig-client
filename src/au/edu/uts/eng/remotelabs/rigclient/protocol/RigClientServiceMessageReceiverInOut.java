@@ -970,7 +970,7 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         return factory.getDefaultEnvelope();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private Object fromOM(OMElement param, Class type, Map<String, String> extraNamespaces) throws AxisFault
     {
         try
@@ -1062,7 +1062,7 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private Map<String, String> getEnvelopeNamespaces(SOAPEnvelope env)
     {
         final Map<String, String> returnMap = new HashMap<String, String>();

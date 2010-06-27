@@ -100,6 +100,7 @@ public class SetTestInterval implements ADBBean
         return new OMSourcedElementImpl(SetTestInterval.MY_QNAME, factory, dataSource);
     }
 
+    @Override
     public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
         return this.setTestInterval.getPullParser(SetTestInterval.MY_QNAME);
@@ -110,12 +111,14 @@ public class SetTestInterval implements ADBBean
         return this.setTestInterval;
     }
 
+    @Override
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
+    @Override
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
             final boolean serializeType) throws XMLStreamException, ADBException
     {

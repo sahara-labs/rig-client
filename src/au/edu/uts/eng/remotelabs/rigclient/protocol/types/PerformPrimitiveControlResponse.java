@@ -108,18 +108,21 @@ public class PerformPrimitiveControlResponse implements ADBBean
         return this.performPrimitiveControlResponse;
     }
 
+    @Override
     public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
         return this.performPrimitiveControlResponse.getPullParser(PerformPrimitiveControlResponse.MY_QNAME);
     }
 
 
+    @Override
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
+    @Override
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
             final boolean serializeType) throws XMLStreamException, ADBException
     {

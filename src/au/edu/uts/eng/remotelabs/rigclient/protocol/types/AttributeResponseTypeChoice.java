@@ -119,6 +119,7 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
         return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(parentQName, factory, dataSource);
     }
 
+    @Override
     public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
         final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
@@ -167,12 +168,14 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
         return prefix;
     }
 
+    @Override
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
+    @Override
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter, final boolean serializeType)
             throws XMLStreamException, ADBException
     {

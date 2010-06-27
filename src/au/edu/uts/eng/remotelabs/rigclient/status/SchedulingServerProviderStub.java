@@ -79,7 +79,7 @@ import au.edu.uts.eng.remotelabs.rigclient.status.types.UpdateRigStatusResponse;
 /**
  * Scheduling Server local rig provider client SOAP implementation.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class SchedulingServerProviderStub extends Stub
 {
     protected AxisOperation[] _operations;
@@ -249,7 +249,6 @@ public class SchedulingServerProviderStub extends Stub
     }
 
     public RegisterRigResponse registerRig(final RegisterRig registerRig) throws RemoteException
-
     {
         MessageContext _messageContext = null;
         try

@@ -100,6 +100,7 @@ public class SetMaintenance implements ADBBean
         return new OMSourcedElementImpl(SetMaintenance.MY_QNAME, factory, dataSource);
     }
 
+    @Override
     public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
         return this.setMaintenance.getPullParser(SetMaintenance.MY_QNAME);
@@ -110,12 +111,14 @@ public class SetMaintenance implements ADBBean
         return this.setMaintenance;
     }
 
+    @Override
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter)
             throws XMLStreamException, ADBException
     {
         this.serialize(parentQName, factory, xmlWriter, false);
     }
 
+    @Override
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
             final boolean serializeType) throws XMLStreamException, ADBException
     {
