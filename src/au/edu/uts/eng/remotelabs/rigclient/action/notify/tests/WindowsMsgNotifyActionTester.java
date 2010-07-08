@@ -56,6 +56,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * @author tmachet
  *
  */
+@Deprecated
 public class WindowsMsgNotifyActionTester extends TestCase
 {
     /** Object of class under test. */

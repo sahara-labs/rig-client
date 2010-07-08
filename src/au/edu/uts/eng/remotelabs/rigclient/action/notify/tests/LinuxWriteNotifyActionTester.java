@@ -56,6 +56,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 /**
  * Tests the {@link LinuxWriteNotifyAction} class.
  */
+@Deprecated
 public class LinuxWriteNotifyActionTester extends TestCase
 {
     /** Object of class under test. */

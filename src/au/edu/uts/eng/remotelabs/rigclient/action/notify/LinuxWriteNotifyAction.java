@@ -57,6 +57,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * the Linux operating system. If run on other platforms, an 
  * {@link IllegalStateException} exception thrown on construction.
  */
+@Deprecated
 public class LinuxWriteNotifyAction implements INotifyAction
 {
     /** Default 'write' command, which must be in path. */

@@ -55,6 +55,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * <p>
  * @author tmachet
  */
+@Deprecated
 public class WindowsMsgNotifyAction implements INotifyAction
 {
     /** Default command for changing user groups for windows */
