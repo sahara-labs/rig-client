@@ -60,6 +60,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * This command is only valid for Windows systems
  * <p>
  */
+@Deprecated
 public class RDPActivityDetectorAction implements IActivityDetectorAction
 {
     /** String to indicate a session is "Active" from qwinsta output */

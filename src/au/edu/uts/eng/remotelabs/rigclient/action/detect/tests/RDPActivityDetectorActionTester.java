@@ -59,6 +59,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * @author tmachet
  *
  */
+@Deprecated
 public class RDPActivityDetectorActionTester extends TestCase
 {
 
