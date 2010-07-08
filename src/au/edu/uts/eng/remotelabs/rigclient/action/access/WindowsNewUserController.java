@@ -49,6 +49,7 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.IPrimitiveController;
  * Obtains the user name and password of the user created by the 
  * {@link WindowsNewUserAccessAction}.
  */
+@Deprecated
 public class WindowsNewUserController implements IPrimitiveController
 {
     @Override

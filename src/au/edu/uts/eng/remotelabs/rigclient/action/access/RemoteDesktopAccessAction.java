@@ -68,6 +68,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * Access is granted with the <code>assign</code> method that adds users to the user group if they do not exist there
  * yet. Access is revoked with the <code>revoke</code> method that removes the user from the group.
  */
+@Deprecated
 public class RemoteDesktopAccessAction implements IAccessAction
 {
 

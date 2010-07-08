@@ -63,6 +63,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * with the newly created user login credentials and these may accessed
  * with the <tt>getCredentialsAction</tt> action method.  
  */
+@Deprecated
 public class WindowsNewUserAccessAction implements IAccessAction
 {
     /** 'net' command string. */

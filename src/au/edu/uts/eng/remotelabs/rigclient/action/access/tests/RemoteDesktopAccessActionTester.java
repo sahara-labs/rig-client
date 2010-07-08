@@ -54,6 +54,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 /**
  * @author tmachet
  */
+@Deprecated
 public class RemoteDesktopAccessActionTester extends TestCase
 {
     /** Object of class under test. */
