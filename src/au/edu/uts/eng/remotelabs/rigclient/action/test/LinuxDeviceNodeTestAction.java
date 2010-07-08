@@ -110,6 +110,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
  *  for character and block devices ('c' or 'b' must be set as the file type).</li>
  * </ul>
  */
+@Deprecated
 public class LinuxDeviceNodeTestAction extends AbstractTestAction
 {
     /** The list of device nodes to test. */

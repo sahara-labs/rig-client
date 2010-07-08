@@ -69,6 +69,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * DODGY: This is a test case that should working using the UTS experiment camera set up
  *        as of 27th January 2009. 
  */
+@Deprecated
 public class JPEGFrameCameraTestActionTester extends TestCase
 {
     /** Cameras - these are currently public at UTS:FEIT Remote Laboratory. */

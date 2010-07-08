@@ -46,6 +46,7 @@ import au.edu.uts.eng.remotelabs.rigclient.action.test.AbstractTestAction;
 /**
  * Mock class to test the Abstract test action class.
  */
+@Deprecated
 public class MockTestAction extends AbstractTestAction
 {
 

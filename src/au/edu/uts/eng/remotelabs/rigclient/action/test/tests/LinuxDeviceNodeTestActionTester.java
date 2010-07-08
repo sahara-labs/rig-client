@@ -64,6 +64,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 /**
  * Tests the {@link LinuxDeviceNodeTestAction} class.
  */
+@Deprecated
 public class LinuxDeviceNodeTestActionTester extends TestCase
 {
     /** Object of class under test. */

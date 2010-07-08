@@ -68,6 +68,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 /**
  * Tests the {@link PingTestAction} class.
  */
+@Deprecated
 public class PingTestActionTester extends TestCase
 {
     /** Object of class under test. */

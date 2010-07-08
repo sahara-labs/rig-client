@@ -76,6 +76,7 @@ import java.util.Map.Entry;
  *  fail before the ping test fails.</li>
  * </ul>
  */
+@Deprecated
 public class PingTestAction extends AbstractTestAction
 {
     /** Default 'ping' command. */

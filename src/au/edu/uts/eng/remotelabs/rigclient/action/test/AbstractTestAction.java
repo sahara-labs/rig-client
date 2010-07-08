@@ -80,6 +80,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * relative success or failure of them should be indicated by calls
  * to <code>getStatus</code> and <code>getReason</code>.
  */
+@Deprecated
 public abstract class AbstractTestAction implements ITestAction
 {
     /** Flag to specify if the test is in run mode or wait mode. */

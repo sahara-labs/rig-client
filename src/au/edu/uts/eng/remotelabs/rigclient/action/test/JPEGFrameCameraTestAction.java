@@ -115,6 +115,7 @@ import java.util.Map.Entry;
  *  test. The default is 10.</li>
  * </ul>
  */
+@Deprecated
 public class JPEGFrameCameraTestAction extends AbstractTestAction
 {
     /** The initial size of the frame buffer. */

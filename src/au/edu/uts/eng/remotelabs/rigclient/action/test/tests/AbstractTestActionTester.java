@@ -63,6 +63,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 /**
  * Tests the AbstractTestAction class.
  */
+@Deprecated
 public class AbstractTestActionTester extends TestCase
 {
     /** Object of class under test. */
