@@ -186,6 +186,10 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     {
                         commandAdd.add(this.domainName + "\\" + name);
                     }
+                    else
+                    {
+                        commandAdd.add(name);
+                    }
                     this.logger.debug("The command to be executed to add a user to the Remote Desktop Users group is "
                             + commandAdd.toString());
 
@@ -331,6 +335,10 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     if (this.domainName != null)
                     {
                         commandDelete.add(this.domainName + "\\" + name);
+                    }
+                    else
+                    {
+                        commandDelete.add(name);
                     }
                     
                     procCheck = this.executeCommand(commandDelete);
