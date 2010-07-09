@@ -67,6 +67,9 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * </ul>
  * Access is granted with the <code>assign</code> method that adds users to the user group if they do not exist there
  * yet. Access is revoked with the <code>revoke</code> method that removes the user from the group.
+ * 
+ * @deprecated To be replaced au.edu.labshare.action.access.RemoteDesktopAccessAction 
+ *      (au.edu.labshare holds commons library for Sahara Rig Client)
  */
 @Deprecated
 public class RemoteDesktopAccessAction implements IAccessAction
@@ -84,7 +87,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
     /** Domain name. */
     private final String domainName;
 
-    /** Default user group for remote desktop access. */
+    /** Reason for failure. */
     private String failureReason;
 
     /** Logger. */
@@ -181,9 +184,8 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     commandAdd.add("/ADD");
                     if (this.domainName != null)
                     {
-                        commandAdd.add("/DOMAIN " + this.domainName);
+                        commandAdd.add(this.domainName + "\\" + name);
                     }
-                    commandAdd.add(name);
                     this.logger.debug("The command to be executed to add a user to the Remote Desktop Users group is "
                             + commandAdd.toString());
 
@@ -328,9 +330,8 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     commandDelete.add("/DELETE");
                     if (this.domainName != null)
                     {
-                        commandDelete.add("/DOMAIN " + this.domainName);
+                        commandDelete.add(this.domainName + "\\" + name);
                     }
-                    commandDelete.add(name);
                     
                     procCheck = this.executeCommand(commandDelete);
                     
