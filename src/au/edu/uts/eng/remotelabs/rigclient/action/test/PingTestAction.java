@@ -181,6 +181,10 @@ public class PingTestAction extends AbstractTestAction
                 {
                     host.setValue(host.getValue() + 1);
                 }
+                else
+                {
+                    host.setValue(0);
+                }
             }
             catch (IOException e)
             {
