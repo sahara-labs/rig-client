@@ -67,6 +67,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * </ul>
  * Access is granted with the <code>assign</code> method that adds users to the user group if they do not exist there
  * yet. Access is revoked with the <code>revoke</code> method that removes the user from the group.
+ * 
  */
 public class RemoteDesktopAccessAction implements IAccessAction
 {
@@ -83,7 +84,7 @@ public class RemoteDesktopAccessAction implements IAccessAction
     /** Domain name. */
     private final String domainName;
 
-    /** Default user group for remote desktop access. */
+    /** Reason for failure. */
     private String failureReason;
 
     /** Logger. */
@@ -180,9 +181,12 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     commandAdd.add("/ADD");
                     if (this.domainName != null)
                     {
-                        commandAdd.add("/DOMAIN " + this.domainName);
+                        commandAdd.add(this.domainName + "\\" + name);
                     }
-                    commandAdd.add(name);
+                    else
+                    {
+                        commandAdd.add(name);
+                    }
                     this.logger.debug("The command to be executed to add a user to the Remote Desktop Users group is "
                             + commandAdd.toString());
 
@@ -327,9 +331,12 @@ public class RemoteDesktopAccessAction implements IAccessAction
                     commandDelete.add("/DELETE");
                     if (this.domainName != null)
                     {
-                        commandDelete.add("/DOMAIN " + this.domainName);
+                        commandDelete.add(this.domainName + "\\" + name);
                     }
-                    commandDelete.add(name);
+                    else
+                    {
+                        commandDelete.add(name);
+                    }
                     
                     procCheck = this.executeCommand(commandDelete);
                     
@@ -388,20 +395,26 @@ public class RemoteDesktopAccessAction implements IAccessAction
      */
     private boolean isUserInGroup(final Process proc, final String name) throws IOException
     {
-        final InputStream is = proc.getInputStream();
-        final BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String line = null;
-
-        while (br.ready() && (line = br.readLine()) != null)
+        BufferedReader br = null;
+        try
         {
-            if (line.contains(name))
+            br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            String line = null;
+    
+            while (br.ready() && (line = br.readLine()) != null)
             {
-                this.logger.debug("The user " + name + " is in the user group.");
-                return true;
+                if (line.contains(name))
+                {
+                    this.logger.debug("The user " + name + " is in the user group.");
+                    return true;
+                }
             }
+            this.logger.debug("The user " + name + " is NOT in the user group.");
+            return false;
         }
-        br.close();
-        this.logger.debug("The user " + name + " is NOT in the user group.");
-        return false;
+        finally
+        {
+            if (br != null) br.close();
+        }
     }
 }
