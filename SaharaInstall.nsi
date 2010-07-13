@@ -1,7 +1,7 @@
 /**
  * SAHARA Installer
  * 
- * Sahara installer/uninstallaer script for Windows.  
+ * Sahara installer/uninstaller script for Windows.  
  
  * @license See LICENSE in the top level directory for complete license terms.
  *
@@ -432,9 +432,12 @@ Function un.CheckSlectedComponents
     ${If} $NoSectionSelectedUninstall S== "false"
         StrCpy $DisplayText "Following sections are selected for uninstallation. Do you want to continue?$DisplayText" 
         MessageBox MB_YESNO "$DisplayText" IDYES selectionEnd
+        StrCpy $NoSectionSelectedUninstall "true"
         Abort
     ${Else}
-        MessageBox MB_OK "No compoennts selected"
+        MessageBox MB_OK "No component selected"
+        StrCpy $NoSectionSelectedUninstall "true"
+        Abort
     ${EndIf}
 selectionEnd:
 FunctionEnd
