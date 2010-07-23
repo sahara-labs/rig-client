@@ -104,7 +104,8 @@ public class PropertiesConfig implements IConfig
     @Override
     public String getProperty(final String key)
     {
-        return this.prop.getProperty(key);
+        final String val = this.prop.getProperty(key);
+        return val == null ? null : val.trim();
     }
     
     /* 
@@ -118,7 +119,7 @@ public class PropertiesConfig implements IConfig
         {
             return defaultValue;
         }
-        return val;
+        return val.trim();
     }
     
     /* 
