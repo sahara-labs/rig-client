@@ -59,6 +59,7 @@ Name "Sahara Rig Client"
 
 !define JREVersion "1.6"
 
+
 ; The file to write
 OutFile "package\SaharaRigClient.exe"
 
@@ -121,29 +122,89 @@ Var RCAlreadyInstalled ;0=Not installed, 1=Installed but different version, 2=in
 
 Function DirectoryPagePre
 	; If there is already an installation of Sahara Rig Client, use the same folder for this installation. Else let the user select the installation folder
- 	${If} $RCAlreadyInstalled S== "0"
-		StrCpy $DirHeaderText "Choose Install Location"
-		StrCpy $DirHeaderSubText "Choose the folder in which to install $(^Name)"
-	${ElseIf} $RCAlreadyInstalled S== "2" 
-		StrCpy $DirHeaderText "Using existing $(^Name) installation folder"
-		StrCpy $DirHeaderSubText "$(^Name) is already installed on this machine. Installer will overwrite the existing installation"
+    Push $0
+    Push $1
+ 	${If} $RCAlreadyInstalled S== "NotInstalled"
+        ${OrIf} $RCAlreadyInstalled S== "NeedUninstall"
+		StrCpy $0 "Choose Install Location"
+		StrCpy $1 "Choose the folder in which to install $(^Name)"
+	${ElseIf} $RCAlreadyInstalled S== "SameVersion"
+         StrCpy $0 "Using existing $(^Name) installation folder"
+         StrCpy $1 "$(^Name) is already installed on this machine. Installer will overwrite the existing installation"
+         ReadRegStr $R0 HKLM "${REGKEY}" "Path"
+         StrCpy $INSTDIR $R0
+    ${ElseIf} $RCAlreadyInstalled S== "Upgrade"
+         StrCpy $0 "Using existing $(^Name) installation folder"
+         StrCpy $1 "$(^Name) is already installed on this machine. Installer will upgrade the existing installation"
+         ReadRegStr $R0 HKLM "${REGKEY}" "Path"
+         StrCpy $INSTDIR $R0
+    ${ElseIf} $RCAlreadyInstalled S== "Downgrade"
+         StrCpy $0 "Using existing $(^Name) installation folder"
+         StrCpy $1 "$(^Name) is already installed on this machine. Installer will downgrade the existing installation"
 		ReadRegStr $R0 HKLM "${REGKEY}" "Path"
 		StrCpy $INSTDIR $R0
 	${EndIf}
-
+    
+    StrCpy $DirHeaderText $0
+    StrCpy $DirHeaderSubText $1
+    
+    Pop $0
+    Pop $1
 FunctionEnd
 
 Function CheckRCVersion
     Push $R0
-	ReadRegStr $R0 HKLM "${REGKEY}" "CurrentVersion"
-	${If} $R0 S== ""
-		StrCpy $RCAlreadyInstalled "0"
-	${ElseIf} $R0 S!=  ${Version} 
-		StrCpy $RCAlreadyInstalled "1"
-	${Else}
-		StrCpy $RCAlreadyInstalled "2"
-	${EndIf}
-    Pop $R0
+    Push $0
+    Push $1
+    Push $2
+    Push $3
+    ReadRegStr $R0 HKLM "${REGKEY}" "CurrentVersion"
+    ${If} $R0 S== ""
+        StrCpy $RCAlreadyInstalled "NotInstalled"
+    ${Else}
+        ; Get the installed <Major version>.<Minor Version>
+        ; TODO This code assumes the major and minor version are one digit each. 
+        StrCpy $0 $R0 3
+        StrCpy $1 $R0 "" -1
+        ${If} $1 S== ""
+            StrCpy $1 "0"
+        ${EndIf}
+   
+        ; $0 - Installed version
+        ; $1 - Installed build number
+        ; $2 - This version
+        ; $3 - This build number
+        
+        ; Get the <Major version>.<Minor Version> for this product
+        StrCpy $2 ${Version} 3
+        StrCpy $3 ${Version} "" -1
+        ${If} $3 S== ""
+            StrCpy $3 "0"
+        ${EndIf}
+    
+        ${If} $0 S== $2 
+            ${If} $1 = $3 ; Installling same version and same build
+                StrCpy $RCAlreadyInstalled "SameVersion"
+            ${ElseIf} $1 > $3  ; Installing same version and older build 
+                StrCpy $RCAlreadyInstalled "Downgrade"
+            ${Else} ; Installing same version and newer build
+                StrCpy $RCAlreadyInstalled "Upgrade"
+            ${EndIf}
+        ${ElseIf} $0 S== "1.0"
+            ; This is an exception. This is the first version delivered
+            ; and the user should be able to upgrade to the new version
+            ; from version 1.0 without uninstallation
+            StrCpy $RCAlreadyInstalled "Upgrade"
+        ${ElseIf} $0 S!= $2 ; ; Installing different version   
+            StrCpy $RCAlreadyInstalled "NeedUninstall"
+        ${EndIf}
+    ${EndIf}
+
+Pop $R0
+Pop $0
+Pop $1
+Pop $2
+Pop $3
 FunctionEnd
 
 
@@ -152,7 +213,9 @@ Function DirectoryPageShow
 	; If there is already an installation of Rig Client, disable the destination folder selection and use the same folder for this installation. 
 	; Else let the user select the installation folder
 	
-	${If} $RCAlreadyInstalled S== "2"
+	${If} $RCAlreadyInstalled S== "SameVersion"
+        ${OrIf} $RCAlreadyInstalled S== "Upgrade"
+         ${OrIf} $RCAlreadyInstalled S== "Downgrade"
 		FindWindow $R0 "#32770" "" $HWNDPARENT
 		GetDlgItem $R1 $R0 1019
 		SendMessage $R1 ${EM_SETREADONLY} 1 0
@@ -163,7 +226,7 @@ Function DirectoryPageShow
 FunctionEnd
 
 Function SetInstallDir
-	${If} $RCAlreadyInstalled S== "0"
+	${If} $RCAlreadyInstalled S== "NotInstalled"
 		StrCpy $INSTDIR "$INSTDIR\RigClient"
 	${EndIf}
 FunctionEnd
@@ -174,20 +237,17 @@ Function .onInit
  	StrCpy $skipSection "false"
  	StrCpy $RCAlreadyInstalled "-1"
 	call CheckRCVersion
-	${If} $RCAlreadyInstalled S== "1"
-		MessageBox MB_OK|MB_ICONSTOP "A different version of $(^Name) is already installed on this machine. $\nPlease uninstall the existing (^Name) software before continuing the installation"
-		Abort 
-	${EndIf}
-
 FunctionEnd
 
 Function checkJREVersion
+    Push $0
 	; Check the JRE version to be 1.6 or higher
 	ReadRegStr $0 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" CurrentVersion 
 	${If} $0 S< ${JREVersion} 
 		MessageBox MB_OK|MB_ICONSTOP "Rig Client needs JRE version ${JREVersion} or higher. It is currently $0. Aborting the installation."
 		Abort ; causes installer to quit.
 	${EndIf}
+    Pop $0
 FunctionEnd
 
 ; Check if RigClient service is installed
@@ -231,7 +291,7 @@ Function checkIfServiceInstalled
 FunctionEnd
 
 ; Check if RigClient service is running
-Function un.checkIfServiceRunning
+!macro checkIfServiceRunning
 	; Check if the RigClient service is running. (probably need a better way to do this)
 	; If the service is running, the output of 'sc query RigClient' will be like:
 	;	SERVICE_NAME: RigClient
@@ -271,14 +331,14 @@ Function un.checkIfServiceRunning
 	ClearErrors
 	${WordReplace} '$1' 'RUNNING' 'RUNNING' 'E+1' $R0
 	IfErrors Errors 0
-	MessageBox MB_OK|MB_ICONSTOP "Please stop the '${Sahara_RCWindows_Service}' service before continuing the uninstallation."
+	MessageBox MB_OK|MB_ICONSTOP "Please stop the '${Sahara_RCWindows_Service}' service before continuing."
 	Abort
 	Errors:
 	StrCmp $R0 '1' NotRunning 0
-	MessageBox MB_OK|MB_ICONSTOP "Error is detecting if '${Sahara_RCWindows_Service}' service is installed"
+	MessageBox MB_OK|MB_ICONSTOP "Error is detecting if '${Sahara_RCWindows_Service}' service is running"
 	Abort
 	NotRunning:
-FunctionEnd
+!macroend
 
 ; Disable the section so that user will not be able to select it
 ; This macro is used mainly for uninstallation. 
@@ -309,31 +369,62 @@ FunctionEnd
 
 Section "Sahara Rig Client" RigClient
 
-	!insertmacro checkAdminUser "installation"
-	call checkJREVersion	
-	call checkIfServiceInstalled
-	
-	; Set output path to the installation directory
-    SetOutPath $INSTDIR\config
-  
-	; Copy the component files/directories
-    File /oname=rigclient.properties config\rigclient.properties.win
-    File config\rigclient_service.ini
-    File config\batch.properties
+    ${If} $RCAlreadyInstalled S== "NeedUninstall"
+        MessageBox MB_OK|MB_ICONSTOP "A different version of $(^Name) is already installed on this machine. $\nPlease uninstall the existing $(^Name) software before continuing the installation"
+        Abort 
+    ${EndIf}
+    ${If} $RCAlreadyInstalled S== "Upgrade"
+        MessageBox MB_YESNO "$(^Name) will be upgraded to version ${Version}. Do you want to continue?" IDYES ContinueInstall
+        MessageBox MB_OK "Installation will be aborted"
+        Abort
+    ${EndIf}
 
+    ${If} $RCAlreadyInstalled S== "Downgrade"
+        MessageBox MB_YESNO "$(^Name) will be downgraded to version ${Version}. Downgrading is not recommended. $\nDo you want to continue?" IDYES ContinueInstall
+        MessageBox MB_OK "Installation will be aborted"
+        Abort
+    ${EndIf}
+
+    ${If} $RCAlreadyInstalled S== "SameVersion"
+        MessageBox MB_ICONQUESTION|MB_YESNO "Same version of $(^Name) is already installed. $\nDo you want to repair/overwrite the installed version?" IDYES ContinueInstall
+        MessageBox MB_OK "Installation will be aborted"
+        Abort
+    ${EndIf}
+    ContinueInstall:
+
+	!insertmacro checkAdminUser "installation"
+    
+    call checkJREVersion	
+    
+    ${If} $RCAlreadyInstalled S== "NotInstalled"
+        call checkIfServiceInstalled     
+	   ; Set output path to the installation directory
+        SetOutPath $INSTDIR\config
+  
+	   ; Copy the component files/directories
+        File /oname=rigclient.properties config\rigclient.properties.win
+        File config\rigclient_service.ini
+        File config\batch.properties
+    ${Else}
+        !insertmacro checkIfServiceRunning
+    ${EndIF}
+    
     SetOutPath $INSTDIR
 	File dist\rigclient.jar
 	File /r /x *.svn interface
-	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
     
+    ${If} $RCAlreadyInstalled S== "NotInstalled"
+    	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
     
-	; Add the RigClient service to the windows services
-	ExecWait '"$INSTDIR\rigclientservice" install'
-	ifErrors 0 WinServiceNoError
-	MessageBox MB_OK|MB_ICONSTOP "Error in executing rigclientservice.exe"
-	; TODO  Revert back the installed RC in case of error?
-	Abort
-	WinServiceNoError:
+	   ; Add the RigClient service to the windows services
+	   ExecWait '"$INSTDIR\rigclientservice" install'
+	   ifErrors 0 WinServiceNoError
+	   MessageBox MB_OK|MB_ICONSTOP "Error in executing rigclientservice.exe"
+	   ; TODO  Revert back the installed RC in case of error?
+	   Abort
+	   WinServiceNoError:
+    ${EndIF}
+       
     WriteRegStr HKLM "${REGKEY}" Path $INSTDIR
     WriteRegStr HKLM "${REGKEY}" CurrentVersion  ${Version}
 
@@ -353,9 +444,7 @@ Function .onInstSuccess
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" "UninstallString" "$\"$INSTDIR\uninstallSaharaRigClient.exe$\""
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" "NoModify" 1
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" "NoRepair" 1
-	;${If} ${SectionIsSelected} ${RigClient}
-	;	MessageBox MB_OK "Postinstall actions: $\n$\nUpdate the configuration file $INSTDIR\RigClient\config\rigclient.properties $\n$\nGo to the Windows Control Panel->Administrative Tools->Services and start the RigClient service"
-	;${EndIf}
+
 installEnd:
 FunctionEnd
 
@@ -363,11 +452,13 @@ FunctionEnd
 ; Create uninstaller
 Section -createUninstaller
 	ClearErrors
-	EnumRegKey $1 HKLM  "${REGKEY}" 0
-	ifErrors 0 createUninstaller
-	MessageBox MB_OK|MB_ICONSTOP  "No component selected for installation. Aborting the installation"
-	Abort
-	createUninstaller:
+	/*EnumRegKey $1 HKLM  "${REGKEY}" 0
+	ifErrors 0 createUninstaller*/
+    ${IfNot} ${SectionIsSelected} RigClient
+	   MessageBox MB_OK|MB_ICONSTOP  "No component selected for installation. Aborting the installation"
+	   Abort
+    ${EndIf}
+	
     WriteRegStr HKLM "${REGKEY}" Path $INSTDIR
 	SetOutPath $INSTDIR
 	WriteUninstaller $INSTDIR\uninstallSaharaRigClient.exe
@@ -381,7 +472,7 @@ SectionEnd
 Section "un.Sahara Rig Client" un.RigClient 
     Push $R1
 	!insertmacro checkAdminUser "uninstallation"
-	call un.checkIfServiceRunning
+	!insertmacro checkIfServiceRunning
 	; Remove the RigClient service from the windows services
 	ReadRegStr $R1 HKLM "${REGKEY}" "Path"
 	ClearErrors
