@@ -1,0 +1,31 @@
+screen mode id:i:1
+winposstr:s:0,1,177,102,977,702
+compression:i:1
+keyboardhook:i:2
+displayconnectionbar:i:1
+disable wallpaper:i:1
+disable full window drag:i:1
+allow desktop composition:i:0
+allow font smoothing:i:0
+disable menu anims:i:1
+disable themes:i:0
+disable cursor setting:i:0
+bitmapcachepersistenable:i:1
+audiomode:i:0
+redirectprinters:i:1
+redirectcomports:i:0
+redirectsmartcards:i:1
+redirectclipboard:i:1
+redirectposdevices:i:0
+autoreconnection enabled:i:1
+authentication level:i:0
+prompt for credentials:i:0
+negotiate security layer:i:1
+remoteapplicationmode:i:0
+alternate shell:s:
+shell working directory:s:
+gatewayhostname:s:
+gatewayusagemethod:i:4
+gatewaycredentialssource:i:4
+gatewayprofileusagemethod:i:0
+promptcredentialonce:i:1
