@@ -325,6 +325,8 @@ Section "Sahara Rig Client" RigClient
 	File dist\rigclient.jar
 	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
     
+    ; Bug #77 - create lib directory
+    SetOutPath $INSTDIR\lib
     
 	; Add the RigClient service to the windows services
 	ExecWait '"$INSTDIR\rigclientservice" install'
@@ -398,6 +400,7 @@ Section "un.Sahara Rig Client" un.RigClient
 	Delete $R1\rigclient.jar
 	RMDir /r $R1\config
 	Delete $R1\rigclientservice*
+    RMDir $R1\lib
 	DeleteRegKey /IfEmpty HKLM "${REGKEY}"
     Pop $R1
 SectionEnd ; end the section
