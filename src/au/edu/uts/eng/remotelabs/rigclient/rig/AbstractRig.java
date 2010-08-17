@@ -1073,6 +1073,55 @@ public abstract class AbstractRig implements IRig
     }
     
     /**
+     * Returns the failure reason of an action. May return <tt>null</tt> if
+     * the previous invocation of the action method did not fail.
+     * 
+     * @param type action type
+     * @return action failure reason
+     */
+    public String getActionFailureReason(ActionType type)
+    {
+        StringBuilder buf = new StringBuilder();
+        List<? extends IAction> actions = new ArrayList<IAction>(0);
+        String tmp;
+        
+        switch (type)
+        {
+            case ACCESS:
+                actions = this.accessActions;
+                break;
+            case DETECT:
+                actions = this.detectionActions;
+                break;
+            case NOTIFY:
+                actions = this.notifyActions;
+                break;
+            case RESET:
+                actions = this.resetActions;
+                break;
+            case SLAVE_ACCESS:
+                actions = this.slaveActions;
+                break;
+            case TEST:
+                actions = this.testActions;
+                break;
+        }
+        
+        for (IAction a : actions)
+        {
+            if ((tmp = a.getFailureReason()) != null)
+            {
+                if (buf.length() > 0) buf.append(' ');
+                buf.append(a.getActionType());
+                buf.append(':');
+                buf.append(tmp);
+            }
+        }
+        
+        return buf.toString();
+    }
+    
+    /**
      * Cleans up this class. This should be called before the rig client
      * is shutdown. 
      */

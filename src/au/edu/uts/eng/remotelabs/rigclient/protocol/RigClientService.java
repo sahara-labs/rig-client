@@ -95,6 +95,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveUserType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.StatusResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.TestIntervalRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig;
+import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchResults;
@@ -176,12 +178,22 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             operation.setSuccess(true);
         }
         else // Something fraked up
-        {   
-            this.logger.warn("Failed allocating user " + user + " because of some unknown reason " +
-            "(this may be a bug).");
+        {
+            this.logger.warn("Failed allocating user " + user + " because of an allocation action failure.");
             operation.setSuccess(false);
             error.setCode(16);
-            error.setReason("Unknown.");
+
+            /* Abstract rig IRig implementations should use actions that provide a failure reason. */
+            if (this.rig instanceof AbstractRig)
+            {
+                AbstractRig aRig = (AbstractRig)this.rig;
+                String failureReason = aRig.getActionFailureReason(ActionType.ACCESS);
+                error.setReason(failureReason != null ? failureReason : "Action failure"); 
+            }
+            else
+            {
+                error.setReason("Action failure");
+            }
         }
 
         return response;
@@ -233,10 +245,21 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         else  // Something fraked up
         {
-            this.logger.warn("Failed to release " + user + " for some unknown reason (this may be a bug).");
+            this.logger.warn("Failed to release " + user + " because of an release action failure.");
             operation.setSuccess(false);
             error.setCode(16);
-            error.setReason("Unknown.");
+
+            /* Abstract rig IRig implementations should use actions that provide a failure reason. */
+            if (this.rig instanceof AbstractRig)
+            {
+                AbstractRig aRig = (AbstractRig)this.rig;
+                String failureReason = aRig.getActionFailureReason(ActionType.ACCESS);
+                error.setReason(failureReason != null ? failureReason : "Action failure"); 
+            }
+            else
+            {
+                error.setReason("Action failure");
+            }
         }
         
         return response;
@@ -308,11 +331,9 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         else
         {
-            this.logger.warn("Failed allocating slave user " + user + ", the user may already have the requested " +
-            		"slave permission.");
             operation.setSuccess(false);
             error.setCode(16);
-            error.setReason("Unknown, user may already be a slave user.");
+            error.setReason("User may already be a slave user or action failure.");
         }
 
         return response;
@@ -359,10 +380,8 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         else // Something mother fraked up
         {
-            this.logger.warn("Failed releasing slave user " + slave + " because of some unknown reason " +
-            		"(possibly a bug).");
             error.setCode(16);
-            error.setReason("Unknown reason.");
+            error.setReason("Action failure.");
         }
         
         return response;
@@ -408,10 +427,20 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         else 
         {
-            this.logger.warn("Failed notification because of some unknown error (possibly a bug).");
             operation.setSuccess(false);
             error.setCode(16);
-            error.setReason("Unknown error.");
+            
+            /* Abstract rig IRig implementations should use actions that provide a failure reason. */
+            if (this.rig instanceof AbstractRig)
+            {
+                AbstractRig aRig = (AbstractRig)this.rig;
+                String failureReason = aRig.getActionFailureReason(ActionType.NOTIFY);
+                error.setReason(failureReason != null ? failureReason : "Action failure"); 
+            }
+            else
+            {
+                error.setReason("Action failure");
+            }
         }
 
         return response;

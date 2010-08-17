@@ -41,6 +41,8 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.protocol.tests;
 
+import static org.easymock.EasyMock.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -107,11 +109,14 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.StatusResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.TestIntervalRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.TypeSlaveUser;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.UserType;
+import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredRig;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchResults;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
+import au.edu.uts.eng.remotelabs.rigclient.rig.tests.MockRig;
 import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
@@ -291,6 +296,51 @@ public class RigClientServiceTester extends TestCase
         assertFalse(this.rig.isSessionActive());
         assertEquals(Session.NOT_IN, this.rig.isInSession("mdiponio"));
     }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#allocate(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate)}.
+     */
+    @Test
+    public void testAllocateActionFailure() throws Exception
+    {
+        MockRig mock = new MockRig();
+        IAccessAction access = createMock(IAccessAction.class);
+        expect(access.getActionType()).andReturn("Access action.").atLeastOnce();
+        expect(access.assign("mdiponio")).andReturn(false);
+        expect(access.getFailureReason()).andReturn("Expected failure.").atLeastOnce();
+        replay(access);
+        mock.register(access, ActionType.ACCESS);
+        
+        Field f = RigClientService.class.getDeclaredField("rig");
+        f.setAccessible(true);
+        f.set(this.service, mock);
+                
+        Allocate alloc = new Allocate();
+        UserType user = new UserType();
+        user.setUser("mdiponio");
+        user.setIdentityToken("abc123");
+        alloc.setAllocate(user);
+        
+        AllocateResponse resp = this.service.allocate(alloc);
+        assertNotNull(resp);
+        
+        OperationResponseType op = resp.getAllocateResponse();
+        assertNotNull(op);
+        assertFalse(op.getSuccess());
+        
+        ErrorType error = op.getError();
+        assertNotNull(error);
+        assertEquals(16, error.getCode());
+        assertNotNull(error.getOperation());
+        
+        String reason = error.getReason();
+        assertNotNull(reason);
+        assertTrue(reason.contains(access.getActionType()));
+        assertTrue(reason.contains(access.getFailureReason()));
+        
+        assertFalse(this.rig.isSessionActive());
+        assertEquals(Session.NOT_IN, this.rig.isInSession("mdiponio"));
+    }
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#release(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release)}.
@@ -414,6 +464,52 @@ public class RigClientServiceTester extends TestCase
         
         assertEquals(Session.MASTER, this.rig.isInSession("tmachet"));
     }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#allocate(au.edu.uts.eng.remotelabs.rigclient.protocol.types.Allocate)}.
+     */
+    @Test
+    public void testReleaseActionFailure() throws Exception
+    {
+        MockRig mock = new MockRig();
+        IAccessAction access = createMock(IAccessAction.class);
+        expect(access.getActionType()).andReturn("Access action.").atLeastOnce();
+        expect(access.assign("mdiponio")).andReturn(true);
+        expect(access.revoke("mdiponio")).andReturn(false);
+        expect(access.getFailureReason()).andReturn("Release failure.").atLeastOnce();
+        replay(access);
+        mock.register(access, ActionType.ACCESS);
+        
+        Field f = RigClientService.class.getDeclaredField("rig");
+        f.setAccessible(true);
+        f.set(this.service, mock);
+        
+        assertTrue(mock.assign("mdiponio"));
+                
+        Release rel = new Release();
+        UserType user = new UserType();
+        user.setUser("mdiponio");
+        user.setIdentityToken("abc123");
+        rel.setRelease(user);
+        
+        ReleaseResponse resp = this.service.release(rel);
+        assertNotNull(resp);
+        
+        OperationResponseType op = resp.getReleaseResponse();
+        assertNotNull(op);
+        assertFalse(op.getSuccess());
+        
+        ErrorType error = op.getError();
+        assertNotNull(error);
+        assertEquals(16, error.getCode());
+        assertNotNull(error.getOperation());
+        
+        String reason = error.getReason();
+        assertNotNull(reason);
+        assertTrue(reason.contains(access.getActionType()));
+        assertTrue(reason.contains(access.getFailureReason()));
+    }
+
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#slaveAllocate(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SlaveAllocate)}.

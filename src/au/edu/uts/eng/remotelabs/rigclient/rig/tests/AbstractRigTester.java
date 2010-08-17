@@ -39,9 +39,9 @@
 package au.edu.uts.eng.remotelabs.rigclient.rig.tests;
 
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.notNull;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
@@ -56,15 +56,15 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig;
+import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
-import au.edu.uts.eng.remotelabs.rigclient.rig.IAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IActivityDetectorAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.INotifyAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IResetAction;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
 import au.edu.uts.eng.remotelabs.rigclient.rig.ISlaveAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.ITestAction;
-import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
-import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
@@ -261,9 +261,99 @@ public class AbstractRigTester extends TestCase
     }
     
     /**
-     * Test action registration failure.
+     * Tests the getting the failure reason of an action failure. 
      */
+    @Test
+    public void testAccessActionFailureReason()
+    {
+        final String tuser = "testuser";
+        IAccessAction mockSucceed = createMock(IAccessAction.class);
+        expect(mockSucceed.getActionType())
+            .andReturn("MockSucceedAccessAction")
+            .atLeastOnce();
+        expect(mockSucceed.assign(tuser))
+            .andReturn(true);
+        expect(mockSucceed.getFailureReason())
+            .andReturn(null);
+        
+        IAccessAction mockFail = createMock(IAccessAction.class);
+        expect(mockFail.assign(tuser))
+            .andReturn(false);
+        expect(mockFail.getActionType())
+            .andReturn("MockFailAccessAction")
+            .atLeastOnce();
+        expect(mockFail.getFailureReason())
+            .andReturn("Cause I told it to")
+            .atLeastOnce();
+        
+        replay(mockSucceed);
+        replay(mockFail);
+        
+        assertTrue(this.rig.register(mockSucceed, ActionType.ACCESS));
+        assertTrue(this.rig.register(mockFail, ActionType.ACCESS));
+        
+        assertFalse(this.rig.assign(tuser)); 
+
+        assertTrue(this.rig instanceof AbstractRig);
+        AbstractRig arig = (AbstractRig)this.rig;
+        
+        String failureReason = arig.getActionFailureReason(ActionType.ACCESS);
+        assertNotNull(failureReason);
+        assertTrue(failureReason.startsWith(mockFail.getActionType()));
+        assertTrue(failureReason.endsWith(mockFail.getFailureReason()));
+        
+        verify(mockSucceed);
+        verify(mockFail);
+    }
     
+    /**
+     * Tests the getting the failure reason of an action failure. 
+     */
+    @Test
+    public void testSlaveAccessActionFailureReason()
+    {
+        final String tuser = "testuser";
+        ISlaveAccessAction mockSucceed = createMock(ISlaveAccessAction.class);
+        expect(mockSucceed.getActionType())
+            .andReturn("MockSucceedSlaveAction")
+            .atLeastOnce();
+        expect(mockSucceed.assign(tuser, false))
+            .andReturn(true);
+        expect(mockSucceed.getFailureReason())
+            .andReturn(null);
+        
+        ISlaveAccessAction mockFail = createMock(ISlaveAccessAction.class);
+        expect(mockFail.assign(tuser, false))
+            .andReturn(false);
+        expect(mockFail.getActionType())
+            .andReturn("MockFailSlaveAction")
+            .atLeastOnce();
+        expect(mockFail.getFailureReason())
+            .andReturn("Cause I told it to")
+            .atLeastOnce();
+        
+        replay(mockSucceed);
+        replay(mockFail);
+        
+        assertTrue(this.rig.register(mockSucceed, ActionType.SLAVE_ACCESS));
+        assertTrue(this.rig.register(mockFail, ActionType.SLAVE_ACCESS));
+        
+        assertTrue(this.rig.assign("master"));
+        assertFalse(this.rig.addSlave(tuser, false));
+
+        assertTrue(this.rig instanceof AbstractRig);
+        AbstractRig arig = (AbstractRig)this.rig;
+        
+        String failureReason = arig.getActionFailureReason(ActionType.SLAVE_ACCESS);
+        System.out.println(failureReason);
+        assertNotNull(failureReason);
+        assertTrue(failureReason.startsWith(mockFail.getActionType()));
+        assertTrue(failureReason.endsWith(mockFail.getFailureReason()));
+        
+        verify(mockSucceed);
+        verify(mockFail);
+    }
+
     /**
      * Tests the <code>AbstractRig.hasPermission</code> method. The permission stack
      * is verified. 
@@ -614,7 +704,6 @@ public class AbstractRigTester extends TestCase
         assertTrue(this.rig.setMaintenance(true, "Test reason", true));
         assertFalse(this.rig.isNotInMaintenance());
         assertEquals("Test reason", this.rig.getMaintenanceReason());
-        verify(mockTest);
         
         /* Removal of maintenance should start tests. */
         reset(mockTest);
@@ -651,7 +740,6 @@ public class AbstractRigTester extends TestCase
         assertTrue(this.rig.setMaintenance(true, "Test reason", false));
         assertFalse(this.rig.isNotInMaintenance());
         assertEquals("Test reason", this.rig.getMaintenanceReason());
-        verify(mockTest);
         
         /* Start tests. */
         reset(mockTest);
