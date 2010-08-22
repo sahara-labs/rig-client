@@ -51,7 +51,7 @@ public interface IConfig
 {
     /**
      * Returns the configuration value of the property key.
-     * Null is returned if the key cannot be found in configuration.
+     * <tt>null</tt> is returned if the key cannot be found in configuration.
      *
      * @param key name of the configuration item
      * @return configuration value set in properties if found, null otherwise

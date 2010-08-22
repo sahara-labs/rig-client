@@ -38,21 +38,29 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 /**
  * Configuration class which uses an intersection of multiple configuration
  * classes to load configuration properties. The intersection consists of a
  * canonical properties file and an extension directory from which zero of  
- * more properties files (with the extension <tt>.properties</tt>) may be 
- * iterated. If there are duplicate properties in the any of the loaded files,
- * the canonical file takes precedence over the extension directory properties. 
- * Within the extension directory the first loaded value of duplicate properties 
- * is used. The loading order of the extension directory properties files are 
- * in the natural ordering of the file names, so prepending an appropriate 
- * number to be beginning of file names allows the loading order to be 
- * controlled. The default location of the canonical file and extension 
- * directory are:
+ * more properties files may be iterated. If there are duplicate properties in 
+ * the any of the loaded files, the canonical file takes precedence over the 
+ * extension directory properties. Within the extension directory the first 
+ * loaded value of duplicate properties is used. The loading order of the 
+ * extension directory properties files are in the natural ordering of the 
+ * file names, so prepending an appropriate number to be beginning of file 
+ * names allows the loading order to be controlled. The default location of the
+ * canonical file and extension directory are:
  * <ul>
  *  <li>Canonical properties file - config/rigclient.properties</li>
  *  <li>Extension directory - config/config.d</li>
@@ -64,43 +72,77 @@ import java.util.Map;
  *  <li><tt>prop.extension.dir</tt> - The location of the properties extension
  *  library.</li>
  * </ul>
+ * The following extensions may be used for the properties files in the
+ * extension directory (note case):
+ * <ul>
+ *  <li>properties</ul>
+ *  <li>props</li>
+ *  <li>conf</li>
+ *  <li>config</li>
+ *  <li>rc</li>
+ * </ul>
  */
 public class PropertiesIntersectionConfig implements IConfig
 {
+    /** The map containing the intersection of properties that are loaded from
+     *  the various properties files. Direct lookup of properties is from this
+     *  map and not proxied to the properties file. */
+    private Map<String, String> props;
+    
+    /** The canonical properties file. */
+    private Properties canonicalProps;
+    
+    /** The location of the canonical properties file. */
+    private String canonicalLocation;
+    
+    /** The properites files loaded from the extension directory in order of 
+     *  their precedence. */
+    private List<Properties> extensionProps;
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#getProperty(java.lang.String)
-     */
+    /** The location of the extension directory. */
+    private String extensionLocation;
+    
+    public PropertiesIntersectionConfig()
+    {
+        this.props = new HashMap<String, String>();
+        this.extensionProps = new ArrayList<Properties>();
+        
+        this.reload();
+    }
+
     @Override
     public String getProperty(String key)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return this.props.get(key);
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#getProperty(java.lang.String, java.lang.String)
-     */
     @Override
-    public String getProperty(String key, String defaultValue)
+    public String getProperty(final String key, final String defaultValue)
     {
-        // TODO Auto-generated method stub
-        return null;
+        final String val = this.props.get(key);
+        if (val == null)
+        {
+            return defaultValue;
+        }
+        else
+        {
+            return val;
+        }
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#getAllProperties()
-     */
     @Override
     public Map<String, String> getAllProperties()
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<String, String> clone = new HashMap<String, String>();
+        
+        for (Entry<String, String> p : this.props.entrySet())
+        {
+            clone.put(p.getKey(), p.getValue());
+        }
+        
+        return clone;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#setProperty(java.lang.String, java.lang.String)
-     */
     @Override
     public void setProperty(String key, String value)
     {
@@ -108,9 +150,6 @@ public class PropertiesIntersectionConfig implements IConfig
 
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#removeProperty(java.lang.String)
-     */
     @Override
     public void removeProperty(String key)
     {
@@ -118,19 +157,41 @@ public class PropertiesIntersectionConfig implements IConfig
 
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#reload()
-     */
     @Override
     public void reload()
     {
-        // TODO Auto-generated method stub
+        try
+        {
+            /* The canonical properties file has the highest precedence. */
+            this.canonicalProps = new Properties();
+            FileInputStream in = new FileInputStream(new File(this.canonicalLocation));
+            this.canonicalProps.load(in);
+            
+            for (String k : this.canonicalProps.stringPropertyNames())
+            {
+                this.props.put(k, this.canonicalProps.getProperty(k));
+            }
+            
+            in.close();
+            
+            File ext = new File(this.extensionLocation);
+            
+            /* The extension directory need not exist. */
+            if (this.extensionLocation == null || !ext.isDirectory()) return;
+            
+            /* The extension directory configuration files are loaded in
+             * the natural order of their filenames. */
+            String files[] = ext.list();
+        }
+        catch (IOException ex)
+        {
+            
+        }
+        
+        
 
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#serialise()
-     */
     @Override
     public void serialise()
     {
@@ -138,9 +199,6 @@ public class PropertiesIntersectionConfig implements IConfig
 
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#dumpConfiguration()
-     */
     @Override
     public String dumpConfiguration()
     {
@@ -148,14 +206,27 @@ public class PropertiesIntersectionConfig implements IConfig
         return null;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.util.IConfig#getConfigurationInfomation()
-     */
     @Override
     public String getConfigurationInfomation()
     {
         // TODO Auto-generated method stub
         return null;
     }
+    
+    class FilenameExtFiler implements FileFilter
+    {
+        /** The list of allowable extensions. */
+        private List<String> extensions;
+        
+        
 
+        @Override
+        public boolean accept(File f)
+        {
+            String name = f.getName();            
+            return this.extensions.contains(name.substring(name.lastIndexOf('.')));
+        }
+        
+    }
+    
 }
