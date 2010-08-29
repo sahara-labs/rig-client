@@ -43,11 +43,14 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Configuration class which uses an intersection of multiple configuration
@@ -213,12 +216,19 @@ public class PropertiesIntersectionConfig implements IConfig
         return null;
     }
     
-    class FilenameExtFiler implements FileFilter
+    /**
+     * File name filter which filters base the file extension (trailing
+     * characters after the last '.' character).
+     */
+    public class FilenameExtFiler implements FileFilter
     {
         /** The list of allowable extensions. */
         private List<String> extensions;
         
-        
+        public FilenameExtFiler(String[] extensions)
+        {
+            this.extensions = Arrays.asList(extensions);
+        }
 
         @Override
         public boolean accept(File f)
@@ -226,7 +236,6 @@ public class PropertiesIntersectionConfig implements IConfig
             String name = f.getName();            
             return this.extensions.contains(name.substring(name.lastIndexOf('.')));
         }
-        
     }
     
 }
