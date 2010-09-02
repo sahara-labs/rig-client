@@ -94,7 +94,7 @@ public interface IConfig
     
     /**
      * Reload configuration from a persistent store. If the in memory
-     * configuration store is dirty, any changes will be flushed.
+     * configuration store is dirty, any changes will be lost.
      */
     public void reload();
     

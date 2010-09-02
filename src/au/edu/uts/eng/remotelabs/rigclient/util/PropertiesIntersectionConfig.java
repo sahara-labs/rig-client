@@ -41,16 +41,17 @@ package au.edu.uts.eng.remotelabs.rigclient.util;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.bcel.generic.FCMPG;
 
 /**
  * Configuration class which uses an intersection of multiple configuration
@@ -60,13 +61,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * the any of the loaded files, the canonical file takes precedence over the 
  * extension directory properties. Within the extension directory the first 
  * loaded value of duplicate properties is used. The loading order of the 
- * extension directory properties files are in the natural ordering of the 
+ * extension direcMtory properties files are in the natural ordering of the 
  * file names, so prepending an appropriate number to be beginning of file 
  * names allows the loading order to be controlled. The default location of the
  * canonical file and extension directory are:
  * <ul>
- *  <li>Canonical properties file - config/rigclient.properties</li>
- *  <li>Extension directory - config/config.d</li>
+ *  <li>Canonical properties file - conf/rigclient.properties</li>
+ *  <li>Extension directory - conf/conf.d</li>
  * </ul>
  * The following system properties can be used to override the locations:
  * <ul>
@@ -87,6 +88,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class PropertiesIntersectionConfig implements IConfig
 {
+    /** The default location of the canonical properties file. */
+    public static final String CANONICAL_FILE_LOC = "conf";
+    
+    /** The default location of the extension directory. */
+    public static final String EXTENSION_DIR_LOC = "conf/conf.d";
+    
     /** The map containing the intersection of properties that are loaded from
      *  the various properties files. Direct lookup of properties is from this
      *  map and not proxied to the properties file. */
@@ -98,9 +105,9 @@ public class PropertiesIntersectionConfig implements IConfig
     /** The location of the canonical properties file. */
     private String canonicalLocation;
     
-    /** The properites files loaded from the extension directory in order of 
+    /** The properties files loaded from the extension directory in order of 
      *  their precedence. */
-    private List<Properties> extensionProps;
+    private Map<String, Properties> extensionProps;
 
     /** The location of the extension directory. */
     private String extensionLocation;
@@ -108,9 +115,17 @@ public class PropertiesIntersectionConfig implements IConfig
     public PropertiesIntersectionConfig()
     {
         this.props = new HashMap<String, String>();
-        this.extensionProps = new ArrayList<Properties>();
+        this.extensionProps = new HashMap<String, Properties>();
         
-        this.reload();
+        /* Find the location of the properties files. */
+        this.canonicalLocation = System.getProperty("prop.file", PropertiesIntersectionConfig.CANONICAL_FILE_LOC);
+        System.out.println("The location of the canonical properties file is: " + this.canonicalLocation);
+        
+        File f = new File(this.canonicalLocation);
+        if (!(f.isFile() || f.canRead() || f.canWrite()))
+        {
+            
+        }
     }
 
     @Override
@@ -134,7 +149,7 @@ public class PropertiesIntersectionConfig implements IConfig
     }
 
     @Override
-    public Map<String, String> getAllProperties()
+    public synchronized Map<String, String> getAllProperties()
     {
         Map<String, String> clone = new HashMap<String, String>();
         
@@ -147,52 +162,131 @@ public class PropertiesIntersectionConfig implements IConfig
     }
 
     @Override
-    public void setProperty(String key, String value)
+    public synchronized void setProperty(String key, String value)
     {
-        // TODO Auto-generated method stub
+        /* Update the memory properties store. */
+        this.props.put(key, value);
+        
+        /* If the property is from the canonical store, update the existing
+         * property with the new value. */
+        if (this.canonicalProps.containsKey(key))
+        {
+            this.canonicalProps.put(key, value);
+            return;
+        }
+        
+        /* Otherwise update the extension location properties store. */
+        for (Properties p : this.extensionProps.values())
+        {
+            if (p.containsKey(key))
+            {
+                p.put(key, value);
+                return;
+            }
+        }
 
+        /* It is a new property, so add it to the canonical location. */
+        this.canonicalProps.put(key, value);
     }
 
     @Override
-    public void removeProperty(String key)
+    public synchronized void removeProperty(String key)
     {
-        // TODO Auto-generated method stub
-
+        if (!this.props.containsKey(key)) return;
+        
+        /* Remove from the memory properties store. */
+        this.props.remove(key);
+        
+        
+        /* If the property is from the canonical store, update the existing
+         * property with the new value. */
+        if (this.canonicalProps.containsKey(key))
+        {
+            this.canonicalProps.remove(key);
+            return;
+        }
+        
+        /* Otherwise update the extension location properties store. */
+        String mKey = null;
+        for (Entry<String, Properties> e : this.extensionProps.entrySet())
+        {
+            if (e.getValue().containsKey(key))
+            {
+                mKey = e.getKey();
+            }
+        }
+        if (mKey != null) this.extensionProps.remove(mKey);
     }
 
     @Override
-    public void reload()
+    public synchronized void reload()
     {
+        this.props.clear();
+        
         try
         {
-            /* The canonical properties file has the highest precedence. */
+            /* Load the canonical file. */
+            FileInputStream fs = new FileInputStream(new File(this.canonicalLocation));
             this.canonicalProps = new Properties();
-            FileInputStream in = new FileInputStream(new File(this.canonicalLocation));
-            this.canonicalProps.load(in);
+            this.canonicalProps.load(fs);
             
-            for (String k : this.canonicalProps.stringPropertyNames())
+            /* All canonical properties are loaded to be used. */
+            for (Entry<Object, Object> e : this.canonicalProps.entrySet())
             {
-                this.props.put(k, this.canonicalProps.getProperty(k));
+                /* This is probably a unneeded check (properties are string key value
+                 * pairs), but unguarded casts are rarely a good idea. */
+                if (!(e.getKey() instanceof String || e.getValue() instanceof String)) continue;
+                
+               this.props.put((String)e.getKey(), (String)e.getValue());
             }
+            fs.close();
             
-            in.close();
-            
-            File ext = new File(this.extensionLocation);
-            
-            /* The extension directory need not exist. */
-            if (this.extensionLocation == null || !ext.isDirectory()) return;
-            
-            /* The extension directory configuration files are loaded in
-             * the natural order of their filenames. */
-            String files[] = ext.list();
+            /* Load the extension properties. The are pre-sorted in order of precedence. */
+            Iterator<Entry<String, Properties>> it = this.extensionProps.entrySet().iterator();
+            while (it.hasNext())
+            {
+                Entry<String, Properties> e = it.next();
+                try
+                {
+                    fs = new FileInputStream(new File(e.getKey()));
+                    Properties p = new Properties();
+                    p.load(fs);
+                    e.setValue(p);
+                    
+                    for (Entry<Object, Object> pe : this.canonicalProps.entrySet())
+                    {
+                        if (!(pe.getKey() instanceof String || pe.getValue() instanceof String)) continue;
+                        
+                        if (!this.props.containsKey(pe.getKey())) 
+                        {
+                            this.props.put((String)pe.getKey(), (String)pe.getValue());
+                        }
+                    }
+                    
+                    fs.close();
+                }
+                catch (FileNotFoundException ex)
+                {
+                    System.out.println("Extension configuration file '" + e.getKey() + "' no longer exists. Removing " +
+                    		"it from the properties set.");
+                    it.remove();
+                }
+                catch (IOException ex)
+                {
+                    System.out.println("Error reading extension configuration file '" + e.getKey() + "'. Removing it " +
+                            "from the properties set.");
+                    it.remove();
+                }
+            }
         }
-        catch (IOException ex)
+        catch (FileNotFoundException e)
         {
-            
+            System.out.println("Canonical properties file not found, not reloading configuration properties.");
         }
-        
-        
-
+        catch (IOException e)
+        {
+            System.out.println("Error reading canonical properties file, not reloading configuration properties.");
+        }
     }
 
     @Override
