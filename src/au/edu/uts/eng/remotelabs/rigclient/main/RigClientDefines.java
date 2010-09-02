@@ -60,7 +60,7 @@ public class RigClientDefines
 {
     /** Bug reporting email. */
     public static final String RC_BUG_REPORTING_TO = "tmachet@eng.uts.edu.au (Software Engineer)\n" +
-    		                                         "or mdiponio@eng.uts.edu.au (Developer)";
+    		                                         "or mdiponio@eng.uts.edu.au (Junior Software Developer)";
     
     /** Rig Client version. */
     public static final String RC_VERSION = "0.2 Alpha";
