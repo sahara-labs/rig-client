@@ -161,6 +161,8 @@ public class ConfigurationActionLoader
                     this.logger.debug("Class " + clazz + " not found.");
                     for (String prefix : this.packagePrefixes)
                     {
+                        if ("".equals(prefix)) continue; // Empty value configuration
+                        
                         try
                         {
                             foundClazz = Class.forName(RigClientDefines.prependPackage(prefix, clazz));
