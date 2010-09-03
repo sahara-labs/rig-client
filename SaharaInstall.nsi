@@ -68,7 +68,7 @@ InstallDir "C:\Program Files\Sahara"
 BrandingText "$(^Name)"
 WindowIcon off
 XPStyle on
-Var skipSection
+Var commonsDisabled
 ;--------------------------------
 ;Interface Settings
  
@@ -87,6 +87,7 @@ Var skipSection
 ;
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "License"
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE CheckSlectedComponents
 !insertmacro MUI_PAGE_COMPONENTS
 
 Var DirHeaderText
@@ -171,7 +172,6 @@ FunctionEnd
 Function .onInit
 	; Splash screen 
 	advsplash::show 1000 1000 1000 -1 labshare
- 	StrCpy $skipSection "false"
  	StrCpy $RCAlreadyInstalled "-1"
 	call CheckRCVersion
 	${If} $RCAlreadyInstalled S== "1"
@@ -306,8 +306,8 @@ FunctionEnd
 
 ;--------------------------------
 ; Install Rig Client
-
-Section "Sahara Rig Client" RigClient
+SectionGroup /e "Sahara Rig Client" RigClientGroup
+Section "Rig Client" RigClient
 
 	!insertmacro checkAdminUser "installation"
 	call checkJREVersion	
@@ -337,8 +337,37 @@ Section "Sahara Rig Client" RigClient
 	WinServiceNoError:
     WriteRegStr HKLM "${REGKEY}" Path $INSTDIR
     WriteRegStr HKLM "${REGKEY}" CurrentVersion  ${Version}
+    
+SectionEnd
 
-SectionEnd 
+Section "Rig Client Commons" Commons
+    SetOutPath $INSTDIR\lib
+    File ..\RigClientCommons\dist\rigclient-commons.jar
+SectionEnd
+SectionGroupEnd     
+;--------------------------------
+
+Function CheckSlectedComponents
+    ${IfNot} ${SectionIsSelected} ${RigClientGroup}
+        ${IfNot} ${SectionIsPartiallySelected} ${RigClientGroup} 
+            MessageBox MB_ICONEXCLAMATION|MB_OK "Please select a component for installation"
+            Abort
+        ${EndIf}
+    ${EndIf}
+FunctionEnd
+
+Function .onSelChange
+    ${IfNot} ${SectionIsSelected} ${RigClient}
+        ; If Rig Client is not selected, check Commons
+        call CheckRCVersion
+        ${If} $RCAlreadyInstalled S!= "2"
+            ; Rig Client is not installed. Disable Commons
+            !insertmacro disableSection ${Commons}
+        ${EndIf}
+    ${Else}
+        !insertmacro ClearSectionFlag ${Commons} ${SF_RO}
+    ${EndIf}    
+FunctionEnd
 
 ;--------------------------------
 
@@ -377,9 +406,8 @@ SectionEnd
 
 ;--------------------------------
 ; Uninstall Rig Client. 
-
-
-Section "un.Sahara Rig Client" un.RigClient 
+SectionGroup /e "un.Sahara Rig Client" un.RigClientGroup
+Section "un.Rig Client" un.RigClient 
     Push $R1
 	!insertmacro checkAdminUser "uninstallation"
 	call un.checkIfServiceRunning
@@ -400,24 +428,31 @@ Section "un.Sahara Rig Client" un.RigClient
 	Delete $R1\rigclient.jar
 	RMDir /r $R1\config
 	Delete $R1\rigclientservice*
-    RMDir $R1\lib
-	DeleteRegKey /IfEmpty HKLM "${REGKEY}"
+    DeleteRegKey /IfEmpty HKLM "${REGKEY}"
     Pop $R1
 SectionEnd ; end the section
-
+Section "un.Rig Client Commons" un.Commons
+    Delete $INSTDIR\lib\rigclient-commons.jar
+SectionEnd
+SectionGroupEnd
 
 
 ;--------------------------------
 ; Uninstaller functions
 Function un.onInit
-
+    StrCpy $commonsDisabled "false"
 	; Get the Rig Client path
 	ReadRegStr $INSTDIR HKLM "${REGKEY}" "Path"
     ; Check if the components are installed and enable only the installed components for uninstallation
     ${If} $INSTDIR S== ""
             !insertmacro disableSection ${un.RigClient}
     ${EndIf}
-
+    ; As the Commons component does not have an entry in the registry, the jar file
+    ; is checked to see if the component is installed. 
+    ${IfNot} ${FileExists} "$INSTDIR\lib\rigclient-commons.jar"
+            !insertmacro disableSection ${un.Commons}
+            StrCpy $commonsDisabled "true"
+    ${EndIf}
 	StrCpy $DisplayText ""
 	StrCpy $NoSectionSelectedUninstall "true"
 
@@ -431,6 +466,12 @@ Function un.CheckSlectedComponents
         StrCpy $DisplayText "$DisplayText$\nRig Client"
         StrCpy $NoSectionSelectedUninstall "false"
     ${EndIf}
+    ${If} ${SectionIsSelected} ${un.Commons} 
+        ; Rig Client is selected
+        StrCpy $DisplayText "$DisplayText$\nRig Client Commons"
+        StrCpy $NoSectionSelectedUninstall "false"
+    ${EndIf}
+
 
     ${If} $NoSectionSelectedUninstall S== "false"
         StrCpy $DisplayText "Following sections are selected for uninstallation. Do you want to continue?$DisplayText" 
@@ -445,6 +486,19 @@ Function un.CheckSlectedComponents
 selectionEnd:
 FunctionEnd
 
+Function un.onSelChange
+${If} $commonsDisabled S== "false"
+    ${If} ${SectionIsSelected} ${un.RigClient}
+        Push $R0
+        IntOp $R0 ${SF_SELECTED} | ${SF_RO}
+        SectionSetFlags ${un.Commons} $R0
+        Pop $R0
+    ${Else}
+        !insertmacro ClearSectionFlag ${un.Commons} ${SF_RO}
+    ${EndIf}    
+${EndIf}
+FunctionEnd
+
 Section -un.postactions 
 
     ; Check if all the components are deleted. If they are, delete the main installation directory and uninstaller
@@ -454,6 +508,7 @@ Section -un.postactions
         DeleteRegKey /IfEmpty HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
         Delete $INSTDIR\uninstallSaharaRigClient.exe
         ClearErrors
+        RMDir $INSTDIR\lib
         RMDir $INSTDIR
         ifErrors 0 InstDirDeleted
         MessageBox MB_ABORTRETRYIGNORE "Error in deleting the directory $INSTDIR." IDRETRY RetryDelete IDIGNORE InstDirDeleted
@@ -473,16 +528,20 @@ SectionEnd
 ;Descriptions
 
 ; Language strings
-LangString DESC_SecRC ${LANG_ENGLISH} "Sahara Rig Client"
+LangString DESC_SecRC ${LANG_ENGLISH} "Sahara Rig Client."
+LangString DESC_SecCommons ${LANG_ENGLISH} "Sahara Rig Client Commons. $\nThis component requires Rig Client component already installed or selected for installation."
+LangString DESC_UnSecCommons ${LANG_ENGLISH} "Sahara Rig Client Commons. $\nIf this component is installed, it will be selected automatically for uninstallation when Rig Client is selected "
 
 
 ; Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${RigClient} $(DESC_SecRC)
+!insertmacro MUI_DESCRIPTION_TEXT ${Commons} $(DESC_SecCommons)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${un.RigClient} $(DESC_SecRC)
+!insertmacro MUI_DESCRIPTION_TEXT ${un.Commons} $(DESC_UnSecCommons)
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
 
 ;--------------------------------
