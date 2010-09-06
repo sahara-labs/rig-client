@@ -38,14 +38,22 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util.tests;
 
-import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig;
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Properties;
+
 import junit.framework.TestCase;
+import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig;
 
 /**
  * Tests the {@link PropertiesIntersectionConfig} class.
  */
 public class PropertiesIntersectionConfigTester extends TestCase
 {
+    public static final String TEST_CANON = "test/resources/PropertiesIntersection/test.properties";
+    public static final String TEST_EXT = "test/resources/PropertiesIntersection/conf.d";
+    
+    /** Object of class under test. */
     private PropertiesIntersectionConfig config;
 
     @Override
@@ -53,8 +61,8 @@ public class PropertiesIntersectionConfigTester extends TestCase
     {
         super.setUp();
         
-        System.setProperty("prop.file", "test/resources/PropertiesIntersection/test.properties");
-        System.setProperty("prop.extension.dir", "test/resources/PropertiesIntersection/conf.d");
+        System.setProperty("prop.file", TEST_CANON);
+        System.setProperty("prop.extension.dir", TEST_EXT);
         this.config = new PropertiesIntersectionConfig();
     }
     
@@ -68,17 +76,75 @@ public class PropertiesIntersectionConfigTester extends TestCase
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig#PropertiesIntersectionConfig()}.
      */
-    public void testPropertiesIntersectionConfig()
+    @SuppressWarnings("unchecked")
+    public void testPropertiesIntersectionConfig() throws Exception
     {
-        fail("Not yet implemented");
+        Field f = PropertiesIntersectionConfig.class.getDeclaredField("canonicalLocation");
+        f.setAccessible(true);
+        assertEquals(TEST_CANON, f.get(this.config));
+        
+        f = PropertiesIntersectionConfig.class.getDeclaredField("extensionLocation");
+        f.setAccessible(true);
+        assertEquals(TEST_EXT, f.get(this.config));
+        
+        f = PropertiesIntersectionConfig.class.getDeclaredField("canonicalProps");
+        f.setAccessible(true);
+        Properties props = (Properties)f.get(this.config);
+        assertNotNull(props);
+        assertEquals(9, props.size());
+        for (int i = 1; i < 10; i++)
+        {
+            assertEquals(props.get("Prop" + i), "Value" + i);
+        }
+        
+        f = PropertiesIntersectionConfig.class.getDeclaredField("extensionProps");
+        f.setAccessible(true);
+        Map<String, Properties> ext = (Map<String, Properties>)f.get(this.config);
+        assertEquals(5, ext.size());
+        String keys[] = ext.keySet().toArray(new String[5]);
+        for (int i = 0; i < 5; i++)
+        {
+            assertEquals(System.getProperty("user.dir") + '/' + TEST_EXT + "/0" + (i + 1) + "test.properties", keys[i]);
+            Properties p = ext.get(keys[i]);
+            assertNotNull(p);
+            for (int j = 0; j < 10; j++)
+            {
+                assertEquals(p.getProperty("Prop" + (i + 1) + j), "Value" + (i + 1) + j);
+            }
+        }
+        
+        f = PropertiesIntersectionConfig.class.getDeclaredField("props");
+        f.setAccessible(true);
+        Map<String, String> intersect = (Map<String, String>)f.get(this.config);
+        assertEquals(59, intersect.size());
+        for (int i = 1; i < 60; i++)
+        {
+            assertEquals(intersect.get("Prop" + i), "Value" + i);
+        }
+        
+        for (String s : intersect.values())
+        {
+            assertFalse("SHOULD_NOT_BE_LOADED".equals(s));
+        }
     }
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig#getProperty(java.lang.String)}.
      */
-    public void testGetPropertyString()
+    @SuppressWarnings("unchecked")
+    public void testGetPropertyString() throws Exception
     {
-        fail("Not yet implemented");
+        Field f = PropertiesIntersectionConfig.class.getDeclaredField("props");
+        f.setAccessible(true);
+        Map<String, String> intersect = (Map<String, String>)f.get(this.config);
+        assertEquals(59, intersect.size());
+        for (int i = 1; i < 60; i++)
+        {
+            String v = this.config.getProperty("Prop" + i);
+            assertEquals(v, "Value" + i);
+            assertFalse(v.charAt(0) == ' ');
+            assertFalse(v.charAt(v.length() - 1) == ' ');
+        }
     }
 
     /**
@@ -86,7 +152,7 @@ public class PropertiesIntersectionConfigTester extends TestCase
      */
     public void testGetPropertyStringString()
     {
-        fail("Not yet implemented");
+        assertEquals("Value1", this.config.getProperty("Prop1", "Does_Exist"));
     }
 
     /**
@@ -108,17 +174,85 @@ public class PropertiesIntersectionConfigTester extends TestCase
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig#removeProperty(java.lang.String)}.
      */
-    public void testRemoveProperty()
+    @SuppressWarnings("unchecked")
+    public void testRemoveProperty() throws Exception
     {
-        fail("Not yet implemented");
+        Field f = PropertiesIntersectionConfig.class.getDeclaredField("props");
+        f.setAccessible(true);
+        Map<String, String> intersect = (Map<String, String>)f.get(this.config);
+        assertEquals(59, intersect.size());
+        for (int i = 1; i < 60; i++)
+        {
+            assertEquals("Value" + i, this.config.getProperty("Prop" + i));
+        }
+        
+        this.config.removeProperty("Prop1");
+        this.config.removeProperty("Prop2");
+        this.config.removeProperty("Prop3");
+        this.config.removeProperty("Prop4");
+        this.config.removeProperty("Prop5");
+        this.config.removeProperty("Prop6");
+        this.config.removeProperty("Prop7");
+        this.config.removeProperty("Prop8");
+        this.config.removeProperty("Prop9");
+        
+        for (int i = 1; i < 10; i++)
+        {
+            assertNull(this.config.getProperty("Prop" + i));
+        }
+        
+        for (int i = 10; i < 60; i++)
+        {
+            assertEquals("Value" + i, this.config.getProperty("Prop" + i));
+        }
     }
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig#reload()}.
      */
-    public void testReload()
+    @SuppressWarnings("unchecked")
+    public void testReload() throws Exception
     {
-        fail("Not yet implemented");
+        /* Make configuration dirty. */
+        this.config.setProperty("Prop60", "Value60");
+        this.config.setProperty("Prop61", "Value61");
+        this.config.setProperty("Prop62", "Value62");
+        this.config.setProperty("Prop63", "Value63");
+        this.config.setProperty("Prop64", "Value64");
+        this.config.setProperty("Prop65", "Value65");
+        this.config.setProperty("Prop66", "Value66");
+        this.config.setProperty("Prop67", "Value67");
+        this.config.setProperty("Prop68", "Value68");
+        this.config.setProperty("Prop69", "Value69");
+        
+        Field f = PropertiesIntersectionConfig.class.getDeclaredField("props");
+        f.setAccessible(true);
+        Map<String, String> intersect = (Map<String, String>)f.get(this.config);
+        assertEquals(69, intersect.size());
+        for (int i = 1; i < 70; i++)
+        {
+            String v = this.config.getProperty("Prop" + i);
+            assertEquals(v, "Value" + i);
+            assertFalse(v.charAt(0) == ' ');
+            assertFalse(v.charAt(v.length() - 1) == ' ');
+        }
+        
+        this.config.reload();
+        
+        intersect = (Map<String, String>)f.get(this.config);
+        assertEquals(59, intersect.size());
+        for (int i = 1; i < 60; i++)
+        {
+            String v = this.config.getProperty("Prop" + i);
+            assertEquals(v, "Value" + i);
+            assertFalse(v.charAt(0) == ' ');
+            assertFalse(v.charAt(v.length() - 1) == ' ');
+        }
+        
+        for (int i = 60; i < 70; i++)
+        {
+            assertFalse(intersect.containsKey("Prop" + i));
+        }
     }
 
     /**
@@ -142,7 +276,10 @@ public class PropertiesIntersectionConfigTester extends TestCase
      */
     public void testGetConfigurationInfomation()
     {
-        fail("Not yet implemented");
+        String confInfo = this.config.getConfigurationInfomation();
+        assertNotNull(confInfo);
+        assertTrue(confInfo.contains(TEST_CANON));
+        assertTrue(confInfo.contains(TEST_EXT));
     }
 
 }

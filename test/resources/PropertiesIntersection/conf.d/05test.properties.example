@@ -38,22 +38,31 @@
 #
 
 #
-# Test configuration file for PropertiesConfig test case.
+# Test configuration file for PropertiesIntersectionConfig test case.
 #
-Prop1 Value1
 
-Prop2 Value2
+Prop1 SHOULD_NOT_BE_LOADED
+Prop11 SHOULD_NOT_BE_LOADED
+Prop21 SHOULD_NOT_BE_LOADED
+Prop31 SHOULD_NOT_BE_LOADED
+Prop41 SHOULD_NOT_BE_LOADED
 
-Prop3 Value3
+Prop50 Value50
 
-Prop4 Value4
+Prop51 Value51
 
-Prop5 Value5
+Prop52 Value52
 
-Prop6 Value6
+Prop53 Value53
 
-Prop7 Value7
+Prop54 Value54
 
-Prop8 Value8
+Prop55 Value55
 
-Prop9 Value9
+Prop56 Value56
+
+Prop57 Value57
+
+Prop58 Value58
+
+Prop59 Value59

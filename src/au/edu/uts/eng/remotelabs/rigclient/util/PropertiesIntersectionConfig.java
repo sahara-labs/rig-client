@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TreeMap;
 
 /**
  * Configuration class which uses an intersection of multiple configuration
@@ -116,7 +117,7 @@ public class PropertiesIntersectionConfig implements IConfig
     public PropertiesIntersectionConfig()
     {
         this.props = new HashMap<String, String>();
-        this.extensionProps = new HashMap<String, Properties>();
+        this.extensionProps = new TreeMap<String, Properties>();
         
         /* Find the location of the properties files. */
         this.canonicalLocation = System.getProperty("prop.file", PropertiesIntersectionConfig.CANONICAL_FILE_LOC);
@@ -134,11 +135,9 @@ public class PropertiesIntersectionConfig implements IConfig
         this.extensionLocation = System.getProperty("prop.extension.dir", PropertiesIntersectionConfig.EXTENSION_DIR_LOC);
         System.err.println("The configuration extension directory is: " + this.extensionLocation + '.');
         f = new File(this.extensionLocation);
-        File files[] = f.listFiles(new FilenameExtFiler("properties", "props", "conf", "config", "rc"));
-        Arrays.sort(files); // Precedence is controlled by the natural ordering of the file names
-        for (File e : files)
+        for (File e : f.listFiles(new FilenameExtFiler("properties", "props", "conf", "config", "rc")))
         {
-            if (f.canRead() && f.canWrite())
+            if (e.canRead() && e.canWrite())
             {
                 this.extensionProps.put(e.getAbsolutePath(), null);
             }
@@ -262,7 +261,7 @@ public class PropertiesIntersectionConfig implements IConfig
                  * pairs), but unguarded casts are rarely a good idea. */
                 if (!(e.getKey() instanceof String || e.getValue() instanceof String)) continue;
                 
-               this.props.put((String)e.getKey(), (String)e.getValue());
+               this.props.put((String)e.getKey(), ((String)e.getValue()).trim());
             }
             fs.close();
             
@@ -278,13 +277,13 @@ public class PropertiesIntersectionConfig implements IConfig
                     p.load(fs);
                     e.setValue(p);
                     
-                    for (Entry<Object, Object> pe : this.canonicalProps.entrySet())
+                    for (Entry<Object, Object> pe : p.entrySet())
                     {
                         if (!(pe.getKey() instanceof String || pe.getValue() instanceof String)) continue;
                         
                         if (!this.props.containsKey(pe.getKey())) 
                         {
-                            this.props.put((String)pe.getKey(), (String)pe.getValue());
+                            this.props.put((String)pe.getKey(), ((String)pe.getValue()).trim());
                         }
                     }
                     
@@ -353,7 +352,7 @@ public class PropertiesIntersectionConfig implements IConfig
      * File name filter which filters base the file extension (trailing
      * characters after the last '.' character).
      */
-    public class FilenameExtFiler implements FilenameFilter
+    public static class FilenameExtFiler implements FilenameFilter
     {
         /** The list of allowable extensions. */
         private List<String> extensions;

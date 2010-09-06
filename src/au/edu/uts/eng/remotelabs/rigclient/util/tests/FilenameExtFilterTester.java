@@ -55,7 +55,7 @@ public class FilenameExtFilterTester extends TestCase
     @Override
     public void setUp()
     {
-        this.filter = (new PropertiesIntersectionConfig()).new FilenameExtFiler("props", "rc");
+        this.filter = new FilenameExtFiler("props", "rc");
     }
     
     public void testFilesAccept()
