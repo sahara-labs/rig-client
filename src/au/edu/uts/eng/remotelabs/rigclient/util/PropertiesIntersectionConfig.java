@@ -39,9 +39,9 @@
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,8 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-
-import org.apache.bcel.generic.FCMPG;
 
 /**
  * Configuration class which uses an intersection of multiple configuration
@@ -85,6 +83,9 @@ import org.apache.bcel.generic.FCMPG;
  *  <li>config</li>
  *  <li>rc</li>
  * </ul>
+ * <strong>NOTE:</strong> The class requires read and write permissions on
+ * any loaded properties files. If the canonical properties has incorrect
+ * permissions, an error is thrown on instantiation.
  */
 public class PropertiesIntersectionConfig implements IConfig
 {
@@ -119,13 +120,37 @@ public class PropertiesIntersectionConfig implements IConfig
         
         /* Find the location of the properties files. */
         this.canonicalLocation = System.getProperty("prop.file", PropertiesIntersectionConfig.CANONICAL_FILE_LOC);
-        System.out.println("The location of the canonical properties file is: " + this.canonicalLocation);
+        System.err.println("The location of the canonical properties file is: " + this.canonicalLocation + '.');
         
         File f = new File(this.canonicalLocation);
         if (!(f.isFile() || f.canRead() || f.canWrite()))
         {
-            
+            System.err.println("Unable to find the canonical properties file location ('" + this.canonicalLocation + 
+                    "') or the permissions on it do not allow reading or writing.");
+            throw new RuntimeException("Error loading configuration.");
         }
+        
+        /* Load up the files in the extension directory. */
+        this.extensionLocation = System.getProperty("prop.extension.dir", PropertiesIntersectionConfig.EXTENSION_DIR_LOC);
+        System.err.println("The configuration extension directory is: " + this.extensionLocation + '.');
+        f = new File(this.extensionLocation);
+        File files[] = f.listFiles(new FilenameExtFiler("properties", "props", "conf", "config", "rc"));
+        Arrays.sort(files); // Precedence is controlled by the natural ordering of the file names
+        for (File e : files)
+        {
+            if (f.canRead() && f.canWrite())
+            {
+                this.extensionProps.put(e.getAbsolutePath(), null);
+            }
+            else
+            {
+                System.err.println("No using extension properites file '" + e.getName() + "' because of incorrect " +
+                		"permissions. Check read and write permissions.");
+            }
+        }
+        
+        /* Do the initial load of the properties. */
+        this.reload();
     }
 
     @Override
@@ -267,13 +292,13 @@ public class PropertiesIntersectionConfig implements IConfig
                 }
                 catch (FileNotFoundException ex)
                 {
-                    System.out.println("Extension configuration file '" + e.getKey() + "' no longer exists. Removing " +
+                    System.err.println("Extension configuration file '" + e.getKey() + "' no longer exists. Removing " +
                     		"it from the properties set.");
                     it.remove();
                 }
                 catch (IOException ex)
                 {
-                    System.out.println("Error reading extension configuration file '" + e.getKey() + "'. Removing it " +
+                    System.err.println("Error reading extension configuration file '" + e.getKey() + "'. Removing it " +
                             "from the properties set.");
                     it.remove();
                 }
@@ -281,55 +306,67 @@ public class PropertiesIntersectionConfig implements IConfig
         }
         catch (FileNotFoundException e)
         {
-            System.out.println("Canonical properties file not found, not reloading configuration properties.");
+            System.err.println("Canonical properties file not found, not reloading configuration properties.");
         }
         catch (IOException e)
         {
-            System.out.println("Error reading canonical properties file, not reloading configuration properties.");
+            System.err.println("Error reading canonical properties file, not reloading configuration properties.");
         }
     }
 
     @Override
     public void serialise()
     {
-        // TODO Auto-generated method stub
-
+        // TODO serialise
     }
 
     @Override
     public String dumpConfiguration()
     {
-        // TODO Auto-generated method stub
-        return null;
+        final StringBuffer buf = new StringBuffer();
+        for (Entry<String, String> e : this.props.entrySet())
+        {
+            buf.append(e.getKey());
+            buf.append(' ');
+            buf.append(e.getValue());
+            buf.append('\n');
+        }
+        return buf.toString();
     }
 
     @Override
     public String getConfigurationInfomation()
     {
-        // TODO Auto-generated method stub
-        return null;
+        StringBuilder buf = new StringBuilder();
+        
+        buf.append("canonical properties file: ");
+        buf.append(this.canonicalLocation);
+        buf.append(", ");
+        buf.append(this.extensionProps.size());
+        buf.append(" extensions in ");
+        buf.append(this.extensionLocation);
+        
+        return buf.toString();
     }
     
     /**
      * File name filter which filters base the file extension (trailing
      * characters after the last '.' character).
      */
-    public class FilenameExtFiler implements FileFilter
+    public class FilenameExtFiler implements FilenameFilter
     {
         /** The list of allowable extensions. */
         private List<String> extensions;
         
-        public FilenameExtFiler(String[] extensions)
+        public FilenameExtFiler(String... extensions)
         {
             this.extensions = Arrays.asList(extensions);
         }
 
         @Override
-        public boolean accept(File f)
+        public boolean accept(File dir, String name)
         {
-            String name = f.getName();            
-            return this.extensions.contains(name.substring(name.lastIndexOf('.')));
+            return this.extensions.contains(name.substring(name.lastIndexOf('.') + 1));
         }
     }
-    
 }

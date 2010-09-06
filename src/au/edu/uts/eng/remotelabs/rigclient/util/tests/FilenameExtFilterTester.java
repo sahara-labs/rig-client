@@ -38,6 +38,8 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util.tests;
 
+import java.io.File;
+
 import junit.framework.TestCase;
 import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig.FilenameExtFiler;
@@ -53,6 +55,20 @@ public class FilenameExtFilterTester extends TestCase
     @Override
     public void setUp()
     {
-
+        this.filter = (new PropertiesIntersectionConfig()).new FilenameExtFiler("props", "rc");
+    }
+    
+    public void testFilesAccept()
+    {
+        File f = new File("/foo/bar/baz");
+        assertFalse(this.filter.accept(f, "foo.properties"));
+        assertFalse(this.filter.accept(f, "foo.car"));
+    }
+    
+    public void testFilesRefuse()
+    {
+        File f = new File("/foo/bar/baz");
+        assertFalse(this.filter.accept(f, "foo.properties"));
+        assertFalse(this.filter.accept(f, "foo.car"));
     }
 }
