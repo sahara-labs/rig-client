@@ -188,6 +188,8 @@ public class PropertiesIntersectionConfig implements IConfig
     @Override
     public synchronized void setProperty(String key, String value)
     {
+        value = value.trim();
+        
         /* Update the memory properties store. */
         this.props.put(key, value);
         

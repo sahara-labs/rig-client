@@ -153,6 +153,7 @@ public class PropertiesIntersectionConfigTester extends TestCase
     public void testGetPropertyStringString()
     {
         assertEquals("Value1", this.config.getProperty("Prop1", "Does_Exist"));
+        assertEquals("Does_Not_Exist", this.config.getProperty("Prop100", "Does_Not_Exist"));
     }
 
     /**
@@ -160,15 +161,63 @@ public class PropertiesIntersectionConfigTester extends TestCase
      */
     public void testGetAllProperties()
     {
-        fail("Not yet implemented");
+        Map<String, String> props = this.config.getAllProperties();
+        assertEquals(59, props.size());
+        for (int i = 1; i < 60; i++)
+        {
+            assertEquals("Value" + i, props.get("Prop" + i));
+        }
     }
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig#setProperty(java.lang.String, java.lang.String)}.
      */
-    public void testSetProperty()
+    @SuppressWarnings("unchecked")
+    public void testSetProperty() throws Exception
     {
-        fail("Not yet implemented");
+        for (int i = 1; i < 60; i++)
+        {
+            assertEquals("Value" + i, this.config.getProperty("Prop" + i));
+            this.config.setProperty("Prop" + i, "Value" + (60 - i));
+            assertEquals("Value" + (60 - i), this.config.getProperty("Prop" + i));
+        }
+        
+        /* Check the main properties store. */
+        Field f = PropertiesIntersectionConfig.class.getDeclaredField("props");
+        f.setAccessible(true);
+        Map<String, String> intersect = (Map<String, String>)f.get(this.config);
+        assertEquals(59, intersect.size());
+        
+        for (int i = 1; i < 60; i++)
+        {
+            assertEquals("Value" + (60 - i), intersect.get("Prop" + i));
+        }
+        
+        /* Check the backing properties. */
+        /* Canonical should have 1 to 9. */
+        f = PropertiesIntersectionConfig.class.getDeclaredField("canonicalProps");
+        f.setAccessible(true);
+        Properties can = (Properties)f.get(this.config);
+        assertEquals(9, can.size());
+        for (int i = 1; i < 10; i++)
+        {
+            assertEquals("Value" + (60 - i), can.get("Prop" + i));
+        }
+        
+        /* There should be 5 groups of 10. */
+        f = PropertiesIntersectionConfig.class.getDeclaredField("extensionProps");
+        f.setAccessible(true);
+        Map<String, Properties> ext = (Map<String, Properties>)f.get(this.config);
+        int i = 5, k = 1;
+        for (Properties p : ext.values())
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                assertEquals("Value" + (60 - k * 10 - j), p.get("Prop" + k + j));
+            }
+            i--;
+            k++;
+        }
     }
 
     /**
@@ -268,7 +317,9 @@ public class PropertiesIntersectionConfigTester extends TestCase
      */
     public void testDumpConfiguration()
     {
-        fail("Not yet implemented");
+        String dump = this.config.dumpConfiguration();
+        assertNotNull(dump);
+        assertEquals(59, dump.split("\n").length);
     }
 
     /**
