@@ -96,10 +96,18 @@ import java.util.TreeMap;
 public class PropertiesIntersectionConfig implements IConfig
 {
     /** The default location of the canonical properties file. */
-    public static final String CANONICAL_FILE_LOC = "conf";
+    public static final String CANONICAL_FILE_LOC = "conf/rigclient.properties";
+    
+    /** The system property which may be used to specify the location of the
+     *  canonical properties file. */
+    public static final String CANONICAL_FILE_SYS_PROP = "prop.file";
     
     /** The default location of the extension directory. */
     public static final String EXTENSION_DIR_LOC = "conf/conf.d";
+    
+    /** The system property which may be used to specify the location of the
+     *  configuration extension property. */
+    public static final String EXTENSION_LOC_SYS_PROP = "prop.extension.dir";
     
     /** The map containing the intersection of properties that are loaded from
      *  the various properties files. Direct lookup of properties is from this
@@ -125,7 +133,7 @@ public class PropertiesIntersectionConfig implements IConfig
         this.extensionProps = new TreeMap<String, Properties>();
         
         /* Find the location of the properties files. */
-        this.canonicalFile = System.getProperty("prop.file", PropertiesIntersectionConfig.CANONICAL_FILE_LOC);
+        this.canonicalFile = System.getProperty(CANONICAL_FILE_SYS_PROP, CANONICAL_FILE_LOC);
         System.err.println("The location of the canonical properties file is: " + this.canonicalFile + '.');
         
         File f = new File(this.canonicalFile);
@@ -137,19 +145,22 @@ public class PropertiesIntersectionConfig implements IConfig
         }
         
         /* Load up the files in the extension directory. */
-        this.extensionLocation = System.getProperty("prop.extension.dir", PropertiesIntersectionConfig.EXTENSION_DIR_LOC);
+        this.extensionLocation = System.getProperty(EXTENSION_LOC_SYS_PROP, EXTENSION_DIR_LOC);
         System.err.println("The configuration extension directory is: " + this.extensionLocation + '.');
         f = new File(this.extensionLocation);
-        for (File e : f.listFiles(new FilenameExtFiler("properties", "props", "conf", "config", "rc")))
+        if (f.isDirectory())
         {
-            if (e.canRead() && e.canWrite())
+            for (File e : f.listFiles(new FilenameExtFiler("properties", "props", "conf", "config", "rc")))
             {
-                this.extensionProps.put(e.getAbsolutePath(), null);
-            }
-            else
-            {
-                System.err.println("No using extension properites file '" + e.getName() + "' because of incorrect " +
-                		"permissions. Check read and write permissions.");
+                if (e.canRead() && e.canWrite())
+                {
+                    this.extensionProps.put(e.getAbsolutePath(), null);
+                }
+                else
+                {
+                    System.err.println("No using extension properites file '" + e.getName() + "' because of incorrect " +
+                    		"permissions. Check read and write permissions.");
+                }
             }
         }
         

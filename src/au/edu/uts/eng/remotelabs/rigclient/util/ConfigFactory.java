@@ -41,11 +41,22 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
+import java.io.File;
+
 /**
  * Configuration implementation factory.
  */
 public class ConfigFactory
 {
+    /** The system property which the implementation can be specified. */
+    public static String IMPL_SYSTEM_PROP = "conf.impl";
+    
+    /** Single properties file (2.0 configuration implementation). */
+    public static String R2_BEHAVIOUR = "single";
+    
+    /** Multiple properties file (conf.d). */
+    public static String R3_BEHAVIOUR = "intersection";
+    
     /** Configuration instance. */
     private static IConfig instance;
     
@@ -79,6 +90,36 @@ public class ConfigFactory
      */
     private static IConfig getInternalInstance()
     {
-        return new PropertiesConfig();
+        /* It would be ideal to use the properties conf.d implementation but
+         * for existing installations, existing behavior should be preserved
+         * to make upgrades least intrusive. */
+        
+        /* Test 1) Allow the user to specify the implementation via a system 
+         * property. */
+        String explicit = System.getProperty(ConfigFactory.IMPL_SYSTEM_PROP);
+        if (ConfigFactory.R3_BEHAVIOUR.equalsIgnoreCase(explicit))
+        {
+            return new PropertiesIntersectionConfig();
+        }
+        else if (ConfigFactory.R2_BEHAVIOUR.equalsIgnoreCase(explicit))
+        {
+            return new PropertiesConfig();
+        }
+        
+        /* Test 2) Detect from expected directories:
+         *   - config - PropertiesConfig
+         *   - conf   - PropertiesIntersectionConfig 
+         */
+       if (new File("conf").isDirectory())
+       {
+           return new PropertiesIntersectionConfig();
+       }
+       else if (new File("config").isDirectory())
+       {
+           return new PropertiesConfig();
+       }
+        
+        /* Nothing determined or detected so use the new implementation. */
+        return new PropertiesIntersectionConfig();
     }
 }
