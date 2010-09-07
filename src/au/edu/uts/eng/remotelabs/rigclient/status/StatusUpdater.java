@@ -272,20 +272,20 @@ public class StatusUpdater implements Runnable
                 
                 if (ex.getCause() instanceof ConnectException)
                 {
-                    this.logger.error("SOAP fault trying to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
-                            " register the rig") + ". Fault reason is connection error with reason: " + ex.getMessage() +
+                    this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                            " register the rig") + ". Error reason is connection error with reason: " + ex.getMessage() +
                             ". Ensure the Scheduling Server is running and listening on the configured port number.");
                 }
                 else if (ex.getCause() instanceof UnknownHostException)
                 {
-                    this.logger.error("SOAP fault trying to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
-                            " register the rig") + ". Fault reason is unknown host " + ex.getMessage() + ". " +
+                    this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                            " register the rig") + ". Error reason is unknown host " + ex.getMessage() + ". " +
                             "Configure the scheduling server host as a valid host name.");
                 }
                 else
                 {
-                    this.logger.error("SOAP fault trying to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
-                    " register the rig") + ". Fault reason is '" + ex.getReason() + "'.");
+                    this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                    " register the rig") + ". Error reason is '" + ex.getReason() + "'.");
                 }
                 
             }
