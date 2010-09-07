@@ -65,7 +65,7 @@ import java.util.TreeMap;
  * the any of the loaded files, the canonical file takes precedence over the 
  * extension directory properties. Within the extension directory the first 
  * loaded value of duplicate properties is used. The loading order of the 
- * extension direcMtory properties files are in the natural ordering of the 
+ * extension directory properties files are in the natural ordering of the 
  * file names, so prepending an appropriate number to be beginning of file 
  * names allows the loading order to be controlled. The default location of the
  * canonical file and extension directory are:
@@ -385,7 +385,7 @@ public class PropertiesIntersectionConfig implements IConfig
             
             /* This is a property line. */
             String kv[] = tmp.split("\\s*[\\s|=|:]\\s*", 2);
-            if (!properties.contains(kv[0])); // This is if it has been removed, so shouldn't be stored
+            if (!properties.containsKey(kv[0])) continue;
             
             buf.append(kv[0]);
             buf.append(' ');
