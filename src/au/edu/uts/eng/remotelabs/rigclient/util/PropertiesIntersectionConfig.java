@@ -38,11 +38,16 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -105,7 +110,7 @@ public class PropertiesIntersectionConfig implements IConfig
     private Properties canonicalProps;
     
     /** The location of the canonical properties file. */
-    private String canonicalLocation;
+    private String canonicalFile;
     
     /** The properties files loaded from the extension directory in order of 
      *  their precedence. */
@@ -120,13 +125,13 @@ public class PropertiesIntersectionConfig implements IConfig
         this.extensionProps = new TreeMap<String, Properties>();
         
         /* Find the location of the properties files. */
-        this.canonicalLocation = System.getProperty("prop.file", PropertiesIntersectionConfig.CANONICAL_FILE_LOC);
-        System.err.println("The location of the canonical properties file is: " + this.canonicalLocation + '.');
+        this.canonicalFile = System.getProperty("prop.file", PropertiesIntersectionConfig.CANONICAL_FILE_LOC);
+        System.err.println("The location of the canonical properties file is: " + this.canonicalFile + '.');
         
-        File f = new File(this.canonicalLocation);
+        File f = new File(this.canonicalFile);
         if (!(f.isFile() || f.canRead() || f.canWrite()))
         {
-            System.err.println("Unable to find the canonical properties file location ('" + this.canonicalLocation + 
+            System.err.println("Unable to find the canonical properties file location ('" + this.canonicalFile + 
                     "') or the permissions on it do not allow reading or writing.");
             throw new RuntimeException("Error loading configuration.");
         }
@@ -252,7 +257,7 @@ public class PropertiesIntersectionConfig implements IConfig
         try
         {
             /* Load the canonical file. */
-            FileInputStream fs = new FileInputStream(new File(this.canonicalLocation));
+            FileInputStream fs = new FileInputStream(new File(this.canonicalFile));
             this.canonicalProps = new Properties();
             this.canonicalProps.load(fs);
             
@@ -316,9 +321,86 @@ public class PropertiesIntersectionConfig implements IConfig
     }
 
     @Override
-    public void serialise()
+    public synchronized void serialise()
     {
-        // TODO serialise
+        try
+        {
+            this.innerSerialise(this.canonicalFile, this.canonicalProps);
+            
+            for (Entry<String, Properties> e : this.extensionProps.entrySet())
+            {
+                this.innerSerialise(e.getKey(), e.getValue());
+            }
+        }
+        catch (IOException ex)
+        {
+            System.err.println("Failed to serialise configuration file, error: " + ex.getMessage());
+        }
+    }
+
+    /** 
+     * Serialises the in-memory properties store to the file system properties
+     * file. 
+     * 
+     * @param filename the name of the file to serialise to
+     * @param properties the properties store
+     * @throws IOException 
+     */
+    private void innerSerialise(String filename, Properties properties) throws IOException
+    {
+        StringBuilder buf = new StringBuilder();
+        String tmp, lineSep = System.getProperty("line.separator");
+        boolean extendedValue = false; // Flag to specify whether the line is an extended property
+        
+        File file = new File(filename);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+        BufferedWriter backup = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(filename + "." + (System.currentTimeMillis() / 1000) + ".backup")));
+        while ((tmp = reader.readLine()) != null)
+        {
+            backup.append(tmp + lineSep);
+            
+            /* If extended property value, ignore it. */
+            tmp = tmp.trim();
+            if (extendedValue)
+            {
+                if (tmp.charAt(tmp.length() - 1) != '\\') extendedValue = false;
+                continue;
+            }
+            
+            /* Blank line. */
+            if (tmp.length() == 0)
+            {
+                buf.append(lineSep);
+                continue;
+            }
+            
+            /* Comment line. */
+            if (tmp.charAt(0) == '#' || tmp.charAt(0) == '!')
+            {
+                buf.append(tmp);
+                buf.append(lineSep);
+                continue;
+            }
+            
+            /* This is a property line. */
+            String kv[] = tmp.split("\\s*[\\s|=|:]\\s*", 2);
+            if (!properties.contains(kv[0])); // This is if it has been removed, so shouldn't be stored
+            
+            buf.append(kv[0]);
+            buf.append(' ');
+            buf.append(properties.get(kv[0]));
+            buf.append(lineSep);
+
+            if (tmp.charAt(tmp.length() -1 ) == '\\') extendedValue = true;
+        }
+        reader.close();
+        backup.close();
+        
+        /* Write changes back to the properties file. */
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+        writer.append(buf.toString());
+        writer.close();
     }
 
     @Override
@@ -341,7 +423,7 @@ public class PropertiesIntersectionConfig implements IConfig
         StringBuilder buf = new StringBuilder();
         
         buf.append("canonical properties file: ");
-        buf.append(this.canonicalLocation);
+        buf.append(this.canonicalFile);
         buf.append(", ");
         buf.append(this.extensionProps.size());
         buf.append(" extensions in ");

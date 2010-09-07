@@ -42,6 +42,8 @@
 #
 Prop1 SHOULD_NOT_BE_LOADED
 
+Prop10 Value10
+
 Prop11 Value11
 
 Prop12 Value12

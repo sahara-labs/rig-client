@@ -38,6 +38,9 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.util.tests;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Properties;
@@ -69,7 +72,39 @@ public class PropertiesIntersectionConfigTester extends TestCase
     @Override
     protected void tearDown() throws Exception
     {
-        // TODO  
+        byte buf[] = new byte[1024];
+        int len = 0;
+        
+        FileInputStream fis = new FileInputStream(TEST_CANON + ".example");
+        FileOutputStream fos = new FileOutputStream(TEST_CANON);
+        while ((len = fis.read(buf)) > 0)
+        {
+            fos.write(buf, 0, len);
+        }
+        fis.close();
+        fos.close();
+        
+        for (int i = 1; i <= 5; i++)
+        {
+            fis = new FileInputStream(TEST_EXT + "/0" + i + "test.properties.example");
+            fos = new FileOutputStream(TEST_EXT + "/0" + i + "test.properties");
+            while ((len = fis.read(buf)) > 0)
+            {
+                fos.write(buf, 0, len);
+            }
+            fis.close();
+            fos.close();
+        }
+        
+        for (File f : new File(TEST_CANON.substring(0, TEST_CANON.lastIndexOf('/'))).listFiles())
+        {
+            if (f.getName().endsWith(".backup")) f.delete();
+        }
+        
+        for (File f : new File(TEST_EXT).listFiles())
+        {
+            if (f.getName().endsWith(".backup")) f.delete();
+        }
     }
     
 
@@ -79,7 +114,7 @@ public class PropertiesIntersectionConfigTester extends TestCase
     @SuppressWarnings("unchecked")
     public void testPropertiesIntersectionConfig() throws Exception
     {
-        Field f = PropertiesIntersectionConfig.class.getDeclaredField("canonicalLocation");
+        Field f = PropertiesIntersectionConfig.class.getDeclaredField("canonicalFile");
         f.setAccessible(true);
         assertEquals(TEST_CANON, f.get(this.config));
         
@@ -307,9 +342,55 @@ public class PropertiesIntersectionConfigTester extends TestCase
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig#serialise()}.
      */
-    public void testSerialise()
+    @SuppressWarnings("unchecked")
+    public void testSerialise() throws Exception
     {
-        fail("Not yet implemented");
+        /* Modify some properties. */
+        for (int i = 1; i < 60; i++)
+        {
+            assertEquals("Value" + i, this.config.getProperty("Prop" + i));
+            this.config.setProperty("Prop" + i, "Value" + (60 - i));
+            assertEquals("Value" + (60 - i), this.config.getProperty("Prop" + i));
+        }
+        
+        this.config.serialise();
+        
+        PropertiesIntersectionConfig cleanLoad = new PropertiesIntersectionConfig();
+        Field f = PropertiesIntersectionConfig.class.getDeclaredField("props");
+        f.setAccessible(true);
+        Map<String, String> intersect = (Map<String, String>)f.get(cleanLoad);
+        assertEquals(59, intersect.size());
+        
+        for (int i = 1; i < 60; i++)
+        {
+            assertEquals("Value" + (60 - i), intersect.get("Prop" + i));
+        }
+        
+        /* Check the backing properties. */
+        /* Canonical should have 1 to 9. */
+        f = PropertiesIntersectionConfig.class.getDeclaredField("canonicalProps");
+        f.setAccessible(true);
+        Properties can = (Properties)f.get(cleanLoad);
+        assertEquals(9, can.size());
+        for (int i = 1; i < 10; i++)
+        {
+            assertEquals("Value" + (60 - i), can.get("Prop" + i));
+        }
+        
+        /* There should be 5 groups of 10. */
+        f = PropertiesIntersectionConfig.class.getDeclaredField("extensionProps");
+        f.setAccessible(true);
+        Map<String, Properties> ext = (Map<String, Properties>)f.get(cleanLoad);
+        int i = 5, k = 1;
+        for (Properties p : ext.values())
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                assertEquals("Value" + (60 - k * 10 - j), p.get("Prop" + k + j));
+            }
+            i--;
+            k++;
+        }
     }
 
     /**
