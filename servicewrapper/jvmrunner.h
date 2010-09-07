@@ -94,7 +94,9 @@ extern "C"
 #define LOG_FILE "rigclientservice.log"
 
 /** Configuration file containing location. */
-#define CONFIG_FILE "config/rigclient_service.ini"
+#define WD_CONFIG_FILE "rigclient_service.ini"
+#define SI_CONFIG_FILE "config/rigclient_service.ini"
+#define IN_CONFIG_FILE "conf/rigclient_service.ini"
 
 /** Name of the environment variable which may contain the JVM shared object
  *  location. */
@@ -110,6 +112,10 @@ char *jvmSo;
 /** Java Class Path. */
 char *classPath;
 char *classPathExt;
+
+/** The list of system properties. */
+int numSysProps;
+char *sysProps[256];
 
 /** Current (executable) directory. */
 char *currentDir;

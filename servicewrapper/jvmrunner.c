@@ -46,23 +46,38 @@
  *                            classpath.
  *  * Max_Memory   -        - The maximum heap memory to set on the Java
  *                            machine (-Xmx JVM option) in megabytes.
+ * 
+ * Every other key - value pairs are treated as system properties. 
  *
  * @return true if successful, false otherwise
  */
 int loadConfig(void)
 {
+	numSysProps = 0;
+	
 	char buf[1024], prop[1024], *line, *val;
 	FILE *config, *jvmPath;
 
 	memset(buf, 0, 1024);
 
-	if ((config = fopen(CONFIG_FILE, "r")) == NULL)
+	if ((config = fopen(WD_CONFIG_FILE, "r")) != NULL) /* First try to see if the service ini is in the working dir. */
 	{
-		logMessage("Unable to open configuration file %s.\n", CONFIG_FILE);
+		logMessage("Opened log file '%s' successfully.\n", WD_CONFIG_FILE);
+	}
+	else if ((config = fopen(SI_CONFIG_FILE, "r")) != NULL) /* Otherwise try 'config'. */
+	{
+		logMessage("Opened log file '%s' successfully.\n", SI_CONFIG_FILE);
+	}
+	else if ((config = fopen(IN_CONFIG_FILE, "r")) != NULL) /* Finally try 'conf'. */
+	{
+		logMessage("Opened log file '%s' successfully.\n", IN_CONFIG_FILE);
+	}
+	else
+	{
+		logMessage("Unable to open configuration file, tried '%s', '%s' and '%s'.\n", WD_CONFIG_FILE, SI_CONFIG_FILE, IN_CONFIG_FILE);
 		perror("Failed to open configuration file because");
 		return 0;
 	}
-	logMessage("Opened log file '%s' successfully.\n", CONFIG_FILE);
 
 	while (fgets(buf, 1023, config) != NULL)
 	{
@@ -70,8 +85,9 @@ int loadConfig(void)
 		memset(prop, 0, 1024);
 
 		line = trim(line);
-		if (strlen(line) == 0) continue; /* Empty line.    */
-		if (line[0] == '#') continue;    /* Comment line. */
+		if (strlen(line) == 0) continue; /* Empty line.     */
+		if (line[0] == '#') continue;    /* Comment line.   */
+		if (line[0] == '[') continue;    /* Section header. */
 
 		val = line;
 		/* The ini format prop to value delimiter is an equal sign. */
@@ -87,8 +103,6 @@ int loadConfig(void)
 		trim(val);
 		val = val + 1;                               /* Equals sign. */
 		while (*val != '\0' && isspace(*val)) val++; /* Remaining left whitespace. */
-
-		logMessage("Prop=%s Value=%s\n", prop, val);
 
 		if (strcmp("JVM_Location", prop) == 0)
 		{
@@ -124,10 +138,20 @@ int loadConfig(void)
 			strcat(maxHeap, "-Xmx");
 			strcat(maxHeap, val);
 			*(maxHeap + 4 + strlen(val)) = 'm';
+			logMessage("Defining max heap memory to %sMB.", val);
 		}
 		else
 		{
-			logMessage("Unknown property %s.\n", prop);
+			/* If unknown key, then it's a system property. */
+			int len = 4 + strlen(prop) + strlen(val);
+			char *sysp = (char *)malloc(sizeof(char) * len);
+			strcat(sysp, "-D");
+			strcat(sysp, prop);
+			strcat(sysp, "=");
+			strcat(sysp, val);
+			*(sysp + len - 1) = 0;
+			sysProps[numSysProps++] = sysp;
+			logMessage("Defining system property '%s' with value '%s'.\n", prop, val);
 		}
 	}
 
@@ -173,7 +197,7 @@ int loadConfig(void)
 		{
 			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, FORMAT_MESSAGE_FROM_HMODULE, err, 0, errMessage, 255, NULL);
 			logMessage("Failed to read registry key (HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\Java Runtime Environment"
-				"\\CurrentVersion). %s", errMessage);
+				"\\CurrentVersion). %s\n", errMessage);
 		}
 	}
 #endif
@@ -319,26 +343,27 @@ int startJVM()
 #else
 	void *libVM;
 #endif
-
-	if (maxHeap == NULL)
-	{
-	    options = (JavaVMOption *) malloc(sizeof(JavaVMOption) * 2);
-	}
-	else
-	{
-		options = (JavaVMOption *) malloc(sizeof(JavaVMOption) * 3);
-	}
+	
+	int i, numOpts = 2 + numSysProps;
+	if (maxHeap != NULL) numOpts++;
 
 	/* Set up Java options. */
+	options = (JavaVMOption *)malloc(sizeof(JavaVMOption) * numOpts);
 	options[0].optionString = classPath; /* Sets the Java classpath. */
 	options[1].optionString = "-Xrs";    /* Set Java to not use a signal handler, (we use our own). */
+	
+	for (i = 0; i < numSysProps; i++)
+	{
+		options[i + 2].optionString = sysProps[i];
+	}
+	
 	if (maxHeap != NULL)
 	{
-		options[2].optionString = maxHeap;
+		options[numOpts - 1].optionString = maxHeap;
 	}
 
 	vm_args.options = options;
-	vm_args.nOptions = maxHeap == NULL ? 2 : 3;
+	vm_args.nOptions = numOpts;
 	vm_args.ignoreUnrecognized = JNI_FALSE;
 	vm_args.version = JNI_VERSION_1_4;
 
@@ -386,6 +411,8 @@ int startJVM()
 	}
 	createJVM = (CreateJavaVM)dlsym(libVM, "JNI_CreateJavaVM");
 #endif
+	
+
 
 	/* Create the JVM. */
 	res = createJVM(&vm, (void **)&env, &vm_args);
@@ -395,7 +422,7 @@ int startJVM()
 		return 0;
 	}
 	logMessage("Successfully created Java virtual machine.\n");
-
+	
 	/* Find the start up class. */
 	if ((clazz = (*env)->FindClass(env, CLASS_NAME)) == NULL)
 	{
