@@ -64,20 +64,20 @@ int loadConfig(void)
 
 	if ((config = fopen(WD_CONFIG_FILE, "r")) != NULL) /* First try to see if the service ini is in the working dir. */
 	{
-		logMessage("Opened log file '%s' successfully.\n", WD_CONFIG_FILE);
+		logMessage("Opened service configuration file '%s' successfully.\n", WD_CONFIG_FILE);
 	}
 	else if ((config = fopen(SI_CONFIG_FILE, "r")) != NULL) /* Otherwise try 'config'. */
 	{
-		logMessage("Opened log file '%s' successfully.\n", SI_CONFIG_FILE);
+		logMessage("Opened service configuration file '%s' successfully.\n", SI_CONFIG_FILE);
 	}
 	else if ((config = fopen(IN_CONFIG_FILE, "r")) != NULL) /* Finally try 'conf'. */
 	{
-		logMessage("Opened log file '%s' successfully.\n", IN_CONFIG_FILE);
+		logMessage("Opened service configuration file '%s' successfully.\n", IN_CONFIG_FILE);
 	}
 	else
 	{
-		logMessage("Unable to open configuration file, tried '%s', '%s' and '%s'.\n", WD_CONFIG_FILE, SI_CONFIG_FILE, IN_CONFIG_FILE);
-		perror("Failed to open configuration file because");
+		logMessage("Unable to open service configuration file, tried '%s', '%s' and '%s'.\n", WD_CONFIG_FILE, SI_CONFIG_FILE, IN_CONFIG_FILE);
+		perror("Failed to open service configuration file");
 		return 0;
 	}
 
