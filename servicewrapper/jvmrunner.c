@@ -61,6 +61,13 @@ int loadConfig(void)
 	FILE *config, *jvmPath;
 
 	memset(buf, 0, 1024);
+	
+	/* Log a timestamp for the service startup. */
+	if (time(&startTime) != -1)
+	{
+		logMessage("Rig client starting at %s", ctime(&startTime));
+	}
+	
 
 	if ((config = fopen(WD_CONFIG_FILE, "r")) != NULL) /* First try to see if the service ini is in the working dir. */
 	{
@@ -469,7 +476,10 @@ int shutDownJVM()
 		return 0;
 	}
 
-	logMessage("Calling shutdown...\n");
+	time(&stopTime);
+	logMessage("Shutting down rig client at %s", ctime(&stopTime));
+	logMessage("Rig client was running for %f seconds.\n", difftime(stopTime, startTime));
+	
 	(*env)->CallStaticVoidMethod(env, clazz, method, NULL);
 	if ((*env)->ExceptionCheck(env))
 	{
@@ -522,8 +532,9 @@ void logMessage(char *fmt, ...)
  * Trims leading and trailing whitespace from a string.
  *
  * @param *tmp string to trim
+ * @return trimmed string
  */
-char *trim(char *tmp)
+char * trim(char *tmp)
 {
 	char *end;
 

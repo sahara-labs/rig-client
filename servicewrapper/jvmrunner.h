@@ -49,6 +49,7 @@ extern "C"
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <time.h>
 
 #ifdef WIN32
 #define _CRT_SECURE_NO_WARNINGS 1
@@ -132,6 +133,10 @@ CreateJavaVM createJVM;
 /** Max memory for Java virtual machine. */
 char *maxHeap;
 
+/** Start up and shutdown times. */
+time_t startTime;
+time_t stopTime;
+
 /******************************************************************************
  ** Function Prototypes                                                      **
  *****************************************************************************/
@@ -185,6 +190,7 @@ void logMessage(char *fmt, ...);
  * Trims leading and trailing whitespace from a string.
  *
  * @param *tmp string to trim
+ * @return trimmed string
  */
 char *trim(char *tmp);
 
