@@ -37,6 +37,10 @@
  * @date 8th March 2010
  */
 
+#ifdef WIN32
+#define _CRT_SECURE_NO_WARNINGS 1
+#endif
+
 #include "jvmrunner.h"
 
 /**
@@ -52,9 +56,7 @@
  * @return true if successful, false otherwise
  */
 int loadConfig(void)
-{
-	numSysProps = 0;
-	
+{	
 	char buf[1024], prop[1024], *line, *val;
 	FILE *config, *jvmPath;
 
@@ -79,6 +81,7 @@ int loadConfig(void)
 		return 0;
 	}
 
+	numSysProps = 0;
 	while (fgets(buf, 1023, config) != NULL)
 	{
 		line = buf;
@@ -163,7 +166,7 @@ int loadConfig(void)
 	if (jvmSo == NULL)
 	{
 		HKEY regKey;
-		char regData[FILENAME_MAX], errMessage[255];
+		char regData[FILENAME_MAX];
 		DWORD regDataSize = FILENAME_MAX, err;
 		float version;
 
@@ -172,7 +175,7 @@ int loadConfig(void)
 		{
 			RegCloseKey(regKey);
 
-			version = atof(regData);
+			version = (float)atof(regData);
 			if (atof(regData) >= 1.6)
 			{
 				/* Version is installed and OK, so now need to find the RuntimeDLL location. */
@@ -195,9 +198,8 @@ int loadConfig(void)
 		}
 		else
 		{
-			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, FORMAT_MESSAGE_FROM_HMODULE, err, 0, errMessage, 255, NULL);
 			logMessage("Failed to read registry key (HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\Java Runtime Environment"
-				"\\CurrentVersion). %s\n", errMessage);
+				"\\CurrentVersion). Error number %i.\n", err);
 		}
 	}
 #endif
