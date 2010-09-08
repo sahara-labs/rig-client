@@ -91,7 +91,7 @@ public class ConfigFactory
     private static IConfig getInternalInstance()
     {
         /* It would be ideal to use the properties conf.d implementation but
-         * for existing installations, existing behavior should be preserved
+         * for existing installations, existing behaviour should be preserved
          * to make upgrades least intrusive. */
         
         /* Test 1) Allow the user to specify the implementation via a system 

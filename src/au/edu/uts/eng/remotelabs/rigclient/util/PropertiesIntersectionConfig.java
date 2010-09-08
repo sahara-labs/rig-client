@@ -60,10 +60,10 @@ import java.util.TreeMap;
 /**
  * Configuration class which uses an intersection of multiple configuration
  * classes to load configuration properties. The intersection consists of a
- * canonical properties file and an extension directory from which zero of  
+ * canonical properties file and an extension directory from which zero or  
  * more properties files may be iterated. If there are duplicate properties in 
- * the any of the loaded files, the canonical file takes precedence over the 
- * extension directory properties. Within the extension directory the first 
+ * any of the loaded files, the canonical file takes precedence over the 
+ * extension directory properties. Within the extension directory, the first 
  * loaded value of duplicate properties is used. The loading order of the 
  * extension directory properties files are in the natural ordering of the 
  * file names, so prepending an appropriate number to be beginning of file 
@@ -83,7 +83,7 @@ import java.util.TreeMap;
  * The following extensions may be used for the properties files in the
  * extension directory (note case):
  * <ul>
- *  <li>properties</ul>
+ *  <li>properties</li>
  *  <li>props</li>
  *  <li>conf</li>
  *  <li>config</li>
@@ -137,7 +137,7 @@ public class PropertiesIntersectionConfig implements IConfig
         System.err.println("The location of the canonical properties file is: " + this.canonicalFile + '.');
         
         File f = new File(this.canonicalFile);
-        if (!(f.isFile() || f.canRead() || f.canWrite()))
+        if (!(f.isFile() && f.canRead() && f.canWrite()))
         {
             System.err.println("Unable to find the canonical properties file location ('" + this.canonicalFile + 
                     "') or the permissions on it do not allow reading or writing.");
