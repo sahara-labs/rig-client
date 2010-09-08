@@ -342,7 +342,7 @@ SectionEnd
 
 Section "Rig Client Commons" Commons
     SetOutPath $INSTDIR\lib
-    File ..\RigClientCommons\dist\rigclient-commons.jar
+    File ..\RigClientCommons\trunk\dist\rigclient-commons.jar
 SectionEnd
 SectionGroupEnd     
 ;--------------------------------
