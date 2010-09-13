@@ -100,5 +100,13 @@ Changelog:
             <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/batchAbort</actionMapping>
             <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/abortBatchControlResponse</outputActionMapping>
         </operation>
+        <operation name="getConfig" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/getConfig</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/getConfigResponse</outputActionMapping>
+        </operation>
+        <operation name="setConfig" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
+            <actionMapping>http://remotelabs.eng.uts.edu.au/rigclient/setConfig</actionMapping>
+            <outputActionMapping>http://remotelabs.eng.uts.edu.au/rigclient/protocol/RigClientService/setConfigResponse</outputActionMapping>
+        </operation>
     </service>
 </serviceGroup>

@@ -39,7 +39,8 @@ Changelog:
 <wsdl:definitions xmlns:rigclient="http://remotelabs.eng.uts.edu.au/rigclient/protocol" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="RigClientService" targetNamespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
   <wsdl:types>
     <xsd:schema targetNamespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
-      <xsd:element name="allocate" type="rigclient:UserType">
+            <xsd:include schemaLocation=""></xsd:include>
+            <xsd:element name="allocate" type="rigclient:UserType">
       </xsd:element>
       <xsd:element name="allocateResponse"
       	type="rigclient:OperationResponseType">
@@ -384,10 +385,18 @@ Changelog:
 
             <xsd:complexType name="AuthRequiredRequestType">
             	<xsd:sequence>
-            		<xsd:element name="identityToken"
-            			type="xsd:string" maxOccurs="1" minOccurs="0">
+            		<xsd:element name="identityToken" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
             		</xsd:element>
-            		<xsd:element name="requestor" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="requestor" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="async" type="xsd:boolean" maxOccurs="1"
+            			minOccurs="0">
+                        <xsd:annotation>
+                        	<xsd:documentation>The sync parameters is a hint to the rig client to perform the requested operation asynchonously. </xsd:documentation>
+                        </xsd:annotation>
+            		</xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
             <xsd:element name="isActivityDetectable"
@@ -402,42 +411,73 @@ Changelog:
             		<xsd:element name="activity" type="xsd:boolean"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
-            <xsd:element name="getAllAttributes"
+            <xsd:element name="getConfig"
             	type="rigclient:NullType">
             </xsd:element>
-            <xsd:element name="getAllAttributesResponse"
-            	type="rigclient:AllAttributesResponseType">
+            <xsd:element name="getConfigResponse"
+            	type="rigclient:ConfigResponseType">
             </xsd:element>
-            <xsd:element name="setAttribute"
-            	type="rigclient:SetAttributeRequestType">
+            <xsd:element name="setConfig"
+            	type="rigclient:SetConfigRequestType">
             </xsd:element>
-            <xsd:element name="setAttributeResponse"
+            <xsd:element name="setConfigResponse"
             	type="rigclient:OperationResponseType">
             </xsd:element>
             
-            <xsd:complexType name="AllAttributesResponseType">
+            <xsd:complexType name="ConfigResponseType">
             	<xsd:sequence>
-            		<xsd:element name="attribute"
-            			type="rigclient:AttributeResponseType" minOccurs="0" maxOccurs="unbounded">
+            		<xsd:element name="config"
+            			type="rigclient:ConfigPropertyType" minOccurs="0" maxOccurs="unbounded">
             		</xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
     
-    
-            <xsd:complexType name="SetAttributeRequestType">
+            <xsd:complexType name="SetConfigRequestType">
             	<xsd:complexContent>
             		<xsd:extension
             			base="rigclient:AuthRequiredRequestType">
             			<xsd:sequence>
-            				<xsd:element name="attribute"
-            					type="xsd:string">
-            				</xsd:element>
-            				<xsd:element name="value"
-            					type="xsd:string">
+            				<xsd:element name="config"
+            					type="rigclient:ConfigPropertyType">
             				</xsd:element>
             			</xsd:sequence>
             		</xsd:extension>
             	</xsd:complexContent>
+            </xsd:complexType>
+    
+            <xsd:complexType name="ConfigPropertyType">
+            	<xsd:sequence>
+            		<xsd:element name="key" type="xsd:string"></xsd:element>
+            		<xsd:element name="value" type="xsd:string"></xsd:element>
+                    <xsd:element name="stanza" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+                    <xsd:element name="description" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="type" maxOccurs="1"
+            			minOccurs="0">
+            			<xsd:simpleType>
+            				<xsd:restriction base="xsd:string">
+            					<xsd:enumeration value="STRING"></xsd:enumeration>
+            					<xsd:enumeration value="INTEGER"></xsd:enumeration>
+            					<xsd:enumeration value="FLOAT"></xsd:enumeration>
+            					<xsd:enumeration value="BOOLEAN"></xsd:enumeration>
+            					<xsd:enumeration value="CHAR"></xsd:enumeration>
+            				</xsd:restriction>
+            			</xsd:simpleType>
+            		</xsd:element>
+            		<xsd:element name="format" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="default" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="restart" type="xsd:boolean"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            		<xsd:element name="example" type="xsd:string"
+            			maxOccurs="1" minOccurs="0">
+            		</xsd:element>
+            	</xsd:sequence>
             </xsd:complexType>
     </xsd:schema>
   </wsdl:types>
@@ -525,17 +565,17 @@ Changelog:
   <wsdl:message name="isActivityDetectableResponse">
   	<wsdl:part name="parameters" element="rigclient:isActivityDetectableResponse"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="getAllAttributesRequest">
-  	<wsdl:part name="parameters" element="rigclient:getAllAttributes"></wsdl:part>
+  <wsdl:message name="getConfigRequest">
+  	<wsdl:part name="parameters" element="rigclient:getConfig"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="getAllAttributesResponse">
-  	<wsdl:part name="parameters" element="rigclient:getAllAttributesResponse"></wsdl:part>
+  <wsdl:message name="getConfigResponse">
+  	<wsdl:part name="parameters" element="rigclient:getConfigResponse"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="setAttributeRequest">
-  	<wsdl:part name="parameters" element="rigclient:setAttribute"></wsdl:part>
+  <wsdl:message name="setConfigRequest">
+  	<wsdl:part name="parameters" element="rigclient:setConfig"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="setAttributeResponse">
-  	<wsdl:part name="parameters" element="rigclient:setAttributeResponse"></wsdl:part>
+  <wsdl:message name="setConfigResponse">
+  	<wsdl:part name="parameters" element="rigclient:setConfigResponse"></wsdl:part>
   </wsdl:message>
   <wsdl:portType name="RigClientService">
     <wsdl:operation name="allocate">
@@ -595,13 +635,13 @@ Changelog:
     	<wsdl:input message="rigclient:isActivityDetectableRequest"></wsdl:input>
     	<wsdl:output message="rigclient:isActivityDetectableResponse"></wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="getAllAttributes">
-    	<wsdl:input message="rigclient:getAllAttributesRequest"></wsdl:input>
-    	<wsdl:output message="rigclient:getAllAttributesResponse"></wsdl:output>
+    <wsdl:operation name="getConfig">
+    	<wsdl:input message="rigclient:getConfigRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:getConfigResponse"></wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="setAttribute">
-    	<wsdl:input message="rigclient:setAttributeRequest"></wsdl:input>
-    	<wsdl:output message="rigclient:setAttributeResponse"></wsdl:output>
+    <wsdl:operation name="setConfig">
+    	<wsdl:input message="rigclient:setConfigRequest"></wsdl:input>
+    	<wsdl:output message="rigclient:setConfigResponse"></wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="RigClientServiceSOAP"
@@ -739,7 +779,28 @@ Changelog:
   		</wsdl:output>
   	</wsdl:operation>
   	<wsdl:operation name="isActivityDetectable">
-  		<soap:operation soapAction="http://remotelabs.eng.uts.edu.au/rigclient/isActivityDetectable"/>
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/isActivityDetectable" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="getConfig">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/protocol/getConfig" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="setConfig">
+  		<soap:operation
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/protocol/setConfig" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
