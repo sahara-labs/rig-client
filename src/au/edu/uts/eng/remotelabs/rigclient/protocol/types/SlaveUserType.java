@@ -108,10 +108,8 @@ public class SlaveUserType extends UserType implements ADBBean
     @Override
     public OMElement getOMElement(final QName parentQName, final OMFactory factory) throws ADBException
     {
-
         final OMDataSource dataSource = new ADBDataSource(this, parentQName)
         {
-
             @Override
             public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
@@ -155,11 +153,17 @@ public class SlaveUserType extends UserType implements ADBBean
                 throw new ADBException("requestor cannot be null");
             }
         }
+        
+        if (this.asyncTracker)
+        {
+            elementList.add(new QName("", "async"));
+            elementList.add(ConverterUtil.convertToString(this.async));
+        }
 
         elementList.add(new QName("", "user"));
-        if (this.localUser != null)
+        if (this.user != null)
         {
-            elementList.add(ConverterUtil.convertToString(this.localUser));
+            elementList.add(ConverterUtil.convertToString(this.user));
         }
         else
         {
@@ -314,6 +318,32 @@ public class SlaveUserType extends UserType implements ADBBean
             }
             xmlWriter.writeEndElement();
         }
+        
+        if (this.asyncTracker)
+        {
+            namespace = "";
+            if (!namespace.equals(""))
+            {
+                prefix = xmlWriter.getPrefix(namespace);
+                if (prefix == null)
+                {
+                    prefix = SlaveUserType.generatePrefix(namespace);
+                    xmlWriter.writeStartElement(prefix, "async", namespace);
+                    xmlWriter.writeNamespace(prefix, namespace);
+                    xmlWriter.setPrefix(prefix, namespace);
+                }
+                else
+                {
+                    xmlWriter.writeStartElement(namespace, "async");
+                }
+            }
+            else
+            {
+                xmlWriter.writeStartElement("async");
+            }
+            xmlWriter.writeCharacters(ConverterUtil.convertToString(this.async));
+            xmlWriter.writeEndElement();
+        }
 
         namespace = "";
         if (!namespace.equals(""))
@@ -336,13 +366,13 @@ public class SlaveUserType extends UserType implements ADBBean
             xmlWriter.writeStartElement("user");
         }
 
-        if (this.localUser == null)
+        if (this.user == null)
         {
             throw new ADBException("user cannot be null");
         }
         else
         {
-            xmlWriter.writeCharacters(this.localUser);
+            xmlWriter.writeCharacters(this.user);
         }
         xmlWriter.writeEndElement();
 
@@ -424,6 +454,18 @@ public class SlaveUserType extends UserType implements ADBBean
                 {
                     final String content = reader.getElementText();
                     object.setRequestor(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+                
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                
+                if (reader.isStartElement() && new QName("", "async").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setAsync(ConverterUtil.convertToBoolean(content));
                     reader.next();
                 }
 

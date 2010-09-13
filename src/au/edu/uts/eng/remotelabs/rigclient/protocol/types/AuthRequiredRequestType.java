@@ -86,6 +86,9 @@ public class AuthRequiredRequestType implements ADBBean
     
     protected boolean requestorTracker = false;
     protected String requestor;
+    
+    protected boolean asyncTracker = false;
+    protected boolean async;
 
     private static String generatePrefix(final String namespace)
     {
@@ -151,6 +154,12 @@ public class AuthRequiredRequestType implements ADBBean
             {
                 throw new ADBException("requestor cannot be null.");
             }
+        }
+        
+        if (this.asyncTracker)
+        {
+            elementList.add(new QName("", "async"));
+            elementList.add(ConverterUtil.convertToString(this.async));
         }
 
         return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
@@ -293,6 +302,33 @@ public class AuthRequiredRequestType implements ADBBean
             }
             xmlWriter.writeEndElement();
         }
+        
+        if (this.asyncTracker)
+        {
+            namespace = "";
+            if (!namespace.equals(""))
+            {
+                prefix = xmlWriter.getPrefix(namespace);
+                if (prefix == null)
+                {
+                    prefix = AuthRequiredRequestType.generatePrefix(namespace);
+                    xmlWriter.writeStartElement(prefix, "async", namespace);
+                    xmlWriter.writeNamespace(prefix, namespace);
+                    xmlWriter.setPrefix(prefix, namespace);
+                }
+                else
+                {
+                    xmlWriter.writeStartElement(namespace, "async");
+                }
+            }
+            else
+            {
+                xmlWriter.writeStartElement("async");
+            }
+            xmlWriter.writeCharacters(ConverterUtil.convertToString(this.async));
+            xmlWriter.writeEndElement();
+        }
+        
         xmlWriter.writeEndElement();
     }
     
@@ -305,6 +341,11 @@ public class AuthRequiredRequestType implements ADBBean
     public String getRequestor()
     {
         return this.requestor;
+    }
+    
+    public boolean getAsync()
+    {
+        return this.async;
     }
 
     public void setIdentityToken(final String param)
@@ -332,6 +373,12 @@ public class AuthRequiredRequestType implements ADBBean
             this.requestorTracker = false;
         }
         this.requestor = param;
+    }
+    
+    public void setAsync(boolean param)
+    {
+        this.async = param;
+        this.asyncTracker = true;
     }
 
     private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue, final XMLStreamWriter xmlWriter)
@@ -401,6 +448,17 @@ public class AuthRequiredRequestType implements ADBBean
                 {
                     final String content = reader.getElementText();
                     object.setRequestor(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+                
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                if (reader.isStartElement() && new QName("", "async").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setAsync(ConverterUtil.convertToBoolean(content));
                     reader.next();
                 }
                 

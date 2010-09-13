@@ -154,6 +154,12 @@ public class MaintenanceRequestType extends AuthRequiredRequestType implements A
                 throw new ADBException("requestor cannot be null!!");
             }
         }
+        
+        if (this.asyncTracker)
+        {
+            elementList.add(new QName("", "async"));
+            elementList.add(ConverterUtil.convertToString(this.async));
+        }
 
         elementList.add(new QName("", "putOffline"));
         elementList.add(ConverterUtil.convertToString(this.putOffline));
@@ -291,6 +297,32 @@ public class MaintenanceRequestType extends AuthRequiredRequestType implements A
             {
                 xmlWriter.writeCharacters(this.requestor);
             }
+            xmlWriter.writeEndElement();
+        }
+        
+        if (this.asyncTracker)
+        {
+            namespace = "";
+            if (!namespace.equals(""))
+            {
+                prefix = xmlWriter.getPrefix(namespace);
+                if (prefix == null)
+                {
+                    prefix = MaintenanceRequestType.generatePrefix(namespace);
+                    xmlWriter.writeStartElement(prefix, "async", namespace);
+                    xmlWriter.writeNamespace(prefix, namespace);
+                    xmlWriter.setPrefix(prefix, namespace);
+                }
+                else
+                {
+                    xmlWriter.writeStartElement(namespace, "async");
+                }
+            }
+            else
+            {
+                xmlWriter.writeStartElement("async");
+            }
+            xmlWriter.writeCharacters(ConverterUtil.convertToString(this.async));
             xmlWriter.writeEndElement();
         }
 
@@ -432,6 +464,18 @@ public class MaintenanceRequestType extends AuthRequiredRequestType implements A
                 {
                     final String content = reader.getElementText();
                     object.setRequestor(ConverterUtil.convertToString(content));
+                    reader.next();
+                }
+                
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                
+                if (reader.isStartElement() && new QName("", "async").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setAsync(ConverterUtil.convertToBoolean(content));
                     reader.next();
                 }
 

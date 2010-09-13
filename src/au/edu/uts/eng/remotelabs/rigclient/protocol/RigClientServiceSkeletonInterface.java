@@ -197,4 +197,6 @@ public interface RigClientServiceSkeletonInterface
      * @return operation response
      */
     public IsActivityDetectableResponse isActivityDetectable(IsActivityDetectable isActivityDetectable);
+    
+    
 }

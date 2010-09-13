@@ -1,6 +1,6 @@
 /**
  * SAHARA Rig Client
- *
+ * 
  * Software abstraction of physical rig to provide rig session control
  * and rig device control. Automatically tests rig hardware and reports
  * the rig status to ensure rig goodness.
@@ -10,46 +10,37 @@
  * Copyright (c) 2009, University of Technology, Sydney
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
+ * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met:
  *
- *  * Redistributions of source code must retain the above copyright notice,
+ *  * Redistributions of source code must retain the above copyright notice, 
  *    this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
+ *  * Redistributions in binary form must reproduce the above copyright 
+ *    notice, this list of conditions and the following disclaimer in the 
  *    documentation and/or other materials provided with the distribution.
- *  * Neither the name of the University of Technology, Sydney nor the names
- *    of its contributors may be used to endorse or promote products derived from
+ *  * Neither the name of the University of Technology, Sydney nor the names 
+ *    of its contributors may be used to endorse or promote products derived from 
  *    this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date 8th December 2009
- *
- * Changelog:
- * - 08/12/2009 - mdiponio - Initial file creation.
- */
-
-/**
- * PrimitiveControlRequestType.java This file was auto-generated from WSDL by
- * the Apache Axis2 version: 1.4.1 Built on : Aug 19, 2008 (10:13:44 LKT)
+ * @date 13th September 2009
  */
 
 package au.edu.uts.eng.remotelabs.rigclient.protocol.types;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -70,37 +61,31 @@ import org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl;
 import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
 
 /**
- * PrimitiveControlRequestType bean class
+ * SetConfigRequestType bean class.
  */
-
-public class PrimitiveControlRequestType extends AuthRequiredRequestType implements ADBBean
+public class SetConfigRequestType extends AuthRequiredRequestType implements ADBBean
 {
     /*
-     * This type was generated from the piece of schema that had name =
-     * PrimitiveControlRequestType Namespace URI =
-     * http://remotelabs.eng.uts.edu.au/rigclient/protocol Namespace Prefix =
-     * ns1
+     * This type was generated from the piece of schema that had
+     * name = SetConfigRequestType
+     * Namespace URI = http://remotelabs.eng.uts.edu.au/rigclient/protocol
+     * Namespace Prefix = ns1
      */
-
-    private static final long serialVersionUID = -780667459288663133L;
-
-    protected String controller;
-
-    protected String action;
-
-    protected boolean paramsTracker = false;
-    protected ParamType[] params;
+   
+    private static final long serialVersionUID = -6832352133882384551L;
 
     private static String generatePrefix(final String namespace)
     {
-        if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
+        if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol"))
+        {
+            return "ns1";
+        }
         return BeanUtil.getUniquePrefix();
     }
 
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
-
         try
         {
             isReaderMTOMAware = Boolean.TRUE.equals(reader.getProperty(OMConstants.IS_DATA_HANDLERS_AWARE));
@@ -112,31 +97,11 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
         return isReaderMTOMAware;
     }
 
-    @SuppressWarnings("unchecked")
-    public void addParam(final ParamType param)
+    protected ConfigPropertyType config;
+
+    public ConfigPropertyType getConfig()
     {
-        if (this.params == null)
-        {
-            this.params = new ParamType[] {};
-        }
-
-        // update the setting tracker
-        this.paramsTracker = true;
-
-        final List<ParamType> list = ConverterUtil.toList(this.params);
-        list.add(param);
-        this.params = list.toArray(new ParamType[list.size()]);
-
-    }
-
-    public String getAction()
-    {
-        return this.action;
-    }
-
-    public String getController()
-    {
-        return this.controller;
+        return this.config;
     }
 
     @Override
@@ -147,28 +112,25 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
             @Override
             public void serialize(final MTOMAwareXMLStreamWriter xmlWriter) throws XMLStreamException
             {
-                PrimitiveControlRequestType.this.serialize(this.parentQName, factory, xmlWriter);
+                SetConfigRequestType.this.serialize(this.parentQName, factory, xmlWriter);
             }
         };
         return new OMSourcedElementImpl(parentQName, factory, dataSource);
     }
 
-    public ParamType[] getParam()
-    {
-        return this.params;
-    }
-
     @Override
     public XMLStreamReader getPullParser(final QName qName) throws ADBException
     {
+
         final ArrayList<Serializable> elementList = new ArrayList<Serializable>();
         final ArrayList<QName> attribList = new ArrayList<QName>();
+
         attribList.add(new QName("http://www.w3.org/2001/XMLSchema-instance", "type"));
-        attribList.add(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "PrimitiveControlRequestType"));
+        attribList.add(new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "SetConfigRequestType"));
+        
         if (this.identityTokenTracker)
         {
             elementList.add(new QName("", "identityToken"));
-
             if (this.identityToken != null)
             {
                 elementList.add(ConverterUtil.convertToString(this.identityToken));
@@ -178,17 +140,17 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
                 throw new ADBException("identityToken cannot be null!!");
             }
         }
+        
         if (this.requestorTracker)
         {
-            elementList.add(new QName("", "requestor"));
-
+            elementList.add(new QName("", ""));
             if (this.requestor != null)
             {
                 elementList.add(ConverterUtil.convertToString(this.requestor));
             }
             else
             {
-                throw new ADBException("requestor cannot be null!!");
+                throw new ADBException(" cannot be null!!");
             }
         }
         
@@ -198,44 +160,13 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
             elementList.add(ConverterUtil.convertToString(this.async));
         }
         
-        elementList.add(new QName("", "controller"));
-        if (this.controller != null)
+        elementList.add(new QName("", "config"));
+        if (this.config == null)
         {
-            elementList.add(ConverterUtil.convertToString(this.controller));
+            throw new ADBException("config cannot be null!!");
         }
-        else
-        {
-            throw new ADBException("controller cannot be null!!");
-        }
+        elementList.add(this.config);
 
-        elementList.add(new QName("", "action"));
-
-        if (this.action != null)
-        {
-            elementList.add(ConverterUtil.convertToString(this.action));
-        }
-        else
-        {
-            throw new ADBException("action cannot be null!!");
-        }
-        if (this.paramsTracker)
-        {
-            if (this.params != null)
-            {
-                for (final ParamType element : this.params)
-                {
-                    if (element != null)
-                    {
-                        elementList.add(new QName("", "param"));
-                        elementList.add(element);
-                    }
-                }
-            }
-            else
-            {
-                throw new ADBException("param cannot be null!!");
-            }
-        }
         return new ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
     }
 
@@ -244,14 +175,16 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
         String prefix = xmlWriter.getPrefix(namespace);
         if (prefix == null)
         {
-            prefix = PrimitiveControlRequestType.generatePrefix(namespace);
+            prefix = SetConfigRequestType.generatePrefix(namespace);
             while (xmlWriter.getNamespaceContext().getNamespaceURI(prefix) != null)
             {
                 prefix = BeanUtil.getUniquePrefix();
             }
+
             xmlWriter.writeNamespace(prefix, namespace);
             xmlWriter.setPrefix(prefix, namespace);
         }
+
         return prefix;
     }
 
@@ -266,12 +199,10 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
     public void serialize(final QName parentQName, final OMFactory factory, final MTOMAwareXMLStreamWriter xmlWriter,
             final boolean serializeType) throws XMLStreamException, ADBException
     {
-
-
         String prefix = parentQName.getPrefix();
         String namespace = parentQName.getNamespaceURI();
 
-        if (namespace != null && namespace.trim().length() > 0)
+        if ((namespace != null) && (namespace.trim().length() > 0))
         {
             final String writerPrefix = xmlWriter.getPrefix(namespace);
             if (writerPrefix != null)
@@ -282,7 +213,7 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
             {
                 if (prefix == null)
                 {
-                    prefix = PrimitiveControlRequestType.generatePrefix(namespace);
+                    prefix = SetConfigRequestType.generatePrefix(namespace);
                 }
 
                 xmlWriter.writeStartElement(prefix, parentQName.getLocalPart(), namespace);
@@ -295,16 +226,17 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
             xmlWriter.writeStartElement(parentQName.getLocalPart());
         }
 
-        final String namespacePrefix = this.registerPrefix(xmlWriter, "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
-        if (namespacePrefix != null && namespacePrefix.trim().length() > 0)
+        final String namespacePrefix = this.registerPrefix(xmlWriter,
+                "http://remotelabs.eng.uts.edu.au/rigclient/protocol");
+        if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0))
         {
             this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", namespacePrefix
-                    + ":PrimitiveControlRequestType", xmlWriter);
+                    + ":SetConfigRequestType", xmlWriter);
         }
         else
         {
-            this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type",
-                    "PrimitiveControlRequestType", xmlWriter);
+            this.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", "SetConfigRequestType",
+                    xmlWriter);
         }
 
         if (this.identityTokenTracker)
@@ -313,15 +245,12 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
             if (!namespace.equals(""))
             {
                 prefix = xmlWriter.getPrefix(namespace);
-
                 if (prefix == null)
                 {
-                    prefix = PrimitiveControlRequestType.generatePrefix(namespace);
-
+                    prefix = SetConfigRequestType.generatePrefix(namespace);
                     xmlWriter.writeStartElement(prefix, "identityToken", namespace);
                     xmlWriter.writeNamespace(prefix, namespace);
                     xmlWriter.setPrefix(prefix, namespace);
-
                 }
                 else
                 {
@@ -334,15 +263,16 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
             }
 
             if (this.identityToken == null)
+            {
                 throw new ADBException("identityToken cannot be null!!");
+            }
             else
             {
                 xmlWriter.writeCharacters(this.identityToken);
             }
-
             xmlWriter.writeEndElement();
         }
-
+        
         if (this.requestorTracker)
         {
             namespace = "";
@@ -351,31 +281,29 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
                 prefix = xmlWriter.getPrefix(namespace);
                 if (prefix == null)
                 {
-                    prefix = PrimitiveControlRequestType.generatePrefix(namespace);
-
-                    xmlWriter.writeStartElement(prefix, "requestor", namespace);
+                    prefix = SetConfigRequestType.generatePrefix(namespace);
+                    xmlWriter.writeStartElement(prefix, "", namespace);
                     xmlWriter.writeNamespace(prefix, namespace);
                     xmlWriter.setPrefix(prefix, namespace);
                 }
                 else
                 {
-                    xmlWriter.writeStartElement(namespace, "requestor");
+                    xmlWriter.writeStartElement(namespace, "");
                 }
             }
             else
             {
-                xmlWriter.writeStartElement("requestor");
+                xmlWriter.writeStartElement("");
             }
 
             if (this.requestor == null)
             {
-                throw new ADBException("requestor cannot be null!!");
+                throw new ADBException(" cannot be null!!");
             }
             else
             {
                 xmlWriter.writeCharacters(this.requestor);
             }
-
             xmlWriter.writeEndElement();
         }
         
@@ -387,7 +315,7 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
                 prefix = xmlWriter.getPrefix(namespace);
                 if (prefix == null)
                 {
-                    prefix = PrimitiveControlRequestType.generatePrefix(namespace);
+                    prefix = SetConfigRequestType.generatePrefix(namespace);
                     xmlWriter.writeStartElement(prefix, "async", namespace);
                     xmlWriter.writeNamespace(prefix, namespace);
                     xmlWriter.setPrefix(prefix, namespace);
@@ -405,114 +333,21 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
             xmlWriter.writeEndElement();
         }
         
-        namespace = "";
-        if (!namespace.equals(""))
+        if (this.config == null)
         {
-            prefix = xmlWriter.getPrefix(namespace);
-
-            if (prefix == null)
-            {
-                prefix = PrimitiveControlRequestType.generatePrefix(namespace);
-                xmlWriter.writeStartElement(prefix, "controller", namespace);
-                xmlWriter.writeNamespace(prefix, namespace);
-                xmlWriter.setPrefix(prefix, namespace);
-            }
-            else
-            {
-                xmlWriter.writeStartElement(namespace, "controller");
-            }
+            throw new ADBException("config cannot be null!!");
         }
-        else
-        {
-            xmlWriter.writeStartElement("controller");
-        }
-
-        if (this.controller == null)
-        {
-            throw new ADBException("controller cannot be null!!");
-        }
-        else
-        {
-            xmlWriter.writeCharacters(this.controller);
-        }
+        this.config.serialize(new QName("", "config"), factory, xmlWriter);
 
         xmlWriter.writeEndElement();
-        namespace = "";
-        if (!namespace.equals(""))
-        {
-            prefix = xmlWriter.getPrefix(namespace);
-
-            if (prefix == null)
-            {
-                prefix = PrimitiveControlRequestType.generatePrefix(namespace);
-
-                xmlWriter.writeStartElement(prefix, "action", namespace);
-                xmlWriter.writeNamespace(prefix, namespace);
-                xmlWriter.setPrefix(prefix, namespace);
-            }
-            else
-            {
-                xmlWriter.writeStartElement(namespace, "action");
-            }
-        }
-        else
-        {
-            xmlWriter.writeStartElement("action");
-        }
-
-        if (this.action == null)
-        {
-            throw new ADBException("action cannot be null!!");
-        }
-        else
-        {
-            xmlWriter.writeCharacters(this.action);
-        }
-
-        xmlWriter.writeEndElement();
-        if (this.paramsTracker)
-        {
-            if (this.params != null)
-            {
-                for (final ParamType element : this.params)
-                {
-                    if (element != null)
-                    {
-                        element.serialize(new QName("", "param"), factory, xmlWriter);
-                    }
-                }
-            }
-            else
-                throw new ADBException("param cannot be null!!");
-        }
-        xmlWriter.writeEndElement();
     }
-
-    public void setAction(final String param)
+    public void setConfig(final ConfigPropertyType param)
     {
-        this.action = param;
+        this.config = param;
     }
 
-    public void setController(final String param)
-    {
-        this.controller = param;
-    }
-
-    public void setParam(final ParamType[] param)
-    {
-        if (param != null)
-        {
-            this.paramsTracker = true;
-        }
-        else
-        {
-            this.paramsTracker = false;
-
-        }
-        this.params = param;
-    }
-    private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue,
-            final XMLStreamWriter xmlWriter) throws XMLStreamException
+    private void writeAttribute(final String prefix, final String namespace, final String attName,
+            final String attValue, final XMLStreamWriter xmlWriter) throws XMLStreamException
     {
         if (xmlWriter.getPrefix(namespace) == null)
         {
@@ -521,21 +356,21 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
         }
         xmlWriter.writeAttribute(namespace, attName, attValue);
     }
-
+    
     public static class Factory
     {
-        public static PrimitiveControlRequestType parse(final XMLStreamReader reader) throws Exception
+        public static SetConfigRequestType parse(final XMLStreamReader reader) throws Exception
         {
-            final PrimitiveControlRequestType object = new PrimitiveControlRequestType();
+            final SetConfigRequestType object = new SetConfigRequestType();
             try
             {
                 while (!reader.isStartElement() && !reader.isEndElement())
-                {
                     reader.next();
-                }
+
                 if (reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type") != null)
                 {
-                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+                    final String fullTypeName = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "type");
                     if (fullTypeName != null)
                     {
                         String nsPrefix = null;
@@ -544,22 +379,19 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
                             nsPrefix = fullTypeName.substring(0, fullTypeName.indexOf(":"));
                         }
                         nsPrefix = nsPrefix == null ? "" : nsPrefix;
+
                         final String type = fullTypeName.substring(fullTypeName.indexOf(":") + 1);
-                        if (!"PrimitiveControlRequestType".equals(type))
+                        if (!"SetConfigRequestType".equals(type))
                         {
-                            // find namespace for the prefix
                             final String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                            return (PrimitiveControlRequestType) ExtensionMapper.getTypeObject(nsUri, type, reader);
+                            return (SetConfigRequestType) ExtensionMapper.getTypeObject(nsUri, type, reader);
                         }
                     }
                 }
 
                 reader.next();
-                final ArrayList<ParamType> params = new ArrayList<ParamType>();
                 while (!reader.isStartElement() && !reader.isEndElement())
-                {
                     reader.next();
-                }
 
                 if (reader.isStartElement() && new QName("", "identityToken").equals(reader.getName()))
                 {
@@ -569,22 +401,17 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
-                {
                     reader.next();
-                }
 
-                if (reader.isStartElement() && new QName("", "requestor").equals(reader.getName()))
+                if (reader.isStartElement() && new QName("", "").equals(reader.getName()))
                 {
                     final String content = reader.getElementText();
                     object.setRequestor(ConverterUtil.convertToString(content));
                     reader.next();
                 }
-                
+
                 while (!reader.isStartElement() && !reader.isEndElement())
-                {
                     reader.next();
-                }
-                
                 if (reader.isStartElement() && new QName("", "async").equals(reader.getName()))
                 {
                     final String content = reader.getElementText();
@@ -593,93 +420,23 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
-                {
                     reader.next();
-                }
 
-                if (reader.isStartElement() && new QName("", "controller").equals(reader.getName()))
+                if (reader.isStartElement() && new QName("", "config").equals(reader.getName()))
                 {
-                    final String content = reader.getElementText();
-                    object.setController(ConverterUtil.convertToString(content));
+                    object.setConfig(ConfigPropertyType.Factory.parse(reader));
                     reader.next();
                 }
                 else
-                {
+                {                 
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
-                {
                     reader.next();
-                }
 
-                if (reader.isStartElement() && new QName("", "action").equals(reader.getName()))
-                {
-
-                    final String content = reader.getElementText();
-                    object.setAction(ConverterUtil.convertToString(content));
-                    reader.next();
-                }
-                else
-                {
+                if (reader.isStartElement())                 
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement() && new QName("", "param").equals(reader.getName()))
-                {
-
-
-                    params.add(ParamType.Factory.parse(reader));
-
-                    boolean loopDone5 = false;
-                    while (!loopDone5)
-                    {
-                        while (!reader.isEndElement())
-                        {
-                            reader.next();
-                        }
-
-                        reader.next();
-
-                        while (!reader.isStartElement() && !reader.isEndElement())
-                        {
-                            reader.next();
-                        }
-                        if (reader.isEndElement())
-                        {
-
-                            loopDone5 = true;
-                        }
-                        else
-                        {
-                            if (new QName("", "param").equals(reader.getName()))
-                            {
-                                params.add(ParamType.Factory.parse(reader));
-                            }
-                            else
-                            {
-                                loopDone5 = true;
-                            }
-                        }
-                    }
-
-                    object.setParam((ParamType[]) ConverterUtil.convertToArray(ParamType.class, params));
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                {
-                    reader.next();
-                }
-
-                if (reader.isStartElement())
-                {
-                    throw new ADBException("Unexpected subelement " + reader.getLocalName());
-                }
             }
             catch (final XMLStreamException e)
             {
