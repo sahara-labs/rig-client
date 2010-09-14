@@ -43,7 +43,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -82,7 +84,7 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
     public static final String RESOURCE_LOC = "META-INF/config-descriptions.xml";
     
     /** Property description information. */
-    private List<Property> descs;
+    private Map<String, Property> descriptions;
     
     /** Logger. */
     private ILogger logger;
@@ -90,7 +92,7 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
     public ResourcePropertiesDescriptions()
     {
         this.logger = LoggerFactory.getLoggerInstance();
-        this.descs = new ArrayList<Property>();
+        ArrayList<Property> descs = new ArrayList<Property>();
         
         InputStream is = null;
         try
@@ -140,7 +142,7 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
                         d = d.replace('\n', ' ');
                     }
                     
-                    this.descs.add(new Property(
+                    descs.add(new Property(
                             e.getAttribute("name"), 
                             e.getAttribute("stanza"), 
                             man,
@@ -169,13 +171,20 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
             catch (IOException e)
             { /* Swallowing, because there isn't anything sensible to do here. */ }
         }
+        
+        /* Key descriptions by name for fast lookups. */
+        this.descriptions = new HashMap<String, Property>(descs.size());
+        for (Property p : descs)
+        {
+            this.descriptions.put(p.getName(), p);
+        }
     }
     
     @Override
     public List<Property> getPropertyDescriptions()
     {
-        List<Property> ret = new ArrayList<Property>(this.descs.size());
-        for (Property p : this.descs)
+        List<Property> ret = new ArrayList<Property>(this.descriptions.size());
+        for (Property p : this.descriptions.values())
         {
             ret.add(p);
         }
@@ -185,8 +194,8 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
     @Override
     public List<Property> getPropertyDescriptions(final String stanza)
     {
-        List<Property> ret = new ArrayList<Property>(this.descs.size());
-        for (Property p : this.descs)
+        List<Property> ret = new ArrayList<Property>(this.descriptions.size());
+        for (Property p : this.descriptions.values())
         {
             if (stanza.equals(p.getStanza())) ret.add(p);
         }
@@ -196,11 +205,6 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
     @Override
     public Property getPropertyDescription(final String name)
     {
-        for (Property p : this.descs)
-        {
-            if (name.equals(p.getName())) return p;
-        }
-        
-        return null;
+        return this.descriptions.get(name);
     }
 }

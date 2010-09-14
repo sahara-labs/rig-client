@@ -186,7 +186,7 @@ public interface IConfigDescriptions
         /**
          * @return the restart
          */
-        public boolean isRestart()
+        public boolean needsRestart()
         {
             return this.restart;
         }
