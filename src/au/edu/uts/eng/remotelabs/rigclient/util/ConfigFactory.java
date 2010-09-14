@@ -60,6 +60,9 @@ public class ConfigFactory
     /** Configuration instance. */
     private static IConfig instance;
     
+    /** Configuration descriptions instance. */
+    private static IConfigDescriptions descriptions;
+    
     static
     {
         ConfigFactory.instance = ConfigFactory.getInternalInstance();
@@ -74,13 +77,27 @@ public class ConfigFactory
     }
     
     /**
-     * Gets a IConfig instance.
+     * Gets a configuration instance.
      *
-     * @return IConfig instance
+     * @return configuration instance
      */
     public static IConfig getInstance()
     {
         return ConfigFactory.instance;
+    }
+    
+    /**
+     * Gets a configuration descriptions instance.
+     * 
+     * @return descriptions instance
+     */
+    public synchronized static IConfigDescriptions getDescriptions()
+    {
+        if (ConfigFactory.descriptions == null)
+        {
+            ConfigFactory.descriptions = new ResourcePropertiesDescriptions();
+        }
+        return ConfigFactory.descriptions;
     }
     
     /**

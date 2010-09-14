@@ -34,117 +34,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Michael Diponio (mdiponio)
- * @date 11th June 2010
+ * @date 14th September 2010
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 /**
- * Loads descriptions of the rig client configuration properties for a resource
- * file '/META-INF/config/descriptions.xml'. The format of this file is given 
- * by the following DTD:<br />
- * <pre>
- * &lt?xml version="1.0" encoding="UTF-8"&gt;
- * &lt;DOCTYPE config[
- *  &lt!ELEMENT config(property*)&gt;
- *  &lt!ELEMENT property (#PCDATA)&gt;
- *  &lt!ATTLIST property name stanza mandatory type format default restart example #PCDATA #REQUIRED&gt;
- * ]&gt;
- * </pre>
+ * Interface for a class providing information about the configuration 
+ * properties of the Rig Client.
  */
-public class PropertyDescriptions
+public interface IConfigDescriptions
 {
-    public static PropertyDescriptions instance = new PropertyDescriptions();
-    
-    /** Property description information. */
-    private List<Property> descs;
-    
-    /** Logger. */
-    private ILogger logger;
-    
-    public PropertyDescriptions()
+    /**
+     * The data type of a configuration value.
+     */
+    public enum ConfigDataType
     {
-        this.logger = LoggerFactory.getLoggerInstance();
-        this.descs = new ArrayList<Property>();
-        
-        InputStream is = null;
-        try
-        {
-            is = this.getClass().getClassLoader().getResourceAsStream("META-INF/config-descriptions.xml");
-            if (is == null)
-            {
-                this.logger.error("Unable to find configuration description resource. It should be packaged in the" +
-                		"'/META-INF/config/descriptions.xml' file in the rig client library. Please report this.");
-                return;
-            }
-            
-            DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
-            fac.setIgnoringComments(true);
-            fac.setIgnoringElementContentWhitespace(true);
-            Document doc = fac.newDocumentBuilder().parse(is);
-            
-            /* Parse the all property elements. */
-            Element root = doc.getDocumentElement();
-            for (Node c = root.getFirstChild(); c != null; c = c.getNextSibling())
-            {
-                if (c.getNodeName().equals("property") && c.getNodeType() == Node.ELEMENT_NODE)
-                {
-                    Element e = (Element)c;
-                    
-                    String tmp = e.getAttribute("mandatory");
-                    boolean man = false;
-                    if ("yes".equals(tmp) || "true".equals(tmp) || "on".equals(tmp)) man = true;
-                    
-                    tmp = e.getAttribute("restart");
-                    boolean res = false;
-                    if ("yes".equals(tmp) || "true".equals(tmp) || "on".equals(tmp)) res = true;
-                    
-                    String d = e.getTextContent();
-                    if (d != null)
-                    {
-                        d = d.trim();
-                        d = d.replace('\n', ' ');
-                    }
-                    
-                    this.descs.add(new Property(
-                            e.getAttribute("name"), 
-                            e.getAttribute("stanza"), 
-                            man,
-                            e.getAttribute("type"),
-                            e.getAttribute("format"),
-                            e.getAttribute("default"),
-                            res,
-                            e.getAttribute("example"),
-                            d
-                    ));
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            this.logger.error("Failed loading property descriptions with exception '" + ex.getClass().getName() + 
-                    "' and message '" + ex.getMessage() + "'.");
-        }
-        finally
-        {
-
-            try
-            {
-                if (is != null) is.close();
-            }
-            catch (IOException e)
-            { /* Swallowing, because there isn't anything sensible to do here. */ }
-        }
+        /** String configuration value. */
+        STRING, /** Integral number. */
+        INTEGER, /** Decimal number. */
+        FLOAT, /** Boolean value. */
+        BOOLEAN, /** Single character. */
+        CHAR
     }
     
     /** 
@@ -152,15 +64,7 @@ public class PropertyDescriptions
      * 
      * @return list of property descriptions
      */
-    public List<Property> getPropertyDescriptions()
-    {
-        List<Property> ret = new ArrayList<Property>(this.descs.size());
-        for (Property p : this.descs)
-        {
-            ret.add(p);
-        }
-        return ret;
-    }
+    public List<Property> getPropertyDescriptions();
     
     /**
      * Gets the property descriptions for the specified stanza.
@@ -168,15 +72,16 @@ public class PropertyDescriptions
      * @param stanza configuration stanza
      * @return list of property in that stanza
      */
-    public List<Property> getPropertyDescriptions(final String stanza)
-    {
-        List<Property> ret = new ArrayList<Property>(this.descs.size());
-        for (Property p : this.descs)
-        {
-            if (stanza.equals(p.stanza))ret.add(p);
-        }
-        return ret;
-    }
+    public List<Property> getPropertyDescriptions(final String stanza);
+    
+    
+    /**
+     * Gets the property description for a specific property.
+     * 
+     * @param name property nameXS
+     * @return property description or null if not found.
+     */
+    public Property getPropertyDescription(final String name);
     
     /**
      * Configuration property information.
@@ -193,7 +98,7 @@ public class PropertyDescriptions
         private final boolean mandatory;
         
         /** The property value data type. */
-        private final String type;
+        private final ConfigDataType type;
         
         /** The property value format. */
         private final String format;
@@ -216,7 +121,13 @@ public class PropertyDescriptions
             this.name = name;
             this.stanza = stanza;
             this.mandatory = mandatory;
-            this.type = type;
+            
+            if ("INTEGER".equalsIgnoreCase(type)) this.type = ConfigDataType.INTEGER;
+            else if ("FLOAT".equalsIgnoreCase(type)) this.type = ConfigDataType.FLOAT;
+            else if ("BOOLEAN".equalsIgnoreCase(type)) this.type = ConfigDataType.BOOLEAN;
+            else if ("CHAR".equalsIgnoreCase(type)) this.type = ConfigDataType.CHAR;
+            else this.type = ConfigDataType.STRING; // String is the most generic
+            
             this.format = format;
             this.defaultValue = defaultVal;
             this.restart = restart;
@@ -251,7 +162,7 @@ public class PropertyDescriptions
         /**
          * @return the type
          */
-        public String getType()
+        public ConfigDataType getType()
         {
             return this.type;
         }
@@ -320,17 +231,5 @@ public class PropertyDescriptions
             r.append(this.example);
             return r.toString();
         }
-    }
-    
-    /**
-     * Returns a cached instance of the property descriptions class. There isn't
-     * must point in getting new instances of this class as it is immutable with
-     * static data.
-     * 
-     * @return cached instance
-     */
-    public static PropertyDescriptions getInstance()
-    {
-        return PropertyDescriptions.instance;
     }
 }

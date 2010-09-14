@@ -7,35 +7,36 @@
 
 Each property should be configured with the following attributes:
 
-  * name - Name of the configuration property
-  * stanza - Property groupings
+  * name      - Name of the configuration property
+  * stanza    - Property groupings
   * mandatory - Whether the property is mandatory or optional, if the value is
-    'yes', 'true' or 'on' the property is mandatory
-  * type - The datatype of the property value
-  * format - Configuration format expected
-  * default - Default format 
-  * restart - Whether the value will be applied immediately or on next rig client
-    start
-  * example - Example value
+                'yes', 'true' or 'on' the property is mandatory
+  * type      - The data type of the property value, this can be either 'STRING',
+                'INTEGER', 'FLOAT', 'BOOLEAN' or 'CHAR'.
+  * format    - Configuration format expected
+  * default   - Default format 
+  * restart   - Whether the value will be applied immediately or on next rig client
+                start
+  * example   - Example value
 -->
 
 <!-- Identity properties -->
- <property name="Rig_Name" stanza="identity" mandatory="yes" type="String" restart="yes"
+ <property name="Rig_Name" stanza="identity" mandatory="yes" type="STRING" restart="yes"
  		example="Inclined_Plane_1" format="&lt;String&gt;" default="">
 Uniquely identifies a rig within the remote laboratory. It is suggested
 the name take the form of words separated by an underscore character.
  </property>
- <property name="Rig_Type" stanza="identity" mandatory="yes" type="String" restart="yes"
+ <property name="Rig_Type" stanza="identity" mandatory="yes" type="STRING" restart="yes"
  		example="Inclined_Plane" format="&lt;String&gt;" default="">
 Identifies the rig as an identical configuration of the same software and hardware. This means any 
 any rig can be used in place of any other rig in the same type.
  </property>
- <property name="Rig_Capabilites" stanza="identity" mandatory="yes" type="String" restart="yes"
+ <property name="Rig_Capabilites" stanza="identity" mandatory="yes" type="STRING" restart="yes"
  		example="physics,static_friction,dynamic_friction" format="&lt;String&gt;,...,&lt;String&gt;" default="">
 Provides a list of identifying tags which may be used to correlate similar rigs in to 
 pulls of rigs to queue or book against.
  </property>
- <property name="Rig_Class" stanza="identity" mandatory="yes" type="String" restart="yes"
+ <property name="Rig_Class" stanza="identity" mandatory="yes" type="STRING" restart="yes"
  		example="" format="[au.edu.uts.eng.remotelabs.rig.ConfiguredRig] | [au.edu.uts.eng.remotelabs.rig.ConfiguredControlledRig] | &lt;String&gt;"
  		default="">
 Qualified class name of rig type class implementing rig client required methods. 
@@ -55,43 +56,43 @@ stanza of this file.&lt;li&gt;
  </property>
 
 <!-- Scheduling Server properties -->
-<property name="Scheduling_Server_Address" stanza="schedserver" mandatory="yes" type="String" restart="yes"
+<property name="Scheduling_Server_Address" stanza="schedserver" mandatory="yes" type="STRING" restart="yes"
 		example="localhost" format="&lt;String&gt;" default="">
 Address of scheduling server.  This can be an IP address or host name of the scheduling server.
 </property>
-<property name="Scheduling_Server_Port" stanza="schedserver" mandatory="yes" type="Integer" example="8080" restart="yes"
+<property name="Scheduling_Server_Port" stanza="schedserver" mandatory="yes" type="INTEGER" example="8080" restart="yes"
 		format="&lt;int&gt;" default="">
 Port the scheduling server is listening on.
 </property>
-<property name="Scheduling_Server_Update_Period" stanza="schedserver" mandatory="no" type="Integer" restart="yes"
+<property name="Scheduling_Server_Update_Period" stanza="schedserver" mandatory="no" type="INTEGER" restart="yes"
 		example="30" format="&lt;30&gt;" default="30">
 The time in seconds between sending status updates from the rig client to scheduling server.
 </property>
 
 <!-- Rig Client server -->
-<property name="Rig_Client_IP_Address" stanza="server" mandatory="no" type="String" example="127.0.0.1" restart="yes"
+<property name="Rig_Client_IP_Address" stanza="server" mandatory="no" type="STRING" example="127.0.0.1" restart="yes"
 		format="[&lt;IP&gt;|Empty]" default="">
 The address of the machine the rig client is running on. This is needed if the rig client machine has multiple network
 interfaces and you want to ensure the external IP address is transmitted as the communication address. If left empty,
 the address of the first iterated network device is used.
 </property>
-<property name="Listening_Network_Interface" stanza="server" mandatory="no" type="String" example="eth0" restart="yes"
+<property name="Listening_Network_Interface" stanza="server" mandatory="no" type="STRING" example="eth0" restart="yes"
 		format="[&lt;String&gt;|Empty]" default="">
 The name of the network interface the rig client is listening on. This is needed if the rig client machine has multiple 
 network interfaces and you want to ensure a specific network interface is used. This may be used in preference to the 
 'Rig_Client_IP_Address' property as it allows a specific network interface to be used while still detecting the IP 
 address at runtime (to support DHCP).
 </property>
-<property name="Listening_Port" stanza="server" mandatory="yes" type="Integer" example="8080" restart="yes"
+<property name="Listening_Port" stanza="server" mandatory="yes" type="INTEGER" example="8080" restart="yes"
 		format="&lt;int&gt;" default="">
 The TCP port the rig client is to listen for communication requests.
 </property>
-<property name="Concurrent_Requests" stanza="server" mandatory="yes" type="Integer" restart="yes"
+<property name="Concurrent_Requests" stanza="server" mandatory="yes" type="INTEGER" restart="yes"
 		example="10" format="&lt;int&gt;" default="50">
 The number of concurrent requests the rig client can service. If there are more than this number of requests, the extra 
 requests are queued.
 </property>
-<property name="Action_Failure_Threshold" stanza="server" mandatory="no" type="Integer" restart="yes"
+<property name="Action_Failure_Threshold" stanza="server" mandatory="no" type="INTEGER" restart="yes"
 		example="3" format="&lt;int&gt;" default="3">
 The threshold indicating how many times a action can fail before the rig is put off line.
 </property>

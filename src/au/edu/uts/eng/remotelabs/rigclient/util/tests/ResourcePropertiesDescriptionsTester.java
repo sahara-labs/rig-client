@@ -33,32 +33,34 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @author <First> <Last> (mdiponio)
- * @date <Day> <Month> 2010
- *
- * Changelog:
- * - 11/06/2010 - mdiponio - Initial file creation.
+ * @author Michael Diponio (mdiponio)
+ * @date 14th September 2010
  */
 package au.edu.uts.eng.remotelabs.rigclient.util.tests;
 
 import java.util.List;
 
 import junit.framework.TestCase;
-import au.edu.uts.eng.remotelabs.rigclient.util.PropertyDescriptions;
-import au.edu.uts.eng.remotelabs.rigclient.util.PropertyDescriptions.Property;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions.Property;
+import au.edu.uts.eng.remotelabs.rigclient.util.ResourcePropertiesDescriptions;
 
 /**
- * 
+ * Tests the {@link ResourcePropertiesDescriptions} class.
  */
-public class PropertyDescriptionsTester extends TestCase
+public class ResourcePropertiesDescriptionsTester extends TestCase
 {
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertyDescriptions#getPropertyDescriptions()}.
-     */
+    /** Object of class under test. */
+    private ResourcePropertiesDescriptions pd;
+    
+    @Override
+    public void setUp() throws Exception
+    {
+        this.pd = new ResourcePropertiesDescriptions();
+    }
+    
     public void testGetPropertyDescriptions()
     {
-        PropertyDescriptions pd = new PropertyDescriptions();
-        List<Property> descs = pd.getPropertyDescriptions();
+        List<Property> descs = this.pd.getPropertyDescriptions();
         assertNotNull(descs);
         assertTrue(descs.size() > 0);
         for (Property p : descs)
