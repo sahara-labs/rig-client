@@ -54,6 +54,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatusResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetConfig;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetConfigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable;
@@ -66,6 +68,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveContro
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfig;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenanceResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetTestInterval;
@@ -198,5 +202,19 @@ public interface RigClientServiceSkeletonInterface
      */
     public IsActivityDetectableResponse isActivityDetectable(IsActivityDetectable isActivityDetectable);
     
+    /**
+     * Request to get all the configuration properties and their information
+     * 
+     * @param configRequest request parameters
+     * @return configuration response
+     */
+    public GetConfigResponse getConfig(GetConfig configRequest);
     
+    /**
+     * Request to change the value of configuration properties.
+     * 
+     * @param configRequest request parameters
+     * @return operation response
+     */
+    public SetConfigResponse setConfig(SetConfig configRequest);
 }

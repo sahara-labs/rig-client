@@ -51,7 +51,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -71,6 +70,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatusResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetConfig;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetConfigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable;
@@ -83,6 +84,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveContro
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfig;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenanceResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetTestInterval;
@@ -255,6 +258,26 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
                     abortBatchResponse = serviceImpl.abortBatchControl(wrappedParam);
                     envelope = this.toEnvelope(this.getSOAPFactory(msgContext), abortBatchResponse, false);
                 }
+                else if ("getConfig".equals(methodName))
+                {
+                    GetConfigResponse getConfigResponse = null;
+                    final GetConfig wrappedParam = (GetConfig) this.fromOM(
+                            msgContext.getEnvelope().getBody().getFirstElement(), GetConfig.class, 
+                            this.getEnvelopeNamespaces(msgContext.getEnvelope()));
+                    
+                    getConfigResponse = serviceImpl.getConfig(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), getConfigResponse, false);
+                }
+                else if ("setConfig".equals(methodName))
+                {
+                    SetConfigResponse setConfigResponse = null;
+                    final SetConfig wrappedParam = (SetConfig) this.fromOM(
+                            msgContext.getEnvelope().getBody().getFirstElement(), SetConfig.class,
+                            this.getEnvelopeNamespaces(msgContext.getEnvelope()));
+                    
+                    setConfigResponse = serviceImpl.setConfig(wrappedParam);
+                    envelope = this.toEnvelope(this.getSOAPFactory(msgContext), setConfigResponse, false);
+                }
                 else
                 {
                     throw new RuntimeException("method not found");
@@ -268,379 +291,14 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         }
     }
 
-    @SuppressWarnings("unused")
-    private OMElement toOM(PerformPrimitiveControl param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(PerformPrimitiveControl.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(PerformPrimitiveControlResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(PerformPrimitiveControlResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(GetBatchControlStatus param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(GetBatchControlStatus.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(GetBatchControlStatusResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(GetBatchControlStatusResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(IsActivityDetectable param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(IsActivityDetectable.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(IsActivityDetectableResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(IsActivityDetectableResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(GetAttribute param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(GetAttribute.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(GetAttributeResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(GetAttributeResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(SlaveRelease param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(SlaveRelease.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(SlaveReleaseResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(SlaveReleaseResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(Release param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(Release.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(ReleaseResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(ReleaseResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(Notify param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(Notify.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(NotifyResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(NotifyResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(SetTestInterval param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(SetTestInterval.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(SetTestIntervalResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(SetTestIntervalResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(SetMaintenance param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(SetMaintenance.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(SetMaintenanceResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(SetMaintenanceResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(PerformBatchControl param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(PerformBatchControl.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(PerformBatchControlResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(PerformBatchControlResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(GetStatus param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(GetStatus.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(GetStatusResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(GetStatusResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(Allocate param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(Allocate.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(AllocateResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(AllocateResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(SlaveAllocate param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(SlaveAllocate.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(SlaveAllocateResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(SlaveAllocateResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(AbortBatchControl param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(AbortBatchControl.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private OMElement toOM(AbortBatchControlResponse param, boolean optimizeContent) throws AxisFault
-    {
-        try
-        {
-            return param.getOMElement(AbortBatchControlResponse.MY_QNAME, OMAbstractFactory.getOMFactory());
-        }
-        catch (final ADBException e)
-        {
-            throw AxisFault.makeFault(e);
-        }
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, PerformPrimitiveControlResponse param, boolean optimizeContent)
             throws AxisFault
     {
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(PerformPrimitiveControlResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
@@ -649,35 +307,20 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         }
     }
 
-    @SuppressWarnings("unused")
-    private PerformPrimitiveControlResponse wrapperformPrimitiveControl()
-    {
-        final PerformPrimitiveControlResponse wrappedElement = new PerformPrimitiveControlResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, GetBatchControlStatusResponse param, boolean optimizeContent)
             throws AxisFault
     {
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(GetBatchControlStatusResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
         {
             throw AxisFault.makeFault(e);
         }
-    }
-
-    @SuppressWarnings("unused")
-    private GetBatchControlStatusResponse wrapgetBatchControlStatus()
-    {
-        final GetBatchControlStatusResponse wrappedElement = new GetBatchControlStatusResponse();
-        return wrappedElement;
     }
 
     private SOAPEnvelope toEnvelope(SOAPFactory factory, IsActivityDetectableResponse param, boolean optimizeContent)
@@ -686,22 +329,13 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(IsActivityDetectableResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
         {
             throw AxisFault.makeFault(e);
         }
-    }
-
-    @SuppressWarnings("unused")
-    private IsActivityDetectableResponse wrapisActivityDetectable()
-    {
-        final IsActivityDetectableResponse wrappedElement = new IsActivityDetectableResponse();
-        return wrappedElement;
     }
 
     private SOAPEnvelope toEnvelope(SOAPFactory factory, GetAttributeResponse param, boolean optimizeContent)
@@ -710,9 +344,7 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(GetAttributeResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
@@ -720,23 +352,14 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
             throw AxisFault.makeFault(e);
         }
     }
-
-    @SuppressWarnings("unused")
-    private GetAttributeResponse wrapgetAttribute()
-    {
-        final GetAttributeResponse wrappedElement = new GetAttributeResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, SlaveReleaseResponse param, boolean optimizeContent)
             throws AxisFault
     {
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(SlaveReleaseResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
@@ -745,22 +368,14 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         }
     }
 
-    @SuppressWarnings("unused")
-    private SlaveReleaseResponse wrapslaveRelease()
-    {
-        final SlaveReleaseResponse wrappedElement = new SlaveReleaseResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, ReleaseResponse param, boolean optimizeContent)
             throws AxisFault
     {
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(ReleaseResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
@@ -768,23 +383,14 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
             throw AxisFault.makeFault(e);
         }
     }
-
-    @SuppressWarnings("unused")
-    private ReleaseResponse wraprelease()
-    {
-        final ReleaseResponse wrappedElement = new ReleaseResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, NotifyResponse param, boolean optimizeContent)
             throws AxisFault
     {
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(NotifyResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
@@ -792,23 +398,14 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
             throw AxisFault.makeFault(e);
         }
     }
-
-    @SuppressWarnings("unused")
-    private NotifyResponse wrapnotify()
-    {
-        final NotifyResponse wrappedElement = new NotifyResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, SetTestIntervalResponse param, boolean optimizeContent)
             throws AxisFault
     {
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(SetTestIntervalResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
@@ -816,23 +413,14 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
             throw AxisFault.makeFault(e);
         }
     }
-
-    @SuppressWarnings("unused")
-    private SetTestIntervalResponse wrapsetTestInterval()
-    {
-        final SetTestIntervalResponse wrappedElement = new SetTestIntervalResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, SetMaintenanceResponse param, boolean optimizeContent)
             throws AxisFault
     {
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(SetMaintenanceResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
@@ -840,23 +428,14 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
             throw AxisFault.makeFault(e);
         }
     }
-
-    @SuppressWarnings("unused")
-    private SetMaintenanceResponse wrapsetMaintenance()
-    {
-        final SetMaintenanceResponse wrappedElement = new SetMaintenanceResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, PerformBatchControlResponse param, boolean optimizeContent)
             throws AxisFault
     {
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(PerformBatchControlResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
@@ -865,13 +444,7 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         }
     }
 
-    @SuppressWarnings("unused")
-    private PerformBatchControlResponse wrapperformBatchControl()
-    {
-        final PerformBatchControlResponse wrappedElement = new PerformBatchControlResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, GetStatusResponse param, boolean optimizeContent)
             throws AxisFault
     {
@@ -887,22 +460,14 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         }
     }
 
-    @SuppressWarnings("unused")
-    private GetStatusResponse wrapgetStatus()
-    {
-        final GetStatusResponse wrappedElement = new GetStatusResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, AllocateResponse param, boolean optimizeContent)
             throws AxisFault
     {
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(AllocateResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
@@ -911,22 +476,14 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         }
     }
 
-    @SuppressWarnings("unused")
-    private AllocateResponse wrapallocate()
-    {
-        final AllocateResponse wrappedElement = new AllocateResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, SlaveAllocateResponse param, boolean optimizeContent)
             throws AxisFault
     {
         try
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
             emptyEnvelope.getBody().addChild(param.getOMElement(SlaveAllocateResponse.MY_QNAME, factory));
-
             return emptyEnvelope;
         }
         catch (final ADBException e)
@@ -934,14 +491,7 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
             throw AxisFault.makeFault(e);
         }
     }
-
-    @SuppressWarnings("unused")
-    private SlaveAllocateResponse wrapslaveAllocate()
-    {
-        final SlaveAllocateResponse wrappedElement = new SlaveAllocateResponse();
-        return wrappedElement;
-    }
-
+    
     private SOAPEnvelope toEnvelope(SOAPFactory factory, AbortBatchControlResponse param, boolean optimizeContent)
             throws AxisFault
     {
@@ -956,20 +506,39 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
             throw AxisFault.makeFault(e);
         }
     }
-
-    @SuppressWarnings("unused")
-    private AbortBatchControlResponse wrapabortBatchControl()
+    
+    private SOAPEnvelope toEnvelope(SOAPFactory factory, GetConfigResponse param, boolean optimizeContent) 
+        throws AxisFault
     {
-        final AbortBatchControlResponse wrappedElement = new AbortBatchControlResponse();
-        return wrappedElement;
+        try
+        {
+            final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+            emptyEnvelope.getBody().addChild(param.getOMElement(GetConfigResponse.MY_QNAME, factory));
+            return emptyEnvelope;
+        }
+        catch (final ADBException e)
+        {
+            throw AxisFault.makeFault(e);
+        }
     }
 
-    @SuppressWarnings("unused")
-    private SOAPEnvelope toEnvelope(SOAPFactory factory)
+    private SOAPEnvelope toEnvelope(SOAPFactory factory, SetConfigResponse param, boolean optimizeContent) 
+        throws AxisFault
     {
-        return factory.getDefaultEnvelope();
+        try
+        {
+            final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+            emptyEnvelope.getBody().addChild(param.getOMElement(SetConfigResponse.MY_QNAME, factory));
+            return emptyEnvelope;
+        }
+        catch (final ADBException e)
+        {
+            throw AxisFault.makeFault(e);
+        }
     }
 
+
+    
     @SuppressWarnings("rawtypes")
     private Object fromOM(OMElement param, Class type, Map<String, String> extraNamespaces) throws AxisFault
     {
@@ -1054,6 +623,18 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
 
             if (AbortBatchControlResponse.class.equals(type))
                 return AbortBatchControlResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            
+            if (GetConfig.class.equals(type))
+                return GetConfig.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            
+            if (GetConfigResponse.class.equals(type))
+                return GetConfigResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            
+            if (SetConfig.class.equals(type))
+                return SetConfig.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            
+            if (SetConfigResponse.class.equals(type))
+                return SetConfigResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
         }
         catch (final Exception e)
         {
@@ -1073,21 +654,5 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
             returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
         }
         return returnMap;
-    }
-
-    @SuppressWarnings("unused")
-    private AxisFault createAxisFault(Exception e)
-    {
-        AxisFault f;
-        final Throwable cause = e.getCause();
-        if (cause != null)
-        {
-            f = new AxisFault(e.getMessage(), cause);
-        }
-        else
-        {
-            f = new AxisFault(e.getMessage());
-        }
-        return f;
     }
 }

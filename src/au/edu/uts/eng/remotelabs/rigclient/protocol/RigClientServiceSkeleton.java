@@ -56,6 +56,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatusResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetConfig;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetConfigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable;
@@ -71,6 +73,8 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveContro
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfig;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenanceResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetTestInterval;
@@ -243,5 +247,21 @@ public class RigClientServiceSkeleton implements RigClientServiceSkeletonInterfa
         this.logger.info("Activity detection operation called.");
         throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName()
                 + "#isActivityDectectable");
+    }
+
+    @Override
+    public GetConfigResponse getConfig(GetConfig configRequest)
+    {
+        this.logger.info("Get configuration operation called.");
+        throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName() + 
+                "#getConfig");
+    }
+
+    @Override
+    public SetConfigResponse setConfig(SetConfig configRequest)
+    {
+        this.logger.info("Set configuration operation called");
+        throw new UnsupportedOperationException("Skeleton implementation of " + this.getClass().getName() +
+                "#setConfig");
     }
 }
