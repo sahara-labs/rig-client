@@ -39,8 +39,7 @@ Changelog:
 <wsdl:definitions xmlns:rigclient="http://remotelabs.eng.uts.edu.au/rigclient/protocol" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="RigClientService" targetNamespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
   <wsdl:types>
     <xsd:schema targetNamespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
-            <xsd:include schemaLocation=""></xsd:include>
-            <xsd:element name="allocate" type="rigclient:UserType">
+      <xsd:element name="allocate" type="rigclient:UserType">
       </xsd:element>
       <xsd:element name="allocateResponse"
       	type="rigclient:OperationResponseType">
@@ -577,9 +576,9 @@ Changelog:
   <wsdl:message name="setConfigResponse">
   	<wsdl:part name="parameters" element="rigclient:setConfigResponse"></wsdl:part>
   </wsdl:message>
+
   <wsdl:portType name="RigClientService">
     <wsdl:operation name="allocate">
-      <wsdl:documentation>Allocates a user to a rig (i.e. this starts a session)</wsdl:documentation>
       <wsdl:input message="rigclient:allocateRequest"/>
       <wsdl:output message="rigclient:allocateResponse"/>
     </wsdl:operation>
@@ -644,8 +643,11 @@ Changelog:
     	<wsdl:output message="rigclient:setConfigResponse"></wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
+  
   <wsdl:binding name="RigClientServiceSOAP"
   	type="rigclient:RigClientService">
+
+  	<!-- Allocate user operation. -->
   	<soap:binding style="document"
   		transport="http://schemas.xmlsoap.org/soap/http" />
   	<wsdl:operation name="allocate">
@@ -658,6 +660,8 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Release user operation. -->
   	<wsdl:operation name="release">
   		<soap:operation
   			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/release" />
@@ -668,6 +672,8 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Slave user allocate operation. -->
   	<wsdl:operation name="slaveAllocate">
   		<soap:operation
   			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/slaveAllocate" />
@@ -678,6 +684,8 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Slave user release operation. -->
   	<wsdl:operation name="slaveRelease">
   		<soap:operation
   			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/slaveRelease" />
@@ -688,6 +696,8 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Session notification operation. -->
   	<wsdl:operation name="notify">
   		<soap:operation
   			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/notify" />
@@ -698,9 +708,11 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Batch control operation. -->
   	<wsdl:operation name="performBatchControl">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/batch" />
+			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/performBatchControl" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -708,9 +720,11 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Primitive control operation. -->
   	<wsdl:operation name="performPrimitiveControl">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/primitiveControl" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/performPrimitiveControl" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -718,6 +732,8 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Get rig attribute operation. -->
   	<wsdl:operation name="getAttribute">
   		<soap:operation
   			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/getAttribute" />
@@ -728,6 +744,8 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Get rig status operation. -->
   	<wsdl:operation name="getStatus">
   		<soap:operation
   			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/getStatus" />
@@ -738,9 +756,11 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Set rig maintenance operation. -->
   	<wsdl:operation name="setMaintenance">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/maintenance" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/setMaintenance" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -748,9 +768,11 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Set exerciser test interval operation. -->
   	<wsdl:operation name="setTestInterval">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/testInterval" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/setTestInterval" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -758,9 +780,11 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Abort batch control operation. -->
   	<wsdl:operation name="abortBatchControl">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/batchAbort" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/abortBatchControl" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -768,9 +792,11 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Batch control status operation. -->
   	<wsdl:operation name="getBatchControlStatus">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/batchStatus" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/getBatchControlStatus" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -778,6 +804,8 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Activity detection operation. -->
   	<wsdl:operation name="isActivityDetectable">
   		<soap:operation
   			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/isActivityDetectable" />
@@ -788,9 +816,11 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Get configuration operation. -->
   	<wsdl:operation name="getConfig">
   		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/protocol/getConfig" />
+  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/getConfig" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -798,17 +828,19 @@ Changelog:
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+
+  	<!-- Set configuration operation. -->
   	<wsdl:operation name="setConfig">
-  		<soap:operation
-  			soapAction="http://remotelabs.eng.uts.edu.au/rigclient/protocol/setConfig" />
-  		<wsdl:input>
-  			<soap:body use="literal" />
-  		</wsdl:input>
+            <soap:operation soapAction="http://remotelabs.eng.uts.edu.au/rigclient/setConfig"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
   		<wsdl:output>
-  			<soap:body use="literal" />
-  		</wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
   	</wsdl:operation>
   </wsdl:binding>
+  
   <wsdl:service name="RigClientService">
     <wsdl:port binding="rigclient:RigClientServiceSOAP" name="RigClientServiceSOAP">
       <soap:address location="http://remotelabs.eng.uts.edu.au:8080/rigclient"/>
