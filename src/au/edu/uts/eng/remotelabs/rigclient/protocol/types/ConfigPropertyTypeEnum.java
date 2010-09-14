@@ -70,6 +70,8 @@ public class ConfigPropertyTypeEnum implements ADBBean
     public static final QName MY_QNAME = new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol", "type_type3",
             "ns1");
     
+    private static HashMap<String, ConfigPropertyTypeEnum> _table_ = new HashMap<String, ConfigPropertyTypeEnum>();
+    
     public static final String _STRING = ConverterUtil.convertToString("STRING");
     public static final String _INTEGER = ConverterUtil.convertToString("INTEGER");
     public static final String _FLOAT = ConverterUtil.convertToString("FLOAT");
@@ -93,10 +95,8 @@ public class ConfigPropertyTypeEnum implements ADBBean
         return BeanUtil.getUniquePrefix();
     }
 
-    
-
     protected String type;
-    private static HashMap<String, ConfigPropertyTypeEnum> _table_ = new HashMap<String, ConfigPropertyTypeEnum>();
+    
 
     protected ConfigPropertyTypeEnum(final String value, final boolean isRegisterValue)
     {
