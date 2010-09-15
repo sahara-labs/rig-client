@@ -62,6 +62,9 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AttributeResponseTypeC
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchState;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchStatusResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ConfigPropertyType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ConfigPropertyTypeEnum;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ConfigResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ErrorType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
@@ -87,6 +90,7 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlRespon
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfig;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfigRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenanceResponse;
@@ -111,6 +115,8 @@ import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions.Property;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -1050,6 +1056,93 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         detect.setActivity(this.rig.isActivityDetected());
         return response;
     }
+    
+    @Override
+    public GetConfigResponse getConfig(GetConfig configRequest)
+    {
+        this.logger.debug("Received get configuration request.");
+        
+        GetConfigResponse response = new GetConfigResponse();
+        ConfigResponseType param = new ConfigResponseType();
+        response.setGetConfigResponse(param);
+        
+        IConfigDescriptions desc = ConfigFactory.getDescriptions();
+        for (Entry<String, String> e : this.config.getAllProperties().entrySet())
+        {
+            ConfigPropertyType c = new ConfigPropertyType();
+            param.addConfig(c);
+            c.setKey(e.getKey());
+            c.setValue(e.getValue());
+            
+            Property p = desc.getPropertyDescription(e.getKey());
+            if (p == null) continue;
+            
+            c.setDefault(p.getDefaultValue());
+            c.setDescription(p.getDescription());
+            c.setExample(p.getExample());
+            c.setFormat(p.getFormat());
+            c.setRestart(p.needsRestart());
+            c.setStanza(p.getStanza());
+            
+            switch (p.getType())
+            {
+                case INTEGER:
+                    c.setType(ConfigPropertyTypeEnum.INTEGER);
+                    break;
+                case FLOAT:
+                    c.setType(ConfigPropertyTypeEnum.FLOAT);
+                    break;
+                case BOOLEAN:
+                    c.setType(ConfigPropertyTypeEnum.BOOLEAN);
+                    break;
+                case CHAR:
+                    c.setType(ConfigPropertyTypeEnum.CHAR);
+                    break;
+                case STRING:
+                default:
+                    c.setType(ConfigPropertyTypeEnum.STRING);
+                    break;
+            }
+        }
+        
+        return response;
+    }
+
+    @Override
+    public SetConfigResponse setConfig(SetConfig configRequest)
+    {
+        /* Request parameters. */
+        SetConfigRequestType request = configRequest.getSetConfig();
+        ConfigPropertyType property = request.getConfig();
+        this.logger.debug("Received set configuration request with parameters: property=" + property.getKey() + 
+                ", value=" + property.getValue() + '.');
+        
+        /* Response parameters. */
+        SetConfigResponse response = new SetConfigResponse();
+        OperationResponseType opResp = new OperationResponseType();
+        response.setSetConfigResponse(opResp);
+        
+        if (this.isSourceAuthenticated(request.getIdentityToken()))
+        {
+            this.logger.info("Changing the value of property '" + property.getKey() + "' to '" + property.getValue() + "'.");
+            opResp.setSuccess(true);
+            this.config.setProperty(property.getKey(), property.getValue());
+            this.config.serialise();
+        }
+        else
+        {
+            this.logger.error("Unable to change to the value of property " + property.getKey() + " because the " +
+                    "request could not be authenticated. Check the rig client registration.");
+            opResp.setSuccess(false);
+            ErrorType err = new ErrorType();
+            opResp.setError(err);
+            err.setCode(3);
+            err.setReason("Not authenticated to change configuration properties.");
+            err.setOperation("Changing value of property " + property.getKey());
+        }
+        
+        return response;
+    }
 
     /**
      * If the source is the scheduling server that is currently registered.
@@ -1078,25 +1171,5 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         
         return false;
-    }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#getConfig(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetConfig)
-     */
-    @Override
-    public GetConfigResponse getConfig(GetConfig configRequest)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceSkeletonInterface#setConfig(au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfig)
-     */
-    @Override
-    public SetConfigResponse setConfig(SetConfig configRequest)
-    {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

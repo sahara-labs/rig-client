@@ -41,7 +41,10 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.protocol.tests;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,11 +75,15 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.AuthRequiredRequestTyp
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchState;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.BatchStatusResponseType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ConfigPropertyType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ConfigResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ErrorType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttributeResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetBatchControlStatusResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetConfig;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetConfigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatus;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.IsActivityDetectable;
@@ -121,6 +128,8 @@ import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions.Property;
 import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
 
 /**
@@ -1871,10 +1880,145 @@ public class RigClientServiceTester extends TestCase
     {
         IsActivityDetectable request = new IsActivityDetectable();
         request.setIsActivityDetectable(new NullType());
-        
+      
         IsActivityDetectableResponse resp = this.service.isActivityDetectable(request);
         assertNotNull(resp);
         assertFalse(resp.getIsActivityDetectableResponse().getActivity());
+    }
+    
+    public void testGetConfig()
+    {
+        GetConfig request = new GetConfig();
+        NullType nll = new NullType();
+        request.setGetConfig(nll);
+        
+        GetConfigResponse resp = this.service.getConfig(request);
+        assertNotNull(resp);
+        
+        ConfigResponseType type = resp.getGetConfigResponse();
+        assertNotNull(type);
+        
+        ConfigPropertyType conf[] = type.getConfig();
+        assertNotNull(conf);
+        assertTrue(conf.length > 0);
+        
+        boolean res = false, ty = false, form = false, ex = false, def = false, des = false, st = false;
+        
+        for (ConfigPropertyType c : conf)
+        {
+            assertNotNull(c.getKey());
+            assertNotNull(c.getValue());
+            
+            if (c.getType() != null) ty = true;
+            if (c.getRestart()) ty = true;
+            if (c.getDefault() != null) def = true;
+            if (c.getDescription() != null) def = true;
+            if (c.getExample() != null) ex = true;
+            if (c.getFormat() != null) form = true;
+            if (c.getStanza() != null) st = true;
+        }
+        
+        assertTrue(res);
+        assertTrue(ty);
+        assertTrue(form);
+        assertTrue(ex);
+        assertTrue(def);
+        assertTrue(des);
+        assertTrue(st);
+    }
+    
+    public void testGetConfigSpecificProps() throws Exception
+    {
+        Map<String, String> map = new HashMap<String, String>();
+        for (int i = 1; i <= 10; i++)
+        {
+            map.put("Key" + i, "Value" + i);
+        }
+        
+        IConfig conf = createMock(IConfig.class);
+        expect(conf.getAllProperties()).andReturn(map);
+        
+        IConfigDescriptions des = createMock(IConfigDescriptions.class);
+        for (int i = 1; i <= 5; i++)
+        {
+            String ty;
+            if (i == 1) ty = "STRING";
+            else if (i == 2) ty = "INTEGER";
+            else if (i == 3) ty = "FLOAT";
+            else if (i == 4) ty = "BOOLEAN";
+            else ty = "CHAR";
+            
+            expect(des.getPropertyDescription("Key" + i)).andReturn(new Property("Key" + i, "stanza", true, 
+                    ty, "foo,<string>,bar", "default", true, "example", "This a core property to set..."));
+        }
+        
+        for (int i = 6; i <= 10; i++)
+        {
+            expect(des.getPropertyDescription("Key" + i)).andReturn(null);
+        }
+        
+        replay(conf);
+        replay(des);
+        
+        Field f = ConfigFactory.class.getDeclaredField("instance");
+        f.setAccessible(true);
+        f.set(null, conf);
+        f = ConfigFactory.class.getDeclaredField("descriptions");
+        f.setAccessible(true);
+        f.set(null, des);
+        
+        GetConfig request = new GetConfig();
+        request.setGetConfig(new NullType());
+        
+        GetConfigResponse response = this.service.getConfig(request);
+        assertNotNull(response);
+        
+        ConfigResponseType type = response.getGetConfigResponse();
+        assertNotNull(type);
+        
+        ConfigPropertyType config[] = type.getConfig();
+        assertNotNull(config);
+        
+        assertEquals(10, config.length);
+        
+        for (int i = 1; i <= 5; i++)
+        {
+            ConfigPropertyType c = config[i - 1];
+            assertEquals("Key" + i, c.getKey());
+            assertEquals("Value" + i, c.getValue());
+            assertEquals("stanza", c.getStanza());
+            assertEquals("foo,<string>,bar", c.getFormat());
+            assertEquals("defaut", c.getDefault());
+            assertTrue(c.getRestart());
+            assertEquals("example", c.getExample());
+            assertEquals("This is a core property to set...", c.getDescription());
+        }
+        
+        for (int i = 6; i <= 10; i++)
+        {
+            ConfigPropertyType c = config[i - 1];
+            assertEquals("Key" + i, c.getKey());
+            assertEquals("Value" + i, c.getValue());
+            assertNull(c.getType());
+            assertNull(c.getDefault());
+            assertNull(c.getDescription());
+            assertNull(c.getExample());
+            assertNull(c.getStanza());
+            assertNull(c.getFormat());
+        }
+        
+        verify(conf);
+        verify(des); 
+    }
+    
+    public void testSetConfig()
+    {
+        // TODO
+    }
+    
+    public void testSetConfigNoProperty()
+    {
+        // TODO
     }
     
     private void recusiveDelete(final File file) throws IOException
@@ -1904,7 +2048,9 @@ public class RigClientServiceTester extends TestCase
                 }
             }
         }
-        
+
+        assertTrue(this.rig.assign("tmachet"));
+        assertTrue(this.rig.addSlave("mdiponio", true));
         file.delete();
     }
 }
