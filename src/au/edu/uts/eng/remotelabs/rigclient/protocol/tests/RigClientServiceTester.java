@@ -43,6 +43,7 @@ package au.edu.uts.eng.remotelabs.rigclient.protocol.tests;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
@@ -103,6 +104,9 @@ import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlReques
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.PrimitiveControlResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.Release;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.ReleaseResponse;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfig;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfigRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetConfigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenance;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetMaintenanceResponse;
 import au.edu.uts.eng.remotelabs.rigclient.protocol.types.SetTestInterval;
@@ -1910,9 +1914,9 @@ public class RigClientServiceTester extends TestCase
             assertNotNull(c.getValue());
             
             if (c.getType() != null) ty = true;
-            if (c.getRestart()) ty = true;
+            if (c.getRestart()) res = true;
             if (c.getDefault() != null) def = true;
-            if (c.getDescription() != null) def = true;
+            if (c.getDescription() != null) des = true;
             if (c.getExample() != null) ex = true;
             if (c.getFormat() != null) form = true;
             if (c.getStanza() != null) st = true;
@@ -1930,7 +1934,7 @@ public class RigClientServiceTester extends TestCase
     public void testGetConfigSpecificProps() throws Exception
     {
         Map<String, String> map = new HashMap<String, String>();
-        for (int i = 1; i <= 10; i++)
+        for (int i = 1; i <= 9; i++)
         {
             map.put("Key" + i, "Value" + i);
         }
@@ -1949,10 +1953,10 @@ public class RigClientServiceTester extends TestCase
             else ty = "CHAR";
             
             expect(des.getPropertyDescription("Key" + i)).andReturn(new Property("Key" + i, "stanza", true, 
-                    ty, "foo,<string>,bar", "default", true, "example", "This a core property to set..."));
+                    ty, "foo,<string>,bar", "default", true, "example", "This is a core property to set..."));
         }
         
-        for (int i = 6; i <= 10; i++)
+        for (int i = 6; i <= 9; i++)
         {
             expect(des.getPropertyDescription("Key" + i)).andReturn(null);
         }
@@ -1960,9 +1964,9 @@ public class RigClientServiceTester extends TestCase
         replay(conf);
         replay(des);
         
-        Field f = ConfigFactory.class.getDeclaredField("instance");
+        Field f = RigClientService.class.getDeclaredField("config");
         f.setAccessible(true);
-        f.set(null, conf);
+        f.set(this.service, conf);
         f = ConfigFactory.class.getDeclaredField("descriptions");
         f.setAccessible(true);
         f.set(null, des);
@@ -1978,25 +1982,31 @@ public class RigClientServiceTester extends TestCase
         
         ConfigPropertyType config[] = type.getConfig();
         assertNotNull(config);
+        assertEquals(9, config.length);
         
-        assertEquals(10, config.length);
+        /* Order the rig. */
+        ConfigPropertyType ordered[] = new ConfigPropertyType[9];
+        for (ConfigPropertyType c : config)
+        {
+            ordered[Integer.parseInt(c.getKey().substring(c.getKey().length() - 1)) - 1] = c;
+        }
         
         for (int i = 1; i <= 5; i++)
         {
-            ConfigPropertyType c = config[i - 1];
+            ConfigPropertyType c = ordered[i - 1];
             assertEquals("Key" + i, c.getKey());
             assertEquals("Value" + i, c.getValue());
             assertEquals("stanza", c.getStanza());
             assertEquals("foo,<string>,bar", c.getFormat());
-            assertEquals("defaut", c.getDefault());
+            assertEquals("default", c.getDefault());
             assertTrue(c.getRestart());
             assertEquals("example", c.getExample());
             assertEquals("This is a core property to set...", c.getDescription());
         }
         
-        for (int i = 6; i <= 10; i++)
+        for (int i = 6; i <= 9; i++)
         {
-            ConfigPropertyType c = config[i - 1];
+            ConfigPropertyType c = ordered[i - 1];
             assertEquals("Key" + i, c.getKey());
             assertEquals("Value" + i, c.getValue());
             assertNull(c.getType());
@@ -2011,14 +2021,37 @@ public class RigClientServiceTester extends TestCase
         verify(des); 
     }
     
-    public void testSetConfig()
+    public void testSetConfig() throws Exception
     {
-        // TODO
-    }
-    
-    public void testSetConfigNoProperty()
-    {
-        // TODO
+        IConfig conf = createMock(IConfig.class);
+        conf.setProperty("Rig_Name", "foobar");
+        expectLastCall();
+        conf.serialise();
+        expectLastCall();
+        replay(conf);
+        
+        Field f = RigClientService.class.getDeclaredField("config");
+        f.setAccessible(true);
+        f.set(this.service, conf);
+
+        SetConfig request = new SetConfig();
+        SetConfigRequestType req = new SetConfigRequestType();
+        request.setSetConfig(req);
+        req.setIdentityToken("abc123");
+        ConfigPropertyType prop = new ConfigPropertyType();
+        req.setConfig(prop);
+        prop.setKey("Rig_Name");
+        prop.setValue("foobar");
+        
+        SetConfigResponse resp = this.service.setConfig(request);
+        assertNotNull(resp);
+        OperationResponseType op = resp.getSetConfigResponse();
+        assertNotNull(op);
+        
+        assertTrue(op.getSuccess());
+        assertNull(op.getError());
+       
+        verify(conf);
     }
     
     private void recusiveDelete(final File file) throws IOException

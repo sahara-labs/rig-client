@@ -111,6 +111,7 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
             {
                 this.logger.error("Unable to find configuration description resource. It should be packaged in the" +
                 		"'/META-INF/config/descriptions.xml' file in the rig client library. Please report this.");
+                this.descriptions = new HashMap<String, IConfigDescriptions.Property>(0);
                 return;
             }
             
