@@ -314,16 +314,18 @@ Section "Rig Client" RigClient
 	call checkIfServiceInstalled
 	
 	; Set output path to the installation directory
-    SetOutPath $INSTDIR\config
+    SetOutPath $INSTDIR\conf
   
 	; Copy the component files/directories
     File /oname=rigclient.properties config\rigclient.properties.win
-    File config\rigclient_service.ini
     File config\batch.properties
+    
+    SetOutPath $INSTDIR\conf\conf.d
 
     SetOutPath $INSTDIR
 	File dist\rigclient.jar
 	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
+    File config\rigclient_service.ini
     
     ; Bug #77 - create lib directory
     SetOutPath $INSTDIR\lib
@@ -426,7 +428,11 @@ Section "un.Rig Client" un.RigClient
 	WinServiceNoError:
 	;Delete the component files/directories
 	Delete $R1\rigclient.jar
-	RMDir /r $R1\config
+    Delete $R1\rigclient_service.ini
+	RMDir $R1\conf\conf.d
+    Delete $R1\conf\rigclient.properties
+    Delete $R1\conf\batch.properties
+    RMDir $R1\conf
 	Delete $R1\rigclientservice*
     DeleteRegKey /IfEmpty HKLM "${REGKEY}"
     Pop $R1
