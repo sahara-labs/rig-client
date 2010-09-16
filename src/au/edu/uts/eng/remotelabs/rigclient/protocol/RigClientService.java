@@ -846,10 +846,23 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             ParamType resultParam;
             for (Entry<String, String> result : primitiveResponse.getResults().entrySet())
             {
-                resultParam = new ParamType();
-                resultParam.setName(result.getKey());
-                resultParam.setValue(result.getValue());
-                results.add(resultParam);
+                if (result.getKey() == null)
+                {
+                    this.logger.warn("Unable to use a null key for a primitive control response parameter Removing " +
+                    		"key=" + result.getKey() + ", value=" + result.getValue() + " pair from result set.");
+                }
+                else if (result.getValue() == null)
+                {
+                    this.logger.warn("Unable to use a null value for a primitive control response parameter Removing " +
+                            "key=" + result.getKey() + ", value=" + result.getValue() + " pair from result set.");
+                }
+                else
+                {
+                    resultParam = new ParamType();
+                    resultParam.setName(result.getKey());
+                    resultParam.setValue(result.getValue());
+                    results.add(resultParam);
+                }
             }
             control.setResult(results.toArray(new ParamType[results.size()]));
         }
