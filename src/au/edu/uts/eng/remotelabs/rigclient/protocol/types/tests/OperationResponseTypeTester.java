@@ -85,6 +85,32 @@ public class OperationResponseTypeTester extends TestCase
     }
     
     @Test
+    public void testParseWillCallback() throws Exception
+    {
+        String xmlStr = "<ns1:notifyResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:OperationResponseType\">\n" + 
+                "            <success>true</success>\n" + 
+                "            <willCallback>true</willCallback>\n" +
+                "            <ns1:error>\n" + 
+                "               <code>3</code>\n" + 
+                "               <operation>Fail!</operation>\n" + 
+                "               <reason>Invalid permission.</reason>\n" + 
+                "            </ns1:error>" +
+                "         </ns1:notifyResponse>";
+        
+        OperationResponseType resp = OperationResponseType.Factory.parse(
+                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(xmlStr.getBytes())));
+        assertNotNull(resp);
+        assertTrue(resp.getSuccess());
+        assertTrue(resp.getWillCallback());
+        
+        ErrorType err = resp.getError();
+        assertNotNull(err);
+        assertEquals(3, err.getCode());
+        assertEquals("Fail!", err.getOperation());
+        assertEquals("Invalid permission.", err.getReason());
+    }
+    
+    @Test
     public void testSerialise() throws Exception
     {
         OperationResponseType op = new OperationResponseType();

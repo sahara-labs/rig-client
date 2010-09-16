@@ -84,6 +84,9 @@ public class OperationResponseType implements ADBBean
     private static final long serialVersionUID = -7961465260745847309L;
 
     protected boolean success;
+    
+    protected boolean willCallbackTracker = false;
+    protected boolean willCallback;
 
     protected boolean errorTracker = false;
     protected ErrorType error;
@@ -131,6 +134,12 @@ public class OperationResponseType implements ADBBean
 
         elementList.add(new QName("", "success"));
         elementList.add(ConverterUtil.convertToString(this.success));
+        
+        if (this.willCallbackTracker)
+        {
+            elementList.add(new QName("", "willCallback"));
+            elementList.add(ConverterUtil.convertToString(this.willCallback));
+        }
 
         if (this.errorTracker)
         {
@@ -211,28 +220,16 @@ public class OperationResponseType implements ADBBean
             }
         }
 
-        namespace = "";
-        if (!namespace.equals(""))
-        {
-            prefix = xmlWriter.getPrefix(namespace);
-            if (prefix == null)
-            {
-                prefix = OperationResponseType.generatePrefix(namespace);
-                xmlWriter.writeStartElement(prefix, "success", namespace);
-                xmlWriter.writeNamespace(prefix, namespace);
-                xmlWriter.setPrefix(prefix, namespace);
-            }
-            else
-            {
-                xmlWriter.writeStartElement(namespace, "success");
-            }
-        }
-        else
-        {
-            xmlWriter.writeStartElement("success");
-        }
+        xmlWriter.writeStartElement("success");
         xmlWriter.writeCharacters(ConverterUtil.convertToString(this.success));
         xmlWriter.writeEndElement();
+        
+        if (this.willCallbackTracker)
+        {
+            xmlWriter.writeStartElement("willCallback");
+            xmlWriter.writeCharacters(ConverterUtil.convertToString(this.willCallback));
+            xmlWriter.writeEndElement();
+        }
 
         if (this.errorTracker)
         {
@@ -270,6 +267,17 @@ public class OperationResponseType implements ADBBean
     public void setSuccess(final boolean param)
     {
         this.success = param;
+    }
+    
+    public boolean getWillCallback()
+    {
+        return this.willCallback;
+    }
+    
+    public void setWillCallback(final boolean param)
+    {
+        this.willCallbackTracker = true;
+        this.willCallback = param;
     }
 
     private void writeAttribute(final String prefix, final String namespace, final String attName, final String attValue,
@@ -329,6 +337,19 @@ public class OperationResponseType implements ADBBean
                 else
                 {
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
+                }
+                
+                reader.next();
+                while (!reader.isStartElement() && !reader.isEndElement())
+                {
+                    reader.next();
+                }
+                
+                if (reader.isStartElement() && new QName("", "willCallback").equals(reader.getName()))
+                {
+                    final String content = reader.getElementText();
+                    object.setWillCallback(ConverterUtil.convertToBoolean(content));
+                    reader.next();
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())
