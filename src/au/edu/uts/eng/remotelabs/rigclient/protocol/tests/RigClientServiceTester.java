@@ -1560,6 +1560,126 @@ public class RigClientServiceTester extends TestCase
     }
     
     /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)}.
+     */
+    @Test
+    public void testPerformPrimitiveControlNullKey()
+    {
+        assertTrue(this.rig.assign("mdiponio"));
+        
+        PerformPrimitiveControl performControl = new PerformPrimitiveControl();
+        PrimitiveControlRequestType controlRequest = new PrimitiveControlRequestType();
+        performControl.setPerformPrimitiveControl(controlRequest);
+        
+        controlRequest.setRequestor("mdiponio");
+        controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        controlRequest.setAction("test");
+        
+        /* Normal params. */
+        ParamType params[] = new ParamType[5];
+        for (int i = 0; i < params.length; i++)
+        {
+            params[i] = new ParamType();
+            params[i].setName("param_" + i);
+            params[i].setValue("Value_" + i);
+        }
+        controlRequest.setParam(params);
+        
+        /* Null key param. */
+        ParamType np = new ParamType();
+        np.setName(null);
+        np.setValue("fooooooood");
+        controlRequest.addParam(np);
+        
+        PerformPrimitiveControlResponse response = this.service.performPrimitiveControl(performControl);
+        PrimitiveControlResponseType controlResponse = response.getPerformPrimitiveControlResponse();
+        assertNotNull(controlResponse);
+        assertTrue(controlResponse.getSuccess());
+        assertTrue(Boolean.valueOf(controlResponse.getWasSuccessful()));
+        
+        ErrorType err = controlResponse.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        
+        ParamType resParams[] = controlResponse.getResult();
+        
+        assertEquals(5, resParams.length);
+        Map<String, String> res = new HashMap<String, String>();
+        for (ParamType p : resParams)
+        {
+            res.put(p.getName(), p.getValue());
+        }
+        
+       for (int i = 0; i < params.length; i++)
+       {
+           assertTrue(res.containsKey(params[i].getName()));
+           assertEquals(params[i].getValue(), res.get(params[i].getName()));
+       }   
+    }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.protocol.types.PerformPrimitiveControl)}.
+     */
+    @Test
+    public void testPerformPrimitiveControlNullValue()
+    {
+        assertTrue(this.rig.assign("mdiponio"));
+        
+        PerformPrimitiveControl performControl = new PerformPrimitiveControl();
+        PrimitiveControlRequestType controlRequest = new PrimitiveControlRequestType();
+        performControl.setPerformPrimitiveControl(controlRequest);
+        
+        controlRequest.setRequestor("mdiponio");
+        controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
+        controlRequest.setAction("test");
+        
+        /* Normal params. */
+        ParamType params[] = new ParamType[5];
+        for (int i = 0; i < params.length; i++)
+        {
+            params[i] = new ParamType();
+            params[i].setName("param_" + i);
+            params[i].setValue("Value_" + i);
+        }
+        controlRequest.setParam(params);
+        
+        /* Null key param. */
+        ParamType np = new ParamType();
+        np.setName("Its almost lunch time");
+        np.setValue(null);
+        controlRequest.addParam(np);
+        
+        PerformPrimitiveControlResponse response = this.service.performPrimitiveControl(performControl);
+        PrimitiveControlResponseType controlResponse = response.getPerformPrimitiveControlResponse();
+        assertNotNull(controlResponse);
+        assertTrue(controlResponse.getSuccess());
+        assertTrue(Boolean.valueOf(controlResponse.getWasSuccessful()));
+        
+        ErrorType err = controlResponse.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertNotNull(err.getReason());
+        assertNotNull(err.getOperation());
+        
+        ParamType resParams[] = controlResponse.getResult();
+        
+        assertEquals(5, resParams.length);
+        Map<String, String> res = new HashMap<String, String>();
+        for (ParamType p : resParams)
+        {
+            res.put(p.getName(), p.getValue());
+        }
+        
+       for (int i = 0; i < params.length; i++)
+       {
+           assertTrue(res.containsKey(params[i].getName()));
+           assertEquals(params[i].getValue(), res.get(params[i].getName()));
+       }   
+    }
+    
+    /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService#getAttribute(au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetAttribute)}.
      */
     @Test
