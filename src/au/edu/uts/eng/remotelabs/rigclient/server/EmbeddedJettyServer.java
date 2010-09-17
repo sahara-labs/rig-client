@@ -202,7 +202,7 @@ public class EmbeddedJettyServer implements IServer
         
         this.logger.debug("Axis2 repository URL " + repoURL.toURI().toString() + ".");
         holder.setInitParameter("axis2.repository.url", repoURL.toURI().toString());
-        this.context.addServlet(holder, "/");
+        this.context.addServlet(holder, "/services/*");
     }
 
     /* 
