@@ -203,6 +203,12 @@ public class EmbeddedJettyServer implements IServer
         this.logger.debug("Axis2 repository URL " + repoURL.toURI().toString() + ".");
         holder.setInitParameter("axis2.repository.url", repoURL.toURI().toString());
         this.context.addServlet(holder, "/services/*");
+        
+        /* --------------------------------------------------------------------
+         * ---- 5. Add the default handler (not the SOAP service). ------------
+         * ------------------------------------------------------------------*/
+        holder = new ServletHolder(new RootServlet());
+        this.context.addServlet(holder, "/*");
     }
 
     /* 

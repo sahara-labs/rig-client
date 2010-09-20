@@ -39,11 +39,22 @@
 package au.edu.uts.eng.remotelabs.rigclient.server;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.AbstractPage;
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.ConfigPage;
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.DocPage;
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.IndexPage;
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.InfoPage;
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.LogsPage;
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.PageResource;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -64,22 +75,84 @@ public class RootServlet extends HttpServlet
     /** Serializable class. */
     private static final long serialVersionUID = -454911787592576294L;
     
+    /** Resource URL bases. */
+    private final List<String> resources;
+    
+    /** Page URL bases. */
+    private final Map<String, String> pages;
+    
     /** Logger. */
     private ILogger logger;
     
     public RootServlet()
     {
         this.logger = LoggerFactory.getLoggerInstance();
+        
+        /* Resources list. */
+        this.resources = new ArrayList<String>();
+        this.resources.add("res");
+        this.resources.add("img");
+        
+        /* Pages list. */
+        this.pages = new HashMap<String, String>();
+        this.pages.put("config", ConfigPage.class.getName());
+        this.pages.put("doc", DocPage.class.getName());
+        this.pages.put("info", InfoPage.class.getName());
+        this.pages.put("logs", LogsPage.class.getName());
     }
     
-    public void serice(final HttpServletRequest request, final HttpServletResponse response)
+    @SuppressWarnings("unchecked")
+    @Override
+    public void service(final HttpServletRequest req, final HttpServletResponse resp)
     {
+        this.logger.debug("Received request: " + req.getRequestURI());
+        String parts[] = req.getRequestURI().split("/");
+
         try
         {
-            response.getWriter().println("Hello, world!");
-            response.setStatus(200);
+            /* Dispatches the request either to a downloadable resource or 
+             * page. */
+            if (parts.length < 2)
+            {
+                /* Nothing has been requested, so just give the default index
+                 * page. */
+                new IndexPage().service(req, resp);
+            }
+            else if (this.resources.contains(parts[1]))
+            {
+                /* Downloadable resource, so provide the requested resource. */
+                new PageResource().download(req, resp);
+            }
+            else if (this.pages.containsKey(parts[1]))
+            {
+                /* Load the page. */
+                ClassLoader loader =  RootServlet.class.getClassLoader();
+                Class<AbstractPage> clazz = (Class<AbstractPage>) loader.loadClass(this.pages.get(parts[1]));
+                clazz.newInstance().service(req, resp);
+            }
+            else
+            {
+                // TODO error page
+                
+            }
+
         }
         catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (ClassNotFoundException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (InstantiationException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IllegalAccessException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
