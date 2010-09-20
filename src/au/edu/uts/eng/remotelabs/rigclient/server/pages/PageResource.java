@@ -70,7 +70,7 @@ public class PageResource
      */
     public void download(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
-        String path = "/META-INF/" + req.getRequestURI();
+        String path = "/META-INF/web" + req.getRequestURI();
         this.logger.debug("Resource request path is '" + path + "'.");
         
         InputStream is = PageResource.class.getResourceAsStream(path);
