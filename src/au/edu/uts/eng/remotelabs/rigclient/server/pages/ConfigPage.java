@@ -49,8 +49,9 @@ import javax.servlet.http.HttpServletResponse;
 public class ConfigPage extends AbstractPage
 {
     @Override
-    protected void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
+    public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
+        this.flushOut();
         resp.getWriter().println("Configuration");
     }
 

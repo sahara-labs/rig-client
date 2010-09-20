@@ -49,8 +49,9 @@ import javax.servlet.http.HttpServletResponse;
 public class InfoPage extends AbstractPage
 {
     @Override
-    protected void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
+    public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
+        this.flushOut();
         // TODO runtime about the rig client
         resp.getWriter().println("Runtime information page.");
     }

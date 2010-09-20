@@ -43,23 +43,54 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
- * Documentation about the rig client.
+ * Error page
  */
-public class DocPage extends AbstractPage
+public class ErrorPage extends AbstractPage
 {
+    /** Error exception. */
+    private Exception ex;
+
+    /** Provided error message. */
+    private String err;
+    
+    public ErrorPage()
+    {
+        super();
+    }
+    
+    public ErrorPage(Exception cause)
+    {
+        super();
+        this.ex = cause;
+    }
+    
+    public ErrorPage(String message)
+    {
+        super();
+        this.err = message;
+    }
+    
+    public ErrorPage(String message, Exception cause)
+    {
+        super();
+        this.err = message;
+        this.ex = cause;
+    }
+    
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
-       this.flushOut();
-       resp.getWriter().println("Documentation");
+        this.flushOut();
+        resp.getWriter().println("Error page");
+        if (this.ex != null) this.buf.append("Ex: " + this.ex.getMessage());
+        if (this.err != null) this.buf.append("Message: " + this.err);
     }
 
     @Override
     protected String getPageType()
     {
-        return "Documentation";
+        return "Main";
     }
 
 }

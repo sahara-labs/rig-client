@@ -51,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.AbstractPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.ConfigPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.DocPage;
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.ErrorPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.IndexPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.InfoPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.LogsPage;
@@ -63,11 +64,10 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * <ol>
  *  <li><tt>/</tt> - A jump-off page to either configuration or help 
  *  documentation.</li>
- *  <li><tt>/conf</tt> - Configuration page (authenticated).</li>
+ *  <li><tt>/config</tt> - Configuration page (authenticated).</li>
  *  <li><tt>/doc</tt> - Documentation page.</li>
- *  <li><tt>/restart</tt> - Restarts the rig client (authenticated).</li>
- *  <li><tt>/images/*</tt> - Images for the interface.</li>
- *  <li><tt>/css/*</tt> - Stylesheets for the interface.</li>
+ *  <li><tt>/info</tt> - Runtime information about the rig.</li>
+ *  <li><tt>/logs</tt> - Recent logs.</li>
  * </ol>
  */
 public class RootServlet extends HttpServlet
@@ -105,8 +105,9 @@ public class RootServlet extends HttpServlet
     @Override
     public void service(final HttpServletRequest req, final HttpServletResponse resp)
     {
-        this.logger.debug("Received request: " + req.getRequestURI());
-        String parts[] = req.getRequestURI().split("/");
+        String uri = req.getRequestURI();
+        this.logger.debug("Received request: " + uri + "\n");
+        String parts[] = uri.split("/");
 
         try
         {
@@ -132,30 +133,46 @@ public class RootServlet extends HttpServlet
             }
             else
             {
-                // TODO error page
-                
+                this.logger.warn("Request URL '" + uri + "' not found.");
+                new ErrorPage("Not found.").service(req, resp);
             }
 
         }
-        catch (IOException e)
+        catch (IOException ex)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            try
+            {
+                this.logger.warn("IO Exception servicing request.");  
+                new ErrorPage(ex).service(req, resp);
+            }
+            catch (IOException e) { /* Not much we can do. */ }
         }
-        catch (ClassNotFoundException e)
+        catch (ClassNotFoundException ex)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            this.logger.warn("Class '" + this.pages.get(parts[1]) + "' not found.");
+            try
+            {
+                new ErrorPage("Not found.").service(req, resp);
+            }
+            catch (IOException e) { /* Not much we can do. */ }
         }
-        catch (InstantiationException e)
+        catch (InstantiationException ex)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            this.logger.warn("Cannot instantiate vlass '" + this.pages.get(parts[1]) + ".");
+            try
+            {
+                new ErrorPage(ex).service(req, resp);
+            }
+            catch (IOException e) { /* Not much we can do. */ }
         }
-        catch (IllegalAccessException e)
+        catch (IllegalAccessException ex)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            this.logger.warn("Illegal access to class '" + this.pages.get(parts[1]) + "'.");
+            try
+            {
+                new ErrorPage(ex).service(req, resp);
+            }
+            catch (IOException e) { /* Not much we can do. */ }
         }
     }
 

@@ -44,11 +44,29 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
+
 /**
  * Interface for the a embedded server page.
  */
 public abstract class AbstractPage
 {
+    /** The output buffer. */
+    protected StringBuilder buf;
+    
+    /** Servlet writer. */
+    private PrintWriter out;
+    
+    /** Logger. */
+    protected ILogger logger;
+    
+    public AbstractPage()
+    {
+        this.logger = LoggerFactory.getLoggerInstance();
+        this.buf = new StringBuilder();
+    }
+    
     /**
      * Services the request.
      * 
@@ -58,24 +76,26 @@ public abstract class AbstractPage
      */
     public void service(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
-        resp.setStatus(HttpServletResponse.SC_OK);
+        this.out = resp.getWriter();
         
-        PrintWriter out = resp.getWriter();
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        this.addHead(out);
-        out.println("<body onload='initPage()' onresize='resizeFooter()'>");
-        out.println("<div id='wrapper'>");
-        this.addHeader(out);
-        this.addNavbar(out, "Index");
+        resp.setStatus(HttpServletResponse.SC_OK);
+        this.buf.append("<!DOCTYPE html>");
+        this.buf.append("<html>");
+        this.addHead();
+        this.buf.append("<body onload='initPage()' onresize='resizeFooter()'>");
+        this.buf.append("<div id='wrapper'>");
+        this.addHeader();
+        this.addNavbar("Index");
         
         /* Actual page contents. */
         this.contents(req, resp);
         
-        this.addFooter(out);
-        out.println("</div>");
-        out.println("</body>");
-        out.println("</html>");
+        this.addFooter();
+        this.buf.append("</div>");
+        this.buf.append("</body>");
+        this.buf.append("</html>");
+        
+        resp.getWriter().print(this.buf);
     }
     
     /**
@@ -85,28 +105,30 @@ public abstract class AbstractPage
      * @param resp response
      * @throws IOException 
      */
-    protected abstract void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException;
+    public abstract void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException;
     
     /**
-     * Gets the page type.
-     * 
-     * @return page type
+     * Flushes the output buffer.
      */
-    protected abstract String getPageType();
+    public void flushOut()
+    {
+        this.out.print(this.buf);
+        this.buf = new StringBuilder();
+    }
     
     /**
      * Adds the head section to the page.
      * 
      * @param out output writer
      */
-    protected void addHead(PrintWriter out)
+    protected void addHead()
     {
-        out.println("<head>");
-        out.println("   <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
-        out.println("   <link href='/res/rigclient.css' media='screen' rel='stylesheet' type='text/css' >");
-        out.println("   <script type='text/javascript' src='/res/rigclient.js'> </script> ");
-        out.println("   <title>Rig Client</title>");
-        out.println("</head>");
+        this.buf.append("<head>");
+        this.buf.append("   <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
+        this.buf.append("   <link href='/res/rigclient.css' media='screen' rel='stylesheet' type='text/css' >");
+        this.buf.append("   <script type='text/javascript' src='/res/rigclient.js'> </script> ");
+        this.buf.append("   <title>Rig Client</title>");
+        this.buf.append("</head>");
     }
    
     /**
@@ -114,20 +136,20 @@ public abstract class AbstractPage
      * 
      * @param out output writer
      */
-    protected void addHeader(PrintWriter out)
+    protected void addHeader()
     {
-        out.println("<div id='header'>");
-        out.println("    <div class='headerimg' >");
-        out.println("        <a href='http://sourceforge.net/projects/labshare-sahara/'>" +
+        this.buf.append("<div id='header'>");
+        this.buf.append("    <div class='headerimg' >");
+        this.buf.append("        <a href='http://sourceforge.net/projects/labshare-sahara/'>" +
         		"<img src='/img/logo.png' alt='Sourceforge Project' /></a>");
-        out.println("   </div>");
-        out.println("   <div class='headerimg' >");
-        out.println("        <img src='/img/sahara.png' alt='Sahara Labs' />");
-        out.println("    </div>");
-        out.println("    <div id='labshareimg'>");
-        out.println("        <a href='http://www.labshare.edu.au/'><img src='/img/labshare.png' alt='LabShare' /></a>");
-        out.println("    </div>");
-        out.println("</div>");   
+        this.buf.append("   </div>");
+        this.buf.append("   <div class='headerimg' >");
+        this.buf.append("        <img src='/img/sahara.png' alt='Sahara Labs' />");
+        this.buf.append("    </div>");
+        this.buf.append("    <div id='labshareimg'>");
+        this.buf.append("        <a href='http://www.labshare.edu.au/'><img src='/img/labshare.png' alt='LabShare' /></a>");
+        this.buf.append("    </div>");
+        this.buf.append("</div>");   
     }
     
     /**
@@ -135,18 +157,21 @@ public abstract class AbstractPage
      * 
      * @param out output writer
      */
-    protected void addNavbar(PrintWriter out, String page)
+    protected void addNavbar(String page)
     {
-        out.println("<div class='menu ui-corner-bottom'>");
-        out.println("   <ol id='menu'>");
-        this.innerNavBar(out, "Main", "/");
-        this.innerNavBar(out, "Configuration", "/config");
-        this.innerNavBar(out, "Documentation", "/doc");
-        this.innerNavBar(out, "Logs", "/logs");
-        this.innerNavBar(out, "Runtime Information", "/info");
-        out.println("   </ol>");
-        out.println("   <div id='slide'> </div>");
-        out.println("</div>");
+        this.buf.append("<div class='menu ui-corner-bottom'>");
+        this.buf.append("   <ol id='menu'>");
+        
+        /* Naviagtion bar contents. */
+        this.innerNavBar("Main", "/");
+        this.innerNavBar("Configuration", "/config");
+        this.innerNavBar("Documentation", "/doc");
+        this.innerNavBar("Logs", "/logs");
+        this.innerNavBar("Runtime Information", "/info");
+        
+        this.buf.append("   </ol>");
+        this.buf.append("   <div id='slide'> </div>");
+        this.buf.append("</div>");
     }
     
     /**
@@ -156,18 +181,18 @@ public abstract class AbstractPage
      * @param name name to display
      * @param path path to page
      */
-    private void innerNavBar(PrintWriter out, String name, String path)
+    private void innerNavBar(String name, String path)
     {
         if (this.getPageType().equals(name))
         {
-            out.println("    <li value='1'>");
+            this.buf.append("    <li value='1'>");
         }
         else
         {
-            out.println("    <li>");
+            this.buf.append("    <li>");
         }
-        out.println("            <a class='plaina apad' href='" + path + "'>" + name + "</a>");
-        out.println("        </li>");
+        this.buf.append("            <a class='plaina apad' href='" + path + "'>" + name + "</a>");
+        this.buf.append("        </li>");
     }
     
     /**
@@ -175,11 +200,18 @@ public abstract class AbstractPage
      * 
      * @param out output writer
      */
-    protected void addFooter(PrintWriter out)
+    protected void addFooter()
     {
-        out.println("<div id='footer' class='ui-corner-top'>");
-        out.println("   <a class='plaina alrpad' href='http://www.labshare.edu.au'>Labshare Australia</a>");
-        out.println("   | <a class='plaina alrpad' href='http://www.uts.edu.au'>&copy; University of Technology, Sydney 2009 - 2010</a>");
-        out.println("</div>");
+        this.buf.append("<div id='footer' class='ui-corner-top'>");
+        this.buf.append("   <a class='plaina alrpad' href='http://www.labshare.edu.au'>Labshare Australia</a>");
+        this.buf.append("   | <a class='plaina alrpad' href='http://www.uts.edu.au'>&copy; University of Technology, Sydney 2009 - 2010</a>");
+        this.buf.append("</div>");
     }
+    
+    /**
+     * Gets the page type.
+     * 
+     * @return page type
+     */
+    protected abstract String getPageType();
 }

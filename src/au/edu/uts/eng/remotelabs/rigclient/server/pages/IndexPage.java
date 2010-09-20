@@ -51,6 +51,7 @@ public class IndexPage extends AbstractPage
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
+        this.flushOut();
         resp.getWriter().println("Index");
 
     }
