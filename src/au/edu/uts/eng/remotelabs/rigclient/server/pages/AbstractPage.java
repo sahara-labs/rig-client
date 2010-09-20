@@ -71,7 +71,7 @@ public abstract class AbstractPage
      * Services the request.
      * 
      * @param req request
-     * @param resq resposne
+     * @param resq response
      * @throws IOException 
      */
     public void service(HttpServletRequest req, HttpServletResponse resp) throws IOException
@@ -79,11 +79,11 @@ public abstract class AbstractPage
         this.out = resp.getWriter();
         
         resp.setStatus(HttpServletResponse.SC_OK);
-        this.buf.append("<!DOCTYPE html>");
-        this.buf.append("<html>");
+        this.println("<!DOCTYPE html>");
+        this.println("<html>");
         this.addHead();
-        this.buf.append("<body onload='initPage()' onresize='resizeFooter()'>");
-        this.buf.append("<div id='wrapper'>");
+        this.println("<body onload='initPage()' onresize='resizeFooter()'>");
+        this.println("<div id='wrapper'>");
         this.addHeader();
         this.addNavbar("Index");
         
@@ -91,9 +91,9 @@ public abstract class AbstractPage
         this.contents(req, resp);
         
         this.addFooter();
-        this.buf.append("</div>");
-        this.buf.append("</body>");
-        this.buf.append("</html>");
+        this.println("</div>");
+        this.println("</body>");
+        this.println("</html>");
         
         resp.getWriter().print(this.buf);
     }
@@ -106,6 +106,17 @@ public abstract class AbstractPage
      * @throws IOException 
      */
     public abstract void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException;
+    
+    /**
+     * Adds a line to the output buffer.
+     * 
+     * @param line output line
+     */
+    public void println(String line)
+    {
+        this.buf.append(line);
+        this.buf.append('\n');
+    }
     
     /**
      * Flushes the output buffer.
@@ -123,12 +134,15 @@ public abstract class AbstractPage
      */
     protected void addHead()
     {
-        this.buf.append("<head>");
-        this.buf.append("   <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
-        this.buf.append("   <link href='/res/rigclient.css' media='screen' rel='stylesheet' type='text/css' >");
-        this.buf.append("   <script type='text/javascript' src='/res/rigclient.js'> </script> ");
-        this.buf.append("   <title>Rig Client</title>");
-        this.buf.append("</head>");
+        this.println("<head>");
+        this.println("  <title>Rig Client</title>");
+        this.println("  <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
+        this.println("  <link href='/css/rigclient.css' media='screen' rel='stylesheet' type='text/css' />");
+        this.println("  <link href='/css/smoothness/jquery-ui.custom.css' rel='stylesheet' type='text/css' />");
+        this.println("  <script type='text/javascript' src='/js/jquery.js'> </script>");
+        this.println("  <script type='text/javascript' src='/js/jquery-ui.js'> </script>");
+        this.println("  <script type='text/javascript' src='/js/rigclient.js'> </script>");
+        this.println("</head>");
     }
    
     /**
@@ -138,18 +152,18 @@ public abstract class AbstractPage
      */
     protected void addHeader()
     {
-        this.buf.append("<div id='header'>");
-        this.buf.append("    <div class='headerimg' >");
-        this.buf.append("        <a href='http://sourceforge.net/projects/labshare-sahara/'>" +
+        this.println("<div id='header'>");
+        this.println("    <div class='headerimg' >");
+        this.println("        <a href='http://sourceforge.net/projects/labshare-sahara/'>" +
         		"<img src='/img/logo.png' alt='Sourceforge Project' /></a>");
-        this.buf.append("   </div>");
-        this.buf.append("   <div class='headerimg' >");
-        this.buf.append("        <img src='/img/sahara.png' alt='Sahara Labs' />");
-        this.buf.append("    </div>");
-        this.buf.append("    <div id='labshareimg'>");
-        this.buf.append("        <a href='http://www.labshare.edu.au/'><img src='/img/labshare.png' alt='LabShare' /></a>");
-        this.buf.append("    </div>");
-        this.buf.append("</div>");   
+        this.println("   </div>");
+        this.println("   <div class='headerimg' >");
+        this.println("        <img src='/img/sahara.png' alt='Sahara Labs' />");
+        this.println("    </div>");
+        this.println("    <div id='labshareimg'>");
+        this.println("        <a href='http://www.labshare.edu.au/'><img src='/img/labshare.png' alt='LabShare' /></a>");
+        this.println("    </div>");
+        this.println("</div>");   
     }
     
     /**
@@ -159,19 +173,21 @@ public abstract class AbstractPage
      */
     protected void addNavbar(String page)
     {
-        this.buf.append("<div class='menu ui-corner-bottom'>");
-        this.buf.append("   <ol id='menu'>");
+        this.println("<div class='menu ui-corner-bottom'>");
+        this.println("   <ol id='menu'>");
         
-        /* Naviagtion bar contents. */
+        /* Navigation bar contents. */
         this.innerNavBar("Main", "/");
+        this.innerNavBar("Status", "/status");
+        this.innerNavBar("Maintenance", "/mainten");
         this.innerNavBar("Configuration", "/config");
         this.innerNavBar("Documentation", "/doc");
         this.innerNavBar("Logs", "/logs");
         this.innerNavBar("Runtime Information", "/info");
         
-        this.buf.append("   </ol>");
-        this.buf.append("   <div id='slide'> </div>");
-        this.buf.append("</div>");
+        this.println("   </ol>");
+        this.println("   <div id='slide'> </div>");
+        this.println("</div>");
     }
     
     /**
@@ -185,14 +201,14 @@ public abstract class AbstractPage
     {
         if (this.getPageType().equals(name))
         {
-            this.buf.append("    <li value='1'>");
+            this.println("    <li value='1'>");
         }
         else
         {
-            this.buf.append("    <li>");
+            this.println("    <li>");
         }
-        this.buf.append("            <a class='plaina apad' href='" + path + "'>" + name + "</a>");
-        this.buf.append("        </li>");
+        this.println("            <a class='plaina apad' href='" + path + "'>" + name + "</a>");
+        this.println("        </li>");
     }
     
     /**
@@ -202,10 +218,10 @@ public abstract class AbstractPage
      */
     protected void addFooter()
     {
-        this.buf.append("<div id='footer' class='ui-corner-top'>");
-        this.buf.append("   <a class='plaina alrpad' href='http://www.labshare.edu.au'>Labshare Australia</a>");
-        this.buf.append("   | <a class='plaina alrpad' href='http://www.uts.edu.au'>&copy; University of Technology, Sydney 2009 - 2010</a>");
-        this.buf.append("</div>");
+        this.println("<div id='footer' class='ui-corner-top'>");
+        this.println("   <a class='plaina alrpad' href='http://www.labshare.edu.au'>Labshare Australia</a>");
+        this.println("   | <a class='plaina alrpad' href='http://www.uts.edu.au'>&copy; University of Technology, Sydney 2009 - 2010</a>");
+        this.println("</div>");
     }
     
     /**
