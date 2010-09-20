@@ -149,8 +149,9 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     {   
         /* Request parameters. */
         final String user = allocRequest.getAllocate().getUser();
-        this.logger.debug("Received allocate request with parameter user=" + user + ".");
-        
+        final boolean async = allocRequest.getAllocate().getAsync();
+        this.logger.debug("Received allocate request with parameters: user=" + user + ", async=" + async + '.'); 
+                
         /* Response parameters. */
         final OperationResponseType operation = new OperationResponseType();
         final ErrorType error = new ErrorType();
@@ -160,6 +161,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         final AllocateResponse response = new AllocateResponse();
         response.setAllocateResponse(operation);
 
+        /* 1) Is the caller authorised to allocate a user. */
         if (!this.isSourceAuthenticated(allocRequest.getAllocate().getIdentityToken()))
         {
             this.logger.warn("Failed allocating user " + user + " because of invalid permission.");
@@ -168,26 +170,52 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             error.setReason("Not authorised to allocate a user.");
 
         }
-        else if (this.rig.isSessionActive()) // Cannot allocate a rig who is already in-use
+        /* 2) Won't attempt to allocate another user if an asynchronous operation
+         *    is already running. */
+        else if (RigClientService.isAsyncOperationRunning())
+        {
+            this.logger.warn("Failed allocating user " + user + " because there is an existing asynchronous " +
+                    "operation running.");
+            operation.setSuccess(false);
+            error.setCode(17);
+            error.setReason("Asynchronous operation already running.");
+        }
+        /* 3) Cannot allocate a rig which is already in-use. */
+        else if (this.rig.isSessionActive())
         {
             this.logger.warn("Failed allocating user " + user + " because there is an existing session.");
             operation.setSuccess(false);
             error.setCode(4);
             error.setReason("A session is already active.");
         }
-        else if (!this.rig.isMonitorStatusGood()) // Cannot allocate a rig who is in bad state
+        /* 4) Cannot allocate a rig which is in bad state, i.e. has a exerciser
+         *    test failed. */
+        else if (!this.rig.isMonitorStatusGood()) 
         {
             this.logger.warn("Failed allocating user " + user + " because the rig is not in a operable state.");
             operation.setSuccess(false);
             error.setCode(7);
             error.setReason("Rig not operable.");
         }
-        else if (this.rig.assign(user)) // Actual allocation 
+        /* 5 - 1) If requested asynchronously, perform allocation out of 
+         *    request thread. */
+        else if (async)
+        {
+            this.logger.debug("Going to assign user " + user + " asychronously.");
+            
+            // TODO async work.
+            
+            operation.setSuccess(true);
+            operation.setWillCallback(true);
+        }
+        /* 5 - 2) The default is to allocate the user synchronously. */
+        else if (this.rig.assign(user))
         {
             this.logger.info("Successfully allocated user " + user + " to rig.");
             operation.setSuccess(true);
         }
-        else // Something fraked up
+        /* 6) Something failing in synchronous assignment. */
+        else
         {
             this.logger.warn("Failed allocating user " + user + " because of an allocation action failure.");
             operation.setSuccess(false);
@@ -214,7 +242,8 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     {
         /* Request parameters. */
         final String user = relRequest.getRelease().getUser();
-        this.logger.debug("Received release request with parameter: user=" + user + ".");
+        final boolean async = relRequest.getRelease().getAsync();
+        this.logger.debug("Received release request with parameter: user=" + user + ", async=" + async + '.');
         
         /* Response parameters. */
         final OperationResponseType operation = new OperationResponseType();
@@ -226,6 +255,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         final ReleaseResponse response = new ReleaseResponse();
         response.setReleaseResponse(operation);
         
+        /* 1) Is the caller authorised to terminate a session. */
         if (!this.isSourceAuthenticated(relRequest.getRelease().getIdentityToken()))
         {
             this.logger.warn("Failed releasing user " + user + " because of invalid permission.");
@@ -234,6 +264,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             error.setReason("Not authorised to release a user.");
 
         }
+        /* 2) A session needs to be active to terminate it. */ 
         else if (!this.rig.isSessionActive())
         {
             this.logger.warn("Failed to release " + user + " as no session is currently running.");
@@ -241,18 +272,32 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             error.setCode(6);
             error.setReason("Session not running.");
         }
-        else if (!this.rig.hasPermission(user, Session.MASTER)) // If the user is indeed a master session user
+        /* 3) The requested user needs to be a master to terminate them. */
+        else if (!this.rig.hasPermission(user, Session.MASTER))
         {
             this.logger.warn("Failed to release " + user + " as they are not the session master.");
             operation.setSuccess(false);
             error.setCode(5);
             error.setReason("User is not a master user.");
         }
+        /* 5 - 1) If requested for the operation to run asynchronously, perform
+         * release out of the request thread. */
+        else if (async)
+        {
+            this.logger.debug("Going to release user " + user + " asynchronously.");
+            
+            // TODO Actual async release
+            
+            operation.setSuccess(true);
+            operation.setWillCallback(true);
+        }
+        /* 5 - 2) Otherwise the default is to perform release synchronously. */
         else if (this.rig.revoke()) // Actual revocation
         {
             this.logger.info("Released user " + user + ".");
             operation.setSuccess(true);
         }
+        /* 6) Error occurred during synchronous release. */
         else  // Something fraked up
         {
             this.logger.warn("Failed to release " + user + " because of an release action failure.");
@@ -1184,5 +1229,37 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         
         return false;
+    }
+    
+    /**
+     * Returns true if an asynchronous operation is currently running.
+     * 
+     * @return true if asynchronous operation running
+     */
+    public static boolean isAsyncOperationRunning()
+    {
+        // TODO Implement async operation check
+        return false;
+//        if (RigClientService.asyncWorker == null)
+//        {
+//            return false;
+//        }
+//        else
+//        {
+//            return RigClientService.asyncWorker.isAlive();
+//        }
+    }
+    
+    /**
+     * Interrupts a running asynchronous operation This operation isn't 
+     * blocking so <tt>isAsyncOperation</tt> should be periodically called
+     * to ensure the asynchronous operation stops.
+     */
+    public static void interruptAsyncOperation()
+    {
+//        if (RigClientService.asyncWorker != null && RigClientService.asyncWorker.isAlive())
+//        {
+//            RigClientService.asyncWorker.interrupt();
+//        }
     }
 }

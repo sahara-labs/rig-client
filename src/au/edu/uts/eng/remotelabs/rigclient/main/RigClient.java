@@ -176,9 +176,14 @@ public class RigClient
                     break;
                 }
             }
+            
+            /* ------------------------------------------------------------------
+             * ---- 5. Terminate any asynchronous operations. -------------------
+             * ----------------------------------------------------------------*/
+            // TODO terminate async operations
 
             /* ------------------------------------------------------------------
-             * ---- 5. Cleanup and shutdown all services. -----------------------
+             * ---- 6. Cleanup and shutdown all services. -----------------------
              * ----------------------------------------------------------------*/
             this.logger.priority("Received shut down request, shutting down...");
             /* Purge all sessions (if running). */
