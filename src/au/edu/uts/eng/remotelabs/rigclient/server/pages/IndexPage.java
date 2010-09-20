@@ -39,28 +39,63 @@
 package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 
 /**
  * The default page.
  */
 public class IndexPage extends AbstractPage
 {
+    private Map<String, String> links;
+    
+    public IndexPage()
+    {
+        this.links = new LinkedHashMap<String, String>();
+        this.links.put("Status", "/status");
+        this.links.put("Maintenance", "/mainten");
+        this.links.put("Configuration", "/config");
+        this.links.put("Runtime Information", "/info");
+        this.links.put("Logs", "/logs");
+        this.links.put("Documentation", "/doc");
+    }
+    
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
-        this.flushOut();
-        resp.getWriter().println("Index");
-
+       this.println("<div id='linklist'>");
+       this.println("   <ul id='ullinklist'>");
+       for (Entry<String, String> e : this.links.entrySet())
+       {
+           this.println("       <li>");
+           this.println("          <a class='linkbut' href='" + e.getValue()+ "'>" + e.getKey() + "</a>");
+           this.println("      </li>");
+       }
+       this.println("   </ul>");
+       this.println("</div>");
     }
 
+    @Override
+    protected String getPageHeader()
+    {
+        return "Welcome to " + ConfigFactory.getInstance().getProperty("Rig_Name");
+    }
+
+    @Override
+    protected String getPageTitle()
+    {
+        return "Main";
+    }
+    
     @Override
     protected String getPageType()
     {
         return "Main";
     }
-
-    
 }

@@ -44,6 +44,8 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -58,12 +60,17 @@ public abstract class AbstractPage
     /** Servlet writer. */
     private PrintWriter out;
     
+    /** Rig client configuration. */
+    protected IConfig config;
+    
     /** Logger. */
     protected ILogger logger;
     
     public AbstractPage()
     {
         this.logger = LoggerFactory.getLoggerInstance();
+        this.config = ConfigFactory.getInstance();
+        
         this.buf = new StringBuilder();
     }
     
@@ -85,7 +92,8 @@ public abstract class AbstractPage
         this.println("<body onload='initPage()' onresize='resizeFooter()'>");
         this.println("<div id='wrapper'>");
         this.addHeader();
-        this.addNavbar("Index");
+        this.addNavbar();
+        this.addPageHeading();
         
         /* Actual page contents. */
         this.contents(req, resp);
@@ -129,8 +137,6 @@ public abstract class AbstractPage
     
     /**
      * Adds the head section to the page.
-     * 
-     * @param out output writer
      */
     protected void addHead()
     {
@@ -147,8 +153,6 @@ public abstract class AbstractPage
    
     /**
      * Adds the header to the page.
-     * 
-     * @param out output writer
      */
     protected void addHeader()
     {
@@ -168,10 +172,8 @@ public abstract class AbstractPage
     
     /**
      * Adds the header to the page.
-     * 
-     * @param out output writer
      */
-    protected void addNavbar(String page)
+    protected void addNavbar()
     {
         this.println("<div class='menu ui-corner-bottom'>");
         this.println("   <ol id='menu'>");
@@ -181,9 +183,9 @@ public abstract class AbstractPage
         this.innerNavBar("Status", "/status");
         this.innerNavBar("Maintenance", "/mainten");
         this.innerNavBar("Configuration", "/config");
-        this.innerNavBar("Documentation", "/doc");
         this.innerNavBar("Logs", "/logs");
         this.innerNavBar("Runtime Information", "/info");
+        this.innerNavBar("Documentation", "/doc");
         
         this.println("   </ol>");
         this.println("   <div id='slide'> </div>");
@@ -193,7 +195,6 @@ public abstract class AbstractPage
     /**
      * Adds a nav bar item to the navigation bar.
      * 
-     * @param out output writer
      * @param name name to display
      * @param path path to page
      */
@@ -212,9 +213,17 @@ public abstract class AbstractPage
     }
     
     /**
+     * Adds the page heading 
+     */
+    protected void addPageHeading()
+    {
+        this.println("<div class='contentsheading'>");
+        this.println("  <h2>" + this.getPageHeader() + "</h2>");
+        this.println("</div>");
+    }
+    
+    /**
      * Adds the footer to the page.
-     * 
-     * @param out output writer
      */
     protected void addFooter()
     {
@@ -222,6 +231,26 @@ public abstract class AbstractPage
         this.println("   <a class='plaina alrpad' href='http://www.labshare.edu.au'>Labshare Australia</a>");
         this.println("   | <a class='plaina alrpad' href='http://www.uts.edu.au'>&copy; University of Technology, Sydney 2009 - 2010</a>");
         this.println("</div>");
+    }
+    
+    /**
+     * Gets the page header.
+     * 
+     * @return page header
+     */
+    protected String getPageHeader()
+    {
+        return this.getPageType() + " Page";
+    }
+    
+    /**
+     * Gets the page title.
+     * 
+     * @return page title
+     */
+    protected String getPageTitle()
+    {
+        return this.getPageType();
     }
     
     /**
