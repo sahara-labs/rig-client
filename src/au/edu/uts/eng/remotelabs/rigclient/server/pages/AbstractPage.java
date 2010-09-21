@@ -93,10 +93,13 @@ public abstract class AbstractPage
         this.println("<div id='wrapper'>");
         this.addHeader();
         this.addNavbar();
-        this.addPageHeading();
+        this.addActionBar();
         
-        /* Actual page contents. */
+        /* Main contents. */
+        this.println("<div id='content'>");
+        this.addPageHeading();
         this.contents(req, resp);
+        this.println("</div>");
         
         this.addFooter();
         this.println("</div>");
@@ -136,12 +139,32 @@ public abstract class AbstractPage
     }
     
     /**
+     * Same string transfrom as the WI.
+     * 
+     * @param str string to transform
+     * @return transformed string
+     */
+    public String stringTransform(String str)
+    {
+        StringBuilder b = new StringBuilder();
+        String parts[] = str.split("_");
+        
+        for (int i = 0; i < parts.length; i++)
+        {
+            b.append(parts[i]);
+            if (i != parts.length - 1) b.append(' ');
+        }
+        
+        return b.toString();
+    }
+    
+    /**
      * Adds the head section to the page.
      */
     protected void addHead()
     {
         this.println("<head>");
-        this.println("  <title>Rig Client</title>");
+        this.println("  <title>" + this.stringTransform(this.config.getProperty("Rig_Name")) + " - " + this.getPageTitle() + "</title>");
         this.println("  <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
         this.println("  <link href='/css/rigclient.css' media='screen' rel='stylesheet' type='text/css' />");
         this.println("  <link href='/css/smoothness/jquery-ui.custom.css' rel='stylesheet' type='text/css' />");
@@ -202,14 +225,104 @@ public abstract class AbstractPage
     {
         if (this.getPageType().equals(name))
         {
-            this.println("    <li value='1'>");
+            this.println("<li value='1'>");
         }
         else
         {
-            this.println("    <li>");
+            this.println("<li>");
         }
-        this.println("            <a class='plaina apad' href='" + path + "'>" + name + "</a>");
-        this.println("        </li>");
+        this.println("  <a class='plaina apad' href='" + path + "'>" + name + "</a>");
+        this.println("</li>");
+    }
+    
+    /**
+     * Adds the action bar to the page.
+     */
+    protected void addActionBar()
+    {
+        this.println("<div id='actionbar'>");
+        this.println("  <ul id='actionbarlist'>");
+        
+        /* Logout. */
+        this.println("      <li><a id='logout' class='actiondialogbutton plaina ui-corner-all'>");
+        this.println("          <img style='margin-bottom:10px' src='/img/logout.png' alt='Logout' /><br />Logout");
+        this.println("      </a></li>");
+        
+        /* Help. */
+        this.println("      <li><a id='help' class='actiondialogbutton plaina ui-corner-all'>");
+        this.println("          <img style='margin-bottom:10px' src='/img/help.png' alt='Help' /><br />Help");
+        this.println("      </a></li>");
+        
+        this.println("  </ul>");
+        this.println("</div>");
+        
+        /* Logout action button contents. */
+        this.println(
+                "<div id='logoutdialog' title='Logout'>\n" + 
+        		"    <div class='ui-priority-primary'>\n" + 
+        		"        Are you sure you want to logout?\n" + 
+        		"    </div>\n" + 
+        		"    <div class='ui-priority-secondary logoutsecondary'>\n" + 
+        		"        <span class='ui-icon ui-icon-alert'></span>\n" + 
+        		"        Any unsaved changes will be lost.\n" + 
+        		"    </div>\n" + 
+        		"</div>");
+        
+        /* Help action button contents. */
+        this.println(
+                "<div id='helpdialog' title='Help and Troubleshooting'>\n" + 
+        		"    <div class='ui-state-error ui-corner-all' style='padding:10px'>\n" + 
+        		"        <strong>TODO add help contents</strong>\n" + 
+        		"    </div>\n" + 
+        		"</div>");
+        
+        
+        this.println("<script type='text/javascript'>");
+        this.println("$(document).ready(function() {");
+        
+        /* Logout action button script. */
+        this.println(
+                "$('#logoutdialog').dialog({\n" + 
+        		"     autoOpen: false,\n" + 
+        		"     width: 400,\n" + 
+        		"     modal: true,\n" + 
+        		"     resizable: false,\n" + 
+        		"     buttons: {\n" +
+        		"         'Yes': function() {\n" +
+        		"             alert('TODO logout.');\n" +
+        		"         },\n" +
+        		"         'No': function() {\n" +
+        		"             $(this).dialog('close');\n" +
+        		"         }\n" +
+        		"     }" +
+        		"});\n");
+        this.println(
+                "$('#logout').click(function(){\n" + 
+        		"     $('#logoutdialog').dialog('open');\n" + 
+        		"     return false;\n" + 
+        		"});");
+        
+        /* Help action button script. */
+        this.println(
+                "$('#helpdialog').dialog({\n" + 
+        		"     autoOpen: false,\n" + 
+        		"     width: 650,\n" + 
+        		"     modal: true,\n" + 
+        		"     resizable: false,\n" + 
+        		"     buttons: {\n" +
+        		"         'Close' : function() {\n" +
+        		"             $(this).dialog('close');\n" +
+        		"         }\n" +
+        		"     }" +
+        		"});\n");
+        this.println(
+                "$('#help').click(function(){\n" + 
+                "   $('#helpdialog').dialog('open');\n" + 
+                "   return false;\n" + 
+                "});");
+        
+        this.println("});");
+        this.println("</script>");
     }
     
     /**
@@ -217,8 +330,8 @@ public abstract class AbstractPage
      */
     protected void addPageHeading()
     {
-        this.println("<div class='contentsheading'>");
-        this.println("  <h2>" + this.getPageHeader() + "</h2>");
+        this.println("<div class='contentheader'>");
+        this.println("  <h2>" + this.stringTransform(this.getPageHeader()) + "</h2>");
         this.println("</div>");
     }
     

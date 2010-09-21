@@ -86,12 +86,6 @@ public class IndexPage extends AbstractPage
     {
         return "Welcome to " + ConfigFactory.getInstance().getProperty("Rig_Name");
     }
-
-    @Override
-    protected String getPageTitle()
-    {
-        return "Main";
-    }
     
     @Override
     protected String getPageType()
