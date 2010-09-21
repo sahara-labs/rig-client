@@ -46,8 +46,6 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
-
 /**
  * The default page.
  */
@@ -61,22 +59,34 @@ public class IndexPage extends AbstractPage
         this.links.put("Status", "/status");
         this.links.put("Maintenance", "/mainten");
         this.links.put("Configuration", "/config");
-        this.links.put("Runtime Information", "/info");
         this.links.put("Logs", "/logs");
+        this.links.put("Runtime Information", "/info");
         this.links.put("Documentation", "/doc");
     }
     
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
-    {
-       this.println("<div id='linklist'>");
-       this.println("   <ul id='ullinklist'>");
-       for (Entry<String, String> e : this.links.entrySet())
-       {
-           this.println("       <li>");
-           this.println("          <a class='linkbut' href='" + e.getValue()+ "'>" + e.getKey() + "</a>");
-           this.println("      </li>");
-       }
+    {   
+        this.println("<div id='linklist'>");
+        this.println("   <ul id='ullinklist'>");
+
+        int i = 0;
+        for (Entry<String, String> e : this.links.entrySet())
+        {
+            String classes = "linkbut plaina";
+            if (i == 0) classes += " ui-corner-top";
+            else if (i == this.links.size() - 1) classes += " ui-corner-bottom";
+
+            this.println("       <li><a class='" + classes + "' href='" + e.getValue() + "'>");
+            this.println("           <div class='linkbutcont'>");
+            this.println(                "<span class='linkicon ui-icon ui-icon-arrowreturnthick-1-e' style='float:left; margin:0 10px 0'></span>" 
+                    + e.getKey());
+            this.println("           </div>");
+            this.println("      </a></li>");
+
+            i++;
+        }
+       
        this.println("   </ul>");
        this.println("</div>");
     }
@@ -84,7 +94,7 @@ public class IndexPage extends AbstractPage
     @Override
     protected String getPageHeader()
     {
-        return "Welcome to " + ConfigFactory.getInstance().getProperty("Rig_Name");
+        return "Welcome to " + this.config.getProperty("Rig_Name");
     }
     
     @Override

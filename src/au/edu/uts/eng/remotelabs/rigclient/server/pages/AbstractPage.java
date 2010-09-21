@@ -44,6 +44,8 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
+import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -60,6 +62,9 @@ public abstract class AbstractPage
     /** Servlet writer. */
     private PrintWriter out;
     
+    /** The rig type class. */
+    protected IRig rig;
+    
     /** Rig client configuration. */
     protected IConfig config;
     
@@ -70,6 +75,7 @@ public abstract class AbstractPage
     {
         this.logger = LoggerFactory.getLoggerInstance();
         this.config = ConfigFactory.getInstance();
+        this.rig = RigFactory.getRigInstance();
         
         this.buf = new StringBuilder();
     }
@@ -212,6 +218,25 @@ public abstract class AbstractPage
         
         this.println("   </ol>");
         this.println("   <div id='slide'> </div>");
+        this.println("</div>");
+        
+        /* Add status icon to right hand side of nav bar. */
+        this.println("<div id='rigstatusbox'>");
+        this.println("  <div style='float:left; margin-top:8px; color:#606060'>Current Status:</div>");
+        this.println("  <a href='/status' class='plaina'>");
+        if (this.rig.isSessionActive())
+        {
+            this.println("      <img src='/img/yellow_small.gif' alt='In use' />");
+        }
+        else if (this.rig.isMonitorStatusGood())
+        {
+            this.println("      <img src='/img/green_small.gif' alt='In use' />");
+        }
+        else
+        {
+            this.println("      <img src='/img/red_amime_small.gif' alt='In use' />");
+        }
+        this.println("  </a>");
         this.println("</div>");
     }
     
