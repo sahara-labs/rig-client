@@ -376,6 +376,21 @@ a.plaina:hover {
 	padding: 10px;
 }
 
+#statelegend {
+	position: absolute;
+	left: 0;
+	top: 150px;
+}
+
+#statelegend p {
+	font-weight: bold;
+}
+
+#statelegend ul {
+	list-style: circle;
+	font-size: 0.8em;
+}
+
 #exerciserdetails {
 	float: left;
 }
@@ -389,4 +404,9 @@ a.plaina:hover {
 	margin-bottom: 10px;
 	padding: 10px;
 	text-align: center;
+}
+
+.errdialog {
+	width: 350px;
+	text-align: left;
 }

@@ -235,11 +235,11 @@ public abstract class AbstractPage
         }
         else if (this.rig.isMonitorStatusGood())
         {
-            this.println("      <img src='/img/green_small.gif' alt='In use' />");
+            this.println("      <img src='/img/green_small.gif' alt='Online' />");
         }
         else
         {
-            this.println("      <img src='/img/red_anime_small.gif' alt='In use' />");
+            this.println("      <img src='/img/red_anime_small.gif' alt='Offline' />");
         }
         this.println("  </a>");
         this.println("</div>");

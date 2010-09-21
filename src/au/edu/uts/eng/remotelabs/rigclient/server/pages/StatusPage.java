@@ -57,6 +57,8 @@ public class StatusPage extends AbstractPage
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
+        this.addLegend();
+        
         /* Main status. */
         this.println("<div id='bigstatus'>");
         if (!StatusUpdater.isRegistered())
@@ -71,31 +73,74 @@ public class StatusPage extends AbstractPage
         }
         else if (this.rig.isMonitorStatusGood())
         {
-            this.println("  <img src='/img/green.gif' alt='In use' />");
+            this.println("  <img src='/img/green.gif' alt='Online' />");
             this.println("  <h3>Online</h3>");
         }
         else
         {
-            this.println("  <img src='/img/red_anime.gif' alt='In use' />");
+            this.println("  <img src='/img/red_anime.gif' alt='Offline' />");
             this.println("  <h3>Offline</h3>");
+            this.println("  <div class='ui-state ui-state-error errdialog'>");
+            this.println("      <p>");
+            this.println("          <span class='ui-icon ui-icon-alert'></span>");
+            this.println("          " + this.rig.getMonitorReason());
+            this.println("      </p>");
+            this.println("  </div>");
         }
         this.println("</div>");
         
         /* Push div. */
         this.println("<div style='height:40px'> </div>");
         
-        /* Exerciser details. */
+        this.addExerciserDetails();
+        this.addSessionDetails();
+    }
+    
+    /**
+     * Adds the legend to the page.
+     */
+    private void addLegend()
+    {
+        this.println("<div id='statelegend'>");
+        this.println("  <p>Legend:</p>");
+        this.println("  <ul>");
+        this.println("      <li id='leg1'>");
+        this.println("          <img src='/img/blue_small.gif' alt='Not registered' />Not Registered");
+        this.println("          <div id='leghov1' class='leghov'>");
+        this.println("              ");
+        this.println("          </div>");
+        this.println("      </li>");
+
+        this.println("  </ul>");
+        this.println("</div>");
+        
+        
+    }
+
+
+    /**
+     *  Adds the exerciser details to the page.
+     */
+    private void addExerciserDetails()
+    {
         this.println("<div id='exerciserdetails' class='ui-corner-all detailspanel'>");
         this.println("  <div class='detailspaneltitle'>");
         this.println("  <p><span class='ui-icon ui-icon-wrench detailspanelicon'></span>Exerciser details</p>");
         this.println("  </div>");
         this.println("  <div class='detailpanelcontents'>");
         
+        /* Overall exerciser state. */
+        
+        
         this.println("  </div>");
         this.println("</div>");
-        
-        
-        /* Session details. */
+    }
+
+    /**
+     * Adds the session details to the page.
+     */
+    private void addSessionDetails()
+    {
         this.println("<div id='sessiondetails' class='ui-corner-all detailspanel'>");
         this.println("  <div class='detailspaneltitle'>");
         this.println("  <p><span class='ui-icon ui-icon-person detailspanelicon'></span>Session details</p>");
