@@ -118,7 +118,11 @@ public class RootServlet extends HttpServlet
         {
             /* Dispatches the request either to a downloadable resource or 
              * page. */
-            if (parts.length < 2)
+            if ("/favicon.ico".equals(uri))
+            {
+                new PageResource().download(req, resp);
+            }
+            else if (parts.length < 2)
             {
                 /* Nothing has been requested, so just give the default index
                  * page. */
