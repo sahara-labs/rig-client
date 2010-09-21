@@ -54,12 +54,17 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  */
 public class PageResource
 {
+    /** Servlet state time. */
+    private Long startTime;
+    
     /** Logger. */
     private ILogger logger;
     
     public PageResource()
     {
         this.logger = LoggerFactory.getLoggerInstance();
+        
+        this.startTime = System.currentTimeMillis();
     }
     /**
      * Downloads a resource.
@@ -73,6 +78,12 @@ public class PageResource
         String path = "/META-INF/web" + req.getRequestURI();
         this.logger.debug("Resource request path is '" + path + "'.");
         
+        if (req.getDateHeader("If-Modified-Since") / 60000 == this.startTime / 60000)
+        {
+            resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            return;
+        }
+        
         InputStream is = PageResource.class.getResourceAsStream(path);
         if (is == null)
         {
@@ -81,6 +92,11 @@ public class PageResource
             resp.getWriter().println("Not found.");
             return;
         }
+        
+        /* Set the header at the time of start the rig client (the files are 
+         * packaged in the jar so they won't change. */
+        resp.setDateHeader("Last-Modified", this.startTime);
+       
         
         BufferedInputStream stream = new BufferedInputStream(is);
         BufferedOutputStream out = new BufferedOutputStream(resp.getOutputStream());
