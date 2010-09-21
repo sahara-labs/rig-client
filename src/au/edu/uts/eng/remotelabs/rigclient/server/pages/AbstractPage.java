@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
+import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
@@ -224,7 +225,11 @@ public abstract class AbstractPage
         this.println("<div id='rigstatusbox'>");
         this.println("  <div style='float:left; margin-top:8px; color:#606060'>Current Status:</div>");
         this.println("  <a href='/status' class='plaina'>");
-        if (this.rig.isSessionActive())
+        if (!StatusUpdater.isRegistered())
+        {
+            this.println("      <img src='/img/blue_small.gif' alt='Not registered' />");
+        }
+        else if (this.rig.isSessionActive())
         {
             this.println("      <img src='/img/yellow_small.gif' alt='In use' />");
         }
