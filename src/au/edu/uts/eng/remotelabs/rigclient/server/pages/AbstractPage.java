@@ -239,7 +239,7 @@ public abstract class AbstractPage
         }
         else
         {
-            this.println("      <img src='/img/red_amime_small.gif' alt='In use' />");
+            this.println("      <img src='/img/red_anime_small.gif' alt='In use' />");
         }
         this.println("  </a>");
         this.println("</div>");

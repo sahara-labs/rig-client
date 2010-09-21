@@ -36,63 +36,62 @@
  * @author Michael Diponio (mdiponio)
  * @date 21st February 2010
  */
-
 * {
-    padding: 0;
-    margin: 0;
-    font-family: Arial,Helvetica,sans-serif;
-    font-size: 99%;
+	padding: 0;
+	margin: 0;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 99%;
 }
 
 body {
-    height: 100%;
-    min-height: 100;
+	height: 100%;
+	min-height: 100;
 }
 
 fieldset table {
-    width: 100%
+	width: 100%
 }
 
 td {
-    padding: 5px;
-    vertical-align: top;
+	padding: 5px;
+	vertical-align: top;
 }
 
 fieldset {
-    border: 0px;
+	border: 0px;
 }
 
 legend {
-    display: none;
+	display: none;
 }
 
 /******************************************************************************
  ** Page blocks                                                              **
  *****************************************************************************/
-#wrapper { 
-    width: 958px;
-    min-width: 922px;
-    margin: 0 auto;
-    height: 100%;
-    min-height: 100%;
-    position: relative;
+#wrapper {
+	width: 958px;
+	min-width: 922px;
+	margin: 0 auto;
+	height: 100%;
+	min-height: 100%;
+	position: relative;
 }
 
 /******************************************************************************
  ** Page Header                                                              **
  *****************************************************************************/
 #header {
-    color: #333;
-    padding: 10px;
-    height: 60px;
-    position: relative;
+	color: #333;
+	padding: 10px;
+	height: 60px;
+	position: relative;
 }
 
 .headerimg {
-    float: left;
-    padding-right: 10px;
-    height: 100%;
-    margin-top: 7px;
+	float: left;
+	padding-right: 10px;
+	height: 100%;
+	margin-top: 7px;
 }
 
 .headerimg a img {
@@ -100,20 +99,21 @@ legend {
 }
 
 #headername {
+	
 }
 
 #headername h1 {
-    float: left;
-    margin-top: 10px;
-    margin-left: 60px;
-    font-weight: bold;
-    font-size: 35px;
+	float: left;
+	margin-top: 10px;
+	margin-left: 60px;
+	font-weight: bold;
+	font-size: 35px;
 }
 
 #labshareimg {
-    float: right;
-    margin-top: -7px;
-    margin-right:10px;
+	float: right;
+	margin-top: -7px;
+	margin-right: 10px;
 }
 
 #labshareimg img {
@@ -124,37 +124,37 @@ legend {
  ** Navigation Menu                                                          **
  *****************************************************************************/
 .menu {
-    position:relative; 
-    background-color: #EFEFEF;
-    height:35px; 
-    border: 1px solid #B5B5B5;
-    -moz-box-shadow: 0 1px 3px #B5B5B5;
-    -webkit-box-shadow: 0 1px 3px #B5B5B5;
-    box-shadow: 0 1px 3px #B5B5B5;
+	position: relative;
+	background-color: #EFEFEF;
+	height: 35px;
+	border: 1px solid #B5B5B5;
+	-moz-box-shadow: 0 1px 3px #B5B5B5;
+	-webkit-box-shadow: 0 1px 3px #B5B5B5;
+	box-shadow: 0 1px 3px #B5B5B5;
 }
 
 .menu ol {
-    list-style:none; 
-    z-index:10;
-    position:absolute; 
-    z-index:100; 
-    padding:9px 5px;
+	list-style: none;
+	z-index: 10;
+	position: absolute;
+	z-index: 100;
+	padding: 9px 5px;
 }
 
 .menu li {
-    float:left
+	float: left
 }
 
 #slide {
-    position:absolute;
-    bottom:0; 
-    height:4px; 
-    background:#000000; 
-    z-index:10
+	position: absolute;
+	bottom: 0;
+	height: 4px;
+	background: #000000;
+	z-index: 10
 }
 
 #rigstatusbox {
-	position:absolute;
+	position: absolute;
 	right: 10px;
 	top: 82px;
 }
@@ -167,135 +167,140 @@ legend {
  ** Right action button menu                                                 **
  *****************************************************************************/
 #actionbar {
-    position: absolute;
-    right: 0px;
+	position: absolute;
+	right: 0px;
 }
 
 #actionbarlist {
-    list-style: none;
+	list-style: none;
 }
 
 .actiondialogbutton {
-    display: block;
-    width: 75px;
-    height: 75px;
-    padding: 5px;
-    margin-top: 10px;
-    font-size: 0.8em;
-    text-align: center;
-    border: 1px solid #B5B5B5;
-    background: #EFEFEF;
-    -moz-box-shadow: 0 0 4px #B5B5B5;
-    -webkit-box-shadow: 0 0 4px #B5B5B5;
-    box-shadow: 0 0 4px #B5B5B5;
-    filter: progid:DXImageTransform.Microsoft.Shadow(color=#B5B5B5, Strength=4);
+	display: block;
+	width: 75px;
+	height: 75px;
+	padding: 5px;
+	margin-top: 10px;
+	font-size: 0.8em;
+	text-align: center;
+	border: 1px solid #B5B5B5;
+	background: #EFEFEF;
+	-moz-box-shadow: 0 0 4px #B5B5B5;
+	-webkit-box-shadow: 0 0 4px #B5B5B5;
+	box-shadow: 0 0 4px #B5B5B5;
+	filter: progid : DXImageTransform.Microsoft.Shadow ( color = #B5B5B5,
+		Strength = 4 );
 }
 
 .actiondialogbutton:hover {
-    -moz-box-shadow: 0 0 4px #606060;
-    -webkit-box-shadow: 0 0 4px #606060;
-    box-shadow: 0 0 4px #606060;
-    filter: progid:DXImageTransform.Microsoft.Shadow(color=#606060, Strength=4);
+	-moz-box-shadow: 0 0 4px #606060;
+	-webkit-box-shadow: 0 0 4px #606060;
+	box-shadow: 0 0 4px #606060;
+	filter: progid : DXImageTransform.Microsoft.Shadow ( color = #606060,
+		Strength = 4 );
 }
 
 a.actiondialogbutton img {
-    width: 40px;
-    height: 40px;
-    border-width: 0px;
+	width: 40px;
+	height: 40px;
+	border-width: 0px;
 }
 
-a.plaina, a.plaina:active, a.plaina:visited {
-    text-decoration:none; 
-    color: #606060; 
+a.plaina,a.plaina:active,a.plaina:visited {
+	text-decoration: none;
+	color: #606060;
 }
 
 a.plaina:hover {
-    color: #010101;
+	color: #010101;
 }
 
 .apad {
-    padding: 10px;
+	padding: 10px;
 }
 
 .alrpad {
-    padding: 0px 10px 0px;
+	padding: 0px 10px 0px;
 }
 
 .logoutsecondary {
-    margin-top: 10px;
+	margin-top: 10px;
 }
 
 .logoutsecondary span {
-    float: left;
-    margin-right: 10px;
+	float: left;
+	margin-right: 10px;
 }
 
 /******************************************************************************
  ** Page Content                                                             **
  *****************************************************************************/
 #content {
-    padding-bottom: 40px;
+	padding-bottom: 40px;
+	width: 750px;
+	margin: 0 auto;
 }
 
 .contentheader {
-    text-align:center;
-    margin-top: 10px;
+	text-align: center;
+	margin-top: 10px;
 }
 
 .contentheader h2 {
-    padding: 10px;
-    font-size: 1.7em;
-    font-weight: bold;
-    text-shadow: 3px 3px 3px #C0C0C0;
+	padding: 10px;
+	font-size: 1.7em;
+	font-weight: bold;
+	text-shadow: 3px 3px 3px #C0C0C0;
 }
 
 .contentheader h3 {
-    padding: 10px;
-    font-size: 1.5em;
-    font-weight: bold;
+	padding: 10px;
+	font-size: 1.5em;
+	font-weight: bold;
 }
+
 .centercontent {
-    margin: 0 auto;
+	margin: 0 auto;
 }
 
 /******************************************************************************
  ** Page Footer                                                              **
  *****************************************************************************/
 #footer {
-    font-size: 0.8em;
-    position: absolute;
-    bottom: 0px;
-    padding: 6px;
-    background-color: #EFEFEF;
-    width: 944px;
-    border-style: solid;
-    border-color: #B5B5B5;
-    border-width: 1px 1px 0px;
-    -moz-box-shadow: 0 -2px 2px #B5B5B5;
-    -webkit-box-shadow: 0 -2px 2px #B5B5B5;
-    box-shadow: 0 -2px 2px #B5B5B5;
+	font-size: 0.8em;
+	position: absolute;
+	bottom: 0px;
+	padding: 6px;
+	background-color: #EFEFEF;
+	width: 944px;
+	border-style: solid;
+	border-color: #B5B5B5;
+	border-width: 1px 1px 0px;
+	-moz-box-shadow: 0 -2px 2px #B5B5B5;
+	-webkit-box-shadow: 0 -2px 2px #B5B5B5;
+	box-shadow: 0 -2px 2px #B5B5B5;
 }
 
 /******************************************************************************
  ** Alert banner.                                                            **
  *****************************************************************************/
 .alertdiv {
-    width: 310px;
+	width: 310px;
 }
 
 .alertspan {
-    float: left;
-    margin: 2px 4px 0px;
+	float: left;
+	margin: 2px 4px 0px;
 }
 
 .alertp {
-    padding: 6px 0 6px;
+	padding: 6px 0 6px;
 }
 
 .alertlist {
-    margin-left: 35px;
-    list-style: square;
-    padding-bottom: 10px;
+	margin-left: 35px;
+	list-style: square;
+	padding-bottom: 10px;
 }
 
 /******************************************************************************
@@ -333,4 +338,55 @@ a.plaina:hover {
 
 .linkbutcont {
 	margin-top: 10px;
+}
+
+/******************************************************************************
+ ** Status page.                                                             **
+ *****************************************************************************/
+#bigstatus {
+	text-align: center;
+}
+
+.detailspanel {
+	width: 360px;
+	border: 1px solid #B5B5B5;
+	-moz-box-shadow: 0 0 5px #B5B5B5;
+	-webkit-box-shadow: 0 0 4px #B5B5B5;
+	box-shadow: 0 0 4px #B5B5B5;
+}
+
+.detailspaneltitle {
+	color: #606060;
+	background-color: #EFEFEF;
+	border-bottom: 1px solid #B5B5B5;
+	font-size: 1em;
+	height: 29px;
+}
+
+.detailspaneltitle p {
+	padding-top: 6px;
+}
+
+.detailspanelicon {
+	float: left;
+	margin: 0 5px;
+}
+
+.detailpanelcontents {
+	padding: 10px;
+}
+
+#exerciserdetails {
+	float: left;
+}
+
+#sessiondetails {
+	float: right;
+}
+
+#activitydect {
+	border-bottom: 1px solid #B5B5B5;
+	margin-bottom: 10px;
+	padding: 10px;
+	text-align: center;
 }
