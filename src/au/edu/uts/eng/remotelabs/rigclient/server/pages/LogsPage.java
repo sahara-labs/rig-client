@@ -49,10 +49,47 @@ import javax.servlet.http.HttpServletResponse;
 public class LogsPage extends AbstractPage
 {
     @Override
+    public void preService(HttpServletRequest req)
+    {
+        if (req.getRequestURI().endsWith("update"))
+        {
+            this.framing = false;
+        }
+    }
+    
+    @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
-    {   
-        /* Add ths list of logs. */
+    {
         String logs[] = this.logger.getLogBuffer();
+        
+        /* Reverse the array to get the latest logs first. */
+        for (int i = 0; i < logs.length / 2; i++)
+        {
+            String t = logs[i];
+            logs[i] = logs[logs.length - i - 1];
+            logs[logs.length - i - 1] = t;
+        }
+        
+        if (req.getRequestURI().endsWith("update"))
+        {
+            /* Update of the logs. */
+            this.generateLogList(logs);
+        }
+        else
+        {
+            /* Normal logs page generation. */
+            this.indexPage(logs);
+        }
+    }
+
+    /**
+     * Generates the index page.
+     * 
+     * @param logs log messages
+     */
+    private void indexPage(String logs[])
+    {
+        /* Add ths list of logs. */
         if (logs.length == 0)
         {
             this.println("<div class='ui-state ui-state-highlight errdialog ui-corner-all'>");
@@ -61,15 +98,6 @@ public class LogsPage extends AbstractPage
             this.println("      There has been no logs since rig client startup.");
             this.println("  </p>");
             this.println("</div>");
-            return;
-        }
-        
-        /* Reverse the array to get the latest logs first. */
-        for (int i = 0; i < logs.length / 2; i++)
-        {
-            String t = logs[i];
-            logs[i] = logs[logs.length - i - 1];
-            logs[logs.length - i - 1] = t;
         }
         
         /* Display logs. */
@@ -82,21 +110,9 @@ public class LogsPage extends AbstractPage
         this.println("      </div>");
         this.println("      <div class='detailspanelcontents'>");
         this.println("          <ul id='logslist'>");
-        for (int i = 0; i < logs.length; i++)
-        {
-            String type = "";
-            if      (logs[i].contains("FATAL")) type = "fatallog";
-            else if (logs[i].contains("PRIORITY")) type = "prilog";
-            else if (logs[i].contains("ERROR")) type = "errorlog";
-            else if (logs[i].contains("WARN")) type = "warnlog";
-            else if (logs[i].contains("INFO")) type = "infolog";
-            else if (logs[i].contains("DEBUG")) type = "debuglog";
-            
-            
-            this.println("          <li class='" + type + " " + (i % 2 == 0 ? "evenlog" : "oddlog")+ "'>");
-            this.println("              <span class='logmessage'>" + logs[i] + "</span>");
-            this.println("          </li>");
-        }
+        
+        this.generateLogList(logs);
+        
         this.println("          </ul>");
         this.println("      </div>"); // panel contents
         this.println("  </div>"); // logscontainer
@@ -161,7 +177,37 @@ public class LogsPage extends AbstractPage
                 "    else $('.debuglog').slideUp();\n" + 
                 "});");
         
+        /* Logs auto-update script. */
+        this.println(
+                "$(document).ready(function() {\n" +
+                "   setTimeout(updateLogs, 5000);\n" +
+                "});");
+        
         this.println("</script>");
+    }
+
+    /**
+     * Generates the lists of logs.
+     * 
+     * @param logs log messages
+     */
+    private void generateLogList(String[] logs)
+    {
+        for (int i = 0; i < logs.length; i++)
+        {
+            String type = "";
+            if      (logs[i].contains("FATAL")) type = "fatallog";
+            else if (logs[i].contains("PRIORITY")) type = "prilog";
+            else if (logs[i].contains("ERROR")) type = "errorlog";
+            else if (logs[i].contains("WARN")) type = "warnlog";
+            else if (logs[i].contains("INFO")) type = "infolog";
+            else if (logs[i].contains("DEBUG")) type = "debuglog";
+            
+            
+            this.println("<li class='" + type + " " + (i % 2 == 0 ? "evenlog" : "oddlog")+ "'>");
+            this.println("  <span class='logmessage'>" + logs[i] + "</span>");
+            this.println("</li>");
+        }
     }
     
     @Override

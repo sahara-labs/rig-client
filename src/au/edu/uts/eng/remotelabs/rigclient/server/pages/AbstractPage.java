@@ -66,6 +66,9 @@ public abstract class AbstractPage
     /** The rig type class. */
     protected IRig rig;
     
+    /** Whether there is page framing with default contents. */
+    protected boolean framing;
+    
     /** Rig client configuration. */
     protected IConfig config;
     
@@ -79,7 +82,16 @@ public abstract class AbstractPage
         this.rig = RigFactory.getRigInstance();
         
         this.buf = new StringBuilder();
+        this.framing = true;
     }
+    
+    /**
+     * Method that is called before page generation.
+     * 
+     * @param req request
+     */
+    protected void preService(HttpServletRequest req)
+    { /* To be optionally overridden with behaviour. */ }
     
     /**
      * Services the request.
@@ -92,26 +104,34 @@ public abstract class AbstractPage
     {
         this.out = resp.getWriter();
         
+        this.preService(req);
+        
         resp.setStatus(HttpServletResponse.SC_OK);
-        this.println("<!DOCTYPE html>");
-        this.println("<html>");
-        this.addHead();
-        this.println("<body onload='initPage()' onresize='resizeFooter()'>");
-        this.println("<div id='wrapper'>");
-        this.addHeader();
-        this.addNavbar();
-        this.addActionBar();
         
-        /* Main contents. */
-        this.println("<div id='content'>");
-        this.addPageHeading();
+        if (this.framing)
+        {
+            this.println("<!DOCTYPE html>");
+            this.println("<html>");
+            this.addHead();
+            this.println("<body onload='initPage()' onresize='resizeFooter()'>");
+            this.println("<div id='wrapper'>");
+            this.addHeader();
+            this.addNavbar();
+            this.addActionBar();
+            this.println("<div id='content'>");
+            this.addPageHeading();
+        }
+        
         this.contents(req, resp);
-        this.println("</div>");
-        
-        this.addFooter();
-        this.println("</div>");
-        this.println("</body>");
-        this.println("</html>");
+
+        if (this.framing)
+        {
+            this.println("</div>");
+            this.addFooter();
+            this.println("</div>");
+            this.println("</body>");
+            this.println("</html>");
+        }
         
         resp.getWriter().print(this.buf);
     }

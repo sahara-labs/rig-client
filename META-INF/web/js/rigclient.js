@@ -134,3 +134,22 @@ function loadToolTip(pre, id, tt)
 		$(pre + id).css('font-weight', 'bold');
 	}
 }
+
+function updateLogs()
+{
+	$.get(
+		"/logs/update",
+		null,
+		function (response) {
+			$("#logslist").empty();
+			$("#logslist").append(response);
+			
+			if (!$("#fatalcheck").is(":checked")) $(".fatallog").hide();
+			if (!$("#infocheck").is(":checked"))  $(".infolog").hide();
+			if (!$("#debugcheck").is(":checked")) $(".debuglog").hide();
+			
+			setTimeout(updateLogs, 5000);
+		}
+	);
+}
+
