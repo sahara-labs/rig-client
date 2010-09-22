@@ -147,9 +147,10 @@ public class ConfigurationActionLoader
         this.logger.debug(type + " actions configuration string is " + conf + ".");
         
         final String classes[] = conf.split(ConfigurationActionLoader.SPLIT_CHAR);
-        Class<?> foundClazz = null;
+
         for (String clazz : classes)
         {
+            Class<?> foundClazz = null;
             try
             {
                 try
