@@ -330,8 +330,9 @@ a.plaina:hover {
 	display: block;
 	width: 200px;
 	height: 40px;
-	background-color: #F8FEA1;
-	-moz-box-shadow: 0 0 12px #606060;
+	border: 1px solid #FCEFA1;
+	background-color: #FCFAF2;
+	-moz-box-shadow: 0 0 12px #FCEFA1;
 	-webkit-box-shadow: 0 0 12px #606060;
 	box-shadow: 0 0 12px #606060;
 }
