@@ -149,6 +149,8 @@ abstract class AbstractLogger implements ILogger
      */
     private void innerLog(final int level, final String message)
     {
+        if (message == null) return;
+        
         synchronized (this.buffer)
         {
             /* Bound the size of buffer. */
