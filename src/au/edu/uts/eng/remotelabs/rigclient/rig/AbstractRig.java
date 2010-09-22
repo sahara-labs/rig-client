@@ -705,7 +705,8 @@ public abstract class AbstractRig implements IRig
     }
     
     /**
-     * Gets the list of tests.
+     * Gets the list of tests. The list is unmodifiable and will throw an 
+     * {@link UnsupportedOperationException} if modified.
      * 
      * @return list of tests
      */
