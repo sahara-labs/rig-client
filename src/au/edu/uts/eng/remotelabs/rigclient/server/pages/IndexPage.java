@@ -79,7 +79,7 @@ public class IndexPage extends AbstractPage
 
             this.println("       <li><a class='" + classes + "' href='" + e.getValue() + "'>");
             this.println("           <div class='linkbutcont'>");
-            this.println(                "<span class='linkicon ui-icon ui-icon-arrowreturnthick-1-e' style='float:left; margin:0 10px 0'></span>" 
+            this.println(                "<span class='linkicon ui-icon ui-icon-bullet' style='float:left; margin:0 10px 0'></span>" 
                     + e.getKey());
             this.println("           </div>");
             this.println("      </a></li>");

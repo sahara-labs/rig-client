@@ -489,3 +489,68 @@ a.plaina:hover {
 	padding: 10px;
 	text-align: center;
 }
+
+/******************************************************************************
+ ** Logs page.                                                               **
+ *****************************************************************************/
+#logscontainer {
+ 	width: 750px;
+}
+
+#logslist {
+	list-style: none;
+}
+
+#logslist li {
+	padding: 5px 10px;
+	border-bottom: 1px solid #606060;
+}
+
+.logmessage {
+	font-size: 10pt;
+	font-family: monospace,courier;
+}
+
+.fatallog {
+	background-color: #010101;
+	color: #FFFFFF;
+}
+
+.prilog {
+	background-color: #859CFF;
+}
+
+.errorlog {
+	color: #FFFFFF;
+	background-color: #5C2525;
+}
+
+.warnlog {
+	background-color: #FAFCB3;	
+}
+
+.infolog {
+	background-color: #CCFFC8;
+}
+
+.debuglog {
+	background-color: #EEFFEE;
+}
+
+.evenlog {
+	opacity: 0.75;
+}
+
+#logchecks {
+	position: absolute;
+	left: 0;
+	top: 177px;
+	width: 88px;
+}
+
+#logschecklist {
+	list-style: none;
+	text-align: right;
+	padding: 10px;
+}
+	
