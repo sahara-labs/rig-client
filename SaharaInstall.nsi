@@ -325,7 +325,7 @@ Section "Rig Client" RigClient
     SetOutPath $INSTDIR
 	File dist\rigclient.jar
 	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
-    File config\rigclient_service.ini
+    File rigclient_service.ini
     
     ; Bug #77 - create lib directory
     SetOutPath $INSTDIR\lib
