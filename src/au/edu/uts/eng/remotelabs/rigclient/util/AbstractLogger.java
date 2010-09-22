@@ -51,7 +51,7 @@ import org.apache.log4j.varia.NullAppender;
 abstract class AbstractLogger implements ILogger
 {
     /** The default of the internal log buffer. */
-    public static final int LOG_BUFFER_SIZE = 100;
+    public static final int LOG_BUFFER_SIZE = 50;
     
     /** Level to log to. */
     protected short logLevel;
