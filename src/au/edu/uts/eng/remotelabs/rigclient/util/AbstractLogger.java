@@ -35,13 +35,12 @@
  *
  * @author Michael Diponio (mdiponio)
  * @date 5th October 2009
- *
- * Changelog:
- * - 05/10/2009 - mdiponio - Initial file creation.
  */
 package au.edu.uts.eng.remotelabs.rigclient.util;
 
+import java.util.ArrayDeque;
 import java.util.Map;
+import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.varia.NullAppender;
@@ -51,6 +50,9 @@ import org.apache.log4j.varia.NullAppender;
  */
 abstract class AbstractLogger implements ILogger
 {
+    /** The default of the internal log buffer. */
+    public static final int LOG_BUFFER_SIZE = 100;
+    
     /** Level to log to. */
     protected short logLevel;
     
@@ -62,6 +64,12 @@ abstract class AbstractLogger implements ILogger
     
     /** The level in the stack of the calling method. */
     protected int stackLevel;
+    
+    /** The max buffer size. */
+    private final int bufferLength;
+    
+    /** The buffer of recent logs. */
+    private final Queue<String> buffer;
     
     /**
      * Constructor - loads the logging level.
@@ -77,6 +85,9 @@ abstract class AbstractLogger implements ILogger
         
         /* Most loggers have 3 as there stack level. */
         this.stackLevel = 3;
+        
+        this.bufferLength = AbstractLogger.LOG_BUFFER_SIZE;
+        this.buffer = new ArrayDeque<String>(this.bufferLength);
      }
 
     @Override
@@ -84,7 +95,7 @@ abstract class AbstractLogger implements ILogger
     {
         if (ILogger.DEBUG <= this.logLevel)
         {
-            this.log(ILogger.DEBUG, 
+            this.innerLog(ILogger.DEBUG, 
                     this.formatter.formatLog(this.formatStrings.get(ILogger.DEBUG), message, "DEBUG", this.stackLevel));
         }
     }
@@ -92,14 +103,14 @@ abstract class AbstractLogger implements ILogger
     @Override
     public void error(final String message)
     {
-        this.log(ILogger.ERROR, 
+        this.innerLog(ILogger.ERROR, 
                 this.formatter.formatLog(this.formatStrings.get(ILogger.ERROR), message, "ERROR", this.stackLevel));
     }
 
     @Override
     public void fatal(final String message)
     {
-        this.log(ILogger.FATAL, 
+        this.innerLog(ILogger.FATAL, 
                 this.formatter.formatLog(this.formatStrings.get(ILogger.FATAL), message, "FATAL", this.stackLevel));        
     }
 
@@ -108,7 +119,7 @@ abstract class AbstractLogger implements ILogger
     {
         if (ILogger.INFO <= this.logLevel)
         {
-            this.log(ILogger.INFO, 
+            this.innerLog(ILogger.INFO, 
                     this.formatter.formatLog(this.formatStrings.get(ILogger.INFO), message, "INFO", this.stackLevel));
         }
     }
@@ -116,7 +127,7 @@ abstract class AbstractLogger implements ILogger
     @Override
     public void priority(final String message)
     {
-        this.log(ILogger.PRIORITY, 
+        this.innerLog(ILogger.PRIORITY, 
                 this.formatter.formatLog(this.formatStrings.get(ILogger.PRIORITY), message, "PRIORITY", this.stackLevel));        
     }
 
@@ -125,8 +136,38 @@ abstract class AbstractLogger implements ILogger
     {
         if (ILogger.WARN <= this.logLevel)
         {
-            this.log(ILogger.WARN, 
+            this.innerLog(ILogger.WARN, 
                     this.formatter.formatLog(this.formatStrings.get(ILogger.WARN), message, "WARN", this.stackLevel));
+        }
+    }
+    
+    /**
+     * Does some common required work for logging.
+     * 
+     * @param level log level
+     * @param message message to log
+     */
+    private void innerLog(final int level, final String message)
+    {
+        synchronized (this.buffer)
+        {
+            /* Bound the size of buffer. */
+            if (this.buffer.size() >= this.bufferLength)
+            {
+                this.buffer.poll();
+            }
+            this.buffer.add(message);
+        }
+        
+        this.log(level, message);
+    }
+    
+    @Override
+    public String[] getLogBuffer()
+    {
+        synchronized (this.buffer)
+        {
+            return this.buffer.toArray(new String[this.buffer.size()]);
         }
     }
 }

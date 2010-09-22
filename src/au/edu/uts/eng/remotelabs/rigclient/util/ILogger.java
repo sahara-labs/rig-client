@@ -114,4 +114,11 @@ public interface ILogger
      * @param message message to log
      */
     public void log(final int level, String message);
+    
+    /**
+     * Gets the log buffer of recent logs.
+     * 
+     * @return log buffer
+     */
+    public String[] getLogBuffer();
 }
