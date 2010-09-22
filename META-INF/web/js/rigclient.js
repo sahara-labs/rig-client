@@ -125,3 +125,12 @@ function resizeFooter()
 	var n = document.getElementById("wrapper");
 	n.style.minHeight = height + "px";
 }
+
+function loadToolTip(pre, id, tt)
+{
+	if (tt[id])
+	{
+		$(pre + "hov" + id).fadeIn();
+		$(pre + id).css('font-weight', 'bold');
+	}
+}

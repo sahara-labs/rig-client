@@ -105,16 +105,64 @@ public class StatusPage extends AbstractPage
         this.println("  <p>Legend:</p>");
         this.println("  <ul>");
         this.println("      <li id='leg1'>");
-        this.println("          <img src='/img/blue_small.gif' alt='Not registered' />Not Registered");
-        this.println("          <div id='leghov1' class='leghov'>");
-        this.println("              ");
+        this.println("          <img class='legicon' src='/img/blue_tiny.gif' alt='blue' />Not Registered");
+        this.println("          <div id='leghov1' class='leghov ui-corner-all'>");
+        this.println("              <div class='legimg'><img src='/img/blue.gif' alt='blue' /></div>");
+        this.println("              <div class='legdesc'>The rig is not registered to a scheduling server so cannot " +
+        		"have users assigned to it.</div>");
         this.println("          </div>");
         this.println("      </li>");
-
+        this.println("      <li id='leg2'>");
+        this.println("          <img class='legicon' src='/img/green_tiny.gif' alt='green' />Online");
+        this.println("          <div id='leghov2' class='leghov ui-corner-all'>");
+        this.println("              <div class='legimg'><img src='/img/green.gif' alt='green' /></div>");
+        this.println("              <div class='legdesc'>The rig is online and ready for use.</div>");
+        this.println("          </div>");
+        this.println("      </li>");
+        this.println("      <li id='leg3'>");
+        this.println("          <img class='legicon' src='/img/red_tiny.gif' alt='red' />Offline");
+        this.println("          <div id='leghov3' class='leghov ui-corner-all'>");
+        this.println("              <div class='legimg'><img src='/img/red.gif' alt='red' /></div>");
+        this.println("              <div class='legdesc'>The rig is offline and cannot be used. Reasons for being " +
+        		"offline are an exerciser test has failed or a session action has failed more than the failure " +
+        		"threshold.</div>");
+        this.println("          </div>");
+        this.println("      </li>");
+        this.println("      <li id='leg4'>");
+        this.println("          <img class='legicon' src='/img/yellow_tiny.gif' alt='yellow' />In Use");
+        this.println("          <div id='leghov4' class='leghov ui-corner-all'>");
+        this.println("              <div class='legimg'><img src='/img/yellow.gif' alt='yellow' /></div>");
+        this.println("              <div class='legdesc'>The rig is currently being used by a user.</div>");
+        this.println("          </div>");
+        this.println("      </li>");
         this.println("  </ul>");
         this.println("</div>");
         
+        /* Click events. */
+        this.println("<script type='text/javascript'>");
+        this.println("var ttStates = [false, false, false, false];");
         
+        this.println("$(document).ready(function() {");
+        for (int i = 1; i <= 4; i++)
+        {
+            this.println(
+                    "$('#leg" + i + "').hover(\n" + 
+            		"        function () {\n" + 
+            		"            ttStates['" + i + "'] = true;\n" + 
+            		"            setTimeout('loadToolTip(\"#leg\", " + i + ", ttStates)', 1200);\n" + 
+            		"        },\n" + 
+            		"        function () {\n" + 
+            		"            if (ttStates['" + i + "'])\n" + 
+            		"            {\n" + 
+            		"                $('#leg' + " + i + ").css('font-weight','normal');\n" + 
+            		"                $('#leghov' + " + i + ").fadeOut();\n" + 
+            		"            }\n" + 
+            		"            ttStates['" + i + "'] = false;\n" + 
+            		"        }\n" + 
+            		");");
+        }
+        this.println("});");
+        this.println("</script>");
     }
 
 

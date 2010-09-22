@@ -391,6 +391,37 @@ a.plaina:hover {
 	font-size: 0.8em;
 }
 
+#statelegend ul li {
+	margin-top: 5px;
+}
+
+.legicon {
+	padding-right: 5px;
+}
+
+.leghov {
+	display: none;
+	position: absolute;
+	width: 250px;
+	color: #FEFEFE;
+	background-color: #606060;
+	padding: 6px;
+	z-index: 100;
+	margin-top: 10px;
+	-moz-box-shadow: 0 0 8px #606060;
+	-webkit-box-shadow: 0 0 8px #606060;
+	box-shadow: 0 0 8px #606060;
+	opacity: 0.75;
+}
+
+.legimg {
+	float: left;
+}
+
+.legdesc {
+	font-weight: normal;
+}
+
 #exerciserdetails {
 	float: left;
 }
