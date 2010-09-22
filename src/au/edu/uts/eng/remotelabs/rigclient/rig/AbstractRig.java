@@ -46,6 +46,7 @@
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -701,6 +702,16 @@ public abstract class AbstractRig implements IRig
                 test.stopTest();
             }
         }
+    }
+    
+    /**
+     * Gets the list of tests.
+     * 
+     * @return list of tests
+     */
+    public List<ITestAction> getTests()
+    {
+        return Collections.unmodifiableList(this.testActions);
     }
     
     /*
