@@ -363,6 +363,18 @@ a.plaina:hover {
 	height: 29px;
 }
 
+.errdialog {
+	margin: 10px auto 0; 
+	width: 350px;
+	text-align: left;
+	padding: 10px;
+}
+
+.erricon {
+	float:left;
+	margin-right: 5px;
+}
+
 .detailspaneltitle p {
 	padding-top: 6px;
 }
@@ -426,6 +438,46 @@ a.plaina:hover {
 	float: left;
 }
 
+#exerciserstate {
+	border-bottom: 1px solid #B5B5B5;
+	margin-bottom: 10px;
+	padding: 10px;
+	text-align: center;
+}
+
+#exercisereason {
+	padding-left: 5px;
+	border-left: 1px solid #B5B5B5;
+	text-align: left;
+}
+
+#exercisertestlist {
+	margin-left: 15px;
+	list-style: none;
+}
+
+.exercisertest {
+	margin-bottom: 10px;
+}
+
+.teststatus {
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+.teststatus img {
+	display: block;
+	float: left;
+	margin-right: 5px;
+	margin-top: -3px;
+}
+
+.testreason {
+	margin-left: 30px;
+	border-left: 1px solid #B5B5B5;
+	padding-left: 5px;
+}
+
 #sessiondetails {
 	float: right;
 }
@@ -435,9 +487,4 @@ a.plaina:hover {
 	margin-bottom: 10px;
 	padding: 10px;
 	text-align: center;
-}
-
-.errdialog {
-	width: 350px;
-	text-align: left;
 }

@@ -46,7 +46,9 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
+import au.edu.uts.eng.remotelabs.rigclient.rig.ITestAction;
 import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 
 /**
@@ -80,9 +82,9 @@ public class StatusPage extends AbstractPage
         {
             this.println("  <img src='/img/red_anime.gif' alt='Offline' />");
             this.println("  <h3>Offline</h3>");
-            this.println("  <div class='ui-state ui-state-error errdialog'>");
+            this.println("  <div class='ui-state ui-state-error errdialog ui-corner-all'>");
             this.println("      <p>");
-            this.println("          <span class='ui-icon ui-icon-alert'></span>");
+            this.println("          <span class=' erricon ui-icon ui-icon-alert'></span>");
             this.println("          " + this.rig.getMonitorReason());
             this.println("      </p>");
             this.println("  </div>");
@@ -90,7 +92,7 @@ public class StatusPage extends AbstractPage
         this.println("</div>");
         
         /* Push div. */
-        this.println("<div style='height:40px'> </div>");
+        this.println("<div style='height:20px'> </div>");
         
         this.addExerciserDetails();
         this.addSessionDetails();
@@ -178,10 +180,63 @@ public class StatusPage extends AbstractPage
         this.println("  <div class='detailpanelcontents'>");
         
         /* Overall exerciser state. */
-        
-        
-        this.println("  </div>");
+        this.println("<div id='exerciserstate'>");
+        this.println("  Exerciser State:");
+        if (this.rig.isMonitorStatusGood())
+        {
+           this.println("<img src='/img/green_small.gif' />");
+        }
+        else
+        {
+            this.println("  <img src='/img/red_small.gif' />");
+            this.println("  <div id='exercisereason'>");
+            this.println("      <strong>Reason:</strong> " + this.rig.getMonitorReason());
+            this.println("  </div>");
+        }
         this.println("</div>");
+        
+        /* Specific test displays. */
+        if (this.rig instanceof AbstractRig)
+        {
+            List<ITestAction> tests = ((AbstractRig)this.rig).getTests();
+            if (tests.size() == 0)
+            {
+                this.println("No test actions configured.");
+            }
+            else
+            {
+                this.println("<ul id='exercisertestlist'>");
+                for (ITestAction t : tests)
+                {
+                    this.println("<li class='exercisertest'>");
+                    this.println("  <div class='teststatus'>");
+                    if (t.getStatus())
+                    {
+                        this.println("<img src='/img/green_tiny.gif' alt='green' />");
+                    }
+                    else
+                    {
+                        this.println("<img src='/img/red_tiny.gif' alt='red' />");
+                    }
+                    this.println(t.getActionType());
+                    this.println("  </div>");
+                    
+                    if (!t.getStatus())
+                    {
+                        this.println("  <div class='testreason'>");
+                        this.println("      <strong>Reason: </strong> " + t.getReason());
+                        this.println("  </div>");
+                    }
+                    
+                    this.println("</li>");
+                }
+                this.println("</ul>");
+            }
+            
+        }
+        
+        this.println("</div>"); /* Panel contents. */
+        this.println("</div>"); /* Panel. */
     }
 
     /**
