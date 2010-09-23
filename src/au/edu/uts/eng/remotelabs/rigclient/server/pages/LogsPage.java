@@ -89,13 +89,13 @@ public class LogsPage extends AbstractPage
      */
     private void indexPage(String logs[])
     {
-        /* Add ths list of logs. */
+        /* Add the list of logs. */
         if (logs.length == 0)
         {
             this.println("<div class='ui-state ui-state-highlight errdialog ui-corner-all'>");
             this.println("  <p>");
             this.println("      <span class='erricon ui-icon ui-icon-info'></span>");
-            this.println("      There has been no logs since rig client startup.");
+            this.println("      There has been no log messages since rig client startup.");
             this.println("  </p>");
             this.println("</div>");
         }

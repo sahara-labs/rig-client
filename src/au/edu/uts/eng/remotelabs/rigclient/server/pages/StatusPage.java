@@ -185,8 +185,8 @@ public class StatusPage extends AbstractPage
         this.println("          <img class='legicon' src='/img/red_tiny.gif' alt='red' />Offline");
         this.println("          <div id='leghov3' class='leghov ui-corner-all'>");
         this.println("              <div class='legimg'><img src='/img/red.gif' alt='red' /></div>");
-        this.println("              <div class='legdesc'>The rig is offline and cannot be used. Reasons for being " +
-        		"offline are an exerciser test has failed or a session action has failed more than the failure " +
+        this.println("              <div class='legdesc'>The rig is offline and cannot be used. The reason for being " +
+        		"offline is that an exerciser test has failed or a session action has failed more than the failure " +
         		"threshold.</div>");
         this.println("          </div>");
         this.println("      </li>");
@@ -194,7 +194,7 @@ public class StatusPage extends AbstractPage
         this.println("          <img class='legicon' src='/img/yellow_tiny.gif' alt='yellow' />In Use");
         this.println("          <div id='leghov4' class='leghov ui-corner-all'>");
         this.println("              <div class='legimg'><img src='/img/yellow.gif' alt='yellow' /></div>");
-        this.println("              <div class='legdesc'>The rig is currently being used by a user.</div>");
+        this.println("              <div class='legdesc'>The rig is currently being used.</div>");
         this.println("          </div>");
         this.println("      </li>");
         this.println("  </ul>");

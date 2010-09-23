@@ -166,7 +166,7 @@ public abstract class AbstractPage
     }
     
     /**
-     * Same string transfrom as the WI.
+     * Same string transform as the WI.
      * 
      * @param str string to transform
      * @return transformed string
