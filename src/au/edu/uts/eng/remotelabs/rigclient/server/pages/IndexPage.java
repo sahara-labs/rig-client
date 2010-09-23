@@ -51,24 +51,39 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class IndexPage extends AbstractPage
 {
-    private Map<String, String> links;
+    /** Page links. */
+    private final Map<String, String> links;
+    
+    /** Operations. */
+    private final Map<String, String> operations;
     
     public IndexPage()
     {
-        this.links = new LinkedHashMap<String, String>();
+        this.links = new LinkedHashMap<String, String>(5);
         this.links.put("Status", "/status");
-        this.links.put("Maintenance", "/mainten");
         this.links.put("Configuration", "/config");
         this.links.put("Logs", "/logs");
         this.links.put("Runtime Information", "/info");
         this.links.put("Documentation", "/doc");
+        
+        this.operations = new LinkedHashMap<String, String>(4);
+        this.operations.put("Set Maintenance", "");
+        this.operations.put("Clear Maintenance", "");
+        this.operations.put("Restart", "");
+        this.operations.put("Shutdown", "");
     }
     
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
-    {   
+    {
+        this.println("<div id='alllinks'>");
+        
+        /* Link pages. */
         this.println("<div id='linklist'>");
-        this.println("   <ul id='ullinklist'>");
+        this.println("  <div class='listtitle'>");
+        this.println("      Pages");
+        this.println("  </div>");
+        this.println("  <ul class='ullinklist'>");
 
         int i = 0;
         for (Entry<String, String> e : this.links.entrySet())
@@ -89,6 +104,35 @@ public class IndexPage extends AbstractPage
        
        this.println("   </ul>");
        this.println("</div>");
+       
+       /* Operations pages. */
+       this.println("<div id='operationlist'>");
+       this.println("  <div class='listtitle'>");
+       this.println("      Operations");
+       this.println("  </div>");
+       this.println("  <ul class='ullinklist'>");
+
+       i = 0;
+       for (Entry<String, String> e : this.operations.entrySet())
+       {
+           String classes = "linkbut plaina";
+           if (i == 0) classes += " ui-corner-top";
+           else if (i == this.links.size() - 1) classes += " ui-corner-bottom";
+
+           this.println("       <li><a class='" + classes + "' href='" + e.getValue() + "'>");
+           this.println("           <div class='linkbutcont'>");
+           this.println(                "<span class='linkicon ui-icon ui-icon-bullet' style='float:left; margin:0 10px 0'></span>" 
+                   + e.getKey());
+           this.println("           </div>");
+           this.println("      </a></li>");
+
+           i++;
+       }
+      
+      this.println("   </ul>");
+      this.println("</div>");
+      
+      this.println("</div>");
     }
 
     @Override

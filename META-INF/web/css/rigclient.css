@@ -306,12 +306,33 @@ a.plaina:hover {
 /******************************************************************************
  ** Index page.                                                              **
  *****************************************************************************/
+#alllinks {
+	width: 450px;
+	margin: 0 auto;
+}
+ 
 #linklist {
 	margin: 40px auto 0;
 	width: 200px;
+	float: left;
 }
 
-#ullinklist {
+#operationlist {
+	margin: 40px auto 0;
+	width: 200px;
+	float: right;
+}
+
+.listtitle {
+	text-align: center;
+	font-weight: bold;
+	font-size: 1.2em;
+	color: #606060;
+	margin-bottom: 10px;
+	text-shadow: 3px 3px 3px #C0C0C0;
+}
+
+.ullinklist {
 	list-style: none;
 }
 
