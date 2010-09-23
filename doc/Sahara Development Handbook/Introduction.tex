@@ -1,0 +1,29 @@
+\section{Introduction} 
+\subsection{Purpose of this document}
+
+This document is intended for use by developer wishing to integrate computer controlled and remotely accessed rigs into Sahara.  
+It is a technical document that describes what development is needed for a Sahara \em{Rig Client} so that a rig can be accessed using the Sahara \em{Web Interface} and managed with the Sahara \em{Scheduling Server}.  It also covers the development required to customise the Sara Web Interface to site and rig specific requirements. 
+
+The development described here is in PHP, JavaScript and Java and the document assumes some technical knowledge of these.
+
+Yhe document details the steps a developer should follow to determine what rig client development is needed for their specific rig.  It then provides instructions and examples of what needs to be developed for each of the rig client types. Also covered is how to develop a customised interface for your rig that users.
+
+Also incuded is a description of how the user can customise the web interface for their site.  This includes authentication, branding (eg page headers) and deployment specific information (eg contact information)
+
+
+\subsection{Definitions}
+\begin{tabular}(|l|p{7cm}|)
+	\hline
+	\bf Term & \bf Definition \\ \hline
+	Action & Rig specific implementation of a single behaviour \\ \hline
+	Classpath & Java Virtual Machine, a set of software that uses the virtual machine model to execute other programs and scripts.  JVMs accept Java byte code (usually generated from Java Source code).  Allows 		for the "write once, run anywhere" aspect of Java.\\ \hline
+	JNI & Java Native Interface, the is a programming framework that allows Java code running in a JVM  to call and to be called by programs specific to a hardware and operating system platform (native 	
+		programs) and libraries written in other languages. \\ \hline
+	Master User & The user who initiates the session and can terminate the session. Also have complete control of the rig. \\ \hline
+	Slave Active User & The user who is assigned access to an existing rig session.  An active slave user has similar access to the rig as the master session user, but may not terminate a session and may not 			assign slave users.\\ \hline
+	Slave Passive User & The user who is assigned access to an existing rig session.  A passive slave has limited access to the experiment and implementations should interpret this permission as a read-only 				user (can view the experiment control interface and audio/visual output, but may not control the rig). \\ \hline
+	Interactive Control & This is where the rig is controlled by a user who is physically present during the session and executing control on the rig. \\ \hline
+	Batch Control & Control is done by means of an executable file that contains instructions on controlling the rig.  rUsing this type of control, the user does not have to be present while the session 				
+		exists. \\ \hline
+
+

@@ -1,0 +1,146 @@
+\chapter{Rig with Primitive Control}
+
+{\em a discussion of the primitive controlled rig.  Below is the existing content that will be restructured (along with other content) into the following sections}
+Primitive control refers to the direct control of a rig by its own Rig Client rather than an external control interface. This can be used to control the rig directly through the Web Interface, or to perform specific tasks by directly addressing the rig even if there is a peripheral controller.  Some examples of this are:
+\begin{itemise}
+	\item UTS FPGA rig, where using the "`switches"' on the Web Interface directly changes the state of the ports on the FPGA.  See screenshot below.
+	\item File transfer from the Rig Client, where data files from a rig session stored on a Rig Client machine are transferred to the Web Interface to be available to a user (even though the rig may be controlled by a LabView interface).
+\end{itemise}
+
+{\em TODO: screenshot of FPGA}
+
+
+\section{Theory of Operation}
+The objective of primitive control is to bridge a request from the Web Interface to a specific action on the Rig Client that the user is assigned to.
+
+A rig with primitive control works through the Rig Client itself issuing control instructions to the rig.  This is done by using the Web Interface's {\em Primitive Controller} to map the url from the Web Interface to a class and method on the Rig Client.  Accessing the Web Interface url results in the method being executed on the Rig Client, and the results being returned to the Web Interface.
+
+By default, all session users can perform primitive control actions, i.e. master users, slave active users and slave passive users (where the master is the user initially given access to the rig, and the slave users are other users subsequently granted access by the master user to control and/or view the rig session).  In order to restrict the use of primitive controls to certain users, filtering of role access may be implemented.
+
+
+\section{Specific Implementation}
+
+
+\section{Case Study}
+
+\section{Hints and Tips}
+
+The following description details how to set up a primitively controlled rig and gives examples of how to develop primitive control actions.  Please note that primitive control actions can be used with other rig types to perform required actions on the rig.
+
+Configuration
+For our implementation, the rigclient.properties configuration values that need to be set are:
+Rig\_Name – this is a unique identifier for the rig. In our case “FPGA\_1”
+Rig\_Type – identifies the rig as a member of this type (a group of fungible rigs), eg “FPGA”
+Rig\_Capabilities – tokens that “describe” the rig, eg “FPGA, programming”
+Rig\_Type\_Class – the qualified class of name of the rig type class implementing the rig.  In our case:  au.edu.uts.remotelabs.AbstractControlledRig.
+Action\_Package\_Prefixes – the package name where the action interface classes can be found (used if the fully qualified action class names fail)
+Access\_Actions – list of access actions to load
+Slave\_Access\_Actions – list of slave actions to load
+Notify\_Actions – list of notification actions to load
+Detection\_Actions – list of detection actions to load
+Reset\_Actions – list of reset actions to load
+Test\_Actions – list of test actions to load
+
+If the required actions do not exist, new action classes must be written that implement the specified action interfaces, as for the examples in Chapter 3.1.4.  This works the same as for a peripherally controlled rig.
+Additionally, for primitive control, commands can be executed on the rig using the Sahara Web Interface.  This is done using a web url that is configured to send a specific command with specified parameters to the rig.  The implementation is described below.
+Primitive Control
+There are two parts to the implementation of primitive control: the part of the user interface that is updated with the information provided by the primitive control request (either by user interaction, or automatically), and the rig client implementation which includes the specific method invocation that the Web Interface request is bridged to.  
+This is accomplished by setting up an interface that uses the Web Interfaces primitive control prefix (described below) to map a named controller and action (WI)  to a specific class and method (Rig Client).
+Web Interface implementation
+The primitive control URL has the following format:
+ http://webserver\_IP\_OR\_hostname/ primitive/<PrimitiveControlAction>/ pc/ <PrimitiveController>/pa/ <primitiveActionName>/ <parameterKey>/ <parameterValue>/ <parameterKey> / <parameterValue> /…
+
+Where:
+webserver\_IP\_OR\_hostname is the hostname for the Web Interface 
+primitive and <primitiveControlAction>: indicate that this is to be a primitive control call with the specified action.  The action bridges a primitive call to the in-session Rig Client.  The actions specify what is done with the response parameter (if there is any) received from the rig client.  The actions available for the primitive controller are file, echo and json (described below).  This is a mandatory parameter.
+pc (or primitiveController) and <PrimitiveController>: indicate for the name of the primitive controller that will be used.  The value PrimitiveController will be the name of the java class that contains the action to be performed.  This is a mandatory parameter.
+pa (or primitiveAction) and  <primitiveActionName>: indicate the name of the action to be run on the controller.  The value primitiveActionName will be the name of the java method (without the suffix Action) that must be executed to perform this primitive control action.  This is a mandatory parameter.
+<parameterKey> and <parameterValue>: These are key-value pairs that indicate the parameter names and values for the primitive control action.  There are some parameters associated with the primitiveControlAction that was specified (described below) , all other parameters indicate the parameters that should be passed when executing the specified method.  These are optional parameters.
+
+The three primitive control action types are:
+1. file: This action indicates that, if a response parameter is specified, its value is a file to download.  If no response parameter is specified, all the response parameters are returned as a file in the format name=value, name=value, ... etc.
+	The file may be text or binary in nature, and (with a suitable mime-type) may directly display on a web browser instead of a file download (this is an option to force file downloads). For example, a JPEG image file may be displayed onto the web browser provided the mime is set to 'image/jpeg'.  There is a soft limitation of file size, due to discreet nature of communication. The file should not be larger then a couple of megabytes and should generally be kept in the low tens of kilobyte range.
+The file action should be used when the information requested from the Rig Client  is a file, for example a results file to be made available to download.
+The possible parameters for the file action are:
+rp or responseParameter: the name of the response parameter
+mime: the mime type of the returned file.  The mime type and subtype of the file should be separated with a ‘-‘ eg text/xml should be text-xml.
+fn or filename: name of the file.  This forces a file download.
+tf or transform: any transformation that needs to be applied to the file.  The currently implemented option for this value is:
+base64 – this interprets the return value as base64 and transforms it as required. To be used if the downloaded file is binary data.
+2. echo: This action indicates that, if a response parameter is specified, its value is a echoed back.  If no response parameter is specified, all the response parameters are returned in the format format name=value, name=value, ... etc.
+The echo is suitable for use with text type data that is to be directly provided to the browser without an interpretation. For example, this can be used with XML data for client side DOM parsing.  The echo action is best used with a nominated response field that will return just the text content.
+The only parameter for the echo action is:
+rp or responseParameter: the name of the response parameter
+3. json: This action indicates that that the response to the action is a JSON string.  
+This action can be used when either of the other two is not suitable and the result is information from the rig client that needs to be manipulated or parsed further before being useful to the interface.  It is most appropriate with action methods that provide map information to be obtained with AJAX calls.  This is due the native interaction between JSON and Javascript that means the developer does not have to serialise and interpret XML or text, rather a Javascript object (or array of objects) is received with map keys that are callable as object properties.
+
+Rig Client Implementation
+The Rig Client that uses primitive control must implement the primitive control interface IPrimitiveControl. The method declaration must match the specified format.
+The Rig Client processes the primitive control request using the “Front Controller” pattern to call the method primivitveAction on a class PrimitiveController (after checking whether the requesting user is assigned and their role satisfies any role filtering constraints, if implemented). 
+The front controller (PrimitiveFront.java) is responsible for determining whether the request is valid in terms of there being an existing class and method matching the request.  After this it is the responsibility of the implemented primitive controller to check for errors.
+A primitive controller class must implement the IPrimitiveController interface which specifies that the following methods should be implemented:
+initController - Method that is called during instantiation of the controller.
+preRoute - Method that is called before routing to an action of this class.
+postRoute - Method that is called after the completion of the routed action. This method is guaranteed to be called if preRoute successfully completes.
+cleanup - Method that is called when the controller is cleanup up (generally at the termination of sessions).
+Primitive controllers are “cached” so that if the controller has instance exists already, there is no new instance created. This allows for the class to be resolved and instantiated only once during the session, instead of repeatedly.  It also means that a state can be stored that will be persisted for all subsequent action method invocations, therefore allowing “stateful” control to be developed.  Controller classes have the following life-cycle: 
+1. On first request of a controller instance, the controller is instantiated and added to the controller cache.
+2. On the next and subsequent requests of a controller instance, the controller instance is recalled and reused to run action.
+3. On termination of the masters rig session, clean up is called and the controller instance is discarded.
+It is safe to have resources (open files, handles...) as instance fields provided they are cleaned in the cleanup method. 
+In order for the Front Controller to correctly route the primitive request to the correct action, the declaration for action methods implemented in the primitive controller must be in the form:
+public PrimitiveResponse primitiveActionNameAction(PrimitiveRequest) 
+where primitiveActionName corresponds to the action specified in the primitive control request from the Web Interface. 
+In the methods, the provided PrimitiveRequest argument contains a hash table of the request parameters to the action method.
+ If the method cannot be resolved because it is not suitable declared, or throws an exception, the primitive control request will fail with the following error codes:
+0: No error
+-1: Illegal controller or action argument.
+-2: Controller class not found.
+-3: Action method not found.
+-4: Security exception accessing action.
+-5: Illegal access to the action (the action method is not public).
+-6: Invalid action signature (does not take, and only take a PrimitiveRequest parameter).
+-7: Action has thrown an exception. 
+-8: The preRoute method failed.
+-9: The ACL check does not allow the users role to perform the action.
+By convention, 0 should be used for no error, negative error codes should be resserved for routing errors and positive error codes for action method errors.  Action methods should not throw exceptions but should return error codes. An exception that is thrown by the method will result in error code -7.  
+Role Filtering for Primitive Control Actions
+For Sahara v3 and above the role (e.g. master, slave active or slave passive) of users allowed to invoke an action method may be filtered.  If implemented without any role filtering, all assigned user roles can perform any primitive control action.  It is advised that consideration be given to this implementation and if control is to be restricted, then filtering is done.
+The role filtering is done implemented per controller written in the Rig Client.  The filtering is based on an “action control list” model that specifies the actions certain roles are allowed to execute. It is included by implementing one of the following interfaces for the controller:
+MasterAllowed – this allows only the Master role to perform primitive control
+SlaveActiveAllowed – this allows the Master and Slave Active roles to perform primitive control.  The Slave passive role is not allowed to perform any primitive control action
+RoleFilteredAcl – this implements access control lists to filter access to primitive control.  Access is determined with the following hierarchy:
+Master – has implicit access to all controls	
+Slave Active – has implicit access to all actions that Slave Passive role has access to, as well as any actions in the Slave Active control list
+Slave Passive – has access only to the actions in the Slave Passive control list.
+The lists are created by populating slaveActiveActions list with those actions the Slave Active role is allowed access to, and similarly with the slavePassiveActions List for the Slave Passive role.  
+iPrimitiveAcl – this can be used if none of the above interfaces suit the restriction requirements.  This allows the rig developer to specify exactly which actions each user is allowed access to.
+For example, in order to allow all Master and Slave Active users access to all controls and restrict Slave Passive users from any controls, using our FileTransfer example, the declaration for the class would be:
+public class FileTransferController implements SlaveActiveAllowed
+Annotation based Controllers
+In Sahara v3 and above controllers may be specified using annotations...
+Example of Primitive Control
+The primitive control implementation will be described with the help of an example FileTransfer functionality.  This is primitive control functionality because the Web Interface is executing a command on the rig: an interface is generated that is periodically updated with all the files in a specified directory on the Rig machine, that are then displayed to the user on the interface, available for download. Stateful control is used to discriminate between new files and previously listed files. This allows the web interface to highlight the newly detected files.
+Firstly, the interface portion of the implementation requires that the a primitive control request be generated periodically to supply details of the files available for transfer.  For the FileTransferController example, the url to transfer a file build.xml which has mime type text/xml and requires no transforming will be:
+http://localhost/primitive/file/pc/FileTransferController/pa/textFile/filename/build.xml/mime/text-xml
+hostname =  localhost
+primitive\_control\_action = file
+primitive\_controller = FileTransferController
+primitive\_action = textFile
+parameter\_key = filename; parameter\_value  = build.xml 
+parameter\_key = mime; parameter\_value  = text-xml
+The mime parameter is used to indicate how the response file should be interpreted as it is a parameter for the primitive type file.  The parameter filename is NOT a parameter for type file so will be passed to the method in the form of an object including this key-value pair.
+This url is a primitive call to execute the method textFile in the class FileTransferController and pass the parameter filename to the method.
+
+For the second part of the implementation, the Rig Client needs to supply the information requested. The class FileTransferController has been written which implements IPrimitiveControl. This class is written to transfer all files in a configurable source directory to the Web Interface (for download by the user). The following methods have been included:
+initController – reads the configurable source directory sets up parameters for storing files and their types.
+preRoute – nothing to do, returns true.
+textFileAction(request)  - transfers the contents of the file specified by the request parameter.  This is used for text files.
+binaryFileAction(request) – transforms the contents of the file specified by request parameter.
+listFileAction(request) – lists the files in the configured source directory that matches the optional extension or regular expression provided to match the files.  If the parameters is not provided matching isn’t done. 
+deleteFileAction(request) -  deletes the file  specified in the request parameter from the source directory.
+postRoute() – nothing to do, returns true.
+cleanup() - nothing to do, returns true.
+
+
+
