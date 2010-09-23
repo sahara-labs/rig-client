@@ -244,7 +244,7 @@ public abstract class AbstractPage
         /* Add status icon to right hand side of nav bar. */
         this.println("<div id='rigstatusbox'>");
         this.println("  <div style='float:left; margin-top:8px; color:#606060'>Current Status:</div>");
-        this.println("  <a href='/status' class='plaina'>");
+        this.println("  <a id='currentstatusicon' href='/status' class='plaina'>");
         if (!StatusUpdater.isRegistered())
         {
             this.println("      <img src='/img/blue_small.gif' alt='Not registered' />");
@@ -263,6 +263,14 @@ public abstract class AbstractPage
         }
         this.println("  </a>");
         this.println("</div>");
+        
+        this.println(
+            "<script type='text/javascript'>\n" +
+            "    $(document).ready(function() {\n" +
+            "        setTimeout(updateNavStatus, 5000);\n" +
+            "    });\n" +
+            "</script>"
+        );
     }
     
     /**

@@ -141,8 +141,7 @@ function updateLogs()
 		"/logs/update",
 		null,
 		function (response) {
-			$("#logslist").empty();
-			$("#logslist").append(response);
+			$("#logslist").empty().append(response);
 			
 			if (!$("#fatalcheck").is(":checked")) $(".fatallog").hide();
 			if (!$("#infocheck").is(":checked"))  $(".infolog").hide();
@@ -153,3 +152,26 @@ function updateLogs()
 	);
 }
 
+function updateStatus()
+{
+	$.get(
+		"/status/update",
+		null,
+		function (response) {
+			$("#statuscontents").empty().append(response);
+			setTimeout(updateStatus, 10000);
+		}
+	);
+}
+
+function updateNavStatus()
+{
+	$.get(
+		"/status/current",
+		null,
+		function (response) {
+			$("#currentstatusicon").empty().append(response);
+			setTimeout(updateNavStatus, 5000);
+		}
+	);
+}

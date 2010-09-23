@@ -56,11 +56,71 @@ import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
  */
 public class StatusPage extends AbstractPage
 {
+    /** Request URI. */
+    private String uri;
+    
+    @Override
+    public void preService(HttpServletRequest req)
+    {
+        this.uri = req.getRequestURI();
+        
+        if (this.uri.endsWith("update") || this.uri.endsWith("current"))
+        {
+            /* This is just a page update, not complete page generation. */
+            this.framing = false;
+        }
+
+    }
+    
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
-        this.addLegend();
+        if (this.uri.endsWith("current"))
+        {
+            if (!StatusUpdater.isRegistered())
+            {
+                this.println("  <img src='/img/blue_small.gif' alt='blue' />");
+            }
+            else if (this.rig.isSessionActive())
+            {
+                this.println("  <img src='/img/yellow_small.gif' alt='red' />");
+            }
+            else if (this.rig.isMonitorStatusGood())
+            {
+                this.println("  <img src='/img/green_small.gif' alt='green' />");
+            }
+            else
+            {
+                this.println("  <img src='/img/red_anime_small.gif' alt='red' />");
+            }
+        }
+        else if (this.uri.endsWith("update"))
+        {
+            this.generateStatusContents();
+        }
+        else
+        {
+            this.addLegend();
+            this.println("<div id='statuscontents'>");
+            this.generateStatusContents();
+            this.println("</div>");
+                        
+            /* Page auto-update. */
+            this.println(
+                "<script type='text/javascript'>\n" +
+                "$(document).ready(function() {\n" +
+                "   setTimeout(updateStatus, 10000);\n" +
+                "});" +
+                "</script>");
         
+        }
+    }
+
+    /**
+     * Generates the main contents of the page.
+     */
+    private void generateStatusContents()
+    {
         /* Main status. */
         this.println("<div id='bigstatus'>");
         if (!StatusUpdater.isRegistered())
@@ -163,6 +223,7 @@ public class StatusPage extends AbstractPage
             		"        }\n" + 
             		");");
         }
+
         this.println("});");
         this.println("</script>");
     }
@@ -309,8 +370,6 @@ public class StatusPage extends AbstractPage
                 }
                 this.println("</ul>");
             }
-            
-            
         }
         else
         {
