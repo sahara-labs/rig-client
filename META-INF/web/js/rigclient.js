@@ -144,6 +144,9 @@ function updateLogs()
 			$("#logslist").empty().append(response);
 			
 			if (!$("#fatalcheck").is(":checked")) $(".fatallog").hide();
+			if (!$("#pricheck").is(":checked")) $(".prilog").hide();
+			if (!$("#errorcheck").is(":checked")) $(".errorlog").hide();
+			if (!$("#warncheck").is(":checked")) $(".warnlog").hide();
 			if (!$("#infocheck").is(":checked"))  $(".infolog").hide();
 			if (!$("#debugcheck").is(":checked")) $(".debuglog").hide();
 			
