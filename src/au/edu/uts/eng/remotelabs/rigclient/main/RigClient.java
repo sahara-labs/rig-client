@@ -253,4 +253,15 @@ public class RigClient
     {
         RigClient.shutdown = true;
     }
+    
+    /**
+     * Soft restarts the rig client. It is soft because the JVM itself is not 
+     * terminated.
+     */
+    public static void restart()
+    {
+        RigClient.stop();
+        RigClient.start();
+    }
+    
 }
