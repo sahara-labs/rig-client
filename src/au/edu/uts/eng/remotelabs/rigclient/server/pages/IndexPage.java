@@ -98,7 +98,7 @@ public class IndexPage extends AbstractPage
         		"properties, uptime...");
         this.toolTips.put("Restart", "Restarts the rig client. This is only a soft restart as the Java virtual " +
         		"machine is not restarted. If the classpath is modified, the rig client must be stopped and the rig" +
-        		"client service started up.");
+        		"client service started up again.");
         this.toolTips.put("Shutdown", "Shuts down the rig client. Terminates the rig client service");
     }
     
@@ -205,7 +205,7 @@ public class IndexPage extends AbstractPage
           this.println("            if (ttStates['" + name + "'])");
           this.println("            {");
           this.println("                $('#" + name + "hover').fadeOut();");
-          this.println("                $('#" + name + "link').css('font-weight', 'bold');");
+          this.println("                $('#" + name + "link').css('font-weight', 'normal');");
           this.println("                ttStates['" + name + "'] = false;");
           this.println("            }");
           this.println("        }");

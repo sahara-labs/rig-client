@@ -464,6 +464,11 @@ a.plaina:hover {
 
 .legimg {
 	float: left;
+	padding: 5px;
+}
+
+.legimg img {
+	border: 0 none;
 }
 
 .legdesc {
