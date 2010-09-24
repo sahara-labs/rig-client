@@ -55,6 +55,7 @@ import au.edu.uts.eng.remotelabs.rigclient.server.pages.ErrorPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.IndexPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.InfoPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.LogsPage;
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.OperationsPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.PageResource;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.StatusPage;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -102,6 +103,7 @@ public class RootServlet extends HttpServlet
         this.pages.put("info", InfoPage.class.getName());
         this.pages.put("logs", LogsPage.class.getName());
         this.pages.put("status", StatusPage.class.getName());
+        this.pages.put("op", OperationsPage.class.getName());
     }
     
     @SuppressWarnings("unchecked")

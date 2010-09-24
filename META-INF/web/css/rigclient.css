@@ -593,4 +593,28 @@ a.plaina:hover {
 	text-align: right;
 	padding: 10px;
 }
+
+/******************************************************************************
+ ** Confirmation page.                                                       **
+ *****************************************************************************/
+ 
+#confirmationcontainer {
+	position: absolute;
+	height: 200px;
+}
+
+.confirmimg {
+	float: left;
+	margin: 5px;
+}
+
+.confirmtext {
+	padding: 20px 15px 0;
+}
+
+#confirmsession {
+	margin: 10px 10px;
+	padding: 5px;
+}
+
 	

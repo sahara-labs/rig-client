@@ -39,6 +39,9 @@
 package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.util.Calendar;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,9 +54,39 @@ public class InfoPage extends AbstractPage
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
-        this.flushOut();
-        // TODO runtime about the rig client
-        resp.getWriter().println("Runtime information page.");
+        this.println("<div id='allinfo'>");
+        
+        /* Runtime information. */
+        RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+        
+        this.println("  <div id='runtimecontainer' class='detailspanel ui-corner-all'>");
+        this.println("      <div class='detailspaneltitle'>");
+        this.println("          <p>");
+        this.println("              <span class='detailspanelicon ui-icon ui-icon-script'> </span>");
+        this.println("              Runtime:");
+        this.println("          </p>");
+        this.println("      </div>");
+        this.println("      <div class='detailspanelcontents'>");
+        
+        this.println("<table>");
+        this.println("  <tr>");
+        this.println("      <th>Item</th>");
+        this.println("      <th>Value</th>");
+        this.println("  </tr>");
+        this.println("  <tr>");
+        this.println("      <td>Start time</td>");
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(runtime.getStartTime());
+        
+        
+        this.println("      <td>"  + "</td>");
+        this.println("  </tr>");
+        this.println("</table>");
+        
+        this.println("      </div>"); // runtime panel contents
+        this.println("  </div>");
+        
+        this.println("</div>"); // allinfo
     }
 
     @Override
@@ -61,5 +94,4 @@ public class InfoPage extends AbstractPage
     {
         return "Runtime Information";
     }
-
 }

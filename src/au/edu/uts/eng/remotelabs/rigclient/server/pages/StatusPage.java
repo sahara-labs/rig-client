@@ -262,7 +262,7 @@ public class StatusPage extends AbstractPage
             List<ITestAction> tests = ((AbstractRig)this.rig).getTests();
             if (tests.size() == 0)
             {
-                this.println("No test actions configured.");
+                this.println("No tests configured.");
             }
             else
             {

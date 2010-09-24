@@ -74,8 +74,8 @@ public class IndexPage extends AbstractPage
         this.links.put("Documentation", "/doc");
         
         this.operations = new LinkedHashMap<String, String>(4);
-        this.operations.put("Restart", "");
-        this.operations.put("Shutdown", "");
+        this.operations.put("Restart", "/op/restart");
+        this.operations.put("Shutdown", "/op/shutdown");
         
         this.icons = new HashMap<String, String>(9);
         this.icons.put("Status", "status");
@@ -97,8 +97,7 @@ public class IndexPage extends AbstractPage
         this.toolTips.put("Runtime_Information", "Runtime information about the rig client such as classpath, system " +
         		"properties, uptime...");
         this.toolTips.put("Restart", "Restarts the rig client. This is only a soft restart as the Java virtual " +
-        		"machine is not restarted. If the classpath is modified, the rig client must be stopped and the rig" +
-        		"client service started up again.");
+        		"machine is not restarted.");
         this.toolTips.put("Shutdown", "Shuts down the rig client. Terminates the rig client service");
     }
     
