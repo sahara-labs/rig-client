@@ -312,13 +312,13 @@ a.plaina:hover {
 }
  
 #linklist {
-	margin: 40px auto 0;
+	margin: 10px auto 0;
 	width: 200px;
 	float: left;
 }
 
 #operationlist {
-	margin: 40px auto 0;
+	margin: 10px auto 0;
 	width: 200px;
 	float: right;
 }
@@ -327,8 +327,7 @@ a.plaina:hover {
 	text-align: center;
 	font-weight: bold;
 	font-size: 1.2em;
-	color: #606060;
-	margin-bottom: 10px;
+	margin-bottom: 20px;
 	text-shadow: 3px 3px 3px #C0C0C0;
 }
 
@@ -360,6 +359,21 @@ a.plaina:hover {
 
 .linkbutcont {
 	margin-top: 10px;
+}
+
+.linkbutconticon {
+	float: left;
+	margin-top: -5px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.linkbutconticon img {
+	border: 0 none;
+}
+
+.linkbutcontlabel {
+
 }
 
 /******************************************************************************

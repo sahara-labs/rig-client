@@ -39,6 +39,7 @@
 package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -57,20 +58,48 @@ public class IndexPage extends AbstractPage
     /** Operations. */
     private final Map<String, String> operations;
     
+    /** Icons. */
+    private final Map<String, String> icons;
+    
+    /** Tooltips. */
+    private final Map<String, String> toolTips;
+    
     public IndexPage()
     {
         this.links = new LinkedHashMap<String, String>(5);
         this.links.put("Status", "/status");
         this.links.put("Configuration", "/config");
         this.links.put("Logs", "/logs");
-        this.links.put("Runtime Information", "/info");
+        this.links.put("Runtime_Information", "/info");
         this.links.put("Documentation", "/doc");
         
         this.operations = new LinkedHashMap<String, String>(4);
-        this.operations.put("Set Maintenance", "");
-        this.operations.put("Clear Maintenance", "");
         this.operations.put("Restart", "");
         this.operations.put("Shutdown", "");
+        
+        this.icons = new HashMap<String, String>(9);
+        this.icons.put("Status", "status");
+        this.icons.put("Configuration", "config");
+        this.icons.put("Logs", "logs");
+        this.icons.put("Documentation", "doc");
+        this.icons.put("Runtime_Information", "runtime");
+        this.icons.put("Restart", "restart");
+        this.icons.put("Shutdown", "shutdown");
+        
+        this.toolTips = new HashMap<String, String>(9);
+        this.toolTips.put("Status", "The status of the rig client including session details and exerciser tests " +
+        		"statuses.");
+        this.toolTips.put("Configuration", "Allows configuration properties of the rig client can be changed.");
+        this.toolTips.put("Logs", "Log viewer of the recent log messages of the rig client. Only the " + 
+                this.logger.getLogBuffer().length + " most recent log messages since the rig client was started are " +
+                "displayed");
+        this.toolTips.put("Documentation", "Documentation about the rig client.");
+        this.toolTips.put("Runtime_Information", "Runtime information about the rig client such as classpath, system " +
+        		"properties, uptime...");
+        this.toolTips.put("Restart", "Restarts the rig client. This is only a soft restart as the Java virtual " +
+        		"machine is not restarted. If the classpath is modified, the rig client must be stopped and the rig" +
+        		"client service started up.");
+        this.toolTips.put("Shutdown", "Shuts down the rig client. Terminates the rig client service");
     }
     
     @Override
@@ -88,22 +117,29 @@ public class IndexPage extends AbstractPage
         int i = 0;
         for (Entry<String, String> e : this.links.entrySet())
         {
+            String name = e.getKey();
             String classes = "linkbut plaina";
             if (i == 0) classes += " ui-corner-top";
             else if (i == this.links.size() - 1) classes += " ui-corner-bottom";
 
-            this.println("       <li><a class='" + classes + "' href='" + e.getValue() + "'>");
+            this.println("       <li><a id='" + name + "link' class='" + classes + "' href='" + e.getValue() + "'>");
             this.println("           <div class='linkbutcont'>");
-            this.println(                "<span class='linkicon ui-icon ui-icon-bullet' style='float:left; margin:0 10px 0'></span>" 
-                    + e.getKey());
+            this.println("               <div class='linkbutconticon'>");
+            this.println("                   <img src='/img/" + this.icons.get(name) + "_small.png' alt='" + name + "' />");
+            this.println("               </div>");
+            this.println("               <div class='linkbutcontlabel'>" + this.stringTransform(name) + "</div>");
+            this.println("               <div id='" + name + "hover' class='leghov ui-corner-all'>");
+            this.println("                  <div class='legimg'><img src='/img/" + this.icons.get(name) + ".png' alt='"+ name + "' /></div>");
+            this.println("                  <div class='legdesc'>" + this.toolTips.get(name) + "</div>");
+            this.println("               </div>");
             this.println("           </div>");
             this.println("      </a></li>");
 
             i++;
         }
        
-       this.println("   </ul>");
-       this.println("</div>");
+       this.println("   </ul>"); // ullinklist
+       this.println("</div>"); // linklist
        
        /* Operations pages. */
        this.println("<div id='operationlist'>");
@@ -115,24 +151,69 @@ public class IndexPage extends AbstractPage
        i = 0;
        for (Entry<String, String> e : this.operations.entrySet())
        {
+           String name = e.getKey();
            String classes = "linkbut plaina";
            if (i == 0) classes += " ui-corner-top";
            else if (i == this.links.size() - 1) classes += " ui-corner-bottom";
 
-           this.println("       <li><a class='" + classes + "' href='" + e.getValue() + "'>");
+           this.println("       <li><a id='" + name + "link' class='" + classes + "' href='" + e.getValue() + "'>");
            this.println("           <div class='linkbutcont'>");
-           this.println(                "<span class='linkicon ui-icon ui-icon-bullet' style='float:left; margin:0 10px 0'></span>" 
-                   + e.getKey());
+           this.println("               <div class='linkbutconticon'>");
+           this.println("                   <img src='/img/" + this.icons.get(name) + "_small.png' alt='" + name + "' />");
+           this.println("               </div>");
+           this.println("               <div class='linkbutcontlabel'>" + this.stringTransform(name) + "</div>");
+           this.println("               <div id='" + name + "hover' class='leghov ui-corner-all'>");
+           this.println("                   <div class='legimg'><img src='/img/" + this.icons.get(name) + ".png' alt='"+ name + "' /></div>");
+           this.println("                   <div class='legdesc'>" + this.toolTips.get(name) + "</div>");
+           this.println("               </div>");
            this.println("           </div>");
            this.println("      </a></li>");
 
            i++;
        }
       
-      this.println("   </ul>");
-      this.println("</div>");
+      this.println("   </ul>"); // ullinklist
+      this.println("</div>"); // operationlist
       
       this.println("</div>");
+      
+      /* Tooltip hover events. */
+      this.println("<script type='text/javascript'>");
+      
+      this.println("var ttStates = new Object();");
+      
+      this.println( 
+      		"function loadIndexToolTip(name)\n" + 
+      		"{\n" + 
+      		"    if (ttStates[name])\n" + 
+      		"    {\n" + 
+      		"        $('#' + name + 'hover').fadeIn();\n" + 
+      		"        $('#' + name + 'link').css('font-weight', 'bold');\n" + 
+      		"    }\n" + 
+      		"}\n");
+      
+      this.println("$(document).ready(function() {");
+      for (String name : this.toolTips.keySet())
+      {
+          this.println("    ttStates['" + name + "'] = false;");
+          this.println("    $('#" + name + "link').hover(");
+          this.println("        function() {");
+          this.println("            ttStates['" + name + "'] = true;");
+          this.println("            setTimeout('loadIndexToolTip(\"" + name + "\")', 1200);");
+          this.println("        },");
+          this.println("        function() {");
+          this.println("            if (ttStates['" + name + "'])");
+          this.println("            {");
+          this.println("                $('#" + name + "hover').fadeOut();");
+          this.println("                $('#" + name + "link').css('font-weight', 'bold');");
+          this.println("                ttStates['" + name + "'] = false;");
+          this.println("            }");
+          this.println("        }");
+          this.println("     )");
+          
+      }
+      this.println("})");
+      this.println("</script>");
     }
 
     @Override
