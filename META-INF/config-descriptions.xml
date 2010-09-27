@@ -20,7 +20,7 @@ Each property should be configured with the following attributes:
   * example   - Example value
 -->
 
-<!-- Identity properties -->
+<!-- ##### Identity properties ################################################ -->
  <property name="Rig_Name" stanza="identity" mandatory="yes" type="STRING" restart="yes"
  		example="Inclined_Plane_1" format="&lt;String&gt;" default="">
 Uniquely identifies a rig within the remote laboratory. It is suggested
@@ -55,7 +55,7 @@ stanza of this file.&lt;li&gt;
 &lt;ul&gt;
  </property>
 
-<!-- Scheduling Server properties -->
+<!-- #### Scheduling Server properties ######################################## -->
 <property name="Scheduling_Server_Address" stanza="schedserver" mandatory="yes" type="STRING" restart="yes"
 		example="localhost" format="&lt;String&gt;" default="">
 Address of scheduling server.  This can be an IP address or host name of the scheduling server.
@@ -69,7 +69,7 @@ Port the scheduling server is listening on.
 The time in seconds between sending status updates from the rig client to scheduling server.
 </property>
 
-<!-- Rig Client server -->
+<!-- #### Rig Client server ################################################### -->
 <property name="Rig_Client_IP_Address" stanza="server" mandatory="no" type="STRING" example="127.0.0.1" restart="yes"
 		format="[&lt;IP&gt;|Empty]" default="">
 The address of the machine the rig client is running on. This is needed if the rig client machine has multiple network
@@ -95,6 +95,16 @@ requests are queued.
 <property name="Action_Failure_Threshold" stanza="server" mandatory="no" type="INTEGER" restart="yes"
 		example="3" format="&lt;int&gt;" default="3">
 The threshold indicating how many times a action can fail before the rig is put off line.
+</property>
+
+<!-- #### Administrative Interface ############################################ -->
+<property name="Admin_Username" stanza="admin" mandatory="no" type="STRING" restart="no"
+		example="admin" format="&lt;String&gt;" default="admin">
+The username to login to the administrative interface.
+</property>
+<property name="Admin_Password" stanza="admin" mandatory="no" type="STRING" restart="no"
+		example="adminpasswd" format="&lt;String&gt;" default="passwd">
+The password to login to the administrative interface.
 </property>
 
 </config>

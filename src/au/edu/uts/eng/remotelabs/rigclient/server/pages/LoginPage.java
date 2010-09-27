@@ -48,6 +48,19 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class LoginPage extends AbstractPage
 {
+    private String message;
+    
+    public LoginPage()
+    {
+        super();
+    }
+    
+    public LoginPage(String message)
+    {
+        super();
+        this.message = message;
+    }
+    
     @Override
     public void preService(HttpServletRequest req)
     {
@@ -59,37 +72,68 @@ public class LoginPage extends AbstractPage
     {
        this.pageBeginning();
        
-        this.println("<div id='loginform' class='detailspanel ui-corner-all'>");
-        this.println("   <div class='detailspaneltitle'>");
-        this.println("      <p>");
-        this.println("          <span class='detailspanelicon ui-icon ui-icon-notice'> </span>");
-        this.println("          Login:");
-        this.println("      </p>");
-        this.println("   </div>");
-        this.println("   <div class='detailspanelcontents'>");
-        
-        this.println("<form method='POST' target='/'>");
-        this.println("  <div class='logininput'> <input type='text' name='username' /></div>");
-        this.println("  <div class='logininput'> <input type='text' name='password' /></div>");
-        this.println("  <div class='loginsubmit'><input id='subbutton' type='submit' name='submit' /></div>");
-        this.println("</form>");
-        
-        this.println("   </div>");
-        this.println("</div>");
-        
-        /* Script to put the confirmation dialog in the center of the page. */
-        this.println("<script type='text/javascript'>");
-        this.println(
-                "$(document).ready(function() {\n" + 
-                "   var leftpos = Math.floor($(window).width() / 2) - 175;\n" +
-                "   var toppos = Math.floor($(window).height() / 2) - 200;\n" +
-        		"   $('#confirmationcontainer').css('left', leftpos);\n" +
-        		"   $('#confirmationcontainer').css('top', toppos)\n" +
-        		"\n" +
-        		"$('#submit').button();\n" + 
-        		"});");
-        this.println("</script>");
+       this.println("<div id='loginformoutercontainer'>");
        
+       if (this.message != null)
+       {
+           this.println("<div id='loginfail' class='ui-state ui-state-error ui-corner-all'>");
+           this.println("   <span class='ui-icon ui-icon-alert detailspanelicon'> </span>");
+           this.println("   " + this.message);
+           this.println("</div>");
+       }
+       
+       
+       this.println("<form id='loginform' method='POST' target='/'>");
+       
+       this.println("<div id='loginformcontainer' class='detailspanel ui-corner-all'>");
+       this.println("   <div class='detailspaneltitle'>");
+       this.println("      <p>");
+       this.println("          <span class='detailspanelicon ui-icon ui-icon-key'> </span>");
+       this.println("          Login:");
+       this.println("      </p>");
+       this.println("   </div>");
+       this.println("   <div class='detailspanelcontents'>");
+
+       this.println("  <div class='forminput'>\n" +
+                    "    <div class='formlabel'>Username:</div>\n" +
+                    "    <div class='forminut'><input id='usernamefield' class='validate[required]' type='text' name='username' /></div>\n" +
+                    "  </div>");
+       this.println("  <div class='forminput'>\n" +
+                    "    <div class='formlabel'>Password:</div>\n" +
+                    "    <div class='forminut'><input id='passwordfield' class='validate[required]' type='password' name='password' /></div>\n" +
+                    "  </div>");
+
+       this.println("   </div>");
+       this.println("</div>");
+       
+       this.println("  <div id='loginsubmit'><input id='subbutton' type='submit' name='submit' value='Login' /></div>");
+       
+       this.println("</form>");
+       this.println("</div>");
+
+       this.println("<script type='text/javascript'>");
+       this.println(
+               "$(document).ready(function() {");
+       
+       /* Form positioning at center of screen. */
+       this.println(
+               "   var leftpos = Math.floor($(window).width() / 2) - 175;\n" +
+               "   var toppos = Math.floor($(window).height() / 2) - 200;\n" +
+               "   $('#loginformoutercontainer').css('left', leftpos);\n" +
+               "   $('#loginformoutercontainer').css('top', toppos)\n");
+       
+       /* Form validation. */
+       this.println("   $('#loginform').validationEngine();\n");
+      
+       /* Form styling. */
+       this.println(
+               "   $('#loginform').jqTransform();\n" + 
+               "   $('.jqTransformInputWrapper').css('margin-top', '8px').css('width', '200px');\n" +
+               "   $('#subbutton').removeClass('jqTransformButton').button();\n");
+       
+       this.println("});");
+       this.println("</script>");
+
        this.pageEnd();
     }
     

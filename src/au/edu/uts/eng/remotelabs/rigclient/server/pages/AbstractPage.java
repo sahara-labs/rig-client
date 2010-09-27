@@ -195,9 +195,14 @@ public abstract class AbstractPage
         this.println("  <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
         this.println("  <link href='/css/rigclient.css' media='screen' rel='stylesheet' type='text/css' />");
         this.println("  <link href='/css/smoothness/jquery-ui.custom.css' rel='stylesheet' type='text/css' />");
+        this.println("  <link href='/css/jqtransform.css' rel='stylesheet' type='text/css' />");
+        this.println("  <link href='/css/validationEngine.jquery.css' rel='stylesheet' type='text/css' />");
         this.println("  <script type='text/javascript' src='/js/jquery.js'> </script>");
         this.println("  <script type='text/javascript' src='/js/jquery-ui.js'> </script>");
         this.println("  <script type='text/javascript' src='/js/rigclient.js'> </script>");
+        this.println("  <script type='text/javascript' src='/js/jquery.jqtransform.js'> </script>");
+        this.println("  <script type='text/javascript' src='/js/jquery.validationEngine-en.js'> </script>");
+        this.println("  <script type='text/javascript' src='/js/jquery.validationEngine.js'> </script>");
         this.println("</head>");
     }
    
@@ -344,7 +349,7 @@ public abstract class AbstractPage
         		"     resizable: false,\n" + 
         		"     buttons: {\n" +
         		"         'Yes': function() {\n" +
-        		"             alert('TODO logout.');\n" +
+        		"             window.location.replace('/logout');\n" +
         		"         },\n" +
         		"         'No': function() {\n" +
         		"             $(this).dialog('close');\n" +

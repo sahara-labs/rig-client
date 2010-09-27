@@ -39,6 +39,7 @@
 package au.edu.uts.eng.remotelabs.rigclient.server;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,22 +61,24 @@ import au.edu.uts.eng.remotelabs.rigclient.server.pages.LogsPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.OperationsPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.PageResource;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.StatusPage;
+import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
- * Root URL servlet which provides allows the following pages:
- * <ol>
- *  <li><tt>/</tt> - A jump-off page to either configuration or help 
- *  documentation.</li>
- *  <li><tt>/config</tt> - Configuration page (authenticated).</li>
- *  <li><tt>/doc</tt> - Documentation page.</li>
- *  <li><tt>/info</tt> - Runtime information about the rig.</li>
- *  <li><tt>/logs</tt> - Recent logs.</li>
- * </ol>
+ * Root URL servlet which provides an online administrative interface to the 
+ * rig client.
  */
 public class RootServlet extends HttpServlet
 {
+    /** Default username. */
+    public static final String DEFAULT_USERNAME = "admin";
+    
+    /** Default password. */
+    public static final String DEFAULT_PASSWORD = "passwd";
+    
     /** Serializable class. */
     private static final long serialVersionUID = -454911787592576294L;
     
@@ -120,11 +123,21 @@ public class RootServlet extends HttpServlet
 
         try
         {
+            /* Session check and login if requested. */
             HttpSession session = req.getSession();
             boolean authenticated = session.getAttribute("authenticated") != null;
             if (!authenticated && "POST".equalsIgnoreCase(req.getMethod()))
             {
-                /* Login attempt. */
+                if (this.authenticate(req))
+                {
+                    session.setAttribute("authenticated", new Date());
+                    authenticated = true;
+                }
+                else
+                {
+                    new LoginPage("Login failed.").service(req, resp);
+                    return;
+                }
             }
             
             /* Dispatches the request either to a downloadable resource or 
@@ -132,6 +145,13 @@ public class RootServlet extends HttpServlet
             if ("/favicon.ico".equals(uri))
             {
                 new PageResource().download(req, resp);
+            }
+            else if ("/logout".equals(uri))
+            {
+                /* Logout the user. */
+                session.invalidate();
+                resp.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+                resp.setHeader("Location", "/");
             }
             else if (this.resources.contains(requestBase))
             {
@@ -201,4 +221,38 @@ public class RootServlet extends HttpServlet
         }
     }
 
+    /**
+     * Attempts to authenticate the request. The request may be successful if
+     * the request provides the correct username / password pair in the 
+     * attributes 'username' and 'password' or the correct identity token is
+     * provided in the 'identtok' attribute. 
+     * 
+     * @param req request
+     * @return true if authenticate succeeds
+     */
+    private boolean authenticate(final HttpServletRequest req)
+    {
+        IConfig config = ConfigFactory.getInstance();
+        
+        /* Login via admin user / password. */
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
+        if (config.getProperty("Admin_Username", RootServlet.DEFAULT_USERNAME).equals(username) &&
+            config.getProperty("Admin_Password", RootServlet.DEFAULT_PASSWORD).equals(password))
+        {
+            return true;
+        }
+        
+        /* Login via identity token. */
+        String identTok = req.getParameter("identtok");
+        if (StatusUpdater.isRegistered() && identTok != null)
+        {
+            for (String i : StatusUpdater.getServerIdentityTokens())
+            {
+                if (i != null && i.equals(identTok)) return true;
+            }
+        }
+        
+        return false;
+    }
 }

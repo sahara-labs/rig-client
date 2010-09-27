@@ -634,3 +634,44 @@ a.plaina:hover {
 	padding: 20px;
 	color: #606060;
 }
+
+/******************************************************************************
+ ** Login page.                                                              **
+ ******************************************************************************/
+#loginformoutercontainer {
+	position: absolute;
+}
+
+#loginformcontainer {
+	width: 300px;
+	height: 120px;
+}
+
+#loginsubmit {
+	margin-top: 10px;
+	float: right;
+}
+
+.forminput {
+	padding: 5px;
+}
+
+.formlabel {
+	margin-top: 15px;
+	margin-left: 0px;
+	float: left;
+	width: 85px;
+}
+
+#loginfail {
+	height: 20px;
+	margin-top: -45px;
+	margin-bottom: 15px;
+	padding: 5px;
+}
+
+#subbutton {
+	width: 75px;
+	height: 40px;
+}
+
