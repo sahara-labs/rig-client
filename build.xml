@@ -136,6 +136,7 @@ Changelog:
 			</zipfileset>
 			<zipfileset dir="META-INF/" prefix="META-INF/">
 				<include name="config-descriptions.xml" />
+				<include name="web/**/*" />
 			</zipfileset>
 		</jar>
 	</target>

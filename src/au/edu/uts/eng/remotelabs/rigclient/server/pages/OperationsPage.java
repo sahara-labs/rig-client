@@ -68,6 +68,7 @@ public class OperationsPage extends AbstractPage
         if (uri.endsWith("shutdown") && "POST".equals(req.getMethod()))
         {
             /* Shutdown the rig client. */
+            RigClient.blockingStop();
         }
         else if (uri.endsWith("shutdown"))
         {
@@ -104,8 +105,8 @@ public class OperationsPage extends AbstractPage
         this.println("<div id='confirmationcontainer' class='detailspanel ui-corner-all'>");
         this.println("   <div class='detailspaneltitle'>");
         this.println("      <p>");
-        this.println("          <span class='detailspanelicon ui-icon ui-icon-script'> </span>");
-        this.println("          Confirmation:");
+        this.println("          <span class='detailspanelicon ui-icon ui-icon-notice'> </span>");
+        this.println("          Confirm:");
         this.println("      </p>");
         this.println("   </div>");
         this.println("   <div class='detailspanelcontents'>");
@@ -131,10 +132,33 @@ public class OperationsPage extends AbstractPage
             this.println("</div>");
         }
         
+        /* Buttons to make a choice. */
+        this.println("<div id='confirmbuttons'>");
+        this.addButton("noconfirm", "No", "window.location.replace(\"/\")");
+        if (isRestart)
+        {
+            this.addButton("confirmres", "Yes", "restartRigClient()");
+        }
+        else
+        {
+            this.addButton("confirmres", "Yes", "shutdownRigClient()");
+        }
+        this.println("</div>");
+        
         this.println("   </div>");
         this.println("</div>");
         
-        this.println("");
+        /* Script to put the confirmation dialog in the center of the page. */
+        this.println("<script type='text/javascript'>");
+        this.println(
+                "$(document).ready(function() {\n" + 
+                "   var leftpos = Math.floor($(window).width() / 2) - 175;\n" +
+                "   var toppos = Math.floor($(window).height() / 2) - 200;\n" +
+        		"   $('#confirmationcontainer').css('left', leftpos);\n" +
+        		"   $('#confirmationcontainer').css('top', toppos)\n" +
+        		"});");
+        this.println("</script>");
+        
         this.pageEnd();
     }
 

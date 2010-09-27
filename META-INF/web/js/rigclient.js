@@ -178,3 +178,50 @@ function updateNavStatus()
 		}
 	);
 }
+
+function restartRigClient()
+{
+	$("#confirmationcontainer").empty().addClass('confirminprogress').append(
+		"<div><img src='/img/spinner.gif' alt='Loading' /></div>\n" +
+		"Restarting rig client..."
+	);
+	
+	$.post(
+		"/op/restart",
+		null,
+		function() {
+			setTimeout(checkIfRestarted, 5000);
+		}
+	);
+}
+
+function checkIfRestarted()
+{
+	$.get(
+		"/status/current",
+		null,
+		function (response) {
+			if (response != '') {
+				window.location.replace("/");
+			}
+		}
+	);
+}
+
+function shutdownRigClient()
+{
+	$("#confirmationcontainer").empty().addClass('confirminprogress').append(
+		"<div><img src='/img/spinner.gif' alt='Loading' /></div>\n" +
+		"Shutting down rig client..."
+	);
+	
+	$.post(
+		"/op/shutdown",
+		null,
+		function() {
+			$("#confirmationcontainer").empty().append(
+				"Rig client has shutdown."
+			);
+		}
+	);
+}

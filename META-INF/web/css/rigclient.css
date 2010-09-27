@@ -600,7 +600,8 @@ a.plaina:hover {
  
 #confirmationcontainer {
 	position: absolute;
-	height: 200px;
+	width: 300px;
+	color: #606060;
 }
 
 .confirmimg {
@@ -617,4 +618,19 @@ a.plaina:hover {
 	padding: 5px;
 }
 
-	
+#confirmbuttons {
+	float: right;
+	margin: 10px;
+	border-top: 1px solid #EFEFEF;
+}
+
+#confirmbuttons button {
+	width: 75px;
+	height: 40px;
+}
+
+.confirminprogress {
+	text-align: center;
+	padding: 20px;
+	color: #606060;
+}

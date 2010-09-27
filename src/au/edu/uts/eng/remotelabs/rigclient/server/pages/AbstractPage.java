@@ -328,9 +328,7 @@ public abstract class AbstractPage
         /* Help action button contents. */
         this.println(
                 "<div id='helpdialog' title='Help and Troubleshooting'>\n" + 
-        		"    <div class='ui-state-error ui-corner-all' style='padding:10px'>\n" + 
-        		"        <strong>TODO add help contents</strong>\n" + 
-        		"    </div>\n" + 
+        		"   " + this.getPageHelp() +
         		"</div>");
         
         
@@ -429,4 +427,29 @@ public abstract class AbstractPage
      * @return page type
      */
     protected abstract String getPageType();
+    
+    /**
+     * Get page help for the action bar help dialog.
+     * 
+     * @return help contents
+     */
+    protected String getPageHelp()
+    {
+        return "No help contents.";
+    }
+
+    /**
+     * Adds a button to the page. 
+     * 
+     * @param id button identifier
+     * @param text display text
+     * @param onclick onclick event
+     */
+    protected void addButton(String id, String text, String onclick)
+    {
+        this.println("<button id='" + id + "' onclick='" + onclick + "' >" + text + "</button>");
+        this.println("<script type='text/javascript'>");
+        this.println("$(document).ready(function() { $('#" + id + "').button(); } );");
+        this.println("</script>");
+    }
 }

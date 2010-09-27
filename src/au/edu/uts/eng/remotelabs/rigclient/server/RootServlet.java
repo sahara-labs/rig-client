@@ -47,6 +47,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.AbstractPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.ConfigPage;
@@ -54,6 +55,7 @@ import au.edu.uts.eng.remotelabs.rigclient.server.pages.DocPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.ErrorPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.IndexPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.InfoPage;
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.LoginPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.LogsPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.OperationsPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.PageResource;
@@ -112,32 +114,46 @@ public class RootServlet extends HttpServlet
     {
         String uri = req.getRequestURI();
         this.logger.debug("Received request: " + uri + "\n");
+        
         String parts[] = uri.split("/");
+        String requestBase = parts.length >= 2 ? parts[1] : "";
 
         try
         {
+            HttpSession session = req.getSession();
+            boolean authenticated = session.getAttribute("authenticated") != null;
+            if (!authenticated && "POST".equalsIgnoreCase(req.getMethod()))
+            {
+                /* Login attempt. */
+            }
+            
             /* Dispatches the request either to a downloadable resource or 
              * page. */
             if ("/favicon.ico".equals(uri))
             {
                 new PageResource().download(req, resp);
             }
-            else if (parts.length < 2)
+            else if (this.resources.contains(requestBase))
+            {
+                /* Downloadable resource, so provide the requested resource. */
+                new PageResource().download(req, resp);
+            }
+            else if (!authenticated)
+            {
+                /* Not logged in so display login form. */
+                new LoginPage().service(req, resp);
+            }
+            else if ("".equals(requestBase))
             {
                 /* Nothing has been requested, so just give the default index
                  * page. */
                 new IndexPage().service(req, resp);
             }
-            else if (this.resources.contains(parts[1]))
-            {
-                /* Downloadable resource, so provide the requested resource. */
-                new PageResource().download(req, resp);
-            }
-            else if (this.pages.containsKey(parts[1]))
+            else if (this.pages.containsKey(requestBase))
             {
                 /* Load the page. */
                 ClassLoader loader =  RootServlet.class.getClassLoader();
-                Class<AbstractPage> clazz = (Class<AbstractPage>) loader.loadClass(this.pages.get(parts[1]));
+                Class<AbstractPage> clazz = (Class<AbstractPage>) loader.loadClass(this.pages.get(requestBase));
                 clazz.newInstance().service(req, resp);
             }
             else

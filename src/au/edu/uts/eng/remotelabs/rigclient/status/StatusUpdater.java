@@ -348,6 +348,8 @@ public class StatusUpdater implements Runnable
             this.logger.error("Failed to remove the scheduling servers registration because of remote exception " + 
                     " with error message '" + e.getMessage() + "'.");
         }
+        
+        StatusUpdater.isRegistered = false;
     }
     
     /**

@@ -65,14 +65,20 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  */
 public class RigClient
 {
+    /** The main thread. */
+    private static Thread startUpThread;
+
     /** Listening server. */
     private final IServer server;
-    
+        
     /** Status updater. */
     private Thread statusThread;
+        
+    /** Whether there has been a notification to shutdown. */
+    private static boolean doShutdown;
     
-    /** Shutdown flag. */
-    private static boolean shutdown;
+    /** Whether to restart the rig client. */
+    private static boolean doRestart = true;
     
     /** Logger. */
     private final ILogger logger;
@@ -87,8 +93,7 @@ public class RigClient
     {
         this.logger = LoggerFactory.getLoggerInstance();
         this.config = ConfigFactory.getInstance();
-        this.server = new EmbeddedJettyServer();
-        
+        this.server = new EmbeddedJettyServer();        
     }
     
     /**
@@ -99,6 +104,7 @@ public class RigClient
         try
         {
             this.logger.priority("Rig client is starting up...");
+            RigClient.startUpThread = Thread.currentThread();
             
             /* Pre-Start, make sure the required properties are valid. */
             String name = this.config.getProperty("Rig_Name");
@@ -165,7 +171,7 @@ public class RigClient
             /* ------------------------------------------------------------------
              * ---- 4. Enter the run loop and wait for shutdown. ----------------
              * ----------------------------------------------------------------*/
-            while (!RigClient.shutdown)
+            while (!RigClient.doShutdown)
             {
                 try
                 {                    
@@ -241,17 +247,37 @@ public class RigClient
      */
     public static void start()
     {
-        RigClient.shutdown = false;
-        final RigClient rigClient = new RigClient();
-        rigClient.runProgram();
+        do
+        {
+            RigClient.doShutdown = false;        
+            RigClient.doRestart = false;
+            final RigClient rigClient = new RigClient();
+            rigClient.runProgram();
+        }
+        while (RigClient.doRestart);
     }
     
     /**
-     * Notifies the rig client to shutdown (called through JNI).
+     * Notifies the rig client to shutdown.
      */
     public static void stop()
     {
-        RigClient.shutdown = true;
+        RigClient.doShutdown = true;
+    }
+    
+    /**
+     * Notifies the rig client to shutdown. This method blocks until the rig 
+     * client has completed shutting down.
+     */
+    public static void blockingStop()
+    {
+        RigClient.stop();
+        try
+        {
+            RigClient.startUpThread.join();
+        }
+        catch (InterruptedException e)
+        {  /* Not much to do here. */  }
     }
     
     /**
@@ -260,8 +286,8 @@ public class RigClient
      */
     public static void restart()
     {
-        RigClient.stop();
-        RigClient.start();
+        RigClient.doRestart = true;
+        RigClient.blockingStop();
     }
     
 }
