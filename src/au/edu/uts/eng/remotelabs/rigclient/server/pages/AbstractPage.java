@@ -238,7 +238,7 @@ public abstract class AbstractPage
         this.innerNavBar("Status", "/status");
         this.innerNavBar("Configuration", "/config");
         this.innerNavBar("Logs", "/logs");
-        this.innerNavBar("Runtime Information", "/info");
+        this.innerNavBar("Diagnostics", "/info");
         this.innerNavBar("Documentation", "/doc");
         
         this.println("   </ol>");
@@ -413,7 +413,7 @@ public abstract class AbstractPage
      */
     protected String getPageHeader()
     {
-        return this.getPageType() + " Page";
+        return this.getPageType();
     }
     
     /**

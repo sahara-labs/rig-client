@@ -70,7 +70,7 @@ public class IndexPage extends AbstractPage
         this.links.put("Status", "/status");
         this.links.put("Configuration", "/config");
         this.links.put("Logs", "/logs");
-        this.links.put("Runtime_Information", "/info");
+        this.links.put("Diagnostics", "/info");
         this.links.put("Documentation", "/doc");
         
         this.operations = new LinkedHashMap<String, String>(4);
@@ -82,7 +82,7 @@ public class IndexPage extends AbstractPage
         this.icons.put("Configuration", "config");
         this.icons.put("Logs", "logs");
         this.icons.put("Documentation", "doc");
-        this.icons.put("Runtime_Information", "runtime");
+        this.icons.put("Diagnostics", "runtime");
         this.icons.put("Restart", "restart");
         this.icons.put("Shutdown", "shutdown");
         
@@ -93,7 +93,7 @@ public class IndexPage extends AbstractPage
         		"changed.");
         this.toolTips.put("Logs", "Log viewer of the latest log messages of the rig client since startup.");
         this.toolTips.put("Documentation", "Documentation about the rig client.");
-        this.toolTips.put("Runtime_Information", "Runtime information about the rig client such as classpath, system " +
+        this.toolTips.put("Diagnostics", "Runtime information about the rig client such as classpath, system " +
         		"properties, uptime...");
         this.toolTips.put("Restart", "Restarts the rig client. This is only a soft restart since the rig client service " +
         		"process is not restarted.");
@@ -116,7 +116,7 @@ public class IndexPage extends AbstractPage
         for (Entry<String, String> e : this.links.entrySet())
         {
             String name = e.getKey();
-            String classes = "linkbut plaina";
+            String classes = "linkbut indexlinkbut plaina";
             if (i == 0) classes += " ui-corner-top";
             else if (i == this.links.size() - 1) classes += " ui-corner-bottom";
 
