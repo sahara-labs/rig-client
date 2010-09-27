@@ -57,8 +57,60 @@ public class LoginPage extends AbstractPage
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
-        // TODO Auto-generated method stub
-        this.println("Login form");
+       this.pageBeginning();
+       
+        this.println("<div id='loginform' class='detailspanel ui-corner-all'>");
+        this.println("   <div class='detailspaneltitle'>");
+        this.println("      <p>");
+        this.println("          <span class='detailspanelicon ui-icon ui-icon-notice'> </span>");
+        this.println("          Login:");
+        this.println("      </p>");
+        this.println("   </div>");
+        this.println("   <div class='detailspanelcontents'>");
+        
+        this.println("<form method='POST' target='/'>");
+        this.println("  <div class='logininput'> <input type='text' name='username' /></div>");
+        this.println("  <div class='logininput'> <input type='text' name='password' /></div>");
+        this.println("  <div class='loginsubmit'><input id='subbutton' type='submit' name='submit' /></div>");
+        this.println("</form>");
+        
+        this.println("   </div>");
+        this.println("</div>");
+        
+        /* Script to put the confirmation dialog in the center of the page. */
+        this.println("<script type='text/javascript'>");
+        this.println(
+                "$(document).ready(function() {\n" + 
+                "   var leftpos = Math.floor($(window).width() / 2) - 175;\n" +
+                "   var toppos = Math.floor($(window).height() / 2) - 200;\n" +
+        		"   $('#confirmationcontainer').css('left', leftpos);\n" +
+        		"   $('#confirmationcontainer').css('top', toppos)\n" +
+        		"\n" +
+        		"$('#submit').button();\n" + 
+        		"});");
+        this.println("</script>");
+       
+       this.pageEnd();
+    }
+    
+    /**
+     * Page beginning.
+     */
+    private void pageBeginning()
+    {
+        this.println("<!DOCTYPE html>");
+        this.println("<html>");
+        this.addHead();
+        this.println("<body>");
+    }
+    
+    /**
+     * Page end.
+     */
+    private void pageEnd()
+    {
+        this.println("</body>");
+        this.println("</html>");
     }
 
     @Override
