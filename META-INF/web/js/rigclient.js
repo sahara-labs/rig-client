@@ -225,3 +225,21 @@ function shutdownRigClient()
 		}
 	);
 }
+
+function loadInfoTab(tab)
+{
+	/* Change selected tab. */
+	$('.selectedtab').removeClass('selectedtab')
+					 .addClass('notselectedtab');
+	$("#" + tab + "tab").removeClass('notselectedtab')
+	                    .addClass('selectedtab');
+	
+	$.get(
+		"/info/" + tab,
+		null,
+		function (resp) {
+			$("#contentspane").empty()
+							  .append(resp);
+		}
+	);
+}

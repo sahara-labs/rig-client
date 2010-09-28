@@ -126,9 +126,9 @@ public class IndexPage extends AbstractPage
             this.println("                   <img src='/img/" + this.icons.get(name) + "_small.png' alt='" + name + "' />");
             this.println("               </div>");
             this.println("               <div class='linkbutcontlabel'>" + this.stringTransform(name) + "</div>");
-            this.println("               <div id='" + name + "hover' class='leghov ui-corner-all'>");
-            this.println("                  <div class='legimg'><img src='/img/" + this.icons.get(name) + ".png' alt='"+ name + "' /></div>");
-            this.println("                  <div class='legdesc'>" + this.toolTips.get(name) + "</div>");
+            this.println("               <div id='" + name + "hover' class='tooltiphov ui-corner-all'>");
+            this.println("                  <div class='tooltipimg'><img src='/img/" + this.icons.get(name) + ".png' alt='"+ name + "' /></div>");
+            this.println("                  <div class='tooltipdesc'>" + this.toolTips.get(name) + "</div>");
             this.println("               </div>");
             this.println("           </div>");
             this.println("      </a></li>");
@@ -160,9 +160,9 @@ public class IndexPage extends AbstractPage
            this.println("                   <img src='/img/" + this.icons.get(name) + "_small.png' alt='" + name + "' />");
            this.println("               </div>");
            this.println("               <div class='linkbutcontlabel'>" + this.stringTransform(name) + "</div>");
-           this.println("               <div id='" + name + "hover' class='leghov ui-corner-all'>");
-           this.println("                   <div class='legimg'><img src='/img/" + this.icons.get(name) + ".png' alt='"+ name + "' /></div>");
-           this.println("                   <div class='legdesc'>" + this.toolTips.get(name) + "</div>");
+           this.println("               <div id='" + name + "hover' class='tooltiphov ui-corner-all'>");
+           this.println("                   <div class='tooltipimg'><img src='/img/" + this.icons.get(name) + ".png' alt='"+ name + "' /></div>");
+           this.println("                   <div class='tooltipdesc'>" + this.toolTips.get(name) + "</div>");
            this.println("               </div>");
            this.println("           </div>");
            this.println("      </a></li>");

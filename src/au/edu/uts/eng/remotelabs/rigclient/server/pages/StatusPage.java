@@ -168,33 +168,33 @@ public class StatusPage extends AbstractPage
         this.println("  <ul>");
         this.println("      <li id='leg1'>");
         this.println("          <img class='legicon' src='/img/blue_tiny.gif' alt='blue' />Not Registered");
-        this.println("          <div id='leghov1' class='leghov ui-corner-all'>");
-        this.println("              <div class='legimg'><img src='/img/blue.gif' alt='blue' /></div>");
-        this.println("              <div class='legdesc'>The rig is not registered to a scheduling server so cannot " +
+        this.println("          <div id='leghov1' class='tooltiphov ui-corner-all'>");
+        this.println("              <div class='tooltipimg'><img src='/img/blue.gif' alt='blue' /></div>");
+        this.println("              <div class='tooltipdesc'>The rig is not registered to a scheduling server so cannot " +
         		"have users assigned to it.</div>");
         this.println("          </div>");
         this.println("      </li>");
         this.println("      <li id='leg2'>");
         this.println("          <img class='legicon' src='/img/green_tiny.gif' alt='green' />Online");
-        this.println("          <div id='leghov2' class='leghov ui-corner-all'>");
-        this.println("              <div class='legimg'><img src='/img/green.gif' alt='green' /></div>");
-        this.println("              <div class='legdesc'>The rig is online and ready for use.</div>");
+        this.println("          <div id='leghov2' class='tooltiphov ui-corner-all'>");
+        this.println("              <div class='tooltipimg'><img src='/img/green.gif' alt='green' /></div>");
+        this.println("              <div class='tooltipdesc'>The rig is online and ready for use.</div>");
         this.println("          </div>");
         this.println("      </li>");
         this.println("      <li id='leg3'>");
         this.println("          <img class='legicon' src='/img/red_tiny.gif' alt='red' />Offline");
-        this.println("          <div id='leghov3' class='leghov ui-corner-all'>");
-        this.println("              <div class='legimg'><img src='/img/red.gif' alt='red' /></div>");
-        this.println("              <div class='legdesc'>The rig is offline and cannot be used. The reason for being " +
+        this.println("          <div id='leghov3' class='tooltiphov ui-corner-all'>");
+        this.println("              <div class='tooltipimg'><img src='/img/red.gif' alt='red' /></div>");
+        this.println("              <div class='tooltipdesc'>The rig is offline and cannot be used. The reason for being " +
         		"offline is that an exerciser test has failed or a session action has failed more than the failure " +
         		"threshold.</div>");
         this.println("          </div>");
         this.println("      </li>");
         this.println("      <li id='leg4'>");
         this.println("          <img class='legicon' src='/img/yellow_tiny.gif' alt='yellow' />In Use");
-        this.println("          <div id='leghov4' class='leghov ui-corner-all'>");
-        this.println("              <div class='legimg'><img src='/img/yellow.gif' alt='yellow' /></div>");
-        this.println("              <div class='legdesc'>The rig is currently being used.</div>");
+        this.println("          <div id='leghov4' class='tooltiphov ui-corner-all'>");
+        this.println("              <div class='tooltipimg'><img src='/img/yellow.gif' alt='yellow' /></div>");
+        this.println("              <div class='tooltipdesc'>The rig is currently being used.</div>");
         this.println("          </div>");
         this.println("      </li>");
         this.println("  </ul>");

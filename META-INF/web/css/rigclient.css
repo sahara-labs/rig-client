@@ -449,7 +449,7 @@ a.plaina:hover {
 	padding-right: 5px;
 }
 
-.leghov {
+.tooltiphov {
 	display: none;
 	position: absolute;
 	width: 250px;
@@ -458,22 +458,23 @@ a.plaina:hover {
 	padding: 6px;
 	z-index: 100;
 	margin-top: 10px;
+	margin-left: -50px;
 	-moz-box-shadow: 0 0 8px #606060;
 	-webkit-box-shadow: 0 0 8px #606060;
 	box-shadow: 0 0 8px #606060;
 	opacity: 0.75;
 }
 
-.legimg {
+.tooltipimg {
 	float: left;
 	padding: 5px;
 }
 
-.legimg img {
+.tooltipimg img {
 	border: 0 none;
 }
 
-.legdesc {
+.tooltipdesc {
 	font-weight: normal;
 }
 
@@ -689,15 +690,6 @@ a.plaina:hover {
 	list-style: none;
 }
 
-.infolinkbut {
-	width: 150px;
-}
-
-.lefttabselected {
-	color: #EFEFEF;
-	background-color: #606060;
-}
-
 .selectedtab {
 	display: block;
 	height: 40px;
@@ -713,6 +705,29 @@ a.plaina:hover {
 	color: #F0F0F0;
 	text-decoration: none;
 	font-weight: bold;
+}
+
+.notselectedtab {
+	display: block;
+	height: 40px;
+	background-color: #EFEFEF;
+	border: 1px solid #B5B5B5;
+	-moz-box-shadow: 0 0 4px #B5B5B5;
+	-webkit-box-shadow: 0 0 4px #B5B5B5;
+	box-shadow: 0 0 4px #B5B5B5;
+	width: 150px;
+	text-decoration: none;
+	color: #606060;
+}
+
+.notselectedtab:hover {
+	display: block;
+	height: 40px;
+	border: 1px solid #FCEFA1;
+	background-color: #FCFAF2;
+	-moz-box-shadow: 0 0 12px #FCEFA1;
+	-webkit-box-shadow: 0 0 12px #606060;
+	box-shadow: 0 0 12px #606060;
 }
 
 #contentspane {
