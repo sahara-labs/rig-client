@@ -351,7 +351,7 @@ public class StatusPage extends AbstractPage
             if (activeSlaves.size() > 0)
             {
                 this.println("Active slave list:");
-                this.println("<ul>");
+                this.println("<ul class='slavelist'>");
                 for (String u : activeSlaves)
                 {
                     this.println("<li>" + u + "</li>");
@@ -363,7 +363,7 @@ public class StatusPage extends AbstractPage
             if (passiveSlaves.size() > 0)
             {
                 this.println("Passive slave list:");
-                this.println("<ul>");
+                this.println("<ul class='slavelist'>");
                 for (String u : passiveSlaves)
                 {
                     this.println("<li>" + u + "</li>");

@@ -39,9 +39,16 @@
 package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 
 import java.io.IOException;
+import java.lang.management.ClassLoadingMXBean;
+import java.lang.management.CompilationMXBean;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -170,6 +177,13 @@ public class InfoPage extends AbstractPage
         
         this.println("  </ul>");
         this.println("</div>");
+        
+        /* Content pane. */
+        this.println("<div id='contentspane' class='ui-corner-tr ui-corner-bottom'>");
+        this.println("  <table id='contentstable'>");
+        this.runtimeTab();
+        this.println("  </table>");
+        this.println("</div>");
 
         /* Tool tip events. */
         this.println("<script type='text/javascript'>");
@@ -205,19 +219,13 @@ public class InfoPage extends AbstractPage
             this.println("     )");
 
         }
+        
+        /* Initial table styling. */
+        this.println("  $('#contentstable tr:even').addClass('evenrow');");
+		this.println("  $('#contentstable tr:odd').addClass('oddrow');");
+        
         this.println("})");
         this.println("</script>");
-        
-        /* Content pane. */
-        this.println("<div id='contentspane' class='ui-corner-tr ui-corner-bottom'>");
-        this.println("  <table id='contentstable'>");
-        this.println("    <tr>");
-        this.println("      <th class='propcol'>Property</th>");
-        this.println("      <th class='valcol'>Value</th>");
-        this.println("    </tr>");
-        this.runtimeTab();
-        this.println("  </table>");
-        this.println("</div>");
     }
     
     /**
@@ -225,20 +233,116 @@ public class InfoPage extends AbstractPage
      */
     public void runtimeTab()
     {
-        // TODO runtime tab
-        this.addRow("run", "time");
+        RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+        
+        /* Name. */
+        this.addRow("Name", runtime.getName());
+        
+        /* Start time. */
+        Calendar start = Calendar.getInstance();
+        start.setTimeInMillis(runtime.getStartTime());
+        this.addRow("Start time",  start.get(Calendar.DAY_OF_MONTH) + "/" + (start.get(Calendar.MONTH) + 1) + "/" +
+                start.get(Calendar.YEAR) + " " + start.get(Calendar.HOUR_OF_DAY) + ":" + start.get(Calendar.MINUTE) + 
+                ":" + start.get(Calendar.SECOND));
+        
+        /* Uptime. */
+        long uptime = runtime.getUptime() / 1000;
+        StringBuilder uptimeStr = new StringBuilder();
+        int seconds = (int) (uptime % 60);
+        uptime /= 60;
+        int mins = (int) uptime % 60;
+        uptime /= 60;
+        int hours = (int) uptime % 24;
+        uptimeStr.append(uptime / 24);
+        uptimeStr.append(" days, ");
+        uptimeStr.append(hours);
+        uptimeStr.append(" hours, ");
+        uptimeStr.append(mins);
+        uptimeStr.append(" minutes, ");
+        uptimeStr.append(seconds);
+        uptimeStr.append(" seconds.");
+        this.addRow("Uptime", uptimeStr.toString());
+        
+        /* Working directory. */
+        this.addRow("Working directory", System.getProperty("user.dir"));
+        
+        /* Temporary directory. */
+        this.addRow("Temp directory", System.getProperty("java.io.tmpdir"));
+        
+        /* Classpath. */
+        this.addRow("Class path", this.getListCell(runtime.getClassPath().split(System.getProperty("path.separator"))));
+        this.addRow("Boot class path", this.getListCell(runtime.getBootClassPath().split(System.getProperty("path.separator"))));
+        
+        /* Library path. */
+        this.addRow("Library path", this.getListCell(runtime.getLibraryPath().split(System.getProperty("path.separator"))));
+        
+        /* System properties. */
+        this.addRow("System properties", this.getMapCell(runtime.getSystemProperties()));
+        
+        /* Environment variables. */
+        this.addRow("Environment variables", this.getMapCell(System.getenv()));
     }
-    
+
+    /**
+     * Resource usage information.
+     */
     public void resTab()
     {
-        // TODO resources tab
-        this.addRow("Resources", "tab");
+
+        //TODO 
+        
     }
     
+    /**
+     * Java virtual machine information.
+     */
     public void vmTab()
     {
-        // TODO virutal machine tab
-        this.addRow("virtual", "machine");
+        RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+        
+        /* Virtual machine informaion. */
+        this.addRow("Virtual machine", runtime.getVmName());
+        this.addRow("Version", runtime.getVmVersion());
+        this.addRow("Vendor", runtime.getVmVendor());
+        this.addRow("Specification", runtime.getSpecVersion());
+        
+        /* JIT information. */
+        CompilationMXBean comp = ManagementFactory.getCompilationMXBean();
+        if (comp == null)
+        {
+            this.addRow("JIT compilation", "No");
+        }
+        else
+        {
+            this.addRow("JIT compilation", "Yes");
+            this.addRow("JIT Compilier", comp.getName());
+            this.addRow("Compilation time", String.valueOf(comp.getTotalCompilationTime()) + " ms");
+        }
+        
+        /* Garbage collector time. */
+        List<GarbageCollectorMXBean> garb = ManagementFactory.getGarbageCollectorMXBeans();
+        this.addRow("Number of garbage Collectors", String.valueOf(garb.size()));
+        long gCollections = 0;
+        long gTime = 0;
+        StringBuilder gCollectors = new StringBuilder();
+        for (GarbageCollectorMXBean g : garb)
+        {
+            if (!g.isValid()) continue;
+            gCollectors.append(g.getName());
+            gCollectors.append(", ");
+            gCollections += g.getCollectionCount();
+            gTime += g.getCollectionTime();
+        }
+        if (gCollectors.length() > 0) gCollectors.deleteCharAt(gCollectors.length() - 2);
+        this.addRow("Garbage collectors", gCollectors.toString());
+        this.addRow("Garbage collections", String.valueOf(gCollections));
+        this.addRow("Garbage collector CPU time", String.valueOf(gTime) + " ms");
+        
+        /* Class loader information. */
+        ClassLoadingMXBean clsloading = ManagementFactory.getClassLoadingMXBean();
+        this.addRow("Loaded classes", String.valueOf(clsloading.getLoadedClassCount()));
+        this.addRow("Unloaded classes", String.valueOf(clsloading.getUnloadedClassCount()));
+        this.addRow("Total loaded classes", String.valueOf(clsloading.getTotalLoadedClassCount()));
     }
     
     public void osTab()
@@ -256,9 +360,59 @@ public class InfoPage extends AbstractPage
     private void addRow(String prop, String val)
     {
         this.println("<tr>");
-        this.println("  <td col='propcol'>" + prop + "</td>");
-        this.println("  <td col='valcol>" + val + "</td>");
+        this.println("  <td class='propcol'>" + prop + ":</td>");
+        this.println("  <td class='valcol'>" + val + "</td>");
         this.println("</tr>");
+    }
+    
+    /**
+     * Gets the contents of a cell containing a list.
+     * 
+     * @param contents list contents
+     * @return cell
+     */
+    private String getListCell(String contents[])
+    {
+        String cwd = System.getProperty("user.dir");
+        StringBuilder colbuf = new StringBuilder();
+        colbuf.append("<ul class='listcell'>");
+        
+        for (String c : contents)
+        {
+            if (c != null) c = c.replace(cwd, ".");
+            colbuf.append("  <li>");
+            colbuf.append(c);
+            colbuf.append("  </li>");
+        }
+        
+        colbuf.append("</ul>");
+        return colbuf.toString();
+    }
+    
+    /**
+     * Gets the contents of a cell containing a table
+     * 
+     * @param contents table contents
+     * @return cell
+     */
+    private String getMapCell(Map<String, String> contents)
+    {
+        String cwd = System.getProperty("user.dir");
+        
+        StringBuilder sysProps = new StringBuilder();
+        sysProps.append("<table class='tablecell'>");
+        for (Entry<String, String> p : contents.entrySet())
+        {
+            String val = p.getValue();
+            if (val != null) val = val.replace(cwd, ".");
+            
+            sysProps.append("<tr>");
+            sysProps.append("  <td class='tablecellpropcol'>" + p.getKey() + "</td>");
+            sysProps.append("  <td class='tablecellvalcol'>" + val + "</td>");
+            sysProps.append("</tr>");
+        }
+        sysProps.append("</table>");
+        return sysProps.toString();
     }
 
     @Override

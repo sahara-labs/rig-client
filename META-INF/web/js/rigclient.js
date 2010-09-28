@@ -238,8 +238,11 @@ function loadInfoTab(tab)
 		"/info/" + tab,
 		null,
 		function (resp) {
-			$("#contentspane").empty()
+			$("#contentstable").empty()
 							  .append(resp);
+			
+			$("#contentstable tr:even").addClass("evenrow");
+			$("#contentstable tr:odd").addClass("oddrow");
 		}
 	);
 }
