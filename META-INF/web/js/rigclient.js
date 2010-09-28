@@ -226,9 +226,28 @@ function shutdownRigClient()
 	);
 }
 
+function updateSelectedInfoTab()
+{
+	$.get(
+		"/info/" + selectedTab,
+		null,
+		function (resp) {
+			$("#contentstable").empty()
+							  .append(resp);
+			
+			$("#contentstable tr:even").addClass("evenrow");
+			$("#contentstable tr:odd").addClass("oddrow");
+			
+			setTimeout(updateSelectedInfoTab, 5000);
+		}
+	);
+}
+
 function loadInfoTab(tab)
 {
 	/* Change selected tab. */
+	selectedTab = tab;
+	
 	$('.selectedtab').removeClass('selectedtab')
 					 .addClass('notselectedtab');
 	$("#" + tab + "tab").removeClass('notselectedtab')

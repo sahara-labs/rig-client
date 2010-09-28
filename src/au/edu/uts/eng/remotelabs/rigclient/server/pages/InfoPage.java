@@ -192,6 +192,7 @@ public class InfoPage extends AbstractPage
         /* Tool tip events. */
         this.println("<script type='text/javascript'>");
         this.println("var ttStates = new Object();");
+        this.println("var selectedTab = 'runtime';");
 
         this.println( 
                 "function loadInfoToolTip(name)\n" + 
@@ -227,6 +228,16 @@ public class InfoPage extends AbstractPage
         /* Initial table styling. */
         this.println("  $('#contentstable tr:even').addClass('evenrow');");
 		this.println("  $('#contentstable tr:odd').addClass('oddrow');");
+		
+		/* Contents pane height. */
+		this.println("  $('#contentspane').css('height', $(window).height() - 230);");
+		this.println(
+		        "  $(window).resize(function() { " +
+				"    $('#contentspane').css('height', $(window).height() - 230);\n" +
+				"  });");
+		
+		/* Automatic page updating. */
+		this.println("  setTimeout(updateSelectedInfoTab, 10000);");
         
         this.println("})");
         this.println("</script>");
