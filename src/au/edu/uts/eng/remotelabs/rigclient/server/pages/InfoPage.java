@@ -38,12 +38,16 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.CompilationMXBean;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -288,9 +292,55 @@ public class InfoPage extends AbstractPage
      */
     public void resTab()
     {
-
-        //TODO 
+        Runtime runtime = Runtime.getRuntime();
         
+        /* Memory information. */
+        this.addRow("In use memory", runtime.totalMemory() / (1024 * 1024) - runtime.freeMemory() / (1024 * 1024) + " Mb");
+        this.addRow("Free memory", runtime.freeMemory() / (1024 * 1024) + " Mb");
+        this.addRow("Total memory", runtime.totalMemory() / (1024 * 1024) + " Mb");
+        this.addRow("Max memory", runtime.maxMemory() / (1024 * 1024) + " Mb");
+        
+        /* Threading information. */
+        ThreadMXBean thr = ManagementFactory.getThreadMXBean();
+        this.addRow("Current threads", String.valueOf(thr.getThreadCount()));
+        this.addRow("Daemon threads", String.valueOf(thr.getDaemonThreadCount()));
+        this.addRow("Peak threads", String.valueOf(thr.getPeakThreadCount()));
+        this.addRow("Total started threads", String.valueOf(thr.getTotalStartedThreadCount()));
+        
+        ThreadInfo threads[] = thr.dumpAllThreads(true, true);
+        StringBuilder tt = new StringBuilder();
+        tt.append("<table id='threadstab'>");
+        tt.append("  <tr>");
+        tt.append("    <th class='threadname'>Thread</th>");;
+        tt.append("    <th class='threadivoc'>Stack trace</th>");
+        tt.append("  </tr>");
+        
+        for (ThreadInfo t : threads)
+        {
+            tt.append("  <tr>");
+            tt.append("    <td class='threadname'>");
+            tt.append("Id: ");
+            tt.append(t.getThreadId());
+            tt.append("<br />Name: <br />");
+            tt.append(t.getThreadName());
+            tt.append("<br />State: ");
+            tt.append(t.getThreadState());
+            tt.append("<br />CPU time: ");
+            tt.append(thr.getThreadCpuTime(t.getThreadId()) / 10e6);
+            tt.append(" ms</td>");
+            
+            StackTraceElement ele[] = t.getStackTrace();
+            tt.append("<td class='threadivoc'>");
+            for (StackTraceElement e : ele)
+            {
+                tt.append(e.toString());
+                tt.append("<br />");
+            }
+            tt.append("</td>");
+            tt.append("  </tr>");
+        }
+        tt.append("</table>");
+        this.addRow(null, tt.toString());
     }
     
     /**
@@ -345,10 +395,32 @@ public class InfoPage extends AbstractPage
         this.addRow("Total loaded classes", String.valueOf(clsloading.getTotalLoadedClassCount()));
     }
     
+    /**
+     * Operating system information.
+     */
     public void osTab()
     {
-        // TODO Operating systems tab
-        this.addRow("op", "sys");
+        OperatingSystemMXBean opSys = ManagementFactory.getOperatingSystemMXBean();
+        this.addRow("Operating System", opSys.getName());
+        this.addRow("Version", opSys.getVersion());
+        this.addRow("Arch", opSys.getArch());
+        this.addRow("Processors", String.valueOf(opSys.getAvailableProcessors()));
+        this.addRow("File separator", System.getProperty("file.separator"));
+        this.addRow("Path separator", System.getProperty("path.separator"));
+        
+        /* File system information. */
+        File[] fsRoots = File.listRoots();
+        String fsRootsStr[] = new String[fsRoots.length];
+        for (int i = 0; i < fsRoots.length; i++) fsRootsStr[i] = fsRoots[i].toString();
+        this.addRow("File system roots", this.getListCell(fsRootsStr));
+        
+        for (File f : fsRoots)
+        {
+            String space = "Free: " + (f.getUsableSpace() / (1024 * 1024)) + " MB";
+            space += "<br />";
+            space += "Total: " + (f.getTotalSpace() / (1024 * 1024)) + " MB";
+            this.addRow("File System '" + f.getPath() + "'", space);
+        }
     }
     
     /**
@@ -360,8 +432,15 @@ public class InfoPage extends AbstractPage
     private void addRow(String prop, String val)
     {
         this.println("<tr>");
-        this.println("  <td class='propcol'>" + prop + ":</td>");
-        this.println("  <td class='valcol'>" + val + "</td>");
+        if (prop == null)
+        {
+            this.println("  <td colspan='2' class='valcol'>" + val + "</td>");
+        }
+        else
+        {
+            this.println("  <td class='propcol'>" + prop + ":</td>");
+            this.println("  <td class='valcol'>" + val + "</td>");
+        }
         this.println("</tr>");
     }
     

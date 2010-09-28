@@ -76,6 +76,7 @@ public class IndexPage extends AbstractPage
         this.operations = new LinkedHashMap<String, String>(4);
         this.operations.put("Restart", "/op/restart");
         this.operations.put("Shutdown", "/op/shutdown");
+        this.operations.put("Garbage_Collection", "/op/gc");
         
         this.icons = new HashMap<String, String>(9);
         this.icons.put("Status", "status");
@@ -85,6 +86,7 @@ public class IndexPage extends AbstractPage
         this.icons.put("Diagnostics", "runtime");
         this.icons.put("Restart", "restart");
         this.icons.put("Shutdown", "shutdown");
+        this.icons.put("Garbage_Collection", "trash");
         
         this.toolTips = new HashMap<String, String>(9);
         this.toolTips.put("Status", "The status of the rig client including session details and exerciser tests " +
@@ -98,6 +100,7 @@ public class IndexPage extends AbstractPage
         this.toolTips.put("Restart", "Restarts the rig client. This is only a soft restart since the rig client service " +
         		"process is not restarted.");
         this.toolTips.put("Shutdown", "Shuts down the rig client. The rig client service is stopped.");
+        this.toolTips.put("Garbage_Collection", "Runs garbage collection which frees unused memory.");
     }
     
     @Override
@@ -152,7 +155,7 @@ public class IndexPage extends AbstractPage
            String name = e.getKey();
            String classes = "linkbut plaina";
            if (i == 0) classes += " ui-corner-top";
-           else if (i == this.links.size() - 1) classes += " ui-corner-bottom";
+           else if (i == this.operations.size() - 1) classes += " ui-corner-bottom";
 
            this.println("       <li><a id='" + name + "link' class='" + classes + "' href='" + e.getValue() + "'>");
            this.println("           <div class='linkbutcont'>");

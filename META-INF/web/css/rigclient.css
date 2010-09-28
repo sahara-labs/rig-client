@@ -458,11 +458,11 @@ a.plaina:hover {
 	padding: 6px;
 	z-index: 100;
 	margin-top: 10px;
-	margin-left: -50px;
+	margin-left: -32px;
 	-moz-box-shadow: 0 0 8px #606060;
 	-webkit-box-shadow: 0 0 8px #606060;
 	box-shadow: 0 0 8px #606060;
-	opacity: 0.75;
+	opacity: 0.9;
 }
 
 .tooltipimg {
@@ -527,7 +527,7 @@ a.plaina:hover {
 }
 
 .slavelist {
-	list-style: circle inner none;
+	list-style: circle inside none;
 }
 
 #activitydect {
@@ -799,3 +799,25 @@ th {
 
 .oddrow {
 	background-color: #FEFEFE;
+}
+
+#threadstab {
+	font-size: 0.75em;
+	width: 565px;
+	margin-top: -10px;
+	margin-left: -10px;
+	margin-bottom: -10px;
+}
+
+.threadname {
+	width: 100px;
+}
+
+.threadstate {
+	width: 60px
+}
+
+.threadcpu {
+	width: 40px;
+}
+

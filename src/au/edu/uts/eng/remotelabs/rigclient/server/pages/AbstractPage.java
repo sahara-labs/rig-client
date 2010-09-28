@@ -185,6 +185,18 @@ public abstract class AbstractPage
         return b.toString();
     }
     
+    /** 
+     * Redirects to the specific location
+     * 
+     * @param resp response
+     * @param loc location
+     */
+    protected void redirect(HttpServletResponse resp, String loc)
+    {
+        resp.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
+        resp.setHeader("Location", loc);
+    }
+    
     /**
      * Adds the head section to the page.
      */

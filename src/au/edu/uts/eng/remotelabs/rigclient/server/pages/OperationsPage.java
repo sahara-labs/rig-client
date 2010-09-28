@@ -85,12 +85,16 @@ public class OperationsPage extends AbstractPage
             /* Display a confirmation page for restarting the rig client. */
             this.displayConfirmation(true);
         }
+        else if (uri.endsWith("gc"))
+        {
+            System.gc();
+            this.redirect(resp, "/");
+        }
         else
         {
             /* Unknown operation so go back to index. */
             new IndexPage().service(req, resp);
         }
-
     }
     
     /**
