@@ -73,7 +73,7 @@ mkdir -p $RPM_BUILD_ROOT/%{installdir}/lib
 mkdir -p $RPM_BUILD_ROOT/%{installdir}/config
 cp $RPM_BUILD_DIR//../../config/batch.properties $RPM_BUILD_ROOT/%{installdir}/config/batch.properties
 cp $RPM_BUILD_DIR/../../config/rigclient.properties.unix $RPM_BUILD_ROOT/%{installdir}/config/rigclient.properties
-cp $RPM_BUILD_DIR/../../config/rigclient_service.ini $RPM_BUILD_ROOT/%{installdir}/config/rigclient_service.ini
+cp $RPM_BUILD_DIR/../../rigclient_service.ini $RPM_BUILD_ROOT/%{installdir}/rigclient_service.ini
 
 # Init script, install
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
