@@ -821,3 +821,41 @@ th {
 	width: 40px;
 }
 
+/******************************************************************************
+ ** Help button pages.                                                       **
+ ******************************************************************************/
+#helpdialog {
+	height: 450px;
+	overflow-y: scroll;
+}
+
+#helpdialog ul {
+	margin-left: 20px;
+}
+
+.helptitle {
+	height: 18px;
+	padding: 5px;
+	border: 1px solid #AAAAAA;
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+.helphint {
+	margin: 6px auto;
+	width: 500px;
+	padding: 5px;
+}
+
+.helphinticon {
+	float: left;
+	margin-left: 5px;
+}
+
+span.bold {
+	font-weight: bold;
+}
+
+span.code {
+	font-family: monospace, courier;
+}

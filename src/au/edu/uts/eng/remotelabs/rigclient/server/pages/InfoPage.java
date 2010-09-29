@@ -376,13 +376,13 @@ public class InfoPage extends AbstractPage
         else
         {
             this.addRow("JIT compilation", "Yes");
-            this.addRow("JIT Compilier", comp.getName());
+            this.addRow("JIT compilier", comp.getName());
             this.addRow("Compilation time", String.valueOf(comp.getTotalCompilationTime()) + " ms");
         }
         
         /* Garbage collector time. */
         List<GarbageCollectorMXBean> garb = ManagementFactory.getGarbageCollectorMXBeans();
-        this.addRow("Number of garbage Collectors", String.valueOf(garb.size()));
+        this.addRow("Number of garbage collectors", String.valueOf(garb.size()));
         long gCollections = 0;
         long gTime = 0;
         StringBuilder gCollectors = new StringBuilder();
@@ -412,7 +412,7 @@ public class InfoPage extends AbstractPage
     public void osTab()
     {
         OperatingSystemMXBean opSys = ManagementFactory.getOperatingSystemMXBean();
-        this.addRow("Operating System", opSys.getName());
+        this.addRow("Operating system", opSys.getName());
         this.addRow("Version", opSys.getVersion());
         this.addRow("Arch", opSys.getArch());
         this.addRow("Processors", String.valueOf(opSys.getAvailableProcessors()));
@@ -430,7 +430,7 @@ public class InfoPage extends AbstractPage
             String space = "Free: " + (f.getUsableSpace() / (1024 * 1024)) + " MB";
             space += "<br />";
             space += "Total: " + (f.getTotalSpace() / (1024 * 1024)) + " MB";
-            this.addRow("File System '" + f.getPath() + "'", space);
+            this.addRow("File system '" + f.getPath() + "'", space);
         }
     }
     

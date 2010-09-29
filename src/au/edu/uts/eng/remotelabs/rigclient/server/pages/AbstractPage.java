@@ -387,8 +387,9 @@ public abstract class AbstractPage
                 "$('#helpdialog').dialog({\n" + 
         		"     autoOpen: false,\n" + 
         		"     width: 650,\n" + 
-        		"     modal: true,\n" + 
-        		"     resizable: false,\n" + 
+        		"     height: 450,\n" +
+        		"     modal: false,\n" + 
+        		"     resizable: true,\n" + 
         		"     buttons: {\n" +
         		"         'Close' : function() {\n" +
         		"             $(this).dialog('close');\n" +
