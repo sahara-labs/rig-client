@@ -78,6 +78,7 @@ public class PageResource
         String path = "/META-INF/web" + req.getRequestURI();
         this.logger.debug("Resource request path is '" + path + "'.");
         
+//        FIXME Re-enable 302 browser caching
 //        if (req.getDateHeader("If-Modified-Since") / 60000 == this.startTime / 60000)
 //        {
 //            resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);

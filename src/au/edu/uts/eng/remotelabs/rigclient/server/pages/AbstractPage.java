@@ -38,8 +38,13 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,6 +70,9 @@ public abstract class AbstractPage
     
     /** The rig type class. */
     protected IRig rig;
+    
+    /** Loaded help documents. */
+    protected static final Map<String, String> helpDocs = new HashMap<String, String>();
     
     /** Whether there is page framing with default contents. */
     protected boolean framing;
@@ -446,13 +454,74 @@ public abstract class AbstractPage
     protected abstract String getPageType();
     
     /**
-     * Get page help for the action bar help dialog.
+     * Get page help for the action bar help dialog. The help contents are loaded
+     * from a HTML file.
      * 
      * @return help contents
      */
     protected String getPageHelp()
     {
-        return "No help contents.";
+        String page = this.getPageType();
+        if (AbstractPage.helpDocs.containsKey(page))
+        {
+            return AbstractPage.helpDocs.get(page);
+        }
+        
+        synchronized (AbstractPage.helpDocs)
+        {
+            String line;
+            StringBuilder helpBuf = new StringBuilder();
+            BufferedReader reader = null;
+            try
+            {
+                InputStream is = AbstractPage.class.getResourceAsStream("/META-INF/web/doc/" + page + ".html");
+                if (is == null)
+                {
+                    this.logger.error("Failed to load help document file '/META-INF/web/doc/" + page + ".html' for page '" +
+                		page + "'. The help file was not found.");
+                
+                    /* Failed loading so put up an error dialog. */
+                    helpBuf.append("<div class='ui-state ui-state-error ui-corner-all' ");
+                    helpBuf.append("style='margin:0 auto; width: 260px; padding: 10px'>\n");
+                    helpBuf.append("  <span class='ui-icon ui-icon-alert' style='float:left; margin-right: 5px;'></span>\n");
+                    helpBuf.append("  Error loading help for this page.\n");
+                    helpBuf.append("</div>\n");
+                }
+                else
+                {
+                    reader = new BufferedReader(new InputStreamReader(is));    
+                    while ((line = reader.readLine()) != null)
+                    {
+                        helpBuf.append(line);
+                        helpBuf.append('\n');
+                    }
+                }
+            }
+            catch (IOException ex)
+            {
+                this.logger.error("Failed to load help document file '/META-INF/web/doc/" + page + ".html' for page '" +
+                		page + "'. Exceptiion message: " + ex.getMessage() + '.');
+                
+                /* Failed loading so put up an error dialog. */
+                helpBuf.append("<div class='ui-state ui-state-error ui-corner-all' ");
+                helpBuf.append("style='margin:0 auto; width: 260px; padding: 10px'>\n");
+                helpBuf.append("  <span class='ui-icon ui-icon-alert' style='float:left; margin-right: 5px;'></span>\n");
+                helpBuf.append("  Error loading help for this page.\n");
+                helpBuf.append("</div>\n");
+            }
+            finally
+            {
+                try 
+                {
+                    if (reader != null) reader.close();
+                }
+                catch (IOException ex) { /* Not much to do. */ }
+            }
+//            FIXME Re-enable help page caching
+//            AbstractPage.helpDocs.put(page, helpBuf.toString());
+        }
+        
+        return AbstractPage.helpDocs.get(page);
     }
 
     /**

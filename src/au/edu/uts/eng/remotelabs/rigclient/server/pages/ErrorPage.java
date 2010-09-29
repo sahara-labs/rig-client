@@ -90,7 +90,7 @@ public class ErrorPage extends AbstractPage
     @Override
     protected String getPageType()
     {
-        return "Main";
+        return "Error";
     }
 
 }
