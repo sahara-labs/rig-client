@@ -1,1 +1,47 @@
-<h3>Index page help</h3>
+<h3 class='helptitle ui-widget-header ui-corner-all'>Pages:</h3>
+The <em>Pages</em> list contains links to te pages of the rig client 
+administrative interface. The links consist of (briefly - consult the
+relavant pages for more in-depth descriptions):
+<ul>
+	<li><span class='bold'>Status</span> - Shows the current status of the
+	rig client including session detais and exerciser tests statuses.</li>
+	<li><span class='bold'>Configuration</span> - Allows the configuration 
+	properties of the rig client to be viewed and changed.</li>
+	<li><span class='bold'>Logs</span> - Log viewer displaying the latest
+	log messages of the rig client since startup.</li>
+	<li><span class='bold'>Diagnostics</span> - Runtime information about
+	the rig client including process details; important paths (class path,
+	library path, ...); memory utilisation; threads and their stack traces;
+	Java virtual machine details and host operating system details.</li>
+	<li><span class='bold'>Documentation</span> - All the important 
+	information required for effective development, customisation and use of
+	the rig client.</li>
+</ul>
+
+<h3 class='helptitle ui-widget-header ui-corner-all'>Operations:</h3>
+The <em>Operations</em> list contains operations which change the 
+temporal state of the rig client. The operations are:
+<ul>
+	<li><span class='bold'>Restart</span> - Soft restarts the rig client.
+	This is a soft restart because the Java virtual machine is not
+	restarted. Any in progress sessions are terminated, the scheduling
+	server registration is removed, the server is stopped and all 
+	exerciser tests are stopped before all being restarted. The rig type
+	class is instantiated anew causing any all action classes and exerciser
+	tests to be freshly loaded.
+	<div class='ui-state ui-state-error ui-corner-all helphint'>
+		<span class='ui-icon ui-icon-alert helphinticon'> </span>
+		<span class='bold'>NOTE:</span> Any modifications to the rig client 
+		class path, such as dropping a Jar file in './lib', requires the rig 
+		client service to be restarted using an operating system specific 
+		mechanism.
+	</div></li>
+	<li><span class='bold'>Shutdown</span> - Shuts down the rig client. The
+	rig client service is stopped and to subsequently start the rig client
+	the rig client service must be started in some operating system specific
+	mechanism.</li>
+	<li><span class='bold'>Garbage Collection</span> - Peforms a Java virtual
+	machine garbage collection which frees unused memory. The Java virtual
+	machine automically performs this operation and it is safe to manually
+	request this as many times as neccessary.</li>
+</ul>

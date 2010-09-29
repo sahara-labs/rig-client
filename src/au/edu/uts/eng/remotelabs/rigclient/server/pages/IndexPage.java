@@ -89,16 +89,13 @@ public class IndexPage extends AbstractPage
         this.icons.put("Garbage_Collection", "trash");
         
         this.toolTips = new HashMap<String, String>(9);
-        this.toolTips.put("Status", "The status of the rig client including session details and exerciser tests " +
-        		"statuses.");
+        this.toolTips.put("Status", "The current status of the rig client.");
         this.toolTips.put("Configuration", "Allows configuration properties of the rig client to be viewed and " +
         		"changed.");
-        this.toolTips.put("Logs", "Log viewer of the latest log messages of the rig client since startup.");
+        this.toolTips.put("Logs", "Log viewer displaying the latest log messages.");
         this.toolTips.put("Documentation", "Documentation about the rig client.");
-        this.toolTips.put("Diagnostics", "Runtime information about the rig client such as classpath, system " +
-        		"properties, uptime...");
-        this.toolTips.put("Restart", "Restarts the rig client. This is only a soft restart since the rig client service " +
-        		"process is not restarted.");
+        this.toolTips.put("Diagnostics", "Runtime information about the rig client.");
+        this.toolTips.put("Restart", "Soft restarts the rig client.");
         this.toolTips.put("Shutdown", "Shuts down the rig client. The rig client service is stopped.");
         this.toolTips.put("Garbage_Collection", "Runs garbage collection which frees unused memory.");
     }
