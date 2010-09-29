@@ -519,9 +519,10 @@ public abstract class AbstractPage
             }
 //            FIXME Re-enable help page caching
 //            AbstractPage.helpDocs.put(page, helpBuf.toString());
+            return helpBuf.toString();
         }
         
-        return AbstractPage.helpDocs.get(page);
+//        return AbstractPage.helpDocs.get(page);
     }
 
     /**
