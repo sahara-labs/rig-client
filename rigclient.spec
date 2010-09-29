@@ -120,7 +120,7 @@ rm -f  /etc/Sahara/RigClient
 %files
 %{installdir}/config/batch.properties
 %{installdir}/config/rigclient.properties
-%{installdir}/config/rigclient_service.ini
+%{installdir}/rigclient_service.ini
 %{installdir}/rigclient.jar
 %{installdir}/rigclientservice
 %{installdir}/lib
