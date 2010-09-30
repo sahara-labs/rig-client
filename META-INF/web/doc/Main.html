@@ -39,7 +39,19 @@ temporal state of the rig client. The operations are:
 	<li><span class='bold'>Shutdown</span> - Shuts down the rig client. The
 	rig client service is stopped and to subsequently start the rig client
 	the rig client service must be started in some operating system specific
-	mechanism.</li>
+	mechanism.
+	<div class='ui-state ui-state-highlight ui-corner-all helphint'>
+		<span class='ui-icon ui-icon-info helphinticon'> </span>
+		<span class='bold'>HINT:</span> On Windows, to start the rig client open
+		'Control&nbsp;Panel'&nbsp;-&gt;&nbsp;'Administrative&nbsp;'Tools'&nbsp;-&gt;&nbsp;'Services'
+		and in the list of services, start the rig client.
+	</div>
+	<div class='ui-state ui-state-highlight ui-corner-all helphint'>
+		<span class='ui-icon ui-icon-info helphinticon'> </span>
+		<span class='bold'>HINT:</span> On Linux, to start the rig client 
+		execute <span class='code'>'/etc/init.d/rigclient&nbsp;start'</span> with
+		root privileges.
+	</div></li>
 	<li><span class='bold'>Garbage Collection</span> - Peforms a Java virtual
 	machine garbage collection which frees unused memory. The Java virtual
 	machine automically performs this operation and it is safe to manually

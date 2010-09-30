@@ -281,9 +281,6 @@ public class InfoPage extends AbstractPage
         /* Working directory. */
         this.addRow("Working directory", System.getProperty("user.dir"));
         
-        /* Temporary directory. */
-        this.addRow("Temp directory", System.getProperty("java.io.tmpdir"));
-        
         /* Classpath. */
         this.addRow("Class path", this.getListCell(runtime.getClassPath().split(System.getProperty("path.separator"))));
         this.addRow("Boot class path", this.getListCell(runtime.getBootClassPath().split(System.getProperty("path.separator"))));
@@ -432,6 +429,9 @@ public class InfoPage extends AbstractPage
             space += "Total: " + (f.getTotalSpace() / (1024 * 1024)) + " MB";
             this.addRow("File system '" + f.getPath() + "'", space);
         }
+        
+        /* Temporary directory. */
+        this.addRow("Temp directory", System.getProperty("java.io.tmpdir"));
     }
     
     /**

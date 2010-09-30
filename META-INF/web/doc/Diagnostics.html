@@ -1,1 +1,46 @@
-<h3>Diagnostics</h3>
+<h3 class='helptitle ui-widget-header ui-corner-all'>Brief description:</h3>
+The diagnostics displays information about the running rig client. This is to
+help diagnose potential problems and investiage error conditions. The 
+runtime information displayed on this page is automatically updated every 10
+seconds.
+
+<h3 class='helptitle ui-widget-header ui-corner-all'>Runtime information:</h3>
+The information shown on this tab is about the execution of the rig client.
+The information fields are:
+<ul>
+	<li><span class='bold'>Name:</span> - The runtime name of the Java virtual
+	machine. The extact name format is virtual machine specific but is usually
+	composed of &lt;Process PID&gt;@&lt;Computer hostname&gt;.</li>
+	<li><span class='bold'>Start time:</span> - The time when the rig client
+	was started.</li>
+	<li><span class='bold'>Uptime:</span> - How long the rig client has been
+	running in terms of days, hours, minutes and seconds.</li>
+	<li><span class='bold'>Working directory:</span> - The current / working
+	directory (CWD) of the rig client which is the base path of relative file paths.
+	<div class='ui-state ui-state-error ui-corner-all helphint'>
+		<span class='ui-icon ui-icon-alert helphinticon'> </span>
+		<span class='bold'>NOTE:</span> The working directory is extremely
+		important as the configuration files are loaded relative to it. 
+	</div>
+	<div class='ui-state ui-state-highlight ui-corner-all helphint'>
+		<span class='ui-icon ui-icon-info helphinticon'> </span>
+		<span class='bold'>HINT:</span> The rig client service sets the working
+		directory to the installation directory of the rig client.
+	</div></li>
+	<li><span class='bold'>Class path:</span> The list of directories and Jar
+	files where classes are loaded from. Any class path location starting with
+	'.' is relative to the working directory of the rig client.
+	<div class='ui-state ui-state-highlight ui-corner-all helphint'>
+		<span class='ui-icon ui-icon-info helphinticon'> </span>
+		<span class='bold'>HINT:</span> Any Jar file added to the 
+		<span class='code'>'./lib'</span> directory is automatically added
+		to class path on rig client start by the rig client service.
+	</div>
+	<div class='ui-state ui-state-highlight ui-corner-all helphint'>
+		<span class='ui-icon ui-icon-info helphinticon'> </span>
+		<span class='bold'>HINT:</span> The rig client service allows explicit
+		Jar files to be configured.
+	</div></li>
+	<li><span class='bold'>Boot class path:</span> The list of directories and Jar
+	files where the Java classes are loaded.</li>
+</ul>
