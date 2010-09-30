@@ -150,6 +150,7 @@ public class ConfigurationActionLoader
 
         for (String clazz : classes)
         {
+            clazz = clazz.trim();
             Class<?> foundClazz = null;
             try
             {
