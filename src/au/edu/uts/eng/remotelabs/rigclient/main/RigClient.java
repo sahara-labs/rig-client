@@ -160,6 +160,7 @@ public class RigClient
             {
                 StatusUpdater statusUpdater = new StatusUpdater(this.server.getAddress()[0]);
                 this.statusThread = new Thread(statusUpdater);
+                this.statusThread.setName("Status Updater");
                 this.statusThread.start();
             }
             catch (Exception ex)
