@@ -1,6 +1,6 @@
 <h3 class='helptitle ui-widget-header ui-corner-all'>Brief description:</h3>
-The diagnostics displays information about the running rig client. This is to
-help diagnose potential problems and investigate error conditions. The 
+The diagnostics page displays information about the running rig client. This
+is to help diagnose potential problems and investigate error conditions. The 
 diagnostics displayed on this page is automatically updated every 10
 seconds.
 
@@ -130,7 +130,16 @@ and active threads.
 The information show on this tab displays Java virtual machine details.
 <ul>
 	<li><span class='bold'>Virtual machine</span> - The name of the
-	virtual machine.</li>
+	virtual machine.
+	<div class='ui-state ui-state-highlight ui-corner-all helphint'>
+		<span class='ui-icon ui-icon-info helphinticon'> </span>
+		<span class='bold'>HINT:</span> Java usually comes with a few virtual
+		machine implementations including 'Client' and 'Server' (the virtual
+		machine name will specifies this). It is recommended to use the 'Server'
+		virtual machine which trades memory and startup time for better 
+		performance. This may be configured in the rig client service INI file 
+		by setting the path of the virtual machine implementation library.
+	</div></li>
 	<li><span class='bold'>version</span> - The Java virtual machine version.
 	<div class='ui-state ui-state-error ui-corner-all helphint'>
 		<span class='ui-icon ui-icon-alert helphinticon'> </span>
@@ -138,7 +147,7 @@ The information show on this tab displays Java virtual machine details.
 		also known as Java 6 (this might be displayed as 16.x). Earlier 
 		versions of Java are unsupported and probably will not work.
 	</div></li>
-	<li><span class='bold'>Vendor</span> - The Java virtual machine vendor.
+	<li><span class='bold'>Vendor</span> - The Java virtual machine vendor.</li>
 	<li><span class='bold'>Specification</span> - The virtual machine
 	specification.</li>
 	<li><span class='bold'>JIT compilation</span> - Whether the virtual machine
