@@ -1,6 +1,6 @@
 <h3 class='helptitle ui-widget-header ui-corner-all'>Brief description:</h3>
 The diagnostics displays information about the running rig client. This is to
-help diagnose potential problems and investiage error conditions. The 
+help diagnose potential problems and investigate error conditions. The 
 diagnostics displayed on this page is automatically updated every 10
 seconds.
 
@@ -9,7 +9,7 @@ The information shown on this tab is about the execution of the rig client.
 The information fields are:
 <ul>
 	<li><span class='bold'>Name</span> - The runtime name of the Java virtual
-	machine. The extact name format is virtual machine specific but is usually
+	machine. The exact name format is virtual machine specific but is usually
 	composed of &lt;Process PID&gt;@&lt;Computer hostname&gt;.</li>
 	<li><span class='bold'>Start time</span> - The time when the rig client
 	was started.</li>
@@ -55,7 +55,7 @@ The information fields are:
 	</div></li>
 	<li><span class='bold'>Environment variables</span> - The environment 
 	variables given to the rig client by the invocation environment. These
-	are <span class='bold'>not</span> used to control rig client behaviour
+	are <span class='bold'>not</span> used to control rig client behavior
 	but are by default inherited by any batch control processes.</li>
 </ul>
 
@@ -100,12 +100,12 @@ and active threads.
 			<span class='bold'>NOTE:</span> The number of these threads should
 			not	exceed the configured concurrent request limit.
 		</div></li>
-		<li>Other miscellenous Java virtual machine threads such as 
+		<li>Other miscellaneous Java virtual machine threads such as 
 		'Finalizer'.</li> 
 	</ul></li>
 	<li><span class='bold'>Daemon threads</span> - Daemon threads do not keep
 	the Java virtual machine running (i.e. when all threads are daemon threads,
-	the rig client terminates). Exceriser tests and HTTP worker threads are
+	the rig client terminates). Exerciser tests and HTTP worker threads are
 	daemon threads.</li>
 	<li><span class='bold'>Peak threads</span> - The highest number of
 	concurrent threads that have been running.</li>
@@ -115,10 +115,10 @@ and active threads.
 	<li><span class='bold'>Thread stack traces</span> - These list of active 
 	threads. The information shown about thread is:
 	<ul>
-		<li>Thread unique identifer.</li>
+		<li>Thread unique identifier.</li>
 		<li>Thread name.</li>
 		<li>Thread state.</li>
-		<li>Thread cpu time, rather how long the thread has been in the 
+		<li>Thread CPU time, rather how long the thread has been in the 
 		runnable state.</li>
 		<li>Thread stack trace. This shows the currently executing method at the
 		top of the stack and the list of method invocations that from thread start
@@ -129,7 +129,38 @@ and active threads.
 <h3 class='helptitle ui-widget-header ui-corner-all'>Java</h3>
 The information show on this tab displays Java virtual machine details.
 <ul>
-
+	<li><span class='bold'>Virtual machine</span> - The name of the
+	virtual machine.</li>
+	<li><span class='bold'>version</span> - The Java virtual machine version.
+	<div class='ui-state ui-state-error ui-corner-all helphint'>
+		<span class='ui-icon ui-icon-alert helphinticon'> </span>
+		<span class='bold'>NOTE:</span>The minimum required version is '1.6.x', 
+		also known as Java 6 (this might be displayed as 16.x). Earlier 
+		versions of Java are unsupported and probably will not work.
+	</div></li>
+	<li><span class='bold'>Vendor</span> - The Java virtual machine vendor.
+	<li><span class='bold'>Specification</span> - The virtual machine
+	specification.</li>
+	<li><span class='bold'>JIT compilation</span> - Whether the virtual machine
+	support just-in-time compilation.</li>
+	<li><span class='bold'>JIT compiler</span> - The name of the JIT 
+	compiler.</li>
+	<li><span class='bold'>Compilation time</span> - The amount of time the
+	virtual machine has spent compiling byte code to native code.</li>
+	<li><span class='bold'>Number of garbage collectors</span> - The number
+	of garbage collectors in use.</li>
+	<li><span class='bold'>Garbage collectors</span> - The name of the garbage
+	collectors.</li>
+	<li><span class='bold'>Garbage collections</span> - The number of times
+	garbage collection has run.</li>
+	<li><span class='bold'>Garbage collection CPU time</span> - The cumulative
+	time taken to run garbage collections.</li>
+	<li><span class='bold'>Loaded classes</span> - The number of loaded 
+	classes.</li>
+	<li><span class='bold'>Unloaded classes</span> - The number of unloaded
+	classes.</li>
+	<li><span class='bold'>Total loaded classes</span> - The total number of 
+	loaded classes.</li>
 </ul>
 
 <h3 class='helptitle ui-widget-header ui-corner-all'>OS</h3>
@@ -141,19 +172,19 @@ The information show on this tab display host operating system details.
 	<li><span class='bold'>Arch</span> - The operating system architecture.
 	<div class='ui-state ui-state-error ui-corner-all helphint'>
 		<span class='ui-icon ui-icon-alert helphinticon'> </span>
-		<span class='bold'>NOTE: On Linux 64bit architectures (displayed as
-		'amd64') should use a rig client service executable compiled for 64bit
-		Linux.</span> 
+		<span class='bold'>NOTE: </span>On Linux 64bit architectures (displayed
+		as 'amd64') should use a rig client service executable compiled for 
+		64bit Linux.
 	</div></li>
 	<li><span class='bold'>Processors</span> - The number of processors 
-	avaliable to the Java virtual machine.</li>
+	available to the Java virtual machine.</li>
 	<li><span class='bold'>File separator</span> - The separator between 
-	directories in file paths. This is dependant on the operating 
+	directories in file paths. This is dependent on the operating 
 	system running.
 	<div class='ui-state ui-state-highlight ui-corner-all helphint'>
 		<span class='ui-icon ui-icon-info helphinticon'> </span>
 		<span class='bold'>HINT:</span> The separtor '/' works on both
-		UNIX and Windows and should on Windows instead of the displayed
+		UNIX and Windows and should be used Windows instead of the displayed
 		character '\'. The '\' character is used as the special character
 		escape character, so if '\' is used, it should be escaped using
 		'\' (i.e. C:\\foo\\bar\\baz).
@@ -161,4 +192,11 @@ The information show on this tab display host operating system details.
 	<li><span class='bold'>Path separator</span> - The character delimiting 
 	file paths in the rig clients class path and library path. This is 
 	dependant on the operating system running.</li>
+	<li><span class='bold'>File system roots</span> - The list of top
+	most directories in the filesystem.</li>
+	<li><span class='bold'>File system &lt;x&gt;</span> - The free and total
+	space on the file system &lt;x&gt;.</li>
+	<li><span class='bold'>Temp directory</span> - The operating system 
+	temporary directory. The rig client by default stores uploaded batch files
+	in this directory.</li>
 </ul>
