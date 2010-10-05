@@ -40,7 +40,7 @@ package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -64,7 +64,7 @@ public class ConfigPage extends AbstractPage
         IConfigDescriptions desc = ConfigFactory.getDescriptions();
         
         /* Group the properties by stanza. */
-        Map<String, List<Entry<String, String>>> stanzas = new HashMap<String, List<Entry<String, String>>>();
+        Map<String, List<Entry<String, String>>> stanzas = new LinkedHashMap<String, List<Entry<String, String>>>();
         for (Entry<String, String> e : props.entrySet())
         {
             Property p = desc.getPropertyDescription(e.getKey());
@@ -78,6 +78,29 @@ public class ConfigPage extends AbstractPage
             if (!stanzas.containsKey(sta)) stanzas.put(sta, new ArrayList<Entry<String, String>>());
             stanzas.get(sta).add(e);
         }
+        
+        /* Add tabs to page. */
+        this.println("<div id='lefttabbar'>");
+        this.println("  <ul id='lefttablist'>");
+        
+        int i = 0;
+        for (String s : stanzas.keySet())
+        {
+            String classes = "notselectedtab";
+            if (i == 0) classes = "ui-corner-tl selectedtab";
+            else if (i == stanzas.size() - 1) classes += " ui-corner-bl";
+
+            this.println("<li><a id='" + s + "tab' class='" + classes + "' onclick='openConfStanza(\"" + s + "\")'>");
+            this.println("  <div class='conftab'>");
+            this.println("    " + s);
+            this.println("  </div>");
+            this.println("</a></li>");
+            
+            i++;
+        }
+        
+        this.println("  </ul>");
+        this.println("<div>");
     }
 
     @Override
