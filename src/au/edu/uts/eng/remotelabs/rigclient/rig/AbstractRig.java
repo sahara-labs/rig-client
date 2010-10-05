@@ -662,7 +662,21 @@ public abstract class AbstractRig implements IRig
             this.logger.debug("Taking the rig out of maintenance mode.");
             this.inMaintenance = false;
             this.maintenanceReason = null;
-            this.actionFailures.clear();
+            
+            /* Clear the action failure counts. */
+            synchronized (this.actionFailures)
+            {
+                for (int c : this.actionFailures.values())
+                {
+                    if (c > this.failureThreshold)
+                    {
+                        this.logger.info("Clearing maintenance state caused by the action failure threshold being " +
+                        		"exceeded.");
+                    }
+                }
+                this.actionFailures.clear();
+            }
+            
             this.logger.debug("Monitor tests are going to be started.");
             this.startTests();
         }
@@ -1195,7 +1209,7 @@ public abstract class AbstractRig implements IRig
                         " is " + this.failureThreshold + ".");
             }
 
-            if (this.actionFailures.get(action) >= this.failureThreshold)
+            if (this.actionFailures.get(action) > this.failureThreshold)
             {
                 this.logger.error("Rig has been put into maintenance mode because an action failure " + 
                         action.getActionType() + " count has reached the failure threshold.");

@@ -222,16 +222,16 @@ public class AbstractRigTester extends TestCase
             .andReturn("MockTestAction")
             .atLeastOnce();
         mockTest.stopTest();
-        expectLastCall().times(2);
+        expectLastCall().times(3);
         mockTest.startTest();
-        expectLastCall().times(2);
+        expectLastCall().times(3);
         expect(mockTest.getStatus())
             .andReturn(true)
             .atLeastOnce();
         
         IAccessAction mockAccess = createMock(IAccessAction.class);
         expect(mockAccess.assign(tuser))
-            .andReturn(false).times(2);  // Action failure
+            .andReturn(false).times(3);  // Action failure
         expect(mockAccess.getActionType())
             .andReturn("MockAccessAction")
             .atLeastOnce();
@@ -246,6 +246,8 @@ public class AbstractRigTester extends TestCase
         
         assertFalse(this.rig.isSessionActive());
         assertFalse(this.rig.assign(tuser)); 
+        assertFalse(this.rig.isSessionActive());
+        assertFalse(this.rig.assign(tuser));
         assertFalse(this.rig.isSessionActive());
         assertTrue(Session.NOT_IN == this.rig.isInSession(tuser)); // Failed but below threshold so not offline
         assertTrue(this.rig.isMonitorStatusGood());
@@ -429,7 +431,7 @@ public class AbstractRigTester extends TestCase
         final String tuser = "testuser";
         ITestAction mockTest = createMock(ITestAction.class);
         expect(mockTest.getActionType())
-            .andReturn("MockTestAction");
+            .andReturn("MockTestAction").times(2);
         expect(mockTest.getStatus())
             .andReturn(true);
         mockTest.stopTest();
@@ -479,7 +481,7 @@ public class AbstractRigTester extends TestCase
         final String tuser = "testuser";
         ITestAction mockTest = createMock(ITestAction.class);
         expect(mockTest.getActionType())
-            .andReturn("MockTestAction");
+            .andReturn("MockTestAction").times(2);
         expect(mockTest.getStatus())
             .andReturn(true);
         mockTest.stopTest();
@@ -518,7 +520,7 @@ public class AbstractRigTester extends TestCase
         final String tuser = "testuser";
         ITestAction mockTest = createMock(ITestAction.class);
         expect(mockTest.getActionType())
-            .andReturn("MockTestAction");
+            .andReturn("MockTestAction").times(2);
         expect(mockTest.getStatus())
             .andReturn(true);
         mockTest.stopTest();
@@ -609,7 +611,7 @@ public class AbstractRigTester extends TestCase
         final int interval = 20;
         ITestAction mockTest = createMock(ITestAction.class);
         expect(mockTest.getActionType())
-            .andReturn("MockTestAction");
+            .andReturn("MockTestAction").times(2);
         mockTest.setInterval(interval);
         expectLastCall();
         replay(mockTest);
@@ -631,7 +633,7 @@ public class AbstractRigTester extends TestCase
         
         expect(mockTest.getActionType())
             .andReturn("MockTestAction")
-            .times(2);
+            .times(3);
         expect(mockTest.getStatus())
             .andReturn(false)
             .times(2);
@@ -659,7 +661,7 @@ public class AbstractRigTester extends TestCase
             .times(2);
         expect(mockTest.getActionType())
             .andReturn("MockTestAction")
-            .times(1);
+            .times(2);
         
         replay(mockTest);
         assertTrue(this.rig.register(mockTest, ActionType.TEST));
@@ -691,7 +693,7 @@ public class AbstractRigTester extends TestCase
         /* Register test. */
         ITestAction mockTest = createMock(ITestAction.class);
         expect(mockTest.getActionType())
-            .andReturn("MockTest");
+            .andReturn("MockTest").times(2);
         replay(mockTest);
         assertTrue(this.rig.register(mockTest, ActionType.TEST));
         verify(mockTest);
@@ -727,7 +729,7 @@ public class AbstractRigTester extends TestCase
         /* Register test. */
         ITestAction mockTest = createMock(ITestAction.class);
         expect(mockTest.getActionType())
-            .andReturn("MockTest");
+            .andReturn("MockTest").times(2);
         replay(mockTest);
         this.rig.register(mockTest, ActionType.TEST);
         verify(mockTest);
