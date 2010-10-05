@@ -105,10 +105,12 @@ public class PageResource
         /* Content type. */
         if      (path.endsWith("js"))   resp.setContentType("text/javascript");
         else if (path.endsWith("css"))  resp.setContentType("text/css");
+        else if (path.endsWith("html")) resp.setContentType("text/html");
         else if (path.endsWith("png"))  resp.setContentType("image/png");
         else if (path.endsWith("jpg") 
               || path.endsWith("jpeg")) resp.setContentType("image/jpeg");
         else if (path.endsWith("gif"))  resp.setContentType("image/gif");
+        else if (path.endsWith("pdf"))  resp.setContentType("application/pdf");
         else                            resp.setContentType("application/octet-stream");
         
         byte buf[] = new byte[1024];

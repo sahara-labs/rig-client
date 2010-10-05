@@ -100,6 +100,7 @@ public class RootServlet extends HttpServlet
         this.resources.add("css");
         this.resources.add("js");
         this.resources.add("img");
+        this.resources.add("pdf");
         
         /* Pages list. */
         this.pages = new HashMap<String, String>();
