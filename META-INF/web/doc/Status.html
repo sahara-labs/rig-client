@@ -1,1 +1,100 @@
-<h3>Status</h3>
+<h3 class='helptitle ui-widget-header ui-corner-all'>Brief description:</h3>
+The status page displays information about the current status of the rig
+client including the overall status, exerciser details and session details.
+<h3 class='helptitle ui-widget-header ui-corner-all'>Overall status:</h3>
+The overall status of the rig client can be one of four different states.
+These are:
+<ul>
+	<li><span class='bold'>Not registered</span> - When the rig client 
+	starts up it registers itself with the configured scheduling server.
+	If this fails, the 'Not registered' state is shown and the rig client
+	is 'dark' from the rest of the remote laboratory system so cannot have
+	users assigned to it. In this state the rig client will periodically
+	attempt to register itself with the scheduling server. 	If the rig should
+	be registered, some remedial steps are:
+	<ol>
+		<li>Check the rig logs. This should show the cause of failing 
+		registration.</li>
+		<li>Check the scheduling server is running.</li>
+		<li>Check the configured scheduling server computer hostname and port
+		are	correct (these are the configuration property <span class='code'>
+		Scheduling_Server_Address</span> and <span class='code'>
+		Scheduling_Server_Port</span> for scheduling server hostname and port
+		respectively).
+		<div class='ui-state ui-state-highlight ui-corner-all helphint'>
+			<span class='ui-icon ui-icon-info helphinticon'> </span>
+			<span class='bold'>HINT:</span> Try using the configured scheduling
+			server address with a web browser. If the address is correct the 
+			scheduling server administrative interface login should be displayed.
+			For example, if the configured hostname is 'eng047151.eng.uts.edu.au'
+			and the port is 8080, enter 'http://eng047151.eng.uts.edu.au:8080'. The 
+			following should be displayed:
+			<div style='text-align:center'>
+				<img src='/img/ss_login.png' alt='Login' />
+			</div>
+			If this is not displayed either the address is incorrect or there is a
+			problem with the network.
+		</div></li>
+		<li>Check there aren't any firewalls blocking access to the scheduling 
+		server. If the computer is Linux, check iptables or if the computer is
+		Windows, check the Windows firewall.</li>
+		<li>Check the rig client name is unqiue. If another rig client has 
+		registered with the same name, the rig client will fail scheduling
+		server registration.</li>
+	</ol></li>
+	<li><span class='bold'>Online</span> - In this state the rig client is 
+	registered with the scheduling server, all exerciser tests have succeeded
+	and the rig is ready to have users assigned to it.</li>
+	<li><span class='bold'>Offline</span> - In this state the rig client is 
+	registered with the rig client but is offline because of some problem. When
+	the rig is offline the reason is also displayed and the logs should have 
+	messages stating the problem. The causes of the rig being offline are:
+	<ul>
+		<li>One or more exericiser tests has failed. The 'Exerciser details' 
+		panel will show the test that has failed and its reason. To put the 
+		rig back offline, resolve the issue causing the tests to fail.</li>
+		<li>The action failure threshold has been exceeded. When an action (such
+		as the '<span class='code'>RemoteDesktopAccessAction</span>' fails, a 
+		counter is incremented. When the counter exceeds the action fail 
+		threshold, the rig is taken offline. The root cause of the action 
+		failure should then be investigated. To put the rig client back online
+		either use the 'Clear Maintenance' button on the 'Main' page.
+		<div class='ui-state ui-state-highlight ui-corner-all helphint'>
+			<span class='ui-icon ui-icon-info helphinticon'> </span>
+			<span class='bold'>HINT:</span> The action fail threshold can be
+			configured using the '<span class='code'>Action_Failure_Threshold
+			</span>' configuration property.
+		</div></li>
+	</ul></li>
+	<li><span class='bold'>In use</span> - The rig is currently being used by
+	a user.</li>
+</ul>
+
+<h3 class='helptitle ui-widget-header ui-corner-all'>Exerciser details:</h3>
+The exerciser details panel lists all the currently running rig client tests
+and their states. If a test is offline, the test failure reason is shown. 
+<div class='ui-state ui-state-highlight ui-corner-all helphint'>
+	<span class='ui-icon ui-icon-info helphinticon'> </span>
+	<span class='bold'>HINT:</span>To 'fix' an exerciser test which has put the
+	rig offline, resolve the underlying failure reason and wait till it runs 
+	again.
+</div>
+
+<h3 class='helptitle ui-widget-header ui-corner-all'>Session details:</h3>
+The session details panel lists the currently assigned users to the rig.
+The types of users who may be in session are:
+<ul>
+	<li><span class='bold'>Master</span> - The master user is the person
+	initially assigned to the rig by the scheduling server. They 'control'
+	the session and when they leave, either by choice or when the
+	session expires, the session is terminated and all other users are 
+	removed.</li>
+	<li><span class='bold'>Slave Active</span> - Slave user who is
+	subsequently assigned to the rig session who <em>should</em> 
+	be able to perform control much the same as the master user.
+	</li>
+	<li><span class='bold'>Slave Passive</span> - Slave user who is 
+	subsequently assigned to the rig session who <em>should not</em> 
+	be able to perform control on the rig. Typically thsese users should
+	be passive session observers.</li>
+</ul>

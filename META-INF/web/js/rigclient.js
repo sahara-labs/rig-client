@@ -226,6 +226,21 @@ function shutdownRigClient()
 	);
 }
 
+function clearMaintenance()
+{
+	$("#confirmationcontainer").empty().addClass('confirminprogress').append(
+		"<div><img src='/img/spinner.gif' alt='Loading' /></div>\n" +
+		"Clearing maintenance..."
+	);
+		
+	$.post(
+		"/op/clear",
+		null,
+		function() {
+			window.location.replace("/");
+	});
+}
+
 function updateSelectedInfoTab()
 {
 	$.get(

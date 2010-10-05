@@ -76,6 +76,7 @@ public class IndexPage extends AbstractPage
         this.operations = new LinkedHashMap<String, String>(4);
         this.operations.put("Restart", "/op/restart");
         this.operations.put("Shutdown", "/op/shutdown");
+        this.operations.put("Clear_Maintenance", "/op/clear");
         this.operations.put("Garbage_Collection", "/op/gc");
         
         this.icons = new HashMap<String, String>(9);
@@ -86,6 +87,7 @@ public class IndexPage extends AbstractPage
         this.icons.put("Diagnostics", "runtime");
         this.icons.put("Restart", "restart");
         this.icons.put("Shutdown", "shutdown");
+        this.icons.put("Clear_Maintenance", "clearmain");
         this.icons.put("Garbage_Collection", "trash");
         
         this.toolTips = new HashMap<String, String>(9);
@@ -97,6 +99,7 @@ public class IndexPage extends AbstractPage
         this.toolTips.put("Diagnostics", "Runtime information about the rig client.");
         this.toolTips.put("Restart", "Soft restarts the rig client.");
         this.toolTips.put("Shutdown", "Shuts down the rig client. The rig client service is stopped.");
+        this.toolTips.put("Clear_Maintenance", "Clears any maintenance states the rig may have.");
         this.toolTips.put("Garbage_Collection", "Runs garbage collection which frees unused memory.");
     }
     

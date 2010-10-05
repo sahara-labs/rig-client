@@ -85,6 +85,17 @@ public class OperationsPage extends AbstractPage
             /* Display a confirmation page for restarting the rig client. */
             this.displayConfirmation(true);
         }
+        else if (uri.endsWith("clear") && "POST".equals(req.getMethod()))
+        {
+            /* Clear the maintenance state. */
+            this.rig.setMaintenance(false, null, true);
+        }
+        else if (uri.endsWith("clear"))
+        {
+            /* Display a confirmation page for restarting the rig client. */
+            this.displayMaintenanceConfirmation();
+            this.println("ok");
+        }
         else if (uri.endsWith("gc"))
         {
             System.gc();
@@ -105,15 +116,7 @@ public class OperationsPage extends AbstractPage
     private void displayConfirmation(boolean isRestart)
     {
         this.pageBeginning();
-        
-        this.println("<div id='confirmationcontainer' class='detailspanel ui-corner-all'>");
-        this.println("   <div class='detailspaneltitle'>");
-        this.println("      <p>");
-        this.println("          <span class='detailspanelicon ui-icon ui-icon-notice'> </span>");
-        this.println("          Confirm:");
-        this.println("      </p>");
-        this.println("   </div>");
-        this.println("   <div class='detailspanelcontents'>");
+        this.confirmPanelStart();
         
         if (isRestart)
         {
@@ -149,6 +152,55 @@ public class OperationsPage extends AbstractPage
         }
         this.println("</div>");
         
+        this.confirmPanelEnd();
+        this.pageEnd();
+    }
+    
+    /**
+     * Displays a confirmation page for the maintenance function.
+     */
+    private void displayMaintenanceConfirmation()
+    {
+        this.pageBeginning();
+        this.confirmPanelStart();
+
+        this.println("      <div class='confirmimg'><img src='/img/clearmain_huge.png' alt='restart' /></div>");
+        this.println("      <div class='confirmtext'>Are you sure you clear any maintenance states of the rig " +
+        		"client? This will allow users to be assigned to the rig (provided no exerciser tests are " +
+        		"failing).</div>");
+        
+        this.println("<div style='clear:both'> </div>");
+        
+        /* Buttons to make a choice. */
+        this.println("<div id='confirmbuttons'>");
+        this.addButton("noconfirm", "No", "window.location.replace(\"/\")");
+        this.addButton("clearmain", "Yes", "clearMaintenance()");
+        this.println("</div>");
+        
+        this.confirmPanelEnd();
+        this.pageEnd();
+    }
+
+    /**
+     * Confirmation panel start content.
+     */
+    private void confirmPanelStart()
+    {
+        this.println("<div id='confirmationcontainer' class='detailspanel ui-corner-all'>");
+        this.println("   <div class='detailspaneltitle'>");
+        this.println("      <p>");
+        this.println("          <span class='detailspanelicon ui-icon ui-icon-notice'> </span>");
+        this.println("          Confirm:");
+        this.println("      </p>");
+        this.println("   </div>");
+        this.println("   <div class='detailspanelcontents'>");
+    }
+
+    /**
+     * Confirmation panel end content.
+     */
+    private void confirmPanelEnd()
+    {
         this.println("   </div>");
         this.println("</div>");
         
@@ -158,12 +210,10 @@ public class OperationsPage extends AbstractPage
                 "$(document).ready(function() {\n" + 
                 "   var leftpos = Math.floor($(window).width() / 2) - 175;\n" +
                 "   var toppos = Math.floor($(window).height() / 2) - 200;\n" +
-        		"   $('#confirmationcontainer').css('left', leftpos);\n" +
-        		"   $('#confirmationcontainer').css('top', toppos)\n" +
-        		"});");
+                "   $('#confirmationcontainer').css('left', leftpos);\n" +
+                "   $('#confirmationcontainer').css('top', toppos)\n" +
+                "});");
         this.println("</script>");
-        
-        this.pageEnd();
     }
 
     /**
