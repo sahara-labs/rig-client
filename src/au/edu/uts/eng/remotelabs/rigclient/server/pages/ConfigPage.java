@@ -39,9 +39,18 @@
 package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions.Property;
 
 /**
  * Configuration page.
@@ -51,8 +60,24 @@ public class ConfigPage extends AbstractPage
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
-        this.flushOut();
-        resp.getWriter().println("Configuration");
+        Map<String, String> props = this.config.getAllProperties();
+        IConfigDescriptions desc = ConfigFactory.getDescriptions();
+        
+        /* Group the properties by stanza. */
+        Map<String, List<Entry<String, String>>> stanzas = new HashMap<String, List<Entry<String, String>>>();
+        for (Entry<String, String> e : props.entrySet())
+        {
+            Property p = desc.getPropertyDescription(e.getKey());
+            String sta = "Others";
+            if (p != null)
+            {
+                /* The property description exists so add the property to the 
+                 * configured stanza. */
+                sta = p.getStanza();
+            }
+            if (!stanzas.containsKey(sta)) stanzas.put(sta, new ArrayList<Entry<String, String>>());
+            stanzas.get(sta).add(e);
+        }
     }
 
     @Override

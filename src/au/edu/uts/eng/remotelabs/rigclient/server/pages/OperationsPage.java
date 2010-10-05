@@ -94,7 +94,6 @@ public class OperationsPage extends AbstractPage
         {
             /* Display a confirmation page for restarting the rig client. */
             this.displayMaintenanceConfirmation();
-            this.println("ok");
         }
         else if (uri.endsWith("gc"))
         {

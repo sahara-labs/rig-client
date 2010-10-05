@@ -78,7 +78,7 @@ public interface IConfigDescriptions
     /**
      * Gets the property description for a specific property.
      * 
-     * @param name property nameXS
+     * @param name property name
      * @return property description or null if not found.
      */
     public Property getPropertyDescription(final String name);

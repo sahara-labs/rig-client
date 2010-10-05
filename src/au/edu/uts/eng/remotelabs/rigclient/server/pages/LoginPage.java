@@ -83,7 +83,7 @@ public class LoginPage extends AbstractPage
        }
        
        
-       this.println("<form id='loginform' method='POST' target='/'>");
+       this.println("<form id='loginform' method='POST'>");
        
        this.println("<div id='loginformcontainer' class='detailspanel ui-corner-all'>");
        this.println("   <div class='detailspaneltitle'>");
