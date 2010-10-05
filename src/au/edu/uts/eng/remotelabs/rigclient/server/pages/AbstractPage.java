@@ -105,7 +105,7 @@ public abstract class AbstractPage
      * Services the request.
      * 
      * @param req request
-     * @param resq response
+     * @param resp response
      * @throws IOException 
      */
     public void service(HttpServletRequest req, HttpServletResponse resp) throws IOException
