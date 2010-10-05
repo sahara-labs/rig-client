@@ -662,6 +662,7 @@ public abstract class AbstractRig implements IRig
             this.logger.debug("Taking the rig out of maintenance mode.");
             this.inMaintenance = false;
             this.maintenanceReason = null;
+            this.actionFailures.clear();
             this.logger.debug("Monitor tests are going to be started.");
             this.startTests();
         }
