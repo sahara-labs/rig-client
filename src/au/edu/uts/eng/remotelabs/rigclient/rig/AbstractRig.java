@@ -443,8 +443,8 @@ public abstract class AbstractRig implements IRig
     {
         /* DODGY Keeping the old misspelled capabilities configuration property
          * for backwards compatibility. */
-        final String cap = this.configuration.getProperty("Rig_Capabilites");
-        if (cap == null || "".equals(cap)) this.configuration.getProperty("Rig_Capabilities");
+        String cap = this.configuration.getProperty("Rig_Capabilites");
+        if (cap == null || "".equals(cap)) cap = this.configuration.getProperty("Rig_Capabilities");
         
         this.logger.debug("Loaded Rig_Capabilities configuration item as " + cap + ".");
         
