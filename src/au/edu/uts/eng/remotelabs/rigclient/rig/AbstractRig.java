@@ -441,14 +441,18 @@ public abstract class AbstractRig implements IRig
     @Override
     public String[] getCapabilities()
     {
+        /* DODGY Keeping the old misspelled capabilities configuration property
+         * for backwards compatibility. */
         final String cap = this.configuration.getProperty("Rig_Capabilites");
-        this.logger.debug("Loaded Rig_Capabilites configuration item as " + cap + ".");
+        if (cap == null || "".equals(cap)) this.configuration.getProperty("Rig_Capabilities");
+        
+        this.logger.debug("Loaded Rig_Capabilities configuration item as " + cap + ".");
         
         if (cap == null)
         {
             this.logger.error("Rig client capabilities configuration item not found. Please check configuration" +
             		"at " + this.configuration.getConfigurationInfomation() + " and ensure the field " +
-            		"'Rig_Capabilites' is present and populated with a comma seperated list of rig client " +
+            		"'Rig_Capabilities' is present and populated with a comma seperated list of rig client " +
             		"capability tokens.");
             return null;
         }
