@@ -84,7 +84,7 @@ public class ConfigPage extends AbstractPage
         for (Entry<String, String> e : this.props.entrySet())
         {
             Property p = this.desc.getPropertyDescription(e.getKey());
-            String sta = "Others";
+            String sta = "Unknown";
             if (p != null)
             {
                 /* The property description exists so add the property to the 
@@ -171,12 +171,22 @@ public class ConfigPage extends AbstractPage
 	        
 	        this.println("<script type='text/javascript'>");
 	        this.println(
-	                "$(document).ready(function() {" +
-	                "     $('#confform').validationEngine();" +
-	                "     $('#confform').jqTransform();" +
-	                "     $('.jqTransformInputWrapper').css('width', '345px');" +
-	                "     $('.jqTransformInputInner div input').css('width', '100%');" +
-	                "});");
+	                "$(document).ready(function() {\n" +
+	                "     $('#confform').validationEngine();\n" +
+	                "     $('#confform').jqTransform();\n" +
+	                "     $('.jqTransformInputWrapper').css('width', '345px');\n" +
+	                "     $('.jqTransformInputInner div input').css('width', '100%');\n");
+	        
+	        /* Contents pane height. */
+	        this.println(
+	                "     $('#contentspane').css('height', $(window).height() - 230);");
+	        this.println(
+	                "     $(window).resize(function() { \n" +
+	                "         $('#contentspane').css('height', $(window).height() - 230);\n" +
+		            "     });");
+	        
+	        this.println("});");
+		
 	        this.println("</script>");
         }
     }

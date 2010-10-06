@@ -456,4 +456,47 @@ Info log format specific to info log messages.
 		  default="Default_Log_Format">
 Debug log format specific to debug log messages.
 </property>
+
+<!-- 
+################################################################################
+## File: primitive.properties                                                 ##
+################################################################################
+-->
+<property name="Package_Prefixes" 
+          stanza="Primitive" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="au.edu.labshare.rigclient.primitive;au.edu.rmit.labshare"
+		  format="&lt;Package&gt;;...;&lt;Package&gt;"
+		  default="">
+<![CDATA[
+The list of package names to find primitive controller classes. Class name
+resolution, works by using the following algorithm:
+<ol>
+
+
+ first trying to resolve the transmitted controller name. If the
+# transmitted controller fails, it is appended to a configured package name 
+# and resolution is attempted again. Multiple prefixes may be configured
+# using the ';' character to separate the package prefixes.
+The logging subsystem which specifies where logs are persisted to. The following 
+logging types are implemented: 
+<ul>
+	<li><strong>SystemErr</strong> - logs messages to the process standard 
+	error stream;</li>
+	<li><strong>File</strong> - logs messages to a plain text file and is 
+	susceptible to log file bloat;</li>
+	<li><strong>RolledFile</strong> - logs messages to a plain text file 
+	and is rolled when it reaches a configured size;</li>
+	<li><strong>Syslog</strong> - logs messages to a Syslog server; </li>
+	<li><strong>WinEvents</strong> - logs messages to the Windows Event 
+	Log.</li>
+</ul>
+NOTE: The WinEvents logger only runs on Windows and requires the file 
+'NTEventLogAppender.dll' to placed in PATH.
+]]>
+</property>
+
+
 </config>
