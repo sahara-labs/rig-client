@@ -280,3 +280,25 @@ function loadInfoTab(tab)
 		}
 	);
 }
+
+function loadConfStanza(stanza)
+{
+	$.get(
+		"/config/" + stanza,
+		null,
+		function(data) {
+			/* Content pane. */
+	        $("#contentspane").empty()
+	        				  .append(data);
+	        $("#confform").validationEngine();
+            $("#confform").jqTransform();
+            $(".jqTransformInputWrapper").css("width", "345px");
+            $(".jqTransformInputInner div input").css("width", "100%");
+		}
+	);
+	
+	$(".selectedtab").removeClass("selectedtab")
+					 .addClass("notselectedtab");
+	$("#" + stanza.replace(" ", "") + "tab").removeClass('notselectedtab')
+											.addClass('selectedtab');
+}

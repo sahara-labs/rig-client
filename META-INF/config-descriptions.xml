@@ -20,91 +20,440 @@ Each property should be configured with the following attributes:
   * example   - Example value
 -->
 
+<!-- 
+################################################################################
+## File: rigclient.properties                                                 ##
+################################################################################
+-->
 <!-- ##### Identity properties ################################################ -->
- <property name="Rig_Name" stanza="Rig identity" mandatory="yes" type="STRING" restart="yes"
- 		example="Inclined_Plane_1" format="&lt;String&gt;" default="">
-Uniquely identifies a rig within the remote laboratory. It is suggested
-the name take the form of words separated by an underscore character.
- </property>
- <property name="Rig_Type" stanza="Rig identity" mandatory="yes" type="STRING" restart="yes"
- 		example="Inclined_Plane" format="&lt;String&gt;" default="">
-Identifies the rig as an identical configuration of the same software and hardware. This means any 
-any rig can be used in place of any other rig in the same type.
- </property>
- <property name="Rig_Capabilites" stanza="Rig identity" mandatory="yes" type="STRING" restart="yes"
- 		example="physics,static_friction,dynamic_friction" format="&lt;String&gt;,...,&lt;String&gt;" default="">
-Provides a list of identifying tags which may be used to correlate similar rigs in to 
-pulls of rigs to queue or book against.
- </property>
- <property name="Rig_Class" stanza="Rig identity" mandatory="yes" type="STRING" restart="yes"
- 		example="" format="[au.edu.uts.eng.remotelabs.rig.ConfiguredRig] | [au.edu.uts.eng.remotelabs.rig.ConfiguredControlledRig] | &lt;String&gt;"
- 		default="">
-Qualified class name of rig type class implementing rig client required methods. 
-This class must implement the 'au.edu.uts.eng.remotelabs.rigclient.rig.IRig'
-interface. Two common rig type classes which exist within the rig client main library
-are:
-&lt;ul&gt;
-&lt;li&gt;au.edu.uts.eng.remotelabs.rig.ConfiguredRig - Class which is
-configuered with the name of action classes. See the configuration
-'Configured Rig Type Configuration' stanza of this file.&lt;li&gt;
-&lt;li&gt;au.edu.uts.eng.remotelabs.rig.ConfiguredControlledRig - Class
-which is configured with the name of action class and enables
-rig client control. For batch control, the ConfiguredBatchRunner
-is used. See the configuration 'Configured Rig Type Configuration'
-stanza of this file.&lt;li&gt;
-&lt;ul&gt;
- </property>
+<property name="Rig_Name" 
+		  stanza="Identity" 
+		  mandatory="yes" 
+		  type="STRING" 
+		  restart="yes"
+ 		  example="Rig_1"
+ 		  format="&lt;String&gt;" 
+ 		  default="">
+Uniquely identifies a rig within the remote laboratory.
+</property>
+
+<property name="Rig_Type" 
+		  stanza="Identity" 
+		  mandatory="yes"
+		  type="STRING" 
+		  restart="yes"
+ 		  example="Inclined_Plane" 
+ 		  format="&lt;String&gt;" 
+ 		  default="">
+Identifies the rig as an identical configuration of same software and hardware.
+This means any rig in this type can be used in place of any other rig in the same
+type.
+</property>
+
+<property name="Rig_Capabilities" 
+		  stanza="Identity" 
+ 		  mandatory="yes" 
+ 		  type="STRING" 
+ 		  restart="yes"
+ 		  example="tag1,tag2,tag3" 
+ 		  format="&lt;String&gt;,...,&lt;String&gt;" 
+ 		  default="">
+A list of identifying tags which may be used to correlate rigs into collections
+to queue or book for. This allows, for example, multiple rig types to be 
+collectively queued to get the first free rig in any of the rig types.
+</property>
+
+<property name="Rig_Class" 
+		  stanza="Identity" 
+		  mandatory="yes" 
+		  type="STRING" 
+		  restart="yes"
+ 		  example="" 
+ 		  format="[au.edu.uts.eng.remotelabs.rig.ConfiguredRig] | [au.edu.uts.eng.remotelabs.rig.ConfiguredControlledRig] | &lt;String&gt;"
+ 		  default="">
+<![CDATA[
+The fully qualified class name of the Rig Clients rig type class. This must 
+implement the interface 'IRig' but in practice most likely extends the 
+abstract class 'AbstractRig'. Two generic implementations exist that provide
+the required rig type class functionality. These are: 
+<ul>
+    <li><strong>ConfiguredRig</strong> - Class
+    which is configured with the name of 'action' classes (classes 
+    implementing interfaces that are run at certain session events);</li>
+     <li><strong>ConfiguredControlledRig</strong> - 
+     Similar class to the former but also implements the option rig client
+     control interface;</li> 
+</ul>
+All the above classes are located in the package 
+'au.edu.uts.eng.remotelabs.rigclient.rig' which must be prefixed to the 
+above class names to make a fully qualified class name.
+<br />
+Consult the 'Sahara Development Handbook' for further detail about rig type 
+classes and how to create them.
+]]>
+</property>
+
+<property name="Rig_Client_IP_Address"
+          stanza="Identity"
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="138.25.49.151" 
+		  format="&lt;IP&gt;|&lt;hostname&gt;|empty"
+		  default="">
+The IP address of the machine the Rig Client is running on. This is needed if 
+the Rig Client machine has multiple network interfaces and you want to ensure 
+the external IP address is transmitted as the communication address. If left 
+empty, the address of the first iterated network device is used.
+</property>
+
+<property name="Listening_Network_Interface"
+          stanza="Identity"
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="eth0" 
+		  format="&lt;String&gt;|empty"
+		  default="">
+The name of the network interface of the Rig CIlient is listening on. This is
+needed if the Rig Client machine has multiple network interfaces and you want
+a specific network interface to be used. This may be used in preference to
+the 'Rig_Client_IP_Address' property as it allows a specific network interface
+to be used while still detecting the IP address at runtime (i.e. Supports DHCP).	
+</property>	
+
+<property name="Listening_Port"
+          stanza="Identity"
+          mandatory="yes" 
+          type="INTEGER" 
+          restart="yes"
+		  example="8080" 
+		  format="&lt;int&gt;"
+		  default=""> 
+The port number the Rig Client server is to listen on. This must be externally 
+accessible by the Scheduling Server.		  
+</property>
 
 <!-- #### Scheduling Server properties ######################################## -->
-<property name="Scheduling_Server_Address" stanza="Scheduling Server" mandatory="yes" type="STRING" restart="yes"
-		example="localhost" format="&lt;String&gt;" default="">
-Address of scheduling server.  This can be an IP address or host name of the scheduling server.
-</property>
-<property name="Scheduling_Server_Port" stanza="Scheduling Server" mandatory="yes" type="INTEGER" example="8080" restart="yes"
-		format="&lt;int&gt;" default="">
-Port the scheduling server is listening on.
-</property>
-<property name="Scheduling_Server_Update_Period" stanza="Scheduling Server" mandatory="no" type="INTEGER" restart="yes"
-		example="30" format="&lt;30&gt;" default="30">
-The time in seconds between sending status updates from the rig client to scheduling server.
+<property name="Scheduling_Server_Address" 
+          stanza="Scheduling Server"
+          mandatory="yes" 
+          type="STRING" 
+          restart="yes"
+		  example="localhost" 
+		  format="&lt;String&gt;" 
+		  default="">
+The address of the Scheduling Server. This can be the host name or the IP 
+address of the computer the Scheduling Server is running on.
 </property>
 
-<!-- #### Rig Client server ################################################### -->
-<property name="Rig_Client_IP_Address" stanza="Server" mandatory="no" type="STRING" example="127.0.0.1" restart="yes"
-		format="[&lt;IP&gt;|Empty]" default="">
-The address of the machine the rig client is running on. This is needed if the rig client machine has multiple network
-interfaces and you want to ensure the external IP address is transmitted as the communication address. If left empty,
-the address of the first iterated network device is used.
+<property name="Scheduling_Server_Port"
+          stanza="Scheduling Server"
+          mandatory="yes" 
+          type="INTEGER" 
+          example="8080" 
+          restart="yes"
+		  format="&lt;int&gt;" 
+		  default="">
+The port number the Scheduling Server is listening on.
 </property>
-<property name="Listening_Network_Interface" stanza="Server" mandatory="no" type="STRING" example="eth0" restart="yes"
-		format="[&lt;String&gt;|Empty]" default="">
-The name of the network interface the rig client is listening on. This is needed if the rig client machine has multiple 
-network interfaces and you want to ensure a specific network interface is used. This may be used in preference to the 
-'Rig_Client_IP_Address' property as it allows a specific network interface to be used while still detecting the IP 
-address at runtime (to support DHCP).
+
+<property name="Scheduling_Server_Update_Period" 
+		  stanza="Scheduling Server" 
+		  mandatory="no" 
+		  type="INTEGER" 
+		  restart="yes"
+		  example="30" 
+		  format="&lt;30&gt;" 
+		  default="30">
+The time in seconds between sending status updates from the Rig Client to the
+Scheduling Server.
 </property>
-<property name="Listening_Port" stanza="Server" mandatory="yes" type="INTEGER" example="8080" restart="yes"
-		format="&lt;int&gt;" default="">
-The TCP port the rig client is to listen for communication requests.
+
+<!-- #### Miscellaneous Properties ######################################## -->
+<property name="Concurrent_Requests" 
+		  stanza="Miscellaneous" 
+		  mandatory="no" 
+		  type="INTEGER" 
+		  restart="yes"
+		  example="10" 
+		  format="&lt;int&gt;" 
+		  default="50">
+The number of concurrent requests the Rig Client can service. If there are more than
+this number of requests, the extra requests are queued.
 </property>
-<property name="Concurrent_Requests" stanza="Server" mandatory="yes" type="INTEGER" restart="yes"
-		example="10" format="&lt;int&gt;" default="50">
-The number of concurrent requests the rig client can service. If there are more than this number of requests, the extra 
-requests are queued.
+
+<property name="Action_Failure_Threshold" 
+      	  stanza="Miscellaneous"
+      	  mandatory="no" 
+      	  type="INTEGER" 
+      	  restart="yes"
+		  example="3" 
+		  format="&lt;int&gt;" 
+		  default="3">
+The threshold indicating how many times an action can fail before the rig is put
+off line.
 </property>
-<property name="Action_Failure_Threshold" stanza="Server" mandatory="no" type="INTEGER" restart="yes"
-		example="3" format="&lt;int&gt;" default="3">
-The threshold indicating how many times a action can fail before the rig is put off line.
+
+<property name="Test_Light_Time"
+      	  stanza="Miscellaneous"
+      	  mandatory="no" 
+      	  type="STRING" 
+      	  restart="yes"
+		  example="07:00" 
+		  format="&lt;hour of day&gt;:&lt;minute&gt;" 
+		  default="09:00">
+The time at which the laboratory 'light' time starts. The light time is when the
+test frequency is set to be specified test run interval for tests which enable
+light-dark scheduling. The time should be configured in 24 hour time with a
+column ':' between the hours and minute portions. The default light time is 09:00.		  
+</property>
+
+<property name="Test_Dark_Time"
+      	  stanza="Miscellaneous"
+      	  mandatory="no" 
+      	  type="STRING" 
+      	  restart="yes"
+		  example="20:00" 
+		  format="&lt;hour of day&gt;:&lt;minute&gt;" 
+		  default="18:00">
+The time at which the laboratory 'dark' time starts. The dark time is when the 
+test frequency is set to the specified test run interval multiplied by the 
+specified dark time factor for exerciser tests which enable light-dark exerciser 
+scheduling. It is the test which specifies the dark time factor. The time should 
+be configured with 24 hour time with a column ':' between the hours and minutes 
+portions. The default dark time is 18:00.
 </property>
 
 <!-- #### Administrative Interface ############################################ -->
-<property name="Admin_Username" stanza="Admin interface" mandatory="no" type="STRING" restart="no"
-		example="admin" format="&lt;String&gt;" default="admin">
-The username to login to the administrative interface.
-</property>
-<property name="Admin_Password" stanza="Admin interface" mandatory="no" type="STRING" restart="no"
-		example="adminpasswd" format="&lt;String&gt;" default="passwd">
-The password to login to the administrative interface.
+<property name="Admin_Username" 
+		  stanza="Admin" 
+		  mandatory="no" 
+		  type="STRING" 
+		  restart="no"
+		  example="admin" 
+		  format="&lt;String&gt;" 
+		  default="admin">
+The username to login to the administrative web interface. If this is not 
+configured the default username is 'admin'.
 </property>
 
+<property name="Admin_Password" 
+          stanza="Admin" 
+          mandatory="no" 
+          type="STRING" 
+          restart="no"
+		  example="adminpasswd"
+		  format="&lt;String&gt;"
+		  default="passwd">
+The password to login to the administrative web interface. If this is not
+configured the defaul password is 'passwd'.
+</property>
+
+<!-- 
+################################################################################
+## File: logger.properties                                                    ##
+################################################################################
+-->
+<property name="Logger_Type" 
+          stanza="Logging" 
+          mandatory="yes" 
+          type="STRING" 
+          restart="yes"
+		  example="SystenErr"
+		  format="[SystemErr|File|RolledFile|Syslog|WinEvents]"
+		  default="">
+<![CDATA[
+The logging subsystem which specifies where logs are persisted to. The following 
+logging types are implemented: 
+<ul>
+	<li><strong>SystemErr</strong> - logs messages to the process standard 
+	error stream;</li>
+	<li><strong>File</strong> - logs messages to a plain text file and is 
+	susceptible to log file bloat;</li>
+	<li><strong>RolledFile</strong> - logs messages to a plain text file 
+	and is rolled when it reaches a configured size;</li>
+	<li><strong>Syslog</strong> - logs messages to a Syslog server; </li>
+	<li><strong>WinEvents</strong> - logs messages to the Windows Event 
+	Log.</li>
+</ul>
+NOTE: The WinEvents logger only runs on Windows and requires the file 
+'NTEventLogAppender.dll' to placed in PATH.
+]]>
+</property>
+
+<property name="Log_Level" 
+          stanza="Logging" 
+          mandatory="yes" 
+          type="STRING" 
+          restart="yes"
+		  example="INFO"
+		  format="[ERROR|WARN|INFO|DEBUG]"
+		  default="">
+<![CDATA[
+The level of log messages that are logged. Configuring a more verbose log 
+level will print that log levels messages and the preceding less verbose log
+levels. The log levels that may be configured in order of least verbosity are:
+<ul>
+	<li><strong>ERROR</strong> - Messages that are generated by events that cause unexpected 
+	results and stop the expected program execution sequence; </li>
+	<li><strong>WARN</strong> - Messages that are generated by events that cause undesired 
+	results but do not stop the expected program execution sequence; </li>
+	<li><strong>INFO</strong> - Message that generated by events that are regular in occurrence, 
+	however are useful in audit trails; </li>
+	<li><strong>DEBUG</strong> - Messages specifying program execution and progression.</li>
+]]>
+</property>
+
+<property name="Log_File_Name" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="rigclient.log"
+		  format="&lt;String&gt;"
+		  default="">
+The name of the text file the 'File' and 'RolledFile' loggers log to.
+</property>
+
+<property name="Log_File_Max_Size" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="INTEGER" 
+          restart="yes"
+		  example="3"
+		  format="&lt;int&gt;"
+		  default="10">
+Maximum file size for the rolled logger log file in megabytes.
+</property>
+
+<property name="Log_File_Backups" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="INTEGER" 
+          restart="yes"
+		  example="5"
+		  format="&lt;int&gt;"
+		  default="5">
+Maximum number of backups for the rolled file logger log file backups. 
+After the maximum number of backups is exceeded, the oldest log backup file 
+is deleted.
+</property>
+
+<property name="Syslog_Host" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="127.0.0.1"
+		  format="&lt;hostname&gt;"
+		  default="">
+The host name of IP of the Syslog server.
+</property>
+
+<property name="Syslog_Local_Facility_Num" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="INTEGER" 
+          restart="yes"
+		  example="4"
+		  format="&lt;int&gt;"
+		  default="">
+Syslog log local facility number to use (between 1 to 7). 
+</property>
+
+<property name="Default_Log_Format" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="[__LEVEL__] - [__ISO8601__] - __MESSAGE__"
+		  format="&lt;Format String&gt;"
+		  default="[__LEVEL__] - [__ISO8601__] - __MESSAGE__">
+<![CDATA[
+The format of the log messages can be specifying by providing a format 
+string with macros which are be replaced by their actual values. 
+The following is a list of macros that may be put in format strings:  
+<ul>
+	<li><strong>__MESSAGE__</strong> - Actual message; </li>
+    <li><strong>__LEVEL__</strong> - Logging level (FATAL, PRIORITY, ..., DEBUG); </li>
+    <li><strong>__TIME__</strong> - Time with hour of day:minute:second; </li>
+    <li><strong>__DATE__</strong> - Date with day:month:year; </li>
+    <li><strong>__ISO8601__</strong> - ISO 8601 formatted date; </li>
+    <li><strong>__CLASS__</strong> - Class where the message originated; </li>
+    <li><strong>__METHOD__</strong> - Method where the message originated;  </li>
+    <li><strong>__SOURCE__</strong> - Source file where the message originated;  </li>
+    <li><strong>__LINE_NUM__</strong> - Line number where the message originated;</li>
+    <li><strong>__TID__</strong> - Thread id where the message originated. </li>
+</ul>
+The default format of logging messages is used for those levels 
+which do not provide their own logging format.
+]]>
+</property>
+
+<property name="FATAL_Log_Format" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="[__LEVEL__] - [__ISO8601__] - __MESSAGE__"
+		  format="&lt;Format String&gt;"
+		  default="Default_Log_Format">
+Fatal log format specific to fatal log messages.
+</property>
+
+<property name="PRIORITY_Log_Format" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="[__LEVEL__] - [__ISO8601__] - __MESSAGE__"
+		  format="&lt;Format String&gt;"
+		  default="Default_Log_Format">
+Priority log format specific to priority log messages.
+</property>
+
+<property name="ERROR_Log_Format" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="[__LEVEL__] - [__ISO8601__] - __MESSAGE__"
+		  format="&lt;Format String&gt;"
+		  default="Default_Log_Format">
+Error log format specific to error log messages.
+</property>
+
+<property name="WARN_Log_Format" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="[__LEVEL__] - [__ISO8601__] - __MESSAGE__"
+		  format="&lt;Format String&gt;"
+		  default="Default_Log_Format">
+Warn log format specific to warn log messages.
+</property>
+
+<property name="INFO_Log_Format" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="[__LEVEL__] - [__ISO8601__] - __MESSAGE__"
+		  format="&lt;Format String&gt;"
+		  default="Default_Log_Format">
+Info log format specific to info log messages.
+</property>
+
+<property name="DEBUG_Log_Format" 
+          stanza="Logging" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="[__LEVEL__] - [__ISO8601__] - __MESSAGE__"
+		  format="&lt;Format String&gt;"
+		  default="Default_Log_Format">
+Debug log format specific to debug log messages.
+</property>
 </config>

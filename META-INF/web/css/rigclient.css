@@ -877,3 +877,29 @@ span.code {
 	margin-top: 10px;
 }
 
+.pdesc {
+	font-weight: normal;
+	font-size: 0.8em;
+}
+
+.pdesc ul {
+	padding: 5px 0;
+}
+
+.pdesc ul li {
+	padding: 5px 0;
+}
+
+.pdetail {
+	font-weight: normal;
+	font-size: 0.8em;
+}
+
+.pcol {
+	font-weight: bold;
+	width: 305px;
+}
+
+.valcol input {
+	width: 100%;
+}

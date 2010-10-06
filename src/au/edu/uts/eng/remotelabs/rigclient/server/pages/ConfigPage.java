@@ -17,7 +17,7 @@
  *    this list of conditions and the following disclaimer.
  *  * Redistributions in binary form must reproduce the above copyright 
  *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the distribution.
+ *     documentation and/or other materials provided with the distribution.
  *  * Neither the name of the University of Technology, Sydney nor the names 
  *    of its contributors may be used to endorse or promote products derived from 
  *    this software without specific prior written permission.
@@ -39,11 +39,15 @@
 package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,17 +61,29 @@ import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions.Property;
  */
 public class ConfigPage extends AbstractPage
 {
+    /** Sorted configuration stanzas. */
+    private  Map<String, List<Entry<String, String>>> stanzas;
+    
+    /** Configuration properties. */
+    private Map<String, String> props;
+    
+    /** Configuration descriptions. */
+    private IConfigDescriptions desc;
+    
+    /** Stanza to load. */
+    private String uriSuffix;
+    
     @Override
-    public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
+    public void preService(HttpServletRequest req)
     {
-        Map<String, String> props = this.config.getAllProperties();
-        IConfigDescriptions desc = ConfigFactory.getDescriptions();
+        this.props = this.config.getAllProperties();
+        this.desc = ConfigFactory.getDescriptions();
         
         /* Group the properties by stanza. */
-        Map<String, List<Entry<String, String>>> stanzas = new LinkedHashMap<String, List<Entry<String, String>>>();
-        for (Entry<String, String> e : props.entrySet())
+        this.stanzas = new TreeMap<String, List<Entry<String, String>>>();
+        for (Entry<String, String> e : this.props.entrySet())
         {
-            Property p = desc.getPropertyDescription(e.getKey());
+            Property p = this.desc.getPropertyDescription(e.getKey());
             String sta = "Others";
             if (p != null)
             {
@@ -75,37 +91,186 @@ public class ConfigPage extends AbstractPage
                  * configured stanza. */
                 sta = p.getStanza();
             }
-            if (!stanzas.containsKey(sta)) stanzas.put(sta, new ArrayList<Entry<String, String>>());
-            stanzas.get(sta).add(e);
+            if (!this.stanzas.containsKey(sta)) this.stanzas.put(sta, new ArrayList<Entry<String, String>>());
+            this.stanzas.get(sta).add(e);
         }
         
-        /* Add tabs to page. */
-        this.println("<div id='lefttabbar'>");
-        this.println("  <ul id='lefttablist'>");
-        
-        int i = 0;
-        for (String s : stanzas.keySet())
+        String url = "";
+        try
         {
-            String classes = "notselectedtab";
-            if (i == 0) classes = "ui-corner-tl selectedtab";
-            else if (i == stanzas.size() - 1) classes += " ui-corner-bl";
-
-            this.println("<li><a id='" + s + "tab' class='" + classes + "' onclick='openConfStanza(\"" + s + "\")'>");
-            this.println("  <div class='conftab'>");
-            this.println("    " + s);
-            this.println("  </div>");
-            this.println("</a></li>");
+            url = URLDecoder.decode(req.getRequestURI(), 
+                    req.getCharacterEncoding() == null ? "UTF-8" : req.getCharacterEncoding());
+        }
+        catch (UnsupportedEncodingException ex)
+        {
+           this.logger.error("Unknown character encoding from HTTP request. Reqest character encoding  is '" + 
+                   req.getCharacterEncoding() + "'. Going to attempt to use the UTF-8 encoding.");
+           try
+           {
+               url = URLDecoder.decode(req.getRequestURI(), "UTF-8");
+           }
+           catch (UnsupportedEncodingException e1)
+           {
+               this.logger.error("Failed URL decoding with 'UTF-8' character encoding, failing request.");
+           } 
+        }
+        
+        if (!"/config".equals(url))
+        {
+            this.uriSuffix = url.substring(url.lastIndexOf("/config") + 8);
+            if (this.stanzas.containsKey(this.uriSuffix))
+            {
+                this.framing = false;
+            }
+        }
+        else this.uriSuffix = url;
+    }
+ 
+    @Override
+    public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
+    {
+        if (this.stanzas.containsKey(this.uriSuffix))
+        {
+            if ("POST".equalsIgnoreCase((req.getMethod())))
+            {
+                /* Stored the posted values. */
+                // TODO 
+            }
+            this.getConfigStanza(this.uriSuffix);
+        }
+        else
+        {
+            /* Add tabs to page. */
+            this.println("<div id='lefttabbar'>");
+            this.println("  <ul id='lefttablist'>");
             
+            int i = 0;
+            for (String s : this.stanzas.keySet())
+            {
+                String id = s.replace(" ", "");
+                
+                String classes = "Identity".equals(s) ? "selectedtab" : "notselectedtab";
+                if (i == 0) classes += " ui-corner-tl";
+                else if (i == this.stanzas.size() - 1) classes += " ui-corner-bl";
+    
+                this.println("<li><a id='" + id + "tab' class='" + classes + "' onclick='loadConfStanza(\"" + s + "\")'>");
+                this.println("  <div class='conftab'>");
+                this.println("    " + s);
+                this.println("  </div>");
+                this.println("</a></li>");
+                
+                i++;
+            }
+            
+            this.println("  </ul>");
+            this.println("</div>");
+            
+            this.println("<div id='contentspane' class='ui-corner-tr ui-corner-bottom'>");
+	        this.getConfigStanza("Identity");
+	        this.println("</div>");
+	        
+	        this.println("<script type='text/javascript'>");
+	        this.println(
+	                "$(document).ready(function() {" +
+	                "     $('#confform').validationEngine();" +
+	                "     $('#confform').jqTransform();" +
+	                "     $('.jqTransformInputWrapper').css('width', '345px');" +
+	                "     $('.jqTransformInputInner div input').css('width', '100%');" +
+	                "});");
+	        this.println("</script>");
+        }
+    }
+    
+    /**
+     * Gets the configuration for the supplied stanza.
+     * 
+     * @param stanza stanza name
+     */
+    private void getConfigStanza(String stanza)
+    {
+        List<Entry<String, String>> stanzaProps = this.stanzas.get(stanza);
+        Collections.sort(stanzaProps, new EntryComparator());
+        
+        this.println("<form id='confform' target='/config/" + stanza + "' method='POST'>");
+        this.println("  <table id='contentstable'>");
+        int i = 0;
+        for (Entry<String, String> e : stanzaProps)
+        {
+            Property p = this.desc.getPropertyDescription(e.getKey());
+            
+            this.println("<tr class='" + (i % 2 == 0 ? "evenrow" : "oddrow") + "'>");
+            
+            /* Property details. */
+            this.println("  <td class='pcol'>");
+            this.println(e.getKey());
+            if (p != null)
+            {
+                this.println("<div class='pdesc'>");
+                this.println(p.getDescription());
+                this.println("</div>");
+            }
+            
+            this.println("  </td>");
+            this.println("  <td class='valcol'>");
+            
+            if (p != null)
+            {
+                String vd = "validate[";
+                vd += p.isMandatory() ? "required" : "optional";
+                switch (p.getType())
+                {
+                    case BOOLEAN:
+                        break;
+                    case CHAR:
+                        if (vd.charAt(vd.length() - 1) != '[') vd += ',';
+                        vd += "length[1,1]]";
+                        this.println("<input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' class='" + vd + "' value='" + 
+                                e.getValue() + "' />");
+                        break;
+                    case FLOAT:
+                        if (vd.charAt(vd.length() - 1) != '[') vd += ',';
+                        vd += "custom[onlyNumber]]";
+                        this.println("<input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' class='" + vd + "' value='" + 
+                                e.getValue() + "' />");
+                        break;
+                    case INTEGER:
+                        if (vd.charAt(vd.length() - 1) != '[') vd += ',';
+                        vd += "custom[onlyNumber]]";
+                        this.println("<input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' class='" + vd + "' value='" + 
+                                e.getValue() + "' />");
+                        break;
+                    case STRING:
+                        this.println("<input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' class='" + vd + "]' value='" + 
+                                e.getValue() + "' />");
+                        break;
+                }
+            }
+            else
+            {
+                this.println("<input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' value='" + 
+                        e.getValue() + "' />");
+            }
+            
+            this.println("  </td>");
+            this.println("</tr>");
             i++;
         }
-        
-        this.println("  </ul>");
-        this.println("<div>");
+        this.println("  </table>");
+        this.println("</form>");
     }
 
     @Override
     protected String getPageType()
     {
         return "Configuration";
+    }
+    
+    static class EntryComparator implements Comparator<Entry<String, String>>
+    {
+        @Override
+        public int compare(Entry<String, String> o1, Entry<String, String> o2)
+        {
+           return o1.getKey().compareTo(o2.getKey());
+        }
     }
 }
