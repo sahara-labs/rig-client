@@ -471,32 +471,146 @@ Debug log format specific to debug log messages.
 		  format="&lt;Package&gt;;...;&lt;Package&gt;"
 		  default="">
 <![CDATA[
-The list of package names to find primitive controller classes. Class name
-resolution, works by using the following algorithm:
+The list of package names that are used in primitive controller class resolution.
+Class resolution works using the following algorithm:
 <ol>
-
-
- first trying to resolve the transmitted controller name. If the
-# transmitted controller fails, it is appended to a configured package name 
-# and resolution is attempted again. Multiple prefixes may be configured
-# using the ';' character to separate the package prefixes.
-The logging subsystem which specifies where logs are persisted to. The following 
-logging types are implemented: 
-<ul>
-	<li><strong>SystemErr</strong> - logs messages to the process standard 
-	error stream;</li>
-	<li><strong>File</strong> - logs messages to a plain text file and is 
-	susceptible to log file bloat;</li>
-	<li><strong>RolledFile</strong> - logs messages to a plain text file 
-	and is rolled when it reaches a configured size;</li>
-	<li><strong>Syslog</strong> - logs messages to a Syslog server; </li>
-	<li><strong>WinEvents</strong> - logs messages to the Windows Event 
-	Log.</li>
-</ul>
-NOTE: The WinEvents logger only runs on Windows and requires the file 
-'NTEventLogAppender.dll' to placed in PATH.
+	<li>The specified controller class name is assumed to be a fully qualified 
+	class name and an attempt is made to load it. If it is found then that class
+	is used;</li>
+	<li>The specified controller class name is appended to the first configured 
+	primitive package and an attempt is made to load it. If it is found then that 
+	class is used; </li>
+	<li>The specified controller class name is appended to the next configured 
+	primitive package and an attempt is made to load it. If it is found then 
+	that class is used. This occurs until either the class is found or 
+	all the configured primitive packages are tried;</li>
+</ol>
+Multiple primitive package prefixes can be configured using the ';' character as
+the delimiter between packages.
 ]]>
 </property>
 
+<!-- 
+################################################################################
+## File: primitive.properties                                                 ##
+################################################################################
+-->
+<property name="Action_Package_Prefixes" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="au.edu.labshare.rigclient.action; au.edu.remotelabs.rigclient"
+		  format="&lt;Package&gt;;...;&lt;Package&gt;"
+		  default="">
+<![CDATA[
+The list of package names that are used in action class resolution. Class 
+resolution works using the following algorithm:
+<ol>
+	<li>The configured controller class name is assumed to be a fully
+    qualified class name and an attempt is made to load it. If it 
+    is found then that class is used;</li>
+    <li>The configured action class name is appended to the first configured
+    action package prefix and an attempt is made to load it. If it is found 
+    then that class is used;</li>
+    <li>The configured action class name is appended to the next configured 
+    action package prefix and an attempt is made to load it. If it is found 
+    then that class is used. This occurs until either the class is found or
+    all the configured action package prefixes are tried;</li> 
+</ol>
+Multiple action package prefixes can be configured using the ';' character
+as the delimiter between packages.
+]]>
+</property>
+
+<property name="Access_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="access.RdpAccessAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Access actions assign access and revoke access to and from the assigned master
+user and run at the beginning and end of sessions. This configures the list 
+of access actions to use. Multiple access actions can be configured, separating 
+each with a ';' character. When multiple access actions are configured, the 
+assignment methods are invoked in order they are configured and the revocation 
+methods are invoked in reverse order they are configured.
+</property>
+
+<property name="Slave_Access_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="slave.VncSlaveAccessAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Slave access actions assign and revoke access for secondary session users.
+This configures the list of slave access actions to load. Multiple slave access 
+actions can be configured, separating each with a ';' character.When multiple 
+slave access actions are configured, the slave assignment methods are 
+invoked in the order they are configured and the slave revocation methods are 
+invoked in the reverse order they are configured.
+</property>
+
+<property name="Notify_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="notify.TSNotifyAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Notify actions provide notifications to users of session event messages and are
+useful if the users focus may not be on the web interface. For example providing
+a Windows popup when a users focus is on using Remote Desktop.  This configures
+the list of notification actions to load. Multiple notification actions can be
+configured, separating each with a ';' character.
+</property>
+
+<property name="Detection_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="detect.WTSDetectionAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Detection actions are used to verify a user is actually using a rig when in 
+session. If they are not, they are removed from the rig after a permission
+configured timeout period. This configures the list of detection actions to 
+load. Multiple detection actions can be configured, separating each 
+with a ';' character.
+</property>
+
+<property name="Reset_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="reset.PowerResetAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Reset actions are run at the end of sessions to cleanup the rig to be ready
+for the next user. This configures the list of reset actions to load. Multiple
+reset actions can be configured, separating each with a ';' character.
+</property>
+
+<property name="Test_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="test.PingTestAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Test actions are used to ensure the rig is ready for use by running tests
+on the system when it is free. These tests report the rig status and if 
+one of the tests fail, the rig is taken offline. This configures the list
+of test actions to load. Multiple test actions can be configured, separating
+each with a ';' character.
+</property>
 
 </config>
