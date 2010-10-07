@@ -109,19 +109,19 @@ public class ConfiguredBatchRunnerTester extends TestCase
     public void testInit()
     {
         reset(this.mockConfig);
-        expect(this.mockConfig.getProperty("Exec"))
+        expect(this.mockConfig.getProperty("Batch_Exec"))
             .andReturn("/bin/ls");
-        expect(this.mockConfig.getProperty("Exec_Arg_1"))
+        expect(this.mockConfig.getProperty("Batch_Exec_Arg_1"))
             .andReturn("-l");
-        expect(this.mockConfig.getProperty("Exec_Arg_2"))
+        expect(this.mockConfig.getProperty("Batch_Exec_Arg_2"))
             .andReturn("__YEAR__");
-        expect(this.mockConfig.getProperty("Exec_Arg_3"))
+        expect(this.mockConfig.getProperty("Batch_Exec_Arg_3"))
             .andReturn(null);
-        expect(this.mockConfig.getProperty("Env_1"))
+        expect(this.mockConfig.getProperty("Batch_Env_1"))
             .andReturn("user:__USER__");
-        expect(this.mockConfig.getProperty("Env_2"))
+        expect(this.mockConfig.getProperty("Batch_Env_2"))
             .andReturn("foo:bar");
-        expect(this.mockConfig.getProperty("Env_3"))
+        expect(this.mockConfig.getProperty("Batch_Env_3"))
             .andReturn(null);
         replay(this.mockConfig);
         
@@ -167,7 +167,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
         try
         {
             reset(this.mockConfig);
-            expect(this.mockConfig.getProperty("Max_File_Size"))
+            expect(this.mockConfig.getProperty("Batch_Max_File_Size"))
                 .andReturn("50");
             replay(this.mockConfig);
             
@@ -196,7 +196,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
         try
         {
             reset(this.mockConfig);
-            expect(this.mockConfig.getProperty("Max_File_Size"))
+            expect(this.mockConfig.getProperty("Batch_Max_File_Size"))
                 .andReturn("10");
             replay(this.mockConfig);
             
@@ -225,7 +225,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
         try
         {
             reset(this.mockConfig);
-            expect(this.mockConfig.getProperty("File_Extension"))
+            expect(this.mockConfig.getProperty("Batch_File_Extension"))
                 .andReturn("class");
             replay(this.mockConfig);
             
@@ -254,7 +254,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
         try
         {
             reset(this.mockConfig);
-            expect(this.mockConfig.getProperty("File_Extension"))
+            expect(this.mockConfig.getProperty("Batch_File_Extension"))
                 .andReturn("properties");
             replay(this.mockConfig);
             
@@ -281,7 +281,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
         try
         {
             reset(this.mockConfig);
-            expect(this.mockConfig.getProperty("File_Magic_Number"))
+            expect(this.mockConfig.getProperty("Batch_File_Magic_Number"))
                 .andReturn("CAFEBABE");
             replay(this.mockConfig);
             
@@ -309,7 +309,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
         try
         {
             reset(this.mockConfig);
-            expect(this.mockConfig.getProperty("File_Magic_Number"))
+            expect(this.mockConfig.getProperty("Batch_File_Magic_Number"))
                 .andReturn("0xCAFEBABE");
             replay(this.mockConfig);
             
@@ -337,7 +337,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
         try
         {
             reset(this.mockConfig);
-            expect(this.mockConfig.getProperty("File_Magic_Number"))
+            expect(this.mockConfig.getProperty("Batch_File_Magic_Number"))
                 .andReturn("0xDEADBEEF"); /* Another awesome magic number. */
             replay(this.mockConfig);
             
@@ -366,17 +366,17 @@ public class ConfiguredBatchRunnerTester extends TestCase
         {
             reset(this.mockConfig);
             /* Run file size test. */
-            expect(this.mockConfig.getProperty("Test_Max_File_Size", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_Max_File_Size", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("Max_File_Size"))
+            expect(this.mockConfig.getProperty("Batch_Max_File_Size"))
                 .andReturn("100");
-            expect(this.mockConfig.getProperty("Test_Magic_Number", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_Magic_Number", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("File_Magic_Number"))
+            expect(this.mockConfig.getProperty("Batch_File_Magic_Number"))
                 .andReturn("0xcafebabe");
-            expect(this.mockConfig.getProperty("Test_File_Extension", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_File_Extension", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("File_Extension"))
+            expect(this.mockConfig.getProperty("Batch_File_Extension"))
                 .andReturn(".class");
             replay(this.mockConfig);
             
@@ -405,17 +405,17 @@ public class ConfiguredBatchRunnerTester extends TestCase
         {
             reset(this.mockConfig);
             /* Run file size test. */
-            expect(this.mockConfig.getProperty("Test_Max_File_Size", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_Max_File_Size", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("Max_File_Size"))
+            expect(this.mockConfig.getProperty("Batch_Max_File_Size"))
                 .andReturn("1");
-            expect(this.mockConfig.getProperty("Test_Magic_Number", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_Magic_Number", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("File_Magic_Number"))
+            expect(this.mockConfig.getProperty("Batch_File_Magic_Number"))
                 .andReturn("0xcafebabe");
-            expect(this.mockConfig.getProperty("Test_File_Extension", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_File_Extension", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("File_Extension"))
+            expect(this.mockConfig.getProperty("Batch_File_Extension"))
                 .andReturn(".class");
             replay(this.mockConfig);
             
@@ -446,17 +446,17 @@ public class ConfiguredBatchRunnerTester extends TestCase
         {
             reset(this.mockConfig);
             /* Run file size test. */
-            expect(this.mockConfig.getProperty("Test_Max_File_Size", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_Max_File_Size", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("Max_File_Size"))
+            expect(this.mockConfig.getProperty("Batch_Max_File_Size"))
                 .andReturn("100");
-            expect(this.mockConfig.getProperty("Test_Magic_Number", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_Magic_Number", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("File_Magic_Number"))
+            expect(this.mockConfig.getProperty("Batch_File_Magic_Number"))
                 .andReturn("0xABADBABE"); // That's a bad babe!
-            expect(this.mockConfig.getProperty("Test_File_Extension", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_File_Extension", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("File_Extension"))
+            expect(this.mockConfig.getProperty("Batch_File_Extension"))
                 .andReturn(".class");
             replay(this.mockConfig);
             
@@ -485,17 +485,17 @@ public class ConfiguredBatchRunnerTester extends TestCase
         {
             reset(this.mockConfig);
             /* Run file size test. */
-            expect(this.mockConfig.getProperty("Test_Max_File_Size", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_Max_File_Size", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("Max_File_Size"))
+            expect(this.mockConfig.getProperty("Batch_Max_File_Size"))
                 .andReturn("100");
-            expect(this.mockConfig.getProperty("Test_Magic_Number", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_Magic_Number", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("File_Magic_Number"))
+            expect(this.mockConfig.getProperty("Batch_File_Magic_Number"))
                 .andReturn("0xcafebabe");
-            expect(this.mockConfig.getProperty("Test_File_Extension", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_File_Extension", "false"))
                 .andReturn("true");
-            expect(this.mockConfig.getProperty("File_Extension"))
+            expect(this.mockConfig.getProperty("Batch_File_Extension"))
                 .andReturn(".java");
             replay(this.mockConfig);
             
@@ -524,17 +524,17 @@ public class ConfiguredBatchRunnerTester extends TestCase
         {
             reset(this.mockConfig);
             /* Run file size test. */
-            expect(this.mockConfig.getProperty("Test_Max_File_Size", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_Max_File_Size", "false"))
                 .andReturn("false");
-            expect(this.mockConfig.getProperty("Max_File_Size"))
+            expect(this.mockConfig.getProperty("Batch_Max_File_Size"))
                 .andReturn("1");
-            expect(this.mockConfig.getProperty("Test_Magic_Number", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_Magic_Number", "false"))
                 .andReturn("false");
-            expect(this.mockConfig.getProperty("File_Magic_Number"))
+            expect(this.mockConfig.getProperty("Batch_File_Magic_Number"))
                 .andReturn("0xCAFED00D"); // Bring on those beans cafe dude!
-            expect(this.mockConfig.getProperty("Test_File_Extension", "false"))
+            expect(this.mockConfig.getProperty("Batch_Test_File_Extension", "false"))
                 .andReturn("false");
-            expect(this.mockConfig.getProperty("File_Extension"))
+            expect(this.mockConfig.getProperty("Batch_File_Extension"))
                 .andReturn(".java");
             replay(this.mockConfig);
             
@@ -560,13 +560,13 @@ public class ConfiguredBatchRunnerTester extends TestCase
     public void testSync()
     {
         reset(this.mockConfig);
-        expect(this.mockConfig.getProperty("Sync_Results_Dir", "false"))
+        expect(this.mockConfig.getProperty("Batch_Sync_Results_Dir", "false"))
             .andReturn("true");
-        expect(this.mockConfig.getProperty("Sync_Dir_Destination"))
+        expect(this.mockConfig.getProperty("Batch_Sync_Dir_Destination"))
         .andReturn(System.getProperty("user.dir") + "/test/resources/BatchRunner/tmp/");
-        expect(this.mockConfig.getProperty("Sync_Dir_Name"))
+        expect(this.mockConfig.getProperty("Batch_Sync_Dir_Name"))
             .andReturn("__USER__/__ISO8601__");
-        expect(this.mockConfig.getProperty("Compress_Dir", "false"))
+        expect(this.mockConfig.getProperty("Batch_Compress_Dir", "false"))
             .andReturn("false");
         replay(this.mockConfig);
         
@@ -597,15 +597,15 @@ public class ConfiguredBatchRunnerTester extends TestCase
     public void testSyncCompress()
     {
         reset(this.mockConfig);
-        expect(this.mockConfig.getProperty("Sync_Results_Dir", "false"))
+        expect(this.mockConfig.getProperty("Batch_Sync_Results_Dir", "false"))
             .andReturn("true");
-        expect(this.mockConfig.getProperty("Sync_Dir_Destination"))
+        expect(this.mockConfig.getProperty("Batch_Sync_Dir_Destination"))
         .andReturn(System.getProperty("user.dir") + "/test/resources/BatchRunner/");
-        expect(this.mockConfig.getProperty("Sync_Dir_Name"))
+        expect(this.mockConfig.getProperty("Batch_Sync_Dir_Name"))
             .andReturn("__USER__");
-        expect(this.mockConfig.getProperty("Compress_Dir", "false"))
+        expect(this.mockConfig.getProperty("Batch_Compress_Dir", "false"))
             .andReturn("true");
-        expect(this.mockConfig.getProperty("Compression_Level", "DEFAULT"))
+        expect(this.mockConfig.getProperty("Batch_Compression_Level", "DEFAULT"))
             .andReturn("FASTEST");
         replay(this.mockConfig);
         
@@ -635,7 +635,7 @@ public class ConfiguredBatchRunnerTester extends TestCase
     public void testSyncPassNoSync()
     {
         reset(this.mockConfig);
-        expect(this.mockConfig.getProperty("Sync_Results_Dir", "false"))
+        expect(this.mockConfig.getProperty("Batch_Sync_Results_Dir", "false"))
             .andReturn("false");
         replay(this.mockConfig);
         

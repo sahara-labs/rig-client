@@ -47,11 +47,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.BatchMacroSubstituter;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryCopier;
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DirectoryZipper;
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.BatchMacroSubstituter;
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
-import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
 
 /**
  * The <code>ConfiguredBatchRunner</code> is an implementation of a 
@@ -63,9 +63,6 @@ import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
  */
 public class ConfiguredBatchRunner extends AbstractBatchRunner
 {
-    /** Batch properties configuration file location. */
-    public static final String BATCH_PROPERTIES = "config/batch.properties";
-    
     /** The maximum number of bytes comprising a file magic number. */
     /* DODGY This is sort of arbitrary based on no formal or even implied
      * conventions on the how long a magic number must be. Nevertheless,
@@ -86,7 +83,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     protected boolean init()
     {
         /* Batch command. */
-        this.command = this.batchConfig.getProperty("Exec");
+        this.command = this.batchConfig.getProperty("Batch_Exec");
         this.logger.debug("Loaded batch control command as " + this.command + ".");
         if (this.command == null)
         {
@@ -100,7 +97,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
         /* Batch control arguments. */
         String arg = null;
         int i = 1;
-        while ((arg = this.batchConfig.getProperty("Exec_Arg_" + i)) != null)
+        while ((arg = this.batchConfig.getProperty("Batch_Exec_Arg_" + i)) != null)
         {
             arg = this.substiter.substituteMacros(arg);
             this.commandArgs.add(arg);
@@ -110,7 +107,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
         
         /* Environment variables. */
         i = 1;
-        while ((arg = this.batchConfig.getProperty("Env_" + i)) != null)
+        while ((arg = this.batchConfig.getProperty("Batch_Env_" + i)) != null)
         {
             String env[] = arg.split(":", 2);
             env[1] = this.substiter.substituteMacros(env[1]);
@@ -131,12 +128,8 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     public ConfiguredBatchRunner(final String file, final String user)
     {
         super(file, user);
-        
-        this.logger.debug("Creating a ConfiguredBatchRunner, using " + ConfiguredBatchRunner.BATCH_PROPERTIES +
-                " as the batch configuration file.");
-        this.batchConfig = new PropertiesConfig(ConfiguredBatchRunner.BATCH_PROPERTIES);
-        this.logger.debug("Batch properites file information is " + this.batchConfig.getConfigurationInfomation());
-        
+
+        this.batchConfig = ConfigFactory.getInstance();
         this.substiter = new BatchMacroSubstituter.MacroBuilder(this.fileName, this.username).build();
     }
 
@@ -147,20 +140,20 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     protected boolean checkFile()
     {
         /* Check file extension. */
-        if (Boolean.parseBoolean(this.batchConfig.getProperty("Test_File_Extension", "false")) 
+        if (Boolean.parseBoolean(this.batchConfig.getProperty("Batch_Test_File_Extension", "false")) 
                 && !this.fileExtensionTest())
         {
             return false;
         }
 
         /* Check file maximum size. */
-        if (Boolean.parseBoolean(this.batchConfig.getProperty("Test_Max_File_Size", "false")) && !this.fileSizeTest())
+        if (Boolean.parseBoolean(this.batchConfig.getProperty("Batch_Test_Max_File_Size", "false")) && !this.fileSizeTest())
         {
             return false;
         }
 
         /* Check file magic number. */
-        if (Boolean.parseBoolean(this.batchConfig.getProperty("Test_Magic_Number", "false")) && !this.magicNumberTest())
+        if (Boolean.parseBoolean(this.batchConfig.getProperty("Batch_Test_Magic_Number", "false")) && !this.magicNumberTest())
         {
             return false;
         }
@@ -177,10 +170,10 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
      */
     private boolean magicNumberTest()
     {
-        String magicNumberStr = this.batchConfig.getProperty("File_Magic_Number");
+        String magicNumberStr = this.batchConfig.getProperty("Batch_File_Magic_Number");
         if (magicNumberStr == null)
         {
-            this.logger.error("Incorrect configuration for file magic number test. The property 'File_Magic_Number'" +
+            this.logger.error("Incorrect configuration for file magic number test. The property 'Batch_File_Magic_Number'" +
             		" is missing. It should be present and populated with a hexadecimal value.");
             return false;
         }
@@ -291,7 +284,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     private boolean fileSizeTest()
     {
         final File file = new File(this.fileName);
-        final long maxSize = Long.parseLong(this.batchConfig.getProperty("Max_File_Size"));
+        final long maxSize = Long.parseLong(this.batchConfig.getProperty("Batch_Max_File_Size"));
         this.logger.debug("Testing instruction file for less that maximum size " + maxSize + ".");
         if ((file.length() / 1024) > maxSize)
         {
@@ -312,7 +305,7 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
      */
     private boolean fileExtensionTest()
     {
-        final String extension = this.batchConfig.getProperty("File_Extension");
+        final String extension = this.batchConfig.getProperty("Batch_File_Extension");
         this.logger.debug("Testing instruction file for extension " + extension + ".");
         if (!this.fileName.endsWith(extension))
         {
@@ -332,23 +325,23 @@ public class ConfiguredBatchRunner extends AbstractBatchRunner
     @Override
     protected boolean sync()
     {
-        if (!Boolean.parseBoolean(this.batchConfig.getProperty("Sync_Results_Dir", "false")))
+        if (!Boolean.parseBoolean(this.batchConfig.getProperty("Batch_Sync_Results_Dir", "false")))
         {
             this.logger.debug("Configured to not sync back results files.");
             return true;
         }
         
-        final String dest = this.substiter.substituteMacros(this.batchConfig.getProperty("Sync_Dir_Destination"));
-        final String name = this.substiter.substituteMacros(this.batchConfig .getProperty("Sync_Dir_Name"));
+        final String dest = this.substiter.substituteMacros(this.batchConfig.getProperty("Batch_Sync_Dir_Destination"));
+        final String name = this.substiter.substituteMacros(this.batchConfig .getProperty("Batch_Sync_Dir_Name"));
         final File destFile = new File(dest, name);
         
-        if (Boolean.parseBoolean(this.batchConfig.getProperty("Compress_Dir", "false")))
+        if (Boolean.parseBoolean(this.batchConfig.getProperty("Batch_Compress_Dir", "false")))
         {
             /* Compress results directory. */
             this.logger.info("Compressing results directory " + this.workingDir + " into " + 
                     destFile.getName() + " archive located in " + destFile.getParent() + ".");
             final DirectoryZipper zipper = new 
-                    DirectoryZipper(this.batchConfig.getProperty("Compression_Level", "DEFAULT"));
+                    DirectoryZipper(this.batchConfig.getProperty("Batch_Compression_Level", "DEFAULT"));
             return zipper.compressDirectory(this.workingDir, destFile.getAbsolutePath());
         }
         else
