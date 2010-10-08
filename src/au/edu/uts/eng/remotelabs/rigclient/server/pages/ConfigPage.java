@@ -174,7 +174,7 @@ public class ConfigPage extends AbstractPage
 	                "$(document).ready(function() {\n" +
 	                "     $('#confform').validationEngine();\n" +
 	                "     $('#confform').jqTransform();\n" +
-	                "     $('.jqTransformInputWrapper').css('width', '345px');\n" +
+	                "     $('.jqTransformInputWrapper').css('width', '305px');\n" +
 	                "     $('.jqTransformInputInner div input').css('width', '100%');\n");
 	        
 	        /* Contents pane height. */
@@ -212,7 +212,7 @@ public class ConfigPage extends AbstractPage
             
             /* Property details. */
             this.println("  <td class='pcol'>");
-            this.println(e.getKey());
+            this.println("  <span class='pkey'>" + e.getKey() + "</span>");
             if (p != null)
             {
                 this.println("<div class='pdesc'>");
@@ -221,7 +221,7 @@ public class ConfigPage extends AbstractPage
             }
             
             this.println("  </td>");
-            this.println("  <td class='valcol'>");
+            this.println("  <td class='pval'>");
             
             if (p != null)
             {

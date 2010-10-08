@@ -74,10 +74,10 @@ public class IndexPage extends AbstractPage
         this.links.put("Documentation", "/doc");
         
         this.operations = new LinkedHashMap<String, String>(4);
-        this.operations.put("Restart", "/op/restart");
-        this.operations.put("Shutdown", "/op/shutdown");
         this.operations.put("Clear_Maintenance", "/op/clear");
         this.operations.put("Garbage_Collection", "/op/gc");
+        this.operations.put("Restart", "/op/restart");
+        this.operations.put("Shutdown", "/op/shutdown");
         
         this.icons = new HashMap<String, String>(9);
         this.icons.put("Status", "status");

@@ -884,11 +884,18 @@ span.code {
 
 .pdesc ul {
 	padding: 5px 0;
+	list-style: inside circle none;
 }
 
-.pdesc ul li {
+.pdesc ul li, .pdesc ol li {
 	padding: 5px 0;
 }
+
+.pdesc ol {
+	padding: 5px 0;
+	list-style: inside decimal none;
+}
+
 
 .pdetail {
 	font-weight: normal;
@@ -896,8 +903,15 @@ span.code {
 }
 
 .pcol {
+	width: 325px;
+}
+
+.pkey {
 	font-weight: bold;
-	width: 305px;
+}
+
+.pval {
+	width: 325px;
 }
 
 .valcol input {

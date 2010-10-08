@@ -21,6 +21,20 @@ administrative interface. The links consist of:
 The <em>Operations</em> list contains operations which change the 
 temporal state of the rig client. The operations are:
 <ul>
+	<li><span class='bold'>Clear Maintenance</span> - Clears any maintenance 
+	states the rig may having putting it back online. A rig client maintenance
+	state is one which requires manual intervention to put it back online. Two
+	maintenance states a rig may be in are:
+	<ul>
+		<li>Action failure threshold has been exceeded. If any action has failure
+		more than an allowed limit, the rig is taken offline so it is not
+		subsequently assigned to a user when it may not be in a useable state.</li>
+		<li>The rig is explicitly put it into maintenace.</li>
+	</ul></li>
+	<li><span class='bold'>Garbage Collection</span> - Performs a Java virtual
+	machine garbage collection which frees unused memory. The Java virtual
+	machine automatically performs this operation and it is safe to manually
+	request this as many times as necessary.</li>
 	<li><span class='bold'>Restart</span> - Soft restarts the rig client.
 	This is a soft restart because the Java virtual machine is not
 	restarted. Any in progress sessions are terminated, the scheduling
@@ -51,18 +65,4 @@ temporal state of the rig client. The operations are:
 		execute <span class='code'>'/etc/init.d/rigclient&nbsp;start'</span> with
 		root privileges.
 	</div></li>
-	<li><span class='bold'>Clear Maintenance</span> - Clears any maintenance 
-	states the rig may having putting it back online. A rig client maintenance
-	state is one which requires manual intervention to put it back online. Two
-	maintenance states a rig may be in are:
-	<ul>
-		<li>Action failure threshold has been exceeded. If any action has failure
-		more than an allowed limit, the rig is taken offline so it is not
-		subsequently assigned to a user when it may not be in a useable state.</li>
-		<li>The rig is explicitly put it into maintenace.</li>
-	</ul>
-	<li><span class='bold'>Garbage Collection</span> - Performs a Java virtual
-	machine garbage collection which frees unused memory. The Java virtual
-	machine automatically performs this operation and it is safe to manually
-	request this as many times as necessary.</li>
 </ul>

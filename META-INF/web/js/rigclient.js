@@ -292,7 +292,7 @@ function loadConfStanza(stanza)
 	        				  .append(data);
 	        $("#confform").validationEngine();
             $("#confform").jqTransform();
-            $(".jqTransformInputWrapper").css("width", "345px");
+            $(".jqTransformInputWrapper").css("width", "305px");
             $(".jqTransformInputInner div input").css("width", "100%");
 		}
 	);
