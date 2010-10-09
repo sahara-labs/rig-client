@@ -26,8 +26,7 @@ Each property should be configured with the following attributes:
 Uniquely identifies a rig within the remote laboratory. It is suggested
 the name take the form of words separated by an underscore character.
  </property>
- <property name="Rig_Type" stanza="identity" mandatory="yes" type="STRING" restart="yes"
- 		example="Inclined_Plane" format="&lt;String&gt;" default="">
+ <property name="Rig_Type" stanza="identity" mandatory="yes" type="STRING" restart="yes" example="Inclined_Plane" format="&lt;String&gt;" default="">
 Identifies the rig as an identical configuration of the same software and hardware. This means any 
 any rig can be used in place of any other rig in the same type.
  </property>
@@ -98,183 +97,236 @@ The threshold indicating how many times a action can fail before the rig is put 
 </property>
 
 <!-- CDU Power Controller properties -->
-<property name="CDU_Outlet" stanza="CDU Power Controller" manatory="yes" type="STRING" restart="" example="???" format="&lt;String&gt;" default="" >This property defines the outlet that is to be power cycled
+<property name="CDU_Outlet" stanza="CDU Power Controller" mandatory="yes" type="STRING" restart="" example="???" format="&lt;String&gt;" default="" >
+This property defines the outlet that is to be power cycled
 </property>
-<property name="CDU_Address" stanza="CDU Power Controller" manatory="yes" type="STRING" restart="" example="127.0.0.1" format="&lt;String&gt;" default="" >This property sets the IP address to hostname to the CDU web interface
+<property name="CDU_Address" stanza="CDU Power Controller" mandatory="yes" type="STRING" restart="" example="127.0.0.1" format="&lt;String&gt;" default="" >
+This property sets the IP address to hostname to the CDU web interface
 </property>
-<property name="CDU_HTTP_Port" stanza="CDU Power Controller" mandatory="no" type="INT" restart="" example="80" format="&lt;int&gt;" default="80">This property defines the port number that the CDU web server is listening on
+<property name="CDU_HTTP_Port" stanza="CDU Power Controller" mandatory="no" type="INTEGER" restart="" example="80" format="&lt;int&gt;" default="80">
+This property defines the port number that the CDU web server is listening on
 </property>
-<property name="CDU_Auth_Basic" stanza="CDU Power Controller" mandatory="yes" type="STRING" restart="" example="YWRtaW46cGFzc3dvcmQNCg==" format="&lt;String&gt;" default="">This property defines the HTTP basic authentication header
+<property name="CDU_Auth_Basic" stanza="CDU Power Controller" mandatory="yes" type="STRING" restart="" example="YWRtaW46cGFzc3dvcmQNCg==" format="&lt;String&gt;" default="">
+This property defines the HTTP basic authentication header
 </property>
 
 <!-- CDU Power Reset Action properties -->
-<property name="CDU_Outlet" stanza="CDU Power Reset Action" mandatory="yes" type="STRING" restart="" example="AA1" format="&lt;String&gt;" default="" >This property specifies the outlet that is to be power cycled. 
+<property name="CDU_Outlet" stanza="CDU Power Reset Action" mandatory="yes" type="STRING" restart="" example="AA1" format="&lt;String&gt;" default="" >
+This property specifies the outlet that is to be power cycled. 
 </property>
-<property name="CDU_Address" stanza="CDU Power Reset Action" mandatory="yes" type="STRING" restart="" example="127.0.0.1" format="&lt;String&gt;" default="" > This property defines the IP address or host name to the CDU web interface.
+<property name="CDU_Address" stanza="CDU Power Reset Action" mandatory="yes" type="STRING" restart="" example="127.0.0.1" format="&lt;String&gt;" default="" >
+This property defines the IP address or host name to the CDU web interface.
 </property>
-<property name="CDU_HTTP_Port" stanza="CDU Power Reset Action" mandatory="no" type="" restart="" example="80" format="&lt;int&gt;" default="80" >This property specifies the port number that the CDU Web server is listening on. 
+<property name="CDU_HTTP_Port" stanza="CDU Power Reset Action" mandatory="no" type="INTEGER" restart="" example="80" format="&lt;int&gt;" default="80" >
+This property specifies the port number that the CDU Web server is listening on. 
 </property>
-<property name="CDU_AuthBasic" stanza="CDU Power Reset Action" mandatory="yes" type="STRING" restart="" example="Basic Zm9vOmJhcgo=" format="&lt;String&gt;" default="" > This property specifies the HTTP basic authentication header. 
+<property name="CDU_AuthBasic" stanza="CDU Power Reset Action" mandatory="yes" type="STRING" restart="" example="Basic Zm9vOmJhcgo=" format="&lt;String&gt;" default="" >
+This property specifies the HTTP basic authentication header. 
 </property>
-<property name="CDU_C0_Cookie" stanza="CDU Power Reset Action" mandatory="yes" type="STRING" restart="" example="FF00FF00FF000000FF00FF00FF000000" format="&lt;String&gt;" default="" > This property defines the value of the web interface cookie.
+<property name="CDU_C0_Cookie" stanza="CDU Power Reset Action" mandatory="yes" type="STRING" restart="" example="FF00FF00FF000000FF00FF00FF000000" format="&lt;String&gt;" default="" >
+This property defines the value of the web interface cookie.
 </property>
 
 <!-- Delete Files Reset Action -->
-<property name="File_Transfer_Directory" stanza="Delete Files Reset Action" mandatory="yes" type="FILE" restart="" example="???" format="&lt;File&gt;" default="">This property sets the path from which to delete the files
+<property name="File_Transfer_Directory" stanza="Delete Files Reset Action" mandatory="yes" type="FILE" restart="" example="???" format="&lt;File&gt;" default="">
+This property sets the path from which to delete the files
 </property>
 
 <!-- Device Ownership Access Action -->
-<property name="Device_Permission_Host_Address" stanza="Device Ownership Access Actioin" mandatory="yes" type="STRING" restart="" example="127.0.0.1" format="&lt;String&gt;" default="">This property defines the host to change the permission of
+<property name="Device_Permission_Host_Address" stanza="Device Ownership Access Actioin" mandatory="yes" type="STRING" restart="" example="127.0.0.1" format="&lt;String&gt;" default="">
+This property defines the host to change the permission of
 </property>
-<property name="Device_Permission_Path_1" stanza="Device Ownership Access Actioin" mandatory="yes" type="STRING" restart="" example="" format="&lt;String&gt;" default="">This property sets the path to the device to change the permissions of
+<property name="Device_Permission_Path_1" stanza="Device Ownership Access Actioin" mandatory="yes" type="STRING" restart="" example="" format="&lt;String&gt;" default="">
+This property sets the path to the device to change the permissions of
 </property>
 
 <!-- IPS Power Reset Action -->
-<property name="IPS_Address" stanza="IPS Power Reset Action" mandatory="yes" type="STRING" restart="" example="127.0.0.1" format="&lt;String&gt;" default="">This property sets the network address to the IPS 
+<property name="IPS_Address" stanza="IPS Power Reset Action" mandatory="yes" type="STRING" restart="" example="127.0.0.1" format="&lt;String&gt;" default="">
+This property sets the network address to the IPS 
 </property>
-<property name="IPS_Port" stanza="IPS Power Reset Action" mandatory="no" type="int" restart="" example="80" format="&lt;int&gt;" default="80">This property defines the port number to the IPS 
+<property name="IPS_Port" stanza="IPS Power Reset Action" mandatory="no" type="INTEGER" restart="" example="80" format="&lt;int&gt;" default="80">
+This property defines the port number to the IPS 
 </property>
-<property name="IPS_Auth_Basic" stanza="IPS Power Reset Action" mandatory="yes" type="STRING" restart="" example="YWRtaW46cGFzc3dvcmQNCg==" format="&lt;String&gt;" default="">This property defines the basic authentication line as a base64 string
+<property name="IPS_Auth_Basic" stanza="IPS Power Reset Action" mandatory="yes" type="STRING" restart="" example="YWRtaW46cGFzc3dvcmQNCg==" format="&lt;String&gt;" default="">
+This property defines the basic authentication line as a base64 string
 </property>
-<property name="IPS_Outlet" stanza="IPS Power Reset Action" mandatory="yes" type="STRING" restart="" example="Coupled_Tanks_1" format="&lt;String&gt;" default="">This property set the name of the outlet to reboot
+<property name="IPS_Outlet" stanza="IPS Power Reset Action" mandatory="yes" type="STRING" restart="" example="Coupled_Tanks_1" format="&lt;String&gt;" default="">
+This property set the name of the outlet to reboot
 </property>
 
 <!-- JPEG Frame Camera Test Action -->
 <property name="Camera_Test_URL_1" stanza="JPEG Frame Camera Test Action" mandatory="no" type="STRING" restart="yes" example="http://cv1.eng.uts.edu.au:7070/stream1.jpg" format="&lt;String&gt;" default=""> may be specified with the n field replaced with an integer number from
 a continuous stream of MJPEG (motion JPEG) frames. As many URLs as needed and point to a JPEG camera frame. The URL should provide a specific frame, not This property is used to test camera URLs. The URLs must use the HTTP protocol
 </property>
-<property name="Camera_Test_Fail_Threshold" stanza="JPEG Frame Camera Test Action" mandatory="no" type="int" retsart="" example="" format="&lt;int&gt;" default="3"> This property defines how often the camera test can fail before causing a test action fail.
+<property name="Camera_Test_Fail_Threshold" stanza="JPEG Frame Camera Test Action" mandatory="no" type="INTEGER" restart="" example="" format="&lt;int&gt;" default="3"> This property defines how often the camera test can fail before causing a test action fail.
 </property>
-<property name="Camera_Test_Timeout" stanza="JPEG Frame Camera Test Action" mandatory="no" type="int" restart="" example="" format="&lt;int&gt;" default=""> This property sets the timeout in seconds to wait for the camera stream to respond to a HTTP
+<property name="Camera_Test_Timeout" stanza="JPEG Frame Camera Test Action" mandatory="no" type="INTEGER" restart="" example="" format="&lt;int&gt;" default=""> This property sets the timeout in seconds to wait for the camera stream to respond to a HTTP
 </property>
-<property name="Camera_Test_Image_Min_Size" stanza="JPEG Frame Camera Test Action" mandatory="no" type="int" restart="" eample="10" format="&lt;int&gt;" default="10"> expected frame size for efficient functioning of the test.
+<property name="Camera_Test_Image_Min_Size" stanza="JPEG Frame Camera Test Action" mandatory="no" type="INTEGER" restart="" example="10" format="&lt;int&gt;" default="10"> expected frame size for efficient functioning of the test.
 failure. The default is 10 kB. This should be set to within 25 % of the minimum
 JPEG frame is less than the minimum required size, it is treated as a camera 
 This property defines the minimum required JPEG frame size. If the returned 
 </property>
-<property name="Camera_Test_Interval" stanza="JPEG Frame Camera Test Action" mandatory="no" type="int" restart="" example="30" format="&lt;int&gt;" default="30">This property defines the period between test runs in seconds.
+<property name="Camera_Test_Interval" stanza="JPEG Frame Camera Test Action" mandatory="no" type="INTEGER" restart="" example="30" format="&lt;int&gt;" default="30">This property defines the period between test runs in seconds.
 </property>
 <property name="Camera_Test_Enable_Uniqueness_Test" stanza="JPEG Frame Camera Test Action" mandatory="no" type="BOOLEAN" restart="" example="" format="&lt;boolean&gt;" default="false">in a frame will cause the image hash to differ. NOTE: This is unlikely to return positives as even a bit difference 
 slightly expensive to download JPEG frames and to compute the frame hashes. the same image continuously (this has occurred using VLC to stream a video feed). The default is not to enable this as it is returning 
 This may be used to ensure the feed is live or if the streaming software has locked up and This property indicates whether to enable the camera frame uniqueness test or not
 </property>
-<property name="Camera_Test_Max_Num_Unique_Frames" stanza="JPEG Frame Camera Test Action" mandatory="no" type="int" restart="" example="10" format="&lt;int&gt;" default="10"> This property indicates the number of allowable identical frames to be
+<property name="Camera_Test_Max_Num_Unique_Frames" stanza="JPEG Frame Camera Test Action" mandatory="no" type="INTEGER" restart="" example="10" format="&lt;int&gt;" default="10"> This property indicates the number of allowable identical frames to be
 </property>
 
 <!-- Labjack Reset Action  -->
+<property name="Labjack_Address" stanza="Labjack Reset Action" mandatory="yes" type="STRING" restart="yes" example="127.0.0.1" format="&lt;String&gt;" default="">
+This property sets the IP address or serial of the Labjack to be reset
+</property>
+<property name="Labjack_Digital_Outputs" stanza="Labjack Reset Action" mandatory="no" type="INTEGER" restart="yes" example="23" format="&lt;int&gt;" default="23">
+This property defines the number of digital outputs available on the labjack
+</property>
+<property name="Labjack_Analogue_Outputs" stanza="Labjack Reset Action" mandatory="no" type="INTEGER" restart="yes" example="2" format="&lt;int&gt;" default="2">
+This property defines the number of analogue outputs available on the labjack
+</property>
 
 <!-- Ldap Group Access Action properties -->
-<property name="Ldap_Host" stanza="Ldap Group Access Action" mandatory="yes" type="STRING" restart="yes" example="127.0.0.1" format="&lt;String&gt;" default="">This property defines the address of the LDAP server
+<property name="Ldap_Host" stanza="Ldap Group Access Action" mandatory="yes" type="STRING" restart="yes" example="127.0.0.1" format="&lt;String&gt;" default="">
+This property defines the address of the LDAP server
 </property>
-<property name="Ldap_Port" stanza="Ldap Group Access Action" mandatory="no" type="STRING" restart="yes" example="389" format="&lt;int&gt;" default="389">This property specifies the connection port to LDAP server
+<property name="Ldap_Port" stanza="Ldap Group Access Action" mandatory="no" type="INTEGER" restart="yes" example="389" format="&lt;int&gt;" default="389">
+This property specifies the connection port to LDAP server
 </property>
-<property name="Ldap_BlindDN" stanza="Ldap Group Access Action" mandatory="yes" type="STRING" restart="yes" example="???" format="" default="">This property sets the DN of the user
+<property name="Ldap_BlindDN" stanza="Ldap Group Access Action" mandatory="yes" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default="">
+This property sets the DN of the user
 </property>
-<property name="Ldap_Password" stanza="Ldap Group Acceess Action" mandatory="yes" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default="">This property sets the password of the user to be bound
+<property name="Ldap_Password" stanza="Ldap Group Acceess Action" mandatory="yes" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default="">
+This property sets the password of the user to be bound
 </property>
-<property name="Ldap_BaseDN" stanza="Ldap group Access Action" mandatory="yes" type="STRING" restart="yes" example="???" format="" default="">The property sets the tree to search for the user
+<property name="Ldap_BaseDN" stanza="Ldap group Access Action" mandatory="yes" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default="">
+The property sets the tree to search for the user
 </property>
-<property name="Ldap_User_Filter" stanza="Ldap Group Access Action" mandatory="no" type="STRING" restart="" example="???" format="&lt;String&gt;" default="">This property is used to find the user record
+<property name="Ldap_User_Filter" stanza="Ldap Group Access Action" mandatory="no" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default="">
+This property is used to find the user record
 </property>
-<property name="Ldap_Access group" stanza="Ldap group Access Action" mandatory="no" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default="">This property sets the DN for adding/removing the user to/from
+<property name="Ldap_Access group" stanza="Ldap group Access Action" mandatory="no" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default="">
+This property sets the DN for adding/removing the user to/from
 </property>
 
 
 <!-- Linux Device Node Test Action properties -->
-<property name="LinuxDeviceNode_Test_Interval" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" reatrt="yes" example="" format="" default="">This property defines the time in seconds between each device node test run.
+<property name="LinuxDeviceNode_Test_Interval" stanza="Linux Device Node Test Action" mandatory="no" type="INTEGER" restart="yes" example="300" format="&lt;int&gt;" default="300">
+This property defines the time in seconds between each device node test run.
 </property>
-<property name="LinuxDeviceNode_Test_Fail_Threshold" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" reatrt="yes" example="" format="" default="">This property defines how often times a device node test can fail before
+<property name="LinuxDeviceNode_Test_Fail_Threshold" stanza="Linux Device Node Test Action" mandatory="no" type="INTEGER" restart="yes" example="3" format="&lt;int&gt;" default="3">
+This property defines how often times a device node test can fail before
 </property>
-<property name="LinuxDeviceNode_Test_Octal_Permission_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" reatrt="yes" example="" format="" default="">order. This is the same format as shown by 'ls -l' (e.g. rwxr-x--x). If this
-read-write-execute permissions for owning user, group and other users in that
-This property defines the device node file permissions as three groups of   
+<property name="LinuxDeviceNode_Test_Path_1" stanza="Linux Device Node Test Action" mandatory="no" type="PATH" restart="yes" example="/dev/null" format="&lt;String&gt;" default="'/dev'">
+This property sets the owning user name of the device node. If this property
 </property>
-<property name="LinuxDeviceNode_Test_User_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" reatrt="yes" example="" format="" default="">This property sets the owning user name of the device node. If this property
+<property name="LinuxDeviceNode_Test_Type_1" stanza="Linux Device Node Test Action" mandatory="yes" type="CHAR" restart="yes" example="c" format="&lt;Char&gt;" default="'/dev'">
+This property sets the owning user name of the device node. If this property
 </property>
-<property name="LinuxDeviceNode_Test_UID_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" reatrt="yes" example="" format="" default="">This property defines the owning user UID of the device node.
+<property name="LinuxDeviceNode_Test_Octal_Permission_1" stanza="Linux Device Node Test Action" mandatory="no" type="INTEGER" restart="yes" example="777" format="&lt;int&gt;" default="">
+This property specifies the device node file permissions as three octal numbers specifying permissions for owning user, group and other users in that order. Each number specifies an octal 
+value of a read-write-execute bit field (e.g. 'r-x'has the value '5'). If this property is not set, testing octal file permissions is disabled.
 </property>
-<property name="LinuxDeviceNode_Test_Group_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" reatrt="yes" example="" format="" default="">This property defines the owning group name of the device node.
+<property name="LinuxDeviceNode_Test_User_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" restart="yes" example="root" format="&lt;String&gt;" default="">This property sets the owning user name of the device node. If this property
 </property>
-<property name="LinuxDeviceNode_Test_GID_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" reatrt="yes" example="" format="" default="">This property defines the owning group GID of the device node.
+<property name="LinuxDeviceNode_Test_UID_1" stanza="Linux Device Node Test Action" mandatory="no" type="INTEGER" restart="yes" example="0" format="&lt;int&gt;" default="">This property defines the owning user UID of the device node.
 </property>
-<property name="LinuxDeviceNode_Test_Major_Number_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" reatrt="yes" example="" format="" default="">This property sets the major number of the device nodes.
+<property name="LinuxDeviceNode_Test_Group_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" restart="yes" example="root" format="&lt;String&gt;" default="">This property defines the owning group name of the device node.
 </property>
-<property name="LinuxDeviceNode_Test_Minor_Number_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" reatrt="yes" example="" format="" default=""> This property sets the minor number of the device node.
+<property name="LinuxDeviceNode_Test_GID_1" stanza="Linux Device Node Test Action" mandatory="no" type="INTEGER" restart="yes" example="0" format="&lt;int&gt;" default="">This property defines the owning group GID of the device node.
 </property>
-<property name="LinuxDeviceNode_Test_Driver_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" reatrt="yes" example="" format="" default=""> property is not set OR the file type property is not set to 'c' or 'b', the
-for the device node with the name as shown in '/proc/devices'. If this 
-This property defines the device driver (driver which has the same major number)
+<property name="LinuxDeviceNode_Test_Major_Number_1" stanza="Linux Device Node Test Action" mandatory="no" type="INTEGER" restart="yes" example="1" format="&lt;int&gt;" default="">This property sets the major number of the device nodes.
+</property>
+<property name="LinuxDeviceNode_Test_Minor_Number_1" stanza="Linux Device Node Test Action" mandatory="no" type="INTEGER" restart="yes" example="3" format="&lt;int&gt;" default=""> This property sets the minor number of the device node.
+</property>
+<property name="LinuxDeviceNode_Test_Driver_1" stanza="Linux Device Node Test Action" mandatory="no" type="STRING" restart="yes" example="mem" format="&lt;String&gt;" default=""> property is not set OR the file type property is not set to 'c' or 'b', the
+for the device node with the name as shown in '/proc/devices'. If this This property defines the device driver (driver which has the same major number)
 </property>
 
 <!-- Ping Test Action properties  -->
-<property name="Ping_Test_Host_1" stanza="Ping Test Action" mandatory="no" type="STRING" restart="yes" example="" format="" default="">This property defines the host names to test for response using the ping test.
+<property name="Ping_Test_Host_1" stanza="Ping Test Action" mandatory="yes" type="STRING" restart="yes" example="127.0.0.1" format="&lt;String&gt;" default="">
+This property defines the host names to test for response using the ping test.
 </property>
-<property name="Ping_Test_Command" stanza="Ping Test Action" mandatory="no" type="STRING" restart="yes" example="" format="" default=""> This property sets the name of the ping command.
+<property name="Ping_Test_Command" stanza="Ping Test Action" mandatory="no" type="STRING" restart="yes" example="ping" format="&lt;String&gt;" default="ping">
+This property sets the name of the ping command.
 </property>
-<property name="Ping_Test_Interval" stanza="Ping Test Action" mandatory="no" type="STRING" restart="yes" example="" format="" default=""> This property specifies the period between test runs in seconds.
+<property name="Ping_Test_Args" stanza="Ping Test Action" mandatory="yes" type="STRING" restart="yes" example="-c 1 -W 5000 -q" format="&lt;String&gt;" default="">
+This property specifies the period between test runs in seconds.
 </property>
-<property name="Ping_Test_Fail_Threshold" stanza="Pring Test Action" mandatory="no" type="STRING" restart="yes" example="" format="" default="">host before it constitutes a test failure (as returned by getStatus).
-This property sets the number of allowable failures of the ping command to a
+<property name="Ping_Test_Interval" stanza="Ping Test Action" mandatory="no" type="INTEGER" restart="yes" example="30" format="&lt;int&gt;" default="30">
+This property specifies the period between test runs in seconds.
+</property>
+<property name="Ping_Test_Fail_Threshold" stanza="Pring Test Action" mandatory="no" type="INTEGER" restart="yes" example="3" format="&lt;int&gt;" default="3">
+This property sets the number of allowable failures of the ping command to a host before it constitutes a test failure (as returned by getStatus). The fail threshold is 3.
 </property>
 
 <!-- PLC Test Action properties -->
-<property name="PLC_Test_Interval" stanza=" PLC Test Action" madatory="no" type="STRING" reset="yes" example="" format="" default="">This property sets the period between test runs in seconds
+<property name="PLC_Test_Interval" stanza="PLC Test Action" mandatory="no" type="INTEGER" restart="yes" example="20" format="&lt;int&gt;" default="3600">This property sets the period between test runs in seconds
 </property>
-<property name="PLC_Test_Timeout" stanza=" PLC Test Action" madatory="no" type="STRING" reset="yes" example="" format="" default=""> This property defines the timeout to use for each read transaction in milliseconds.
+<property name="PLC_Test_Timeout" stanza="PLC Test Action" mandatory="no" type="INTEGER" restart="yes" example="5000" format="&lt;int&gt;" default="5000"> This property defines the timeout to use for each read transaction in milliseconds.
 </property>
-<property name="PLC_Test_Pause " stanza=" PLC Test Action" madatory="no" type="STRING" reset="yes" example="" format="" default="">This property indicates the number of milliseconds to delay between sending each value in
+<property name="PLC_Test_Pause" stanza="PLC Test Action" mandatory="no" type="INTEGER" restart="yes" example="800" format="&lt;int&gt;" default="1500">This property indicates the number of milliseconds to delay between sending each value in
 </property>
-<property name="PLC_Test_Data_Size " stanza=" PLC Test Action" madatory="no" type="STRING" reset="yes" example="" format="" default="">This property sets the number of bytes to read from or write to the device in
+<property name="PLC_Test_Data_Size" stanza="PLC Test Action" mandatory="no" type="INTEGER" restart="yes" example="2" format="&lt;int&gt;" default="2">This property sets the number of bytes to read from or write to the device in
 </property>
-<property name="PLC_Test_Host_1" stanza=" PLC Test Action" madatory="no" type="STRING" reset="yes" example="" format="" default=""> This property defines the host names to test for response using the PLC test.
+<property name="PLC_Test_Host_1" stanza="PLC Test Action" mandatory="no" type="STRING" restart="yes" example="127.0.0.1" format="&lt;String&gt;" default=""> This property defines the host names to test for response using the PLC test.
 </property>
-<property name="PLC_Test_Port_1 " stanza=" PLC Test Action" madatory="no" type="STRING" reset="yes" example="" format="" default="">This property indicated ports for each hosts.
+<property name="PLC_Test_Port_1" stanza="PLC Test Action" mandatory="no" type="INTEGER" restart="yes" example="44818" format="&lt;int&gt;" default="44818">This property indicated ports for each hosts.
 </property>
-<property name="PLC_Test_Write_Tag_1 " stanza=" PLC Test Action" madatory="no" type="STRING" reset="yes" example="" format="" default="">This property sets the tags to write to in order to test each host's response.
+<property name="PLC_Test_Write_Tag_1" stanza="PLC Test Action" mandatory="no" type="STRING" restart="yes" example="O0:0" format="&lt;String&gt;" default="">This property sets the tags to write to in order to test each host's response.
+</property>
+<property name="PLC_Write_Values_1_1" stanza="PLC Test Action" mandatory="yes" type="STRING" restart="yes" example="640/64/128/64/128/64/128/320" format="&lt;String&gt;" default="">This property sets the tags to write to in order to test each host's response.
 </property>
 
  <!-- Remote Desktop Windows Domain properties -->
-<property name="Remote_Desktop_Windows_Domain" stanza="Remote Desktop Access Action" madatory="no" type="STRING" reset="yes" example="" format="" default="">
+<property name="Remote_Desktop_Windows_Domain" stanza="Remote Desktop Access Action" mandatory="no" type="STRING" restart="yes" example="REMOTELABS" format="&lt;String&gt;" default="">
+This property specifies the Win NT4 domain the user is part of 
 </property>
-<property name="Remote_Desktop_Groupname" stanza="Remote Desktop Access Action" madatory="no" type="STRING" reset="yes" example="" format="" default="">This property set the name of the user group to which the user must be added
+<property name="Remote_Desktop_Groupname" stanza="Remote Desktop Access Action" mandatory="no" type="STRING" restart="yes" example="Remote Desktop Users" format="&lt;String&gt;" default="Remote Desktop Users">
+This property set the name of the user group to which the user must be added
 </property>
 
 <!-- Samba Password Access Action propoerties -->
-<property name="Ldap_host" stanza="Samba Password Access Action" mandatory="no" type="STRING" restart="yes" example="" format="" default="????"> This property defines the address of the LDAP server
+<property name="Ldap_Host" stanza="Samba Password Access Action" mandatory="yes" type="STRING" restart="yes" example="127.0.0.1" format="&lt;String&gt;" default=""> This property defines the address of the LDAP server
 </property>
-<property name="Ldap_port" stanza="Samba Password Access Action" mandatory="no" type="STRING" restart="yes" example="" format="" default="389"> This property specifies the connection port to LDAP server
+<property name="Ldap_Port" stanza="Samba Password Access Action" mandatory="no" type="INTEGER" restart="yes" example="123" format="&lt;int&gt;" default="389"> This property specifies the connection port to LDAP server
 </property>
-<property name="Ldap_BlindDN" stanza="Samba Password Access Action" mandatory="np" type="STRING" restart="yes" esample="" format="" default=""> This property sets the DN of the user
+<property name="Ldap_BlindDN" stanza="Samba Password Access Action" mandatory="yes" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default=""> This property sets the DN of the user
 </property>
-<property name="Ldap_Password" stanza="Samba Password Access Action" mandatory="no" type="STRING" restart="yes" example="" format="" default=""> This property sets the password of the user to be bound
+<property name="Ldap_Password" stanza="Samba Password Access Action" mandatory="yes" type="STRING" restart="yes" example="password" format="&lt;String&gt;" default=""> This property sets the password of the user to be bound
 </property>
-<property name="Ldap_BaseDN" stanza="Samba Password Access Action" amndatory="no" type="STRING" restart="yes" esample="" format="" default=""> The property sets the tree to search for the user
+<property name="Ldap_BaseDN" stanza="Samba Password Access Action" mandatory="no" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default=""> The property sets the tree to search for the user
 </property>
-<property name="Ldap_User_Filter" stanza="Samba Password Access Action" mandatory="no" type="STRING" restart="yes" example="" format="" default=""> This property is used to find the user record
+<property name="Ldap_User_Filter" stanza="Samba Password Access Action" mandatory="no" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default=""> This property is used to find the user record
 </property>
 
 <!-- Socket Command Reset Actoin -->
-<property name="" stanza="Socket Command Reset Actoin" mandatory="" type="" restart="" example="" format="" default="" >
+	<property name="Socket_Command_Reset_Host" stanza="Socket Command Reset Actoin" mandatory="no" type="STRING" restart="yes" example="localhost" format="&lt;String&gt;" default="localhost">
+This property defines the host to connect to
 </property>
-<property name="" stanza="Socket Command Reset Actoin" mandatory="" type="" restart="" example="" format="" default="" >
+<property name="Socket_Command_Reset_Port" stanza="Socket Command Reset Actoin" mandatory="yes" type="INTEGER" restart="yes" example="80" format="&lt;int&gt;" default="" >
+This property sets the port number to connect to
 </property>
-<property name="" stanza="Socket Command Reset Actoin" mandatory="" type="" restart="" example="" format="" default="" >
+<property name="Socket_Command_Reset_Command" stanza="Socket Command Reset Actoin" mandatory="yes" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default="" >
 </property>
-<property name="" stanza="Socket Command Reset Actoin" mandatory="" type="" restart="" example="" format="" default="" >
+<property name="Socket_Command_Reset_Response" stanza="Socket Command Reset Actoin" mandatory="yes" type="STRING" restart="yes" example="???" format="&lt;String&gt;" default="" >
 </property>
-<property name="" stanza="Socket Command Reset Actoin" mandatory="" type="" restart="" example="" format="" default="" >
+<property name="Socket_Command_Reset_Timeout" stanza="Socket Command Reset Actoin" mandatory="no" type="INTEGER" restart="yes" example="30" format="&lt;int&gt;" default="30" >
+</property>
+<property name="Socket_Command_Reset_Ignore_Timeout" stanza="Socket Command Reset Actoin" mandatory="yes" type="BOOLEAN" restart="yes" example="false" format="&lt;boolean&gt;" default="" >
 </property>
 
 <!-- Socket Pass Through Controller -->
-<property name="" stanza="Socket Pass Through Controller" mandatory="" type="" restart="" example="" format="" default="" >
+<property name="Socket_Pass_Through_Host" stanza="Socket Pass Through Controller" mandatory="no" type="STRING" restart="yes" example="127.0.0.1" format="&lt;String&gt;" default="localhost" >
 </property>
-<property name="" stanza="Socket Pass Through Controller" mandatory="" type="" restart="" example="" format="" default="" >
+<property name="Socket_Pass_Through_Port" stanza="Socket Pass Through Controller" mandatory="yes" type="INTEGER" restart="yes" example="80" format="&lt;int&gt;" default="" >
 </property>
-<property name="" stanza="Socket Pass Through Controller" mandatory="" type="" restart="" example="" format="" default="" >
+<property name="Socket_Pass_Through_Timeout" stanza="Socket Pass Through Controller" mandatory="no" type="INTEGER" restart="yes" example="5" format="&lt;int&gt;" default="5" >
 </property>
 
 <!-- WTS Detector Action -->
-<property name="" stanza="WTS Detector Action" mandatory="" type="" restart="" example="" format="" default="" >
+<property name="WTS_DLL_PATH" stanza="WTS Detector Action" mandatory="yes" type="???  WTSSessions" restart="yes" example="???" format="???" default="">
 </property>
 </config>
  
