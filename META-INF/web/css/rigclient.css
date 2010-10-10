@@ -917,3 +917,16 @@ span.code {
 .valcol input {
 	width: 100%;
 }
+
+.submitbut {
+	float: right;
+	padding-right: 35px;
+}
+
+.submitbutton {
+	width: 60px;
+}
+
+.submitbutton span span {
+	width: 60px;
+}

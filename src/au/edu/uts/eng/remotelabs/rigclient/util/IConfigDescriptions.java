@@ -59,6 +59,13 @@ public interface IConfigDescriptions
         CHAR
     }
     
+    /**
+     * Gets the configuration stanzas of the properties.
+     * 
+     * @return stanzas
+     */
+    public List<String> getStanzas();
+    
     /** 
      * Gets all the property descriptions
      * 

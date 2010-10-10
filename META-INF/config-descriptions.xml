@@ -225,6 +225,129 @@ be configured with 24 hour time with a column ':' between the hours and minutes
 portions. The default dark time is 18:00.
 </property>
 
+<!-- 
+################################################################################
+## File: configuredrig.properties                                             ##
+################################################################################
+-->
+<property name="Action_Package_Prefixes" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="au.edu.labshare.rigclient.action; au.edu.remotelabs.rigclient"
+		  format="&lt;Package&gt;;...;&lt;Package&gt;"
+		  default="">
+<![CDATA[
+The list of package names that are used in action class resolution. Class 
+resolution works using the following algorithm:
+<ol>
+	<li>The configured controller class name is assumed to be a fully
+    qualified class name and an attempt is made to load it. If it 
+    is found then that class is used;</li>
+    <li>The configured action class name is appended to the first configured
+    action package prefix and an attempt is made to load it. If it is found 
+    then that class is used;</li>
+    <li>The configured action class name is appended to the next configured 
+    action package prefix and an attempt is made to load it. If it is found 
+    then that class is used. This occurs until either the class is found or
+    all the configured action package prefixes are tried;</li> 
+</ol>
+Multiple action package prefixes can be configured using the ';' character
+as the delimiter between packages.
+]]>
+</property>
+
+<property name="Access_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="access.RdpAccessAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Access actions assign access and revoke access to and from the assigned master
+user and run at the beginning and end of sessions. This configures the list 
+of access actions to use. Multiple access actions can be configured, separating 
+each with a ';' character. When multiple access actions are configured, the 
+assignment methods are invoked in order they are configured and the revocation 
+methods are invoked in reverse order they are configured.
+</property>
+
+<property name="Slave_Access_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="slave.VncSlaveAccessAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Slave access actions assign and revoke access for secondary session users.
+This configures the list of slave access actions to load. Multiple slave access 
+actions can be configured, separating each with a ';' character.When multiple 
+slave access actions are configured, the slave assignment methods are 
+invoked in the order they are configured and the slave revocation methods are 
+invoked in the reverse order they are configured.
+</property>
+
+<property name="Notify_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="notify.TSNotifyAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Notify actions provide notifications to users of session event messages and are
+useful if the users focus may not be on the web interface. For example providing
+a Windows popup when a users focus is on using Remote Desktop.  This configures
+the list of notification actions to load. Multiple notification actions can be
+configured, separating each with a ';' character.
+</property>
+
+<property name="Detection_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="detect.WTSDetectionAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Detection actions are used to verify a user is actually using a rig when in 
+session. If they are not, they are removed from the rig after a permission
+configured timeout period. This configures the list of detection actions to 
+load. Multiple detection actions can be configured, separating each 
+with a ';' character.
+</property>
+
+<property name="Reset_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="reset.PowerResetAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Reset actions are run at the end of sessions to cleanup the rig to be ready
+for the next user. This configures the list of reset actions to load. Multiple
+reset actions can be configured, separating each with a ';' character.
+</property>
+
+<property name="Test_Actions" 
+          stanza="Configured Rig" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="test.PingTestAction"
+		  format="&lt;Class&gt;;...;&lt;Class&gt;"
+		  default="">
+Test actions are used to ensure the rig is ready for use by running tests
+on the system when it is free. These tests report the rig status and if 
+one of the tests fail, the rig is taken offline. This configures the list
+of test actions to load. Multiple test actions can be configured, separating
+each with a ';' character.
+</property>
+
 <!-- #### Administrative Interface ############################################ -->
 <property name="Admin_Username" 
 		  stanza="Admin" 
@@ -492,125 +615,310 @@ the delimiter between packages.
 
 <!-- 
 ################################################################################
-## File: primitive.properties                                                 ##
+## File: batch.properties                                                    ##
 ################################################################################
 -->
-<property name="Action_Package_Prefixes" 
-          stanza="Configured Rig" 
+<property name="Batch_Download_Dir" 
+          stanza="Batch Control" 
           mandatory="no" 
           type="STRING" 
           restart="yes"
-		  example="au.edu.labshare.rigclient.action; au.edu.remotelabs.rigclient"
-		  format="&lt;Package&gt;;...;&lt;Package&gt;"
+		  example="/tmp"
+		  format="&lt;Path&gt;"
+		  default="System temp directory">
+Directory where batch control uploaded instruction files are stored. If this
+is left blank, the system default temporary directory is used. 
+</property>
+
+<property name="Batch_Timeout" 
+          stanza="Batch Control" 
+          mandatory="no" 
+          type="INTEGER" 
+          restart="yes"
+		  example="30"
+		  format="&lt;int&gt;"
+		  default="60">
+Batch time out in seconds. Time to wait at batch startup before failing 
+batch control, if the batch process has not started. The default is 60
+seconds.
+</property>
+
+<property name="Batch_Termination_TimeOut" 
+          stanza="Batch Control" 
+          mandatory="no" 
+          type="INTEGER" 
+          restart="yes"
+		  example="5"
+		  format="&lt;int&gt;"
+		  default="10">
+Batch termination time out in seconds. Time to wait before returning a 
+batch termination success or failure result.  The default is 10 seconds.
+</property>
+
+<property name="Batch_Working_Dir" 
+          stanza="Batch Control" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="/var/cache/rigclient"
+		  format="[&lt;Path&gt;|null]"
+		  default="System temp directory">
+Batch process working directory. If this is is set to null, the working
+directory is taken to be the System temporary directory. The default is
+null.
+</property>
+
+<property name="Batch_Create_Nested_Dir" 
+          stanza="Batch Control" 
+          mandatory="no" 
+          type="BOOLEAN" 
+          restart="yes"
+		  example="true"
+		  format="[true|false]"
+		  default="true">
+Whether to create a nested working directory per batch control invocation.
+If this is set to true, a new directory is created in the batch working
+directory and the batch processes working directory is set as the new 
+directory. The default is true.
+</property>
+
+<property name="Batch_Clean_Up" 
+          stanza="Batch Control" 
+          mandatory="no" 
+          type="BOOLEAN" 
+          restart="yes"
+		  example="true"
+		  format="[true|false]"
+		  default="false">
+Whether to run batch clean up. If this is set to true, the batch control 
+invocation generated files are deleted. This setting is only honoured if the
+property Batch_Create_Nester_Dir property is set to true. If not, it is 
+ignored and no clean up run. The default is false.
+</property>
+
+<property name="Batch_Flush_Env" 
+          stanza="Batch Control" 
+          mandatory="no" 
+          type="BOOLEAN" 
+          restart="yes"
+		  example="true"
+		  format="[true|false]"
+		  default="false">
+Specifies if the batch process should inherit the environment variables of the 
+rig client process (the diagnostics page shows the rig client environment 
+variables). If true, no inherited environment variables will be given to the
+batch process unless they are set up manually. The default value is false.
+</property>
+
+<property name="Batch_Instruct_File_Delete" 
+          stanza="Batch Control" 
+          mandatory="no" 
+          type="BOOLEAN" 
+          restart="yes"
+		  example="true"
+		  format="[true|false]"
+		  default="true">
+Specifies if the uploaded instruction should be deleted upon completion of 
+batch execution. If true, the uploaded batch instruction file is deleted.
+The default value is true.
+</property>
+
+<!-- ConfiguredBatchRunner properties. -->
+<property name="Batch_Exec" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="/bin/false"
+		  format="&lt;String&gt;"
+		  default="System temp directory">
+The batch executable to run. This should be an absolute reference to 
+the batch executable that should be invoked for batch control 
+(i.e. '/bin/ls' instead of 'ls').
+</property>
+
+<property name="Batch_Exec_Arg_1" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="__FILE__"
+		  format="[&lt;String&gt;|&lt;Macro&gt;]"
 		  default="">
+Arguments to provide to the batch executable in order of 1 to n. As many
+arguments as needed may be configured provided they follow the format
+'Exec_Arg_&lt;Integer&gt;'. The Exec_Arg_ integers must be correctly sequenced,
+missing a number will cause subsequent argument configuration to not be
+loaded. The arguments are provided to the batch command in the order they
+are sequenced. Macros may be used as values. To provide the file as
+a command line argument use the __FILE__ macro.
+</property>
+
+<property name="Batch_Env_1" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="key:value"
+		  format="&lt;String&gt;:[&lt;String&gt;|&lt;Macro&gt;]"
+		  default="">
+Environment variables to provide for the batch executable process. As may
+environment variables as needed may be configured provided they follow
+the format 'Env_&lt;Integer&gt;' with the configuration value as environment 
+'&lt;Key&gt;:&lt;Value&gt;'. The Env integers must be correctly sequenced, missing a 
+number will cause subsequent environment variable configuration to not be
+loaded. Macros be use using as the value portion of the environment variable.
+</property>
+
+<property name="Batch_Test_File_Extension" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="BOOLEAN" 
+          restart="yes"
+		  example="true"
+		  format="[true|false]"
+		  default="false">
+Whether to test the instruction file extension. If this is set to true,
+File_Extension property must be set. The default value is false to specify
+not to test a file extension.
+</property>
+
+<property name="Batch_File_Extension" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="tar.gz"
+		  format="&lt;String&gt;"
+		  default="">
+Instruction file extension. Should be configured as a string specifying the
+characters of the file extension. The file extension test will check if the 
+instruction file name ends with the configured extension.
+</property>
+
+<property name="Batch_Test_Max_File_Size" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="BOOLEAN" 
+          restart="yes"
+		  example="true"
+		  format="[true|false]"
+		  default="false">
+Whether to test for instruction file maximum size. If this is set to true,
+the File_Size property must be set with the maximum permissible instruction
+file size. The default value is false to specify not to test for file 
+size.
+</property>
+
+<property name="Batch_Max_File_Size" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="INTEGER" 
+          restart="yes"
+		  example="true"
+		  format="&lt;int&gt;"
+		  default="">
+Maximum file size of the instruction file in kilobytes.
+</property>
+
+<property name="Batch_Test_Magic_Number" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="BOOLEAN" 
+          restart="yes"
+		  example="true"
+		  format="[true|false]"
+		  default="false">
+Whether to test the instruction file for magic number. Many files have constants
+that identify the contained data. Detecting such constants in files is an effective 
+way of distinguishing between many file formats. If this is set top true, the 
+File_Magic_Number property must be set with a hexadecimal representation of the
+file magic number. The default value is false to specify not to test for file
+magic number.
+</property>
+
+<property name="Batch_File_Magic_Number" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="0xCAFEBABE"
+		  format="&lt;hex&gt;"
+		  default="">
+File magic number in hexadecimal format. The prefix '0x' is optional.
+</property>
+
+<property name="Batch_Sync_Results_Dir" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="BOOLEAN" 
+          restart="yes"
+		  example="true"
+		  format="[true|false]"
+		  default="false">
+Whether to synchronise the results directory (batch process working directory
+to the another directory. If true, the results directory is copied to a
+different directory. If true the Sync_Dir_Destination property and 
+the Sync_Dir_Name property must be set with the results destination path name
+and result directory name respectively. The default is false.
+</property>
+
+<property name="Batch_Sync_Dir_Destination" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="/var/rigclient/__YEAR__/"
+		  format="&lt;path&gt;"
+		  default="">
+The absolute path name to the directory to store the results file
+directory. Macro variables may be used as path elements. This 
+directory must exist for storing results to succeed.
+</property>
+
+<property name="Batch_Sync_Dir_Name" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="__USER__"
+		  format="&lt;String&gt;"
+		  default="">
+The name of either the results directory or results file depending on the 
+Compress_Dir setting. If Compress_Dir is true, this is used as the file 
+name and a suitable file extension is appended to the name.
+</property>
+
+<property name="Batch_Compress_Dir" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="BOOLEAN" 
+          restart="yes"
+		  example="true"
+		  format="[true|false]"
+		  default="false">
+Whether to compress the results directory into a zip archive. The default
+false to not compress the results directory.
+</property>
+
+<property name="Batch_Compression_Level" 
+          stanza="Configured Batch" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="BEST"
+		  format="[BEST|DEFAULT|FASTEST]"
+		  default="DEFAULT">
+The compression level of the results file. This may be one of the following
+compression levels:
 <![CDATA[
-The list of package names that are used in action class resolution. Class 
-resolution works using the following algorithm:
-<ol>
-	<li>The configured controller class name is assumed to be a fully
-    qualified class name and an attempt is made to load it. If it 
-    is found then that class is used;</li>
-    <li>The configured action class name is appended to the first configured
-    action package prefix and an attempt is made to load it. If it is found 
-    then that class is used;</li>
-    <li>The configured action class name is appended to the next configured 
-    action package prefix and an attempt is made to load it. If it is found 
-    then that class is used. This occurs until either the class is found or
-    all the configured action package prefixes are tried;</li> 
-</ol>
-Multiple action package prefixes can be configured using the ';' character
-as the delimiter between packages.
+<ul>
+  <li>BEST - Best compression</li>
+  <li>DEFAULT - Default compression</li>
+  <li>FASTEST - Fastest compression</li>
+</ul>
+The default compression level is 'DEFAULT'.
 ]]>
-</property>
-
-<property name="Access_Actions" 
-          stanza="Configured Rig" 
-          mandatory="no" 
-          type="STRING" 
-          restart="yes"
-		  example="access.RdpAccessAction"
-		  format="&lt;Class&gt;;...;&lt;Class&gt;"
-		  default="">
-Access actions assign access and revoke access to and from the assigned master
-user and run at the beginning and end of sessions. This configures the list 
-of access actions to use. Multiple access actions can be configured, separating 
-each with a ';' character. When multiple access actions are configured, the 
-assignment methods are invoked in order they are configured and the revocation 
-methods are invoked in reverse order they are configured.
-</property>
-
-<property name="Slave_Access_Actions" 
-          stanza="Configured Rig" 
-          mandatory="no" 
-          type="STRING" 
-          restart="yes"
-		  example="slave.VncSlaveAccessAction"
-		  format="&lt;Class&gt;;...;&lt;Class&gt;"
-		  default="">
-Slave access actions assign and revoke access for secondary session users.
-This configures the list of slave access actions to load. Multiple slave access 
-actions can be configured, separating each with a ';' character.When multiple 
-slave access actions are configured, the slave assignment methods are 
-invoked in the order they are configured and the slave revocation methods are 
-invoked in the reverse order they are configured.
-</property>
-
-<property name="Notify_Actions" 
-          stanza="Configured Rig" 
-          mandatory="no" 
-          type="STRING" 
-          restart="yes"
-		  example="notify.TSNotifyAction"
-		  format="&lt;Class&gt;;...;&lt;Class&gt;"
-		  default="">
-Notify actions provide notifications to users of session event messages and are
-useful if the users focus may not be on the web interface. For example providing
-a Windows popup when a users focus is on using Remote Desktop.  This configures
-the list of notification actions to load. Multiple notification actions can be
-configured, separating each with a ';' character.
-</property>
-
-<property name="Detection_Actions" 
-          stanza="Configured Rig" 
-          mandatory="no" 
-          type="STRING" 
-          restart="yes"
-		  example="detect.WTSDetectionAction"
-		  format="&lt;Class&gt;;...;&lt;Class&gt;"
-		  default="">
-Detection actions are used to verify a user is actually using a rig when in 
-session. If they are not, they are removed from the rig after a permission
-configured timeout period. This configures the list of detection actions to 
-load. Multiple detection actions can be configured, separating each 
-with a ';' character.
-</property>
-
-<property name="Reset_Actions" 
-          stanza="Configured Rig" 
-          mandatory="no" 
-          type="STRING" 
-          restart="yes"
-		  example="reset.PowerResetAction"
-		  format="&lt;Class&gt;;...;&lt;Class&gt;"
-		  default="">
-Reset actions are run at the end of sessions to cleanup the rig to be ready
-for the next user. This configures the list of reset actions to load. Multiple
-reset actions can be configured, separating each with a ';' character.
-</property>
-
-<property name="Test_Actions" 
-          stanza="Configured Rig" 
-          mandatory="no" 
-          type="STRING" 
-          restart="yes"
-		  example="test.PingTestAction"
-		  format="&lt;Class&gt;;...;&lt;Class&gt;"
-		  default="">
-Test actions are used to ensure the rig is ready for use by running tests
-on the system when it is free. These tests report the rig status and if 
-one of the tests fail, the rig is taken offline. This configures the list
-of test actions to load. Multiple test actions can be configured, separating
-each with a ';' character.
 </property>
 
 </config>

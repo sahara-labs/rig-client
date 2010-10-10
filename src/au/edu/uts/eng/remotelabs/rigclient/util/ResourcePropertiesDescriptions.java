@@ -42,8 +42,10 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,6 +85,9 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
     /** The Property descriptions resource location. */
     public static final String RESOURCE_LOC = "META-INF/config-descriptions.xml";
     
+    /** Configuration stanzas. */
+    private final List<String> stanzas;
+    
     /** Property description information. */
     private Map<String, Property> descriptions;
     
@@ -92,68 +97,80 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
     public ResourcePropertiesDescriptions()
     {
         this.logger = LoggerFactory.getLoggerInstance();
-        ArrayList<Property> descs = new ArrayList<Property>();
+        List<Property> descs = new ArrayList<Property>();
+        this.stanzas = new ArrayList<String>();
         
-        InputStream is = null;
+        List<InputStream> lis = new ArrayList<InputStream>();
         try
         {
             String desLoc = System.getProperty("prop.descriptions");
             if (desLoc == null)
             {
-                is = this.getClass().getClassLoader().getResourceAsStream("META-INF/config-descriptions.xml");
+                
+                Enumeration<URL> urls = this.getClass().getClassLoader().getResources(RESOURCE_LOC);
+                while (urls.hasMoreElements())
+                {
+                    lis.add(urls.nextElement().openStream());
+                }
             }
             else
             {
-                is = new BufferedInputStream(new FileInputStream(desLoc));
+                lis.add(new BufferedInputStream(new FileInputStream(desLoc)));
             }
             
-            if (is == null)
+            if (lis.size() == 0)
             {
                 this.logger.error("Unable to find configuration description resource. It should be packaged in the" +
                 		"'/META-INF/config/descriptions.xml' file in the rig client library. Please report this.");
-                this.descriptions = new HashMap<String, IConfigDescriptions.Property>(0);
+                this.descriptions = new LinkedHashMap<String, IConfigDescriptions.Property>(0);
                 return;
             }
             
-            DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
-            fac.setIgnoringComments(true);
-            fac.setIgnoringElementContentWhitespace(true);
-            Document doc = fac.newDocumentBuilder().parse(is);
-            
-            /* Parse the all property elements. */
-            Element root = doc.getDocumentElement();
-            for (Node c = root.getFirstChild(); c != null; c = c.getNextSibling())
+            for (InputStream is : lis)
             {
-                if (c.getNodeName().equals("property") && c.getNodeType() == Node.ELEMENT_NODE)
+                DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
+                fac.setIgnoringComments(true);
+                fac.setIgnoringElementContentWhitespace(true);
+                Document doc = fac.newDocumentBuilder().parse(is);
+                
+                /* Parse the all property elements. */
+                Element root = doc.getDocumentElement();
+                for (Node c = root.getFirstChild(); c != null; c = c.getNextSibling())
                 {
-                    Element e = (Element)c;
-                    
-                    String tmp = e.getAttribute("mandatory");
-                    boolean man = false;
-                    if ("yes".equals(tmp) || "true".equals(tmp) || "on".equals(tmp)) man = true;
-                    
-                    tmp = e.getAttribute("restart");
-                    boolean res = false;
-                    if ("yes".equals(tmp) || "true".equals(tmp) || "on".equals(tmp)) res = true;
-                    
-                    String d = e.getTextContent();
-                    if (d != null)
+                    if (c.getNodeName().equals("property") && c.getNodeType() == Node.ELEMENT_NODE)
                     {
-                        d = d.trim();
-                        d = d.replace('\n', ' ');
+                        Element e = (Element)c;
+                        
+                        String tmp = e.getAttribute("mandatory");
+                        boolean man = false;
+                        if ("yes".equals(tmp) || "true".equals(tmp) || "on".equals(tmp)) man = true;
+                        
+                        tmp = e.getAttribute("restart");
+                        boolean res = false;
+                        if ("yes".equals(tmp) || "true".equals(tmp) || "on".equals(tmp)) res = true;
+                        
+                        String d = e.getTextContent();
+                        if (d != null)
+                        {
+                            d = d.trim();
+                            d = d.replace('\n', ' ');
+                        }
+                        
+                        String stanza = e.getAttribute("stanza");
+                        if (!this.stanzas.contains(stanza)) this.stanzas.add(stanza);
+                        
+                        descs.add(new Property(
+                                e.getAttribute("name"), 
+                                stanza,
+                                man,
+                                e.getAttribute("type"),
+                                e.getAttribute("format"),
+                                e.getAttribute("default"),
+                                res,
+                                e.getAttribute("example"),
+                                d
+                        ));
                     }
-                    
-                    descs.add(new Property(
-                            e.getAttribute("name"), 
-                            e.getAttribute("stanza"), 
-                            man,
-                            e.getAttribute("type"),
-                            e.getAttribute("format"),
-                            e.getAttribute("default"),
-                            res,
-                            e.getAttribute("example"),
-                            d
-                    ));
                 }
             }
         }
@@ -167,18 +184,26 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
 
             try
             {
-                if (is != null) is.close();
+                for (InputStream is : lis) is.close();
             }
             catch (IOException e)
             { /* Swallowing, because there isn't anything sensible to do here. */ }
         }
         
         /* Key descriptions by name for fast lookups. */
-        this.descriptions = new HashMap<String, Property>(descs.size());
+        this.descriptions = new LinkedHashMap<String, Property>(descs.size());
         for (Property p : descs)
         {
             this.descriptions.put(p.getName(), p);
         }
+    }
+    
+    @Override
+    public List<String> getStanzas()
+    {
+        List<String> copy = new ArrayList<String>(this.stanzas.size());
+        copy.addAll(this.stanzas);
+        return copy;
     }
     
     @Override

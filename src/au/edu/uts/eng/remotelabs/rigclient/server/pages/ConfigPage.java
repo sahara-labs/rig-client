@@ -41,13 +41,13 @@ package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +62,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions.Property;
 public class ConfigPage extends AbstractPage
 {
     /** Sorted configuration stanzas. */
-    private  Map<String, List<Entry<String, String>>> stanzas;
+    private  Map<String, Map<String, String>> stanzas;
     
     /** Configuration properties. */
     private Map<String, String> props;
@@ -80,7 +80,7 @@ public class ConfigPage extends AbstractPage
         this.desc = ConfigFactory.getDescriptions();
         
         /* Group the properties by stanza. */
-        this.stanzas = new TreeMap<String, List<Entry<String, String>>>();
+        this.stanzas = new HashMap<String, Map<String, String>>();
         for (Entry<String, String> e : this.props.entrySet())
         {
             Property p = this.desc.getPropertyDescription(e.getKey());
@@ -91,8 +91,8 @@ public class ConfigPage extends AbstractPage
                  * configured stanza. */
                 sta = p.getStanza();
             }
-            if (!this.stanzas.containsKey(sta)) this.stanzas.put(sta, new ArrayList<Entry<String, String>>());
-            this.stanzas.get(sta).add(e);
+            if (!this.stanzas.containsKey(sta)) this.stanzas.put(sta, new HashMap<String, String>());
+            this.stanzas.get(sta).put(e.getKey(), e.getValue());
         }
         
         String url = "";
@@ -118,7 +118,7 @@ public class ConfigPage extends AbstractPage
         if (!"/config".equals(url))
         {
             this.uriSuffix = url.substring(url.lastIndexOf("/config") + 8);
-            if (this.stanzas.containsKey(this.uriSuffix))
+            if (this.stanzas.containsKey(this.uriSuffix) && !"POST".equalsIgnoreCase(req.getMethod()))
             {
                 this.framing = false;
             }
@@ -129,66 +129,108 @@ public class ConfigPage extends AbstractPage
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
+        String displayStanza = "Rig";
+        boolean showRestartMessage = false;
+        
         if (this.stanzas.containsKey(this.uriSuffix))
         {
-            if ("POST".equalsIgnoreCase((req.getMethod())))
+            if ("POST".equalsIgnoreCase(req.getMethod()))
             {
                 /* Stored the posted values. */
-                // TODO 
+                displayStanza = this.uriSuffix;
+                
+                boolean changed = false;
+                
+                @SuppressWarnings("unchecked")
+                Enumeration<String> params = req.getParameterNames();
+                while (params.hasMoreElements())
+                {
+                    String param = params.nextElement();
+                    String value = req.getParameter(param);
+                    
+                    String confVal = this.config.getProperty(param);
+                    if (confVal != null && !confVal.equals(param))
+                    {
+                        this.logger.info("Changing configuration property '" + param + "' to '" + value + "'.");
+                        
+                        /* Property is changed so save it. */
+                        this.props.put(param, value);
+                        this.config.setProperty(param, value);
+                        changed = true;
+                        
+                        Property p = this.desc.getPropertyDescription(param);
+                        if (p == null || p.needsRestart()) showRestartMessage = true;
+                    }
+                }
+                
+                if (changed) this.config.serialise();
             }
-            this.getConfigStanza(this.uriSuffix);
-        }
-        else
-        {
-            /* Add tabs to page. */
-            this.println("<div id='lefttabbar'>");
-            this.println("  <ul id='lefttablist'>");
-            
-            int i = 0;
-            for (String s : this.stanzas.keySet())
+            else
             {
-                String id = s.replace(" ", "");
-                
-                String classes = "Identity".equals(s) ? "selectedtab" : "notselectedtab";
-                if (i == 0) classes += " ui-corner-tl";
-                else if (i == this.stanzas.size() - 1) classes += " ui-corner-bl";
-    
-                this.println("<li><a id='" + id + "tab' class='" + classes + "' onclick='loadConfStanza(\"" + s + "\")'>");
-                this.println("  <div class='conftab'>");
-                this.println("    " + s);
-                this.println("  </div>");
-                this.println("</a></li>");
-                
-                i++;
+                this.getConfigStanza(this.uriSuffix);
+                return;
             }
-            
-            this.println("  </ul>");
-            this.println("</div>");
-            
-            this.println("<div id='contentspane' class='ui-corner-tr ui-corner-bottom'>");
-	        this.getConfigStanza("Identity");
-	        this.println("</div>");
-	        
-	        this.println("<script type='text/javascript'>");
-	        this.println(
-	                "$(document).ready(function() {\n" +
-	                "     $('#confform').validationEngine();\n" +
-	                "     $('#confform').jqTransform();\n" +
-	                "     $('.jqTransformInputWrapper').css('width', '305px');\n" +
-	                "     $('.jqTransformInputInner div input').css('width', '100%');\n");
-	        
-	        /* Contents pane height. */
-	        this.println(
-	                "     $('#contentspane').css('height', $(window).height() - 230);");
-	        this.println(
-	                "     $(window).resize(function() { \n" +
-	                "         $('#contentspane').css('height', $(window).height() - 230);\n" +
-		            "     });");
-	        
-	        this.println("});");
-		
-	        this.println("</script>");
         }
+        
+        /* Display restart warning. */
+        if (showRestartMessage)
+        {
+            this.println("<div id='confrestartwarning'>");
+            this.println("The configuration change will be applied on next restart.");
+            this.println("</div>");
+        }
+
+        /* Add tabs to page. */
+        this.println("<div id='lefttabbar'>");
+        this.println("  <ul id='lefttablist'>");
+
+        int i = 0;
+        Set<String> orderedStanzas = new LinkedHashSet<String>(this.desc.getStanzas());
+        orderedStanzas.retainAll(this.stanzas.keySet());
+        orderedStanzas.addAll(this.stanzas.keySet());
+
+        for (String s : orderedStanzas)
+        {
+            String id = s.replace(" ", "");
+
+            String classes = "Rig".equals(s) ? "selectedtab" : "notselectedtab";
+            if (i == 0) classes += " ui-corner-tl";
+            else if (i == this.stanzas.size() - 1) classes += " ui-corner-bl";
+
+            this.println("<li><a id='" + id + "tab' class='" + classes + "' onclick='loadConfStanza(\"" + s + "\")'>");
+            this.println("  <div class='conftab'>");
+            this.println("    " + s);
+            this.println("  </div>");
+            this.println("</a></li>");
+
+            i++;
+        }
+
+        this.println("  </ul>");
+        this.println("</div>");
+
+        this.println("<div id='contentspane' class='ui-corner-tr ui-corner-bottom'>");
+        this.getConfigStanza(displayStanza);
+        this.println("</div>");
+
+        this.println("<script type='text/javascript'>");
+        this.println(
+                "$(document).ready(function() {\n" +
+                "     $('#confform').validationEngine();\n" +
+                "     $('#confform').jqTransform();\n" +
+                "     $('.jqTransformInputWrapper').css('width', '305px');\n" +
+                "     $('.jqTransformInputInner div input').css('width', '100%');\n");
+
+        /* Contents pane height. */
+        this.println(
+                "     $('#contentspane').css('height', $(window).height() - 230);");
+        this.println(
+                "     $(window).resize(function() { \n" +
+                "         $('#contentspane').css('height', $(window).height() - 230);\n" +
+                "     });");
+
+        this.println("});");		
+        this.println("</script>");
     }
     
     /**
@@ -198,74 +240,108 @@ public class ConfigPage extends AbstractPage
      */
     private void getConfigStanza(String stanza)
     {
-        List<Entry<String, String>> stanzaProps = this.stanzas.get(stanza);
-        Collections.sort(stanzaProps, new EntryComparator());
+        Map<String, String> stanzaProps = this.stanzas.get(stanza);
+        List<Property> stanzaPropList = this.desc.getPropertyDescriptions(stanza);
         
-        this.println("<form id='confform' target='/config/" + stanza + "' method='POST'>");
+        this.println("<form id='confform' action='/config/" + stanza + "' method='POST'>");
         this.println("  <table id='contentstable'>");
         int i = 0;
-        for (Entry<String, String> e : stanzaProps)
+        
+        if (stanzaPropList != null)
         {
-            Property p = this.desc.getPropertyDescription(e.getKey());
-            
-            this.println("<tr class='" + (i % 2 == 0 ? "evenrow" : "oddrow") + "'>");
-            
-            /* Property details. */
-            this.println("  <td class='pcol'>");
-            this.println("  <span class='pkey'>" + e.getKey() + "</span>");
-            if (p != null)
+            for (Property p : stanzaPropList)
             {
-                this.println("<div class='pdesc'>");
-                this.println(p.getDescription());
-                this.println("</div>");
-            }
-            
-            this.println("  </td>");
-            this.println("  <td class='pval'>");
-            
-            if (p != null)
-            {
+                String name = p.getName();
+                stanzaProps.remove(name);
+                String val = this.config.getProperty(name);
+                if (val == null) val = ""; // If the property value isn't set.
+                
+                this.println("<tr class='" + (i % 2 == 0 ? "evenrow" : "oddrow") + "'>");
+                
+                /* Property details. */
+                this.println("  <td class='pcol'>");
+                this.println("      <span class='pkey'>" + name + "</span>");
+                this.println("      <div class='pdesc'>" + p.getDescription() + "</div>");
+                this.println("  </td>");
+                this.println("  <td class='pval'>");
+                
                 String vd = "validate[";
                 vd += p.isMandatory() ? "required" : "optional";
                 switch (p.getType())
                 {
                     case BOOLEAN:
+                        if ("true".equalsIgnoreCase(val))
+                        {
+                            this.println("<div><input type='radio' name='" + name + "' value='true' checked='checked' />" +
+                                    "<span class='pblabel'>true</span></div>");
+                        }
+                        else
+                        {
+                            this.println("<div><input type='radio' name='" + name + "' value='true' />" +
+                                    "<span class='pblabel'>true</span></div>");
+                        }
+                        
+                        if ("false".equalsIgnoreCase(val))
+                        {
+                            this.println("<div style='margin-top: 10px'><input type='radio' name='" + name + "' value='false' checked='checked' />" +
+                                    "<span class='pblabel'>false</span></div>");
+                        }
+                        else
+                        {
+                            this.println("<div style='margin-top: 10px'><input type='radio' name='" + name + "' value='false' />" +
+                                    "<span class='pblabel'>false</span></div>");
+                        }
                         break;
                     case CHAR:
                         if (vd.charAt(vd.length() - 1) != '[') vd += ',';
                         vd += "length[1,1]]";
-                        this.println("<input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' class='" + vd + "' value='" + 
-                                e.getValue() + "' />");
+                        this.println("<input id='" + name + "' type='text' name='" + name + "' class='" + vd + "' value='" + 
+                                val + "' />");
                         break;
                     case FLOAT:
                         if (vd.charAt(vd.length() - 1) != '[') vd += ',';
                         vd += "custom[onlyNumber]]";
-                        this.println("<input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' class='" + vd + "' value='" + 
-                                e.getValue() + "' />");
+                        this.println("<input id='" + name + "' type='text' name='" + name + "' class='" + vd + "' value='" + 
+                                val + "' />");
                         break;
                     case INTEGER:
                         if (vd.charAt(vd.length() - 1) != '[') vd += ',';
                         vd += "custom[onlyNumber]]";
-                        this.println("<input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' class='" + vd + "' value='" + 
-                                e.getValue() + "' />");
+                        this.println("<input id='" + name + "' type='text' name='" + name + "' class='" + vd + "' value='" + 
+                                val + "' />");
                         break;
                     case STRING:
-                        this.println("<input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' class='" + vd + "]' value='" + 
-                                e.getValue() + "' />");
+                        this.println("<input id='" + name + "' type='text' name='" + name + "' class='" + vd + "]' value='" + 
+                                val + "' />");
                         break;
                 }
-            }
-            else
-            {
-                this.println("<input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' value='" + 
-                        e.getValue() + "' />");
+
+                this.println("  </td>");
+                this.println("</tr>");
+                i++;
             }
             
-            this.println("  </td>");
-            this.println("</tr>");
-            i++;
+            /* Any other properties that may exist. */
+            for (Entry<String, String> e : stanzaProps.entrySet())
+            {
+                this.println("<tr class='" + (i % 2 == 0 ? "evenrow" : "oddrow") + "'>");
+                this.println("  <td class='pcol'>");
+                this.println("      <span class='pkey'>" + e.getKey() + "</span>");
+                this.println("  </td>");
+                this.println("  <td class='pval'>");
+                this.println("      <input id='" + e.getKey() + "' type='text' name='" + e.getKey() + "' value='" + 
+                            e.getValue() + "' />");
+                this.println("  </td>");
+                this.println("</tr>");
+                i++;
+            }
         }
         this.println("  </table>");
+        
+        this.println("  <div class='submitbut'>");
+        this.println("      <input class='submitbutton' type='submit' value='Save' />");
+        this.println("  </div>");
+        
         this.println("</form>");
     }
 
@@ -273,14 +349,5 @@ public class ConfigPage extends AbstractPage
     protected String getPageType()
     {
         return "Configuration";
-    }
-    
-    static class EntryComparator implements Comparator<Entry<String, String>>
-    {
-        @Override
-        public int compare(Entry<String, String> o1, Entry<String, String> o2)
-        {
-           return o1.getKey().compareTo(o2.getKey());
-        }
     }
 }
