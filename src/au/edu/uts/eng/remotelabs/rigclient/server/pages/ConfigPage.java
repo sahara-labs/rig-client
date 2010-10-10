@@ -149,7 +149,7 @@ public class ConfigPage extends AbstractPage
                     String value = req.getParameter(param);
                     
                     String confVal = this.config.getProperty(param);
-                    if (confVal != null && !confVal.equals(param))
+                    if (confVal != null && !confVal.equals(value))
                     {
                         this.logger.info("Changing configuration property '" + param + "' to '" + value + "'.");
                         
@@ -175,8 +175,9 @@ public class ConfigPage extends AbstractPage
         /* Display restart warning. */
         if (showRestartMessage)
         {
-            this.println("<div id='confrestartwarning'>");
-            this.println("The configuration change will be applied on next restart.");
+            this.println("<div id='confrestartwarning' class='ui-state ui-state-error ui-corner-all confalert'>");
+            this.println("  <span class='ui-icon ui-icon-alert helphinticon'> </span>");
+            this.println("  The change will be applied next time the rig client is started.");
             this.println("</div>");
         }
 
