@@ -1,36 +1,36 @@
 #
 # SAHARA Rig Client
-# 
+#
 # Software abstraction of physical rig to provide rig session control
 # and rig device control. Automatically tests rig hardware and reports
 # the rig status to ensure rig goodness.
 #
 # @license See LICENSE in the top level directory for complete license terms.
 #
-# Copyright (c) 2009, University of Technology, Sydney
-# All rights reserved. 
+# Copyright (c) 2009 - 2010, University of Technology, Sydney
+# All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without 
+# Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
-#  * Redistributions of source code must retain the above copyright notice, 
+#  * Redistributions of source code must retain the above copyright notice,
 #    this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above copyright 
-#    notice, this list of conditions and the following disclaimer in the 
+#  * Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-#  * Neither the name of the University of Technology, Sydney nor the names 
-#    of its contributors may be used to endorse or promote products derived from 
+#  * Neither the name of the University of Technology, Sydney nor the names
+#    of its contributors may be used to endorse or promote products derived from
 #    this software without specific prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # @author Michael Diponio (mdiponio)
@@ -45,10 +45,6 @@
 #     Key <Value> Actual configuration                                        #
 #                                                                             #
 # NOTE: Key values and enumerated values ARE case sensitive.                  #
-# Also NOTE: The rig client is not very defensive for valid configuration so  #
-# if the expected configuration value type is specified as an int or integer  #
-# and you don't put a valid integer as the value, tough, the rig client will  #
-# most likely crash. You have been warned!                                    #
 #                                                                             #
 ###############################################################################
 
@@ -56,725 +52,143 @@
 ## Rig Identification                                                        ##
 ###############################################################################
 
-# Rig name - uniquely identifies a rig in a local remote laboratory
+# Uniquely identifies a rig within the remote laboratory.
 # Rig_Type <String>
 # Rig_Name test1
 Rig_Name Rig_1
 
-# Rig type - identifies the rig as an instance of a fungible replacement
-# of a common hardware and software configuration
+# Identifies the rig as an identical configuration of the same
+# software and hardware. This means any rig in this type can be used in
+# place of any other rig in the same type.
 # Rig_Type <String>
-# Rig_Type test
+# Rig_Type Rig_Type
 Rig_Type Rig_Type
 
-# Rig capabilities - tokens identifying a descriptive identifier of a rig
-# attribute. This is a comma separated list of tokens.
+# A list of identifying tags which may be used to correlate rigs into collections
+# to queue or book for. This allows, for example, multiple rig types to be
+# collectively queued to get the first free rig in any of the rig types.
 # Rig_Capabilites <String,...,String>
-# Rig_Capabilites spartan2e,xilinx
-Rig_Capabilites tag1,tag2
+# Rig_Capabilites tag1,tag2,tag3
+Rig_Capabilities tag1,tag2,tag3
 
-# Rig class - qualified class name of rig type class implementing rig client
-# required methods. Must be derived class of au.edu.uts.eng.remotelabs.rigclient.rig.IRig)
-# Two common rig type classes which exist within the rig client main library are:.
+# The fully qualified class name of the rig clients rig type class. This must
+# implement the interface 'au.edu.uts.eng.remotelabs.rigclient.rig.IRig' but in
+# practice most likely extends the abstract class
+# 'au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig'. Two generic
+# implementations exist that provide the required rig type class functionality.
+# These are:
 #
-#      * au.edu.uts.eng.remotelabs.rig.ConfiguredRig - Class which is
-#        configuered with the name of action classes. See the configuration
-#        'Configured Rig Type Configuration' stanza of this file.
-#      * au.edu.uts.eng.remotelabs.rig.ConfiguredControlledRig - Class
-#        which is configured with the name of action class and enables
-#        rig client control. For batch control, the ConfiguredBatchRunner
-#        is used. See the configuration 'Configured Rig Type Configuration'
-#        stanza of this file.
-#            
-# Rig_Class [au.edu.uts.eng.remotelabs.rig.ConfiguredRig] | \
-#           [au.edu.uts.eng.remotelabs.rig.ConfiguredControlledRig] | <String>
-# Rig_Class au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredRig 
+#     * au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredRig - Class
+#        which is configured with the name of 'action' classes (classes
+#        implementing interfaces that are run at certain session events);
+#
+#     * au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredControlledRig -
+#       Similar class to the former but also implements the option rig client
+#       control interface;
+#
+# Consult the 'Sahara Development Handbook' for further detail about rig type
+# classes and how to create them.
+# Rig_Class [au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredRig] | \
+#           [au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredControlledRig] | \
+#           <Class name>
+# Rig_Class au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredControlledRig
 Rig_Class au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredRig
+
+# The IP address of the machine the Rig Client is running on. This is needed
+# if the Rig Client machine has multiple network interfaces and you want to
+# ensure the external IP address is transmitted as the communication address.
+# If left empty, the address of the first iterated network device is used.
+# Rig_Client_IP_Address <IP>|<hostname>|empty
+# Rig_Client_IP_Address
+#Rig_Client_IP_Address
+
+# The name of the network interface of the Rig Client is listening on. This is
+# needed if the Rig Client machine has multiple network interfaces and you want
+# a specific network interface to be used. This may be used in preference to
+# the 'Rig_Client_IP_Address' property as it allows a specific network interface
+# to be used while still detecting the IP address at runtime
+# (i.e. Supports DHCP).
+# Listening_Network_Interface <String>|empty
+# Listening_Network_Interface
+#Listening_Network_Interface
+
+# The port number the Rig Client server is to listen on. This must be externally
+# accessible by the Scheduling Server.
+# Listening_Port <int>
+# Listening_Port 8080
+Listening_Port 8081
 
 ###############################################################################
 ## Scheduling Server Communication                                           ##
 ###############################################################################
 
-# Address of Scheduling server.  This can be an IP address or host name
+# The address of the Scheduling Server. This can be the host name or the IP
+# address of the computer the Scheduling Server is running on.
 # Scheduling_Server_Address <String>
 # Scheduling_Server_Address localhost
 Scheduling_Server_Address localhost
 
-# Port to which Scheduling Server is attached.
+# The port number the Scheduling Server is listening on.
 # Scheduling_Server_Port <int>
 # Scheduling_Server_Port 80
 Scheduling_Server_Port 8080
 
 # The time in seconds between sending status updates from the Rig Client
-# to Scheduling Server
+# to Scheduling Server.
 # Scheduling_Server_Update_Period <int> seconds
 # Scheduling_Server_Update_Period 30
 Scheduling_Server_Update_Period 30
 
+
 ###############################################################################
-## Rig Communication                                                         ##
+## Miscellaneous Properties                                                  ##
 ###############################################################################
 
-# Rig client IP address - the IP address of the machine the rig client is 
-# running on. This is needed if the rig client machine has multiple network
-# interfaces and you want to ensure the external IP address is transmitted
-# as the communication address. If left empty, the address of the first 
-# iterated network device is used.
-# Rig_Client_IP_Address [<IP>|Empty]
-# Rig_Client_IP_Address 
-#Rig_Client_IP_Address
-
-# Network interface name - the name of the network interface the rig client 
-# is listening on. This is needed if the rig client machine has multiple 
-# network interfaces and you want to ensure a specific network interface
-# is used. This may be used in preference to the 'Rig_Client_IP_Address'
-# property as it allows a specific network interface to be used while
-# still detecting the IP address at runtime (to support DHCP).
-# Rig_Client_IP_Address [<String>|Empty]
-# Rig_Client_IP_Address 
-#Listening_Network_Interface
-
-# Listening port - the TCP port the rig client is to listen for communication 
-# requests.
-# Listening_Port <int>
-# Listening_Port 8080
-Listening_Port 8081
-
-# The number of concurrent requests the rig client can service. If there are
+# The number of concurrent requests the Rig Client can service. If there are
 # more than this number of requests, the extra requests are queued.
 # Concurrent_Requests <int>
 # Concurrent_Requests 50
 Concurrent_Requests 10
 
-# The threshold indicating how many times a action can fail before the rig
-# is put off line
+# The threshold indicating how many times an action can fail before the rig
+# is put off line.
 # Action_Failure_Threshold <int>
 # Action_Failure_Threshold 3
-Action_Failure_Threshold 3
+Action_Failure_Threshold 5
+
+# The time at which the laboratory 'light' time starts. The light time is
+# when the test frequency is set to be the specified test run interval for
+# tests which enable light-dark exerciser scheduling. The time should be
+# configured in 24 hour time with a column ':' between the hours and
+# minute portions. The default light time is 09:00.
+# Test_Light_Time <hour>:<minute>
+# Test_Light_Time 09:00
+Test_Light_Time 7:00
+
+# The time at which the laboratory 'dark' time starts. The dark time is
+# when the test frequency is set to be the specified test run interval
+# multiplied by the specified dark time factor for exerciser tests which
+# enable light-dark exerciser scheduling. It is the test which specifies
+# the dark time factor. The time should be configured with 24 hour time
+# with a column ':' between the hours and minute portions. The default
+# dark time is 18:00.
+# Test_Dark_Time <hour of day>:<minute>
+# Test_Dark_Time 18:00
+Test_Dark_Time 19:00
 
 ###############################################################################
 ## Administrative Interface                                                  ##
 ###############################################################################
 
-# The username to login to the administrative interface. If this is not 
+# The username to login to the administrative web interface. If this is not
 # configured the default username is 'admin'.
 # Admin_Username <String>
 # Admin_Username admin
 Admin_Username admin
 
-# The password to login to the administrative interface. If this is not 
+# The password to login to the administrative web interface. If this is not
 # configured the default password is 'passwd'.
 # Admin_Password <String>
 # Admin_Password passwd
 Admin_Password passwd
-
-###############################################################################
-## Logging configuration                                                     ##
-###############################################################################
-
-# Logger type - either:
-#      * SystemErr - logging messages printed to standard error stream
-#      * File - logging messages printed to file (not rolled)
-#      * RolledFile - logging messages printed to a rolled log file
-#      * Syslog - logging messages sent to Syslog server (TODO)
-#      * WinEvents - logging messages sent to the Windows Event Log
-#            
-# NOTE: The WinEvents logger only runs on Windows and requires the 
-# NTEventLogAppender.dll to placed in a directory in PATH (e.g.
-# C:\Windows\System32).
-
-# Logger_Type [SystemErr | File | RolledFile | Syslog | WinEvents]
-# Logger_Type SystemErr
-Logger_Type RolledFile
-
-# Logging level - either (in order of verbosity)
-#      * ERROR - Messages that are generated by events that cause unexpected \ 
-#                results and stop the expected program execution sequence.
-#      * WARN - Messages that are generated by events that cause undesired \ 
-#               results but do not stop the expected program execution sequence.
-#      * INFO - Messages that are generated by events that are regular in \
-#               occurrence, however are useful for audit trails.
-#      * DEBUG - Messages specifying program execution and progression.
-# Note: FATAL and PRIORITY are always logged.
-# Log_Level [ERROR | WARN | INFO | DEBUG]
-# Log_Level DEBUG
-Log_Level WARN
-
-# Log file name that are logged messages are appended to (for File and RolledFile)
-# Log_File_Name <String>
-# Log_File_Name rigclient.log
-Log_File_Name rigclient.log
-
-# Maximum file size for the rolled file logger log file in megabytes. For use
-# with the RolledFile logger.
-# Log_File_Max_Size <int>
-# Log_File_Max_Size 10
-Log_File_Max_Size 5
-
-# Maximum number of backups for the rolled file logger log file backups. After 
-# the maximum number of backups is exceeded, the oldest log backup file is 
-# deleted. For use with the RolledFile logger.
-# Log_File_Backups <int>
-# Log_File_Backups 5
-Log_File_Backups 3
-
-# Syslog host - The host name or IP of the Syslog server. For use with the 
-# Syslog logger.
-# Syslog_Host <host>
-# Syslog_Host 127.0.0.1
-#Syslog_Host 127.0.0.1
-
-# Syslog log local facility number to use (between 1 to 7). For use with the
-# Syslog logger.
-# Syslog_Local_Facility_Num <int between 1 and 7 inclusive)
-# Syslog_Local_Facility_Num 1
-#Syslog_Local_Facility_Num 1
-
-# The format of the log messages can be specifying by providing a format
-# string with macros which are be replaced by their actual values.
-# The following is a list of macros that may be put in format strings.
-#      * __MESSAGE__  - Actual message
-#      * __LEVEL__    - Logging level (FATAL, PRIORITY, ..., DEBUG)
-#      * __TIME__     - Time with hour of day:minute:second
-#      * __DATE__     - Date with day:month:year
-#      * __ISO8601__  - ISO 8601 formatted date
-#      * __CLASS__    - Class where the message originated
-#      * __METHOD__   - Method where the message originated
-#      * __SOURCE__   - Source file where the message originated
-#      * __LINE_NUM__ - Line number where the message originated
-#      * __TID__      - Thread id where the message orignated
-
-# Default log format - the default format of logging messages for those 
-# levels which do not provide their own logging format 
-# Default_Log_Format <format string>
-# Default_Log_Format [__LEVEL__] - [__ISO8601__] - __MESSAGE__
-Default_Log_Format [__LEVEL__] - [T__TID__] - [__ISO8601__] - __MESSAGE__ (__SOURCE__:__LINE_NUM__)
-
-# Fatal log format specific to fatal log messages
-# FATAL_Log_Format <format string>
-# FATAL_Log_Format [FATAL] - [__ISO8601__] - __MESSAGE__
-#FATAL_Log_Format [FATAL] - [__ISO8601__] - __MESSAGE__
-
-# Priority log format specific to priority log messages
-# PRIORITY_Log_Format <format string>
-# PRIORITY_Log_Format [FATAL] - [__ISO8601__] - __MESSAGE__
-#PRIORITY_Log_Format [PRIORITY] - [__ISO8601__] - __MESSAGE__
-
-# Error log format specific to error log messages
-# ERROR_Log_Format <format string>
-# ERROR_Log_Format [ERROR] - [__ISO8601__] - __MESSAGE__
-#ERROR_Log_Format [ERROR] - [__ISO8601__] - __MESSAGE__
-
-# Warn log format specific to warning log messages
-# WARN_Log_Format <format string>
-# WARN_Log_Format [WARN] - [__ISO8601__] - __MESSAGE__
-#WARN_Log_Format [WARN] - [__ISO8601__] - __MESSAGE__
-
-# Info log format specific to informational log messages
-# INFO_Log_Format <format string>
-# INFO_Log_Format [INFO] - [__ISO8601__] - __MESSAGE__
-#INFO_Log_Format [INFO] - [__ISO8601__] - __MESSAGE__
-
-# Debug log format specific to debugging log messages
-# DEBUG_Log_Format <format string>
-# DEBUG_Log_Format [DEBUG] - [__ISO8601__] - __MESSAGE__ (__SOURCE__:__LINE_NUM__)
-#DEBUG_Log_Format [DEBUG] - [__ISO8601__] - __MESSAGE__ (__SOURCE__:__LINE_NUM__)
-
-###############################################################################
-## Batch Control Configuration                                               ##
-###############################################################################
-
-# Batch download directory. Directory to download uploaded instruction 
-# files to. If this is left blank, the system default temporary
-# directory is used.
-# Batch_Download_Dir <String>
-# Batch_Download_Dir /tmp
-#Batch_Download_Dir 
-
-# Batch timeout in seconds. Time to wait at batch startup before failing 
-# batch control, if the batch process has not started. The default is 60
-# seconds.
-# Batch_Timeout <int>
-# Batch_Timeout 60
-#Batch_Timeout 60
-
-# Batch termination timeout in seconds. Time to wait before returning a 
-# batch termination success or failure result.  The default is 10 seconds.
-# Batch_Termination_TimeOut <int>
-# Batch_Termination_TimeOut 10
-#Batch_Termination_TimeOut 10
-
-# Batch process working directory. If this is is set to null, the working
-# directory is taken to be the System temporary directory. The default is
-# null.
-# Batch_Working_Dir [<Path>|null]
-# Batch_Working_Dir /var/rigclient/batch
-#Batch_Working_Dir null
-
-# Don't create a nested working directory. If this is set to true, a new 
-# directory is created in the batch working directory and the batch 
-# processes working directory is set as the new directory. The default is 
-# true.
-# Batch_Created_Nested_Dir [true|false]
-# Batch_Created_Nested_Dir true
-#Batch_Create_Nested_Dir true
-
-# Batch clean up. If this is set to true, the batch control invocation generated
-# files are deleted. This setting is only honoured if the property
-# Batch_Create_Nester_Dir property is set to true. If not, it is 
-# ignored and no clean up occurs. The default is false.
-# Batch_Clean_Up [true|false]
-# Batch_Clean_Up false
-#Batch_Clean_Up false
-
-# Specifies if the batch process should inherit the environment variables. If
-# true, no inherited environment variables will be given to the batch process
-# unless they are set up manually. The default value is false.
-# Batch_Flush_Env [true|false]
-# Batch_Flush_Env false
-#Batch_Flush_Env false
-
-# Specifies if the uploaded instruction should be deleted upon completion of 
-# batch execution. If true, the uploaded batch instruction file is deleted.
-# The default value is true.
-# Batch_Instruct_File_Delete [true|false]
-# Batch_Instruct_File_Delete true
-#Batch_Instruct_File_Delete false
-
-###############################################################################
-## Primitive Control Configuration                                           ##
-###############################################################################
-
-# The package names to find primitive controller classes. Class name resolution,
-# works by first trying to resolve the transmitted controller name. If the
-# transmitted controller fails, it is appended to a configured package name 
-# and resolution is attempted again. Multiple prefixes may be configured
-# using the ';' character to separate the package prefixes.
-# Package_Prefixes <package.1>;<package.2>;<package.3>
-# Package_Prefixes au.edu.uts.eng.remotelabs.rigclient
-#Package_Prefixes au.edu.uts.eng.remotelabs.rigclient
-
-###############################################################################
-## Configured Rig Type Configuration (ConfiguredRig|ConfiguredControllerRig) ## 
-###############################################################################
-
-# A configured rig determines required action instances from configuration.
-
-# The package names to find action interface classes. Fully qualified action
-# class names may be used and if this fails, the configured packages are
-# checked. Multiple packages may be configured, separating each package with
-# a ';' character.
-# Package_Prefixes <package.1>;<package.2>;<package.3>
-# Package_Prefixes au.edu.uts.eng.remotelabs.rigclient.action
-Action_Package_Prefixes au.edu.uts.eng.remotelabs.rigclient.action 
-
-# The list of access actions to load. Multiple access actions can be 
-# configured, separating each with a ';' character. When multiple access
-# actions are configured, the assignment methods are invoked in order
-# and the revocation methods are invoked in reverse order they are configured.
-# Access_Actions [Class];[Class];[Class]
-# Access_Actions access.RemoteDesktopAccessAction
-#Access_Actions access.RemoteDesktopAccessAction
-
-# The list of slave access actions to load. Multiple slave access actions can
-# be configured, separating each with a ';' character.  When multiple slave
-# access classes are configured, the slave assignment methods are invoked
-# in the order they are configured and the slave revocation methods are
-# invokde in the reverse order they are configured.
-# Slave_Access_Actions [Class];[Class];[Class]
-# Slave_Access_Actions VNCSlaveAccessAction
-#Slave_Access_Actions slave.VNCSlaveAccessAction
-
-# The list of notification actions to load. Multiple notification actions can 
-# be configured, separating each with a ';' character.
-# Notify_Actions [Class];[Class];[Class]
-# Notify_Actions notify.WindowsMsgNotifyAction
-#Notify_Actions notify.WindowsMsgNotifyAction
-
-# The list of detection actions to load. Multiple detection actions can 
-# be configured, separating each with a ';' character.
-# Detection_Actions [Class];[Class];[Class]
-# Detection_Actions detect.RDPActivityDetectorAction
-#Detection_Actions detect.RDPActivityDetectorAction
-
-# The list of reset actions to load. Multiple reset actions can 
-# be configured, separating each with a ';' character.
-# Reset_Actions [Class];[Class];[Class]
-# Reset_Actions PowerCycleResetAction
-#Reset_Actions reset.PowerCycleResetAction
-
-# The list of test actions to load. Multiple test actions can 
-# be configured, separating each with a ';' character.
-# Test_Actions [Class];[Class];[Class]
-# Test_Actions test.PingTestAction
-#Test_Actions test.PingTestAction;test.JPEGFrameCameraTestAction
-
-# The time at which the laboratory 'light' time starts. The light time is
-# when the test frequency is set to be the specified test run interval for
-# tests which enable light-93dark exerciser scheduling. The time should be
-# configured in 24 hour time with a column ':' between the hours and 
-# minute portions. The default light time is 09:00.
-# Test_Light_Time <hour>:<minute>
-# Test_Light_Time 09:00
-Test_Light_Time 04:00
-
-# The time at which the laboratory 'dark' time starts. The dark time is
-# when the test frequency is set to be the specified test run interval
-# multiplied by the specified dark time factory for exerciser tests which
-# enable light-dark exerciser scheduling. The time should be configured
-# with 24 hour time with a column ':' between the hours and minute portions.
-# The default dark time is 18:00.
-# Test_Dark_Time <hour of day>:<minute>
-# Test_Dark_Time 18:00 
-Test_Dark_Time 19:00
-
-###############################################################################
-## Action classes configuration.                                             ##
-###############################################################################
-
-############################################################################### 
-# Remote Desktop Access Action (au.edu.uts.eng.remotelabs.rigclient.action.access.RemoteDesktopAccessAction)
-#
-# Windows Remote Desktop Access Action:
-# Windows domain: the domain the user belongs to.
-# Remote_Desktop_Windows_Domain <String>
-# Remote_Desktop_Windows_Domain REMOTELABS
-#Remote_Desktop_Windows_Domain REMOTELABS
-
-# The name of the user group to which the user must be added for Remote
-# Desktop access permissions
-# Remote_Desktop_Groupname <String>
-# Remote_Desktop_Groupname "Remote Desktop Users"
-Remote_Desktop_Groupname "Remote Desktop Users"
-
-
-############################################################################### 
-# Ping Test Action (au.edu.uts.eng.remotelabs.rigclient.action.test.PingTestAction)
-#
-# The ping test action ensures one or more hosts are up by 'pinging' a host and
-# ensuring a response is received.
-#
-# The host names to test for response using the ping test. As many hosts may be 
-# specified as neccessary using 1 to n hosts, provided the hosts are in 
-# sequence. 
-# Ping_Test_Host_[<1> .. <n>] [<IP>|<Host name>]
-# Ping_Test_Host_1 127.0.0.1
-Ping_Test_Host_1 127.0.0.1
-
-# The name of the ping command. This may be a executable in PATH or the fully
-# qualified path of the execute. The default is 'ping'.
-# Ping_Test_Command <Host>
-#Ping_Test_Command /bin/ping
-
-# The arguments to supply to the ping command. The arguments should ideally 
-# specify one ping with a timeout of 5 seconds. The default is detected from
-# the operating system.
-#      * Windows - -n 1 -w 5000
-#      * Linux - -c 1 -q -W 5"
-#      * Others - none
-# Ping_Test_Args <args>
-# Ping_Test_Args -c 1 -W 5000 -q
-#Ping_Test_Args -c 1 -w 5000 -q
-
-# The period between test runs in seconds. The default period is 30 seconds.
-# Ping_Test_Interval <int>
-# Ping_Test_Interval 30
-Ping_Test_Interval 10
-
-# Number of allowable failures of the ping command to a host before it 
-# constitutes a test failure (as returned by getStatus). The fail fail
-# threshold is 3.
-# Ping_Test_Fail_Threshold <int>
-# Ping_Test_Fail_Threshold 3
-Ping_Test_Fail_Threshold 10
-
-###############################################################################
-# JPEG Camera Test Action 
-# (au.edu.uts.eng.remotelabs.rigclient.action.test.JPEGFrameCameraTestAction)
-#
-# The JPEG Camera test ensures one or more cameras is providing live footage by
-# downloading a JPEG camera frame and ensuring it is a valid JPEG image.
-
-# The camera URLs to test. The URLs must use the HTTP protocol and point to
-# a JPEG camera frame. The URL should provide a specific frame, not a 
-# continuous stream of MJPEG (motion JPEG) frames. As many URLs as needed
-# may be specified with the n field replaced with an integer number from
-# 1 to n in sequence.
-# Camera_Test_URL_<n> <hostname>
-# Camera_Test_URL_1 http://cv1.eng.uts.edu.au:7070/stream1.jpg
-Camera_Test_URL_1 http://cv1.eng.uts.edu.au:7070/stream1.jpg
-
-# The number of times the camera test can fail before causing a test action fail.
-# The default fail threshold is 3.
-# Camera_Test_Fail_Threshold <int>
-# Camera_Test_Fail_Threshold 3
-Camera_Test_Fail_Threshold 3
-
-# The timeout in seconds to wait for the camera stream to respond to a HTTP 
-# GET request. If the camera does not provide a response within this 
-# timeout, it is treated as a camera fail. The default is 5 seconds.
-# Camera_Test_Timeout <int>
-# Camera_Test_Timeout 5 
-Camera_Test_Timeout 5
-
-# The minimum size in kilobytes of a valid JPEG frame from the camera stream.
-# If a returned frame is less than this size, it is treated as a camera fail.
-# The default is 10 kB. This should be set to within 25 % of the minimum 
-# expected frame size for efficient functioning of the test.
-# Camera_Test_Image_Min_Size <int>
-# Camera_Test_Image_Min_Size 10
-Camera_Test_Image_Min_Size 10
-
-# The period between test runs in seconds. The default is 30 seconds.
-# Camera_Test_Interval <int>
-# Camera_Test_Interval 30
-Camera_Test_Interval 300
-
-# Whether to enable the camera frame uniqueness test. This may be used to 
-# ensure the feed is live or if the streaming software has locked up and
-# is returning the same image continuously (this has occurred using VLC
-# to stream a video feed). The default is not to enable this as it is 
-# slightly expensive to download JPEG frames and to compute the frame
-# hashes. 
-# NOTE: This is unlikely to return positives as even a bit difference 
-# in a frame will cause the image hash to differ.
-# Camera_Test_Enable_Uniqueness_Test [true|false]
-# Camera_Test_Enable_Uniqueness_Test false
-Camera_Test_Enable_Uniqueness_Test false
-
-# The number of allowable identical frames to be sequentially downloaded
-# for this test to constitute a failure.
-#Camera_Test_Max_Num_Unique_Frames 10
-
-###############################################################################
-# Linux Device Node Test Action
-# (au.eng.uts.eng.remotelabs.rigclient.action.test.LinuxDeviceNodeTestAction)
-#
-# The Linux device node test checks if a device node exists and has the desired
-# attributes. Device nodes usually correspond to a hardware device. For example 
-# the device node '/dev/video0' is a character device node with major and minor
-# numbers (identifies the driver) that correspond to the 'video4linux' driver
-# which interfaces with the hardware. At its most basic the device node test
-# ensures a file exists in the file system and may optionally test file 
-# attributes (type and permissions) and device node attributes (major and minor
-# numbers). The driver test checks for the '/proc/devices' file and ensures the
-# the device driver has the same major number as the device node.
-#
-# One to many device node files may be configured by sequencing the
-# LinuxDeviceNode_Test_Path_<n> with a suffix number from 1 to n. The attributes
-# to test of the device node may be set by suffixing the test property with the
-# same number as the LinuxDeviceNode_Test_Path_<n> property.
-#
-# NOTE: The Linux device node test will only run on Linux. Running it on any 
-# other platform will cause an error to be raised.
-
-# The amount of seconds between each device node test run in seconds. The 
-# default is to run every 300 seconds.
-# LinuxDeviceNode_Test_Interval <int>
-# LinuxDeviceNode_Test_Interval 300
-#LinuxDeviceNode_Test_Interval 300
-
-# The number of times a device node test can fail before causing a test action
-# failure. The default is 3.
-# LinuxDeviceNode_Test_Fail_Threshold <int>
-# LinuxDeviceNode_Test_Fail_Threshol
-#LinuxDeviceNode_Test_Fail_Threshold 3
-
-# The device node paths to test. This is the fully qualified path to the device
-# node. The LinuxDeviceNode_Test_Path_1 property is mandatory and each
-# subsequent numbered property (e.g. LinuxDeviceNode_Path_2) is optional.
-# LinuxDeviceNode_Test_Path_<n> <Path>
-# LinuxDeviceNode_Test_Path_1 /dev/null
-#LinuxDeviceNode_Test_Path_1 /dev/null
-
-# The file type of the device node file. The options for file type are:
-#      * 'c' - Character device
-#      * 'b' - Block device
-#      * '-' - Regular file
-#      * 'd' - Directory
-#      * 'l' - Symbolic link
-#      * 's' - Socket
-#      * 'p' - Named pipe
-# If this property is not set, testing file type is disabled.
-# LinuxDeviceNode_Test_Type_<n> [c|b|-|d|l|s|p]
-# LinuxDeviceNode_Test_Type_1 c
-#LinuxDeviceNode_Test_Type_1 c
-
-# The device node file permissions as three groups of read-write-execute 
-# permissions for owning user, group and other users in that order. This is 
-# the same format as shown by 'ls -l' (e.g. rwxr-x--x). If this property is
-# not set, testing file permissions is disabled.
-# LinuxDeviceNode_Test_Permission_<n> <String>
-# LinuxDeviceNdoe_Test_Permission_1 rwxrwx--- 
-#LinuxDeviceNode_Test_Permission_1 rwxrwxrwx
-
-# The device node file permissions as three octal numbers specifying 
-# permissions for owning user, group and other users in that order. Each
-# number specifies an octal value of a read-write-execute bit field (e.g. 'r-x'
-# has the value '5'). If this property is not set, testing octal file
-# permissions is disabled.
-# LinuxDeviceNode_Test_Octal_Permission_<n> <int>
-# LinuxDeviceNode_Test_Octal_Permission_1 777
-#LinuxDeviceNode_Test_Octal_Permission_1 666
-
-# The owning user name of the device node. If this property is not set,
-# testing the owning user by name is disabled.
-# LinuxDeviceNode_Test_User_<n> <user name>
-# LinuxDeviceNode_Test_User_1 root
-#LinuxDeviceNode_Test_User_1 root
-
-# The owning user UID of the device node. If this property is not set, 
-# testing the owning user by UID is disabled.
-# LinuxDeviceNode_Test_UID_<n> <UID>
-# LinuxDeviceNode_Test_UID_1 0
-#LinuxDeviceNode_Test_UID_1 0
-
-# The owning group name of the device node. If this property is not set,
-# testing the owning group by name is disabled.
-# LinuxDeviceNode_Test_Group_<n> <user name>
-# LinuxDeviceNode_Test_Group_1 root
-#LinuxDeviceNode_Test_Group_1 root
-
-# The owning group GID of the device node. If this property is not set, 
-# testing the owning group by GID is disabled.
-# LinuxDeviceNode_Test_GID_<n> <UID>
-# LinuxDeviceNode_Test_GID_1 0
-#LinuxDeviceNode_Test_GID_1 0
-
-# The major number of the device node. If this property is not set OR the
-# file type property is not set to 'c' or 'b', the major number test is 
-# disabled.
-# LinuxDeviceNode_Test_Major_Number_<n> <int>
-# LinuxDeviceNode_Test_Major_Number_1 1
-#LinuxDeviceNode_Test_Major_Number_1 1
-
-# The minor number of the device node. If this property is not set OR the
-# file type property is not set to 'c' or 'b', the minor number test is 
-# disabled.
-# LinuxDeviceNode_Test_Major_Number_<n> <int>
-# LinuxDeviceNode_Test_Major_Number_1 3
-#LinuxDeviceNode_Test_Minor_Number_1 3
-
-# The device driver (driver which has the same major number) for the device 
-# node with the name as shown in '/proc/devices'. If this property is not set
-# OR the file type property is not set to 'c' or 'b', the device driver test 
-# is disabled.
-# LinuxDeviceNode_Test_Driver_<n> <String>
-# LinuxDeviceNode_Test_Driver_1 mem
-#LinuxDeviceNode_Test_Driver_1 mem
-
-###############################################################################
-## Rig Attributes for the Web Interface                                      ##
-###############################################################################
-#                                                                             #
-# Rig client attribute information discovery uses configured properties to of #
-# this file to determine information about the rig. When an information       #
-# request is made, the configuration value of the requested key is parsed     #
-# with a macro substitute to replace tokens with runtime variables. The       #
-# following are a list of marcos supported with their runtime substituted     #
-# value:                                                                      #
-#                                                                             #
-#      * __HOSTNAME__ : Server hostname                                       #
-#      * __IP__ : Server IP address                                           #
-#      * __USER__ : Master user assigned to rig (session user)                #
-#      * __RIG_NAME__ : Name of the rig (as configured in the property        #
-#                       'Rig_Name').                                          #
-#      * __RIG_TYPE__ : Type of the rig (as configured in the property        #
-#                       'Rig_Type').                                          #
-#                                                                             #
-# The algorithm for determining the above network values is:                  #
-#                                                                             #
-#      1. If the property 'Rig_Client_IP_Address' is set, the __IP__ value is #
-#         the configured value, and the __HOSTNAME__ value is determined from #
-#         that IP.                                                            #
-#      2. If the 'Listening_Network_Interface' property is set, the __IP__    #
-#         and __HOSTNAME__ values are determined from the configured network  #
-#          interface name.                                                    #  
-#      3. If neither are set, the __IP__ and __HOSTNAME__ are determined from #
-#         the first iterated network interface (eth0 on Linux systems).       #
-#                                                                             #
-###############################################################################
-
-###############################################################################
-#
-# Remote Desktop Options
-#
-# The hostname of *this* computer to display as the remote desktop. The options
-# are a manually entered IP or hostname or a macro to automatically try to
-# detect these - __IP__ or __HOSTNAME__.  It should be this computer's IP
-# or hostname as the RemoteDesktopAccessAction assigns and revokes access
-# to the current machine.
-# Remote_Desktop_Host [<Display value>|__IP__|__HOSTNAME__]
-# Remote_Desktop_Host __IP__
-Remote_Desktop_Host __IP__
-
-# The options for the Sahara remote desktop Java applet. The options are in the form
-# -<character option>=<value>,-<character option>=<value>,... The list of options are:
-#
-#      * -g - THe size of the remote desktop window in <width>x<height> form.
-#      * -s - The shell program to run. If this isn't specified the default is
-#             'explorer.exe' which runs a normal desktop.
-#      * -d - Logon domain.
-#      * -o - Bits per pixel for display.
-#      * -f - Full screen mode.
-#      * -t - RDP port (default is 3389)
-#      * -T - Window title
-#
-# Remote_Desktop_Options -<character option>=<value>,-<character option>=<value>,...
-# Remote_Desktop_Options -g=1024x768,-s=C:\seamlessrdp\seamlessrdpshell.exe <Program>, \
-#                       -T=__USER__ __RIG_NAME__ session
-Remote_Desktop_Options -g=1024x768,-s=C:\seamlessrdp\seamlessrdpshell.exe <Program>, \
-                       -T=__USER__ __RIG_NAME__ session
-
-###############################################################################
-#
-# Camera options                   
-# The number of cameras that should be displayed. There should also be Camera_<N>
-# properties from 1 to specified number of cameras.
-# Number_of_Cameras <n>
-# Number_of_Cameras 1
-Number_of_Cameras 1
-
-# List of camera details from 1 to number of cameras specified in Number_of_Cameras.
-# These camera details provide information about how to generate the camera stream
-# URL as given by the 'FORMAT' portion of the configuration string.
-# On the web interface side, in the 'config.ini' file, there should be properties named
-# 'camera.<format>' containing the video stream URL template.
-# To generate the stream URL, variables within chevrons ('<', '>') are replaced
-# with the corresponding value in the configuration string specified in 'config.ini'
-# Multiple formats can be listed, seperating each with a comma.
-#
-# For example, the configuration string:
-# HOST=shakermonitor1.eng.uts.edu.au,PORT=7070,NUM=2,SIZE=320x240,FORMAT=jpeg;mms;mmsh
-#
-# With web interface configuration:
-# camera.jpeg = http://<HOST>:<PORT>/stream<NUM>.jpg
-# camera.mms = mms://<HOST>:<PORT>/stream<NUM>_v_medium.asf
-# camera.mmsh = mmsh://<HOST>:<PORT>/stream<NUM>_v_medium.asf
-#
-# Generates the stream URLs:
-# http://127.0.0.1:7070/stream2.jpg
-# mms://127.0.0.1:7070/stream2_v_medium.asf
-# mmsh://127.0.0.1:7070/stream2_v_medium.asf
-#
-# Each format specified in the 'config.ini' file is listed in the camera panel of the rig
-# interface as an option to select. Known  formats (listed below) are deployed using a
-# predetermined browser plugin client. Unknown formats are deployed with a
-# detected plugin that *should* display the stream. Known formats:
-#   * jpeg - JPEG frames deployed with a slider to select the refresh period
-#            (between 250ms and 2s).
-#   * mms  - Microsoft Media Server stream deployed using Window Media Player
-#            plugin.
-#   * mmsh - MMS over HTTP deployed using the VideoLAN plugin.
-#
-# Some common portions of a camera configuration string are:
-#   * FORMAT - Specifies the streaming option(s). This is mandatory portion.
-#   * SIZE   - The size of video frames in the format '<width>x<height>'.
-#   * HOST   - The host name or IP address of the camera server.
-#   * PORT   - The port number of the streaming server is listening on.
-#   * TITLE  - The camera panel title.
-#
-# Camera_1 FORMAT=<comma seperated list of formats>,SIZE=<width>x<height>
-# Camera_1 FORMAT=jpeg;mms;mmsh,SIZE=320x240,HOST=__IP__,PORT=7070,NUM=2,TITLE=Fluid Camera
-Camera_1 FORMAT=jpeg;mms;mmsh,SIZE=320x240,HOST=__IP__,PORT=7070,NUM=2,TITLE=Fluid Camera
 

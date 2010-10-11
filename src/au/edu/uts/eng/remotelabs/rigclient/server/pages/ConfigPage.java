@@ -213,6 +213,8 @@ public class ConfigPage extends AbstractPage
         this.println("<div id='contentspane' class='ui-corner-tr ui-corner-bottom'>");
         this.getConfigStanza(displayStanza);
         this.println("</div>");
+        
+        this.println("<div style='clear: both;'> </div>");
 
         this.println("<script type='text/javascript'>");
         this.println(
@@ -223,11 +225,10 @@ public class ConfigPage extends AbstractPage
                 "     $('.jqTransformInputInner div input').css('width', '100%');\n");
 
         /* Contents pane height. */
-        this.println(
-                "     $('#contentspane').css('height', $(window).height() - 230);");
+        this.println("     resizeConfPanel();");
         this.println(
                 "     $(window).resize(function() { \n" +
-                "         $('#contentspane').css('height', $(window).height() - 230);\n" +
+                "         resizeConfPanel();\n" +
                 "     });");
 
         this.println("});");		

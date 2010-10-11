@@ -302,3 +302,12 @@ function loadConfStanza(stanza)
 	$("#" + stanza.replace(" ", "") + "tab").removeClass('notselectedtab')
 											.addClass('selectedtab');
 }
+
+function resizeConfPanel()
+{
+	var height = $(window).height() - 230;
+    var tabsHeight = $('#lefttablist').height();
+    
+    if (height < tabsHeight) height = tabsHeight;
+    $('#contentspane').css('height', height);
+}
