@@ -518,12 +518,11 @@ public abstract class AbstractPage
                 }
                 catch (IOException ex) { /* Not much to do. */ }
             }
-//            FIXME Re-enable help page caching
-//            AbstractPage.helpDocs.put(page, helpBuf.toString());
-            return helpBuf.toString();
+
+            AbstractPage.helpDocs.put(page, helpBuf.toString());
         }
         
-//        return AbstractPage.helpDocs.get(page);
+        return AbstractPage.helpDocs.get(page);
     }
 
     /**

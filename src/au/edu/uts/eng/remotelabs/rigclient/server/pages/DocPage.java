@@ -67,14 +67,17 @@ public class DocPage extends AbstractPage
         
         this.links = new LinkedHashMap<String, String>(2);
         this.links.put("Installation", "/pdf/Installation.pdf");
+        this.links.put("Configuration", "/pdf/RigClientConfiguration.pdf");
         this.links.put("Development", "/pdf/Handbook.pdf");
 
         this.icons = new HashMap<String, String>(2);
         this.icons.put("Installation", "install");
+        this.icons.put("Configuration", "config");
         this.icons.put("Development", "handbook");
         
         this.toolTips = new HashMap<String, String>(2);
         this.toolTips.put("Installation", "How to install Sahara.");
+        this.toolTips.put("Configuration", "Rig Client configuration properties appendix.");
         this.toolTips.put("Development", "How to develop rigs for Sahara.");
     }
     
