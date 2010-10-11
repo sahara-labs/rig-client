@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.edu.uts.eng.remotelabs.rigclient.main.RigClient;
+import au.edu.uts.eng.remotelabs.rigclient.util.BackupCleaner;
 
 /**
  * Page to provide confirmations for the operations:
@@ -92,8 +93,17 @@ public class OperationsPage extends AbstractPage
         }
         else if (uri.endsWith("clear"))
         {
-            /* Display a confirmation page for restarting the rig client. */
+            /* Display a confirmation page for clearing maintenance. */
             this.displayMaintenanceConfirmation();
+        }
+        else if (uri.endsWith("clean") && "POST".equals(req.getMethod()))
+        {
+            new BackupCleaner().clean();
+        }
+        else if (uri.endsWith("clean"))
+        {
+            /* Display a confirmation page for cleaning backups. */
+            this.displayCleanConfirmation();
         }
         else if (uri.endsWith("gc"))
         {
@@ -163,7 +173,7 @@ public class OperationsPage extends AbstractPage
         this.pageBeginning();
         this.confirmPanelStart();
 
-        this.println("      <div class='confirmimg'><img src='/img/clearmain_huge.png' alt='restart' /></div>");
+        this.println("      <div class='confirmimg'><img src='/img/clearmain_huge.png' alt='clear' /></div>");
         this.println("      <div class='confirmtext'>Are you sure you clear any maintenance states of the rig " +
         		"client? This will allow users to be assigned to the rig (provided no exerciser tests are " +
         		"failing).</div>");
@@ -174,6 +184,30 @@ public class OperationsPage extends AbstractPage
         this.println("<div id='confirmbuttons'>");
         this.addButton("noconfirm", "No", "window.location.replace(\"/\")");
         this.addButton("clearmain", "Yes", "clearMaintenance()");
+        this.println("</div>");
+        
+        this.confirmPanelEnd();
+        this.pageEnd();
+    }
+    
+    /**
+     * Displays a confirmation page for the maintenance function.
+     */
+    private void displayCleanConfirmation()
+    {
+        this.pageBeginning();
+        this.confirmPanelStart();
+
+        this.println("      <div class='confirmimg'><img src='/img/clean_huge.png' alt='clean' /></div>");
+        this.println("      <div class='confirmtext'>Are you sure you want to clean configuration and log backup " +
+        		"files?</div>");
+        
+        this.println("<div style='clear:both'> </div>");
+        
+        /* Buttons to make a choice. */
+        this.println("<div id='confirmbuttons'>");
+        this.addButton("noconfirm", "No", "window.location.replace(\"/\")");
+        this.addButton("clearmain", "Yes", "cleanBackups()");
         this.println("</div>");
         
         this.confirmPanelEnd();

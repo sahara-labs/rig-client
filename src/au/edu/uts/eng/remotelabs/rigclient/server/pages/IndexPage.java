@@ -75,6 +75,7 @@ public class IndexPage extends AbstractPage
         
         this.operations = new LinkedHashMap<String, String>(4);
         this.operations.put("Clear_Maintenance", "/op/clear");
+        this.operations.put("Clean_Files", "/op/clean");
         this.operations.put("Garbage_Collection", "/op/gc");
         this.operations.put("Restart", "/op/restart");
         this.operations.put("Shutdown", "/op/shutdown");
@@ -89,6 +90,7 @@ public class IndexPage extends AbstractPage
         this.icons.put("Shutdown", "shutdown");
         this.icons.put("Clear_Maintenance", "clearmain");
         this.icons.put("Garbage_Collection", "trash");
+        this.icons.put("Clean_Files", "clean");
         
         this.toolTips = new HashMap<String, String>(9);
         this.toolTips.put("Status", "The current status of the rig client.");
@@ -101,6 +103,7 @@ public class IndexPage extends AbstractPage
         this.toolTips.put("Shutdown", "Shuts down the rig client. The rig client service is stopped.");
         this.toolTips.put("Clear_Maintenance", "Clears any maintenance states the rig may have.");
         this.toolTips.put("Garbage_Collection", "Runs garbage collection which frees unused memory.");
+        this.toolTips.put("Clean_Files", "Cleans configuration and log backup files.");
     }
     
     @Override
@@ -153,7 +156,7 @@ public class IndexPage extends AbstractPage
        for (Entry<String, String> e : this.operations.entrySet())
        {
            String name = e.getKey();
-           String classes = "linkbut plaina";
+           String classes = "linkbut indexlinkbut plaina";
            if (i == 0) classes += " ui-corner-top";
            else if (i == this.operations.size() - 1) classes += " ui-corner-bottom";
 

@@ -241,6 +241,21 @@ function clearMaintenance()
 	});
 }
 
+function cleanBackups()
+{
+	$("#confirmationcontainer").empty().addClass('confirminprogress').append(
+			"<div><img src='/img/spinner.gif' alt='Loading' /></div>\n" +
+			"Cleaning backups..."
+	);
+
+	$.post(
+		"/op/clean",
+		null,
+		function() {
+			window.location.replace("/");
+	});
+}
+
 function updateSelectedInfoTab()
 {
 	$.get(
