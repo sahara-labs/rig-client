@@ -1,1 +1,24 @@
-<h3>Configuration page</h3>
+<h3 class='helptitle ui-widget-header ui-corner-all'>Brief Description:</h3>
+The configuration page allows configuration properties of the rig client
+to be modified. When the properties are changed, the rig client configuration
+files are backed up, then the changed property values are saved. However, some
+properties require the rig client to be restarted (a warning box notifies of
+this) and will only come in effect the next time the rig client is started.
+
+<h3 class='helptitle ui-widget-header ui-corner-all'>Information Discovery:</h3>
+The rig client has an external operation to query configured information 
+about the rig. Client side, this allows rig interface customisation (for the
+example providing rig camera stream URLs to video player). When an 
+information request is made, the configuration value of the requested keys 
+value is parsed with macro substitution to replace tokens with runtime variables.
+The following are a list of macros supported with their runtime substituted value:
+<ul>
+	<li><span class='bold code'>__HOSTNAME__</span> - Rig client computer
+	hostname.</li>
+	<li><span class='bold code'>__IP__</span> - Rig client computer IP 
+	address.</li>
+	<li><span class='bold code'>__USER__</span> - The name of the assigned
+	master user.</li>
+	<li><span class='bold code'>__RIG_NAME__</span> - The name of the rig.</li>
+	<li><span class='bold code'>__RIG_TYPE__</span> - The type of the rig.</li>
+</ul>
