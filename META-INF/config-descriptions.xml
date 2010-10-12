@@ -242,7 +242,7 @@ portions. The default dark time is 18:00.
 The list of package names that are used in action class resolution. Class 
 resolution works using the following algorithm:
 <ol>
-	<li>The configured controller class name is assumed to be a fully
+	<li>The configured action class name is assumed to be a fully
     qualified class name and an attempt is made to load it. If it 
     is found then that class is used;</li>
     <li>The configured action class name is appended to the first configured
