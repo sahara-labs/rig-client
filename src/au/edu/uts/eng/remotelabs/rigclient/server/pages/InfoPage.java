@@ -494,7 +494,9 @@ public class InfoPage extends AbstractPage
         for (Entry<String, String> p : contents.entrySet())
         {
             String val = p.getValue();
-            if (val != null) val = val.replace(cwd, ".");
+            /* The system property containing the current working directory
+             * should not be replaced with a symbolic representation. */
+            if (val != null && !"user.dir".equals(p.getKey())) val = val.replace(cwd, ".");
             
             sysProps.append("<tr>");
             sysProps.append("  <td class='tablecellpropcol'>" + p.getKey() + "</td>");
