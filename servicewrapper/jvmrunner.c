@@ -255,15 +255,16 @@ int loadConfig(void)
 int generateClassPath(void)
 {
 	char currentDir[FILENAME_MAX];
-
+	
 	memset(currentDir, 0, FILENAME_MAX);
-	if (getCWDir(currentDir, sizeof(currentDir)) == NULL)
+	if (getcwd(currentDir, FILENAME_MAX) == NULL)
 	{
 		logMessage("Unable to detect current working directory, failing...\n");
 		return 0;
 	}
 
-	classPath = (char *)malloc(strlen(CLASS_PATH) + strlen(currentDir) + 1 + strlen(JAR_FILE));
+	classPath = (char *)malloc(strlen(CLASS_PATH) + strlen(currentDir) + 2 + strlen(JAR_FILE));
+	memset(classPath, 0, strlen(CLASS_PATH) + strlen(currentDir) + 2 + strlen(JAR_FILE));
 	strcpy(classPath, CLASS_PATH);
 
 	/* Rig Client library. */

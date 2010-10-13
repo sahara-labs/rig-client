@@ -61,7 +61,6 @@ extern "C"
 #include <dirent.h>
 #include <dlfcn.h>
 #include <unistd.h>
-#define getCWDir getcwd
 #endif
 
 #include "jni.h"
