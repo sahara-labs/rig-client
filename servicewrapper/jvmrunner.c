@@ -155,6 +155,7 @@ int loadConfig(void)
 			/* If unknown key, then it's a system property. */
 			int len = 4 + strlen(prop) + strlen(val);
 			char *sysp = (char *)malloc(sizeof(char) * len);
+			memset(sysp, 0, len);
 			strcat(sysp, "-D");
 			strcat(sysp, prop);
 			strcat(sysp, "=");
