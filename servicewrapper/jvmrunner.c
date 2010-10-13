@@ -161,8 +161,18 @@ int loadConfig(void)
 			strcat(sysp, "=");
 			strcat(sysp, val);
 			*(sysp + len - 1) = 0;
-			sysProps[numSysProps++] = sysp;
-			logMessage("Defining system property '%s' with value '%s'.\n", prop, val);
+			
+			if (numSysProps < 255)
+			{
+				sysProps[numSysProps] = sysp;
+				logMessage("Defining system property '%s' with value '%s'.\n", prop, val);
+			}
+			else
+			{
+				logMessage("Only able to give the JVM 256 system properties. Failing the add system property '%i' (%s=%s).",
+						numSysProps, prop, val);
+			}
+			numSysProps++;
 		}
 	}
 
