@@ -162,7 +162,7 @@ int loadConfig(void)
 			strcat(sysp, val);
 			*(sysp + len - 1) = 0;
 			
-			if (numSysProps < 255)
+			if (numSysProps < 256)
 			{
 				sysProps[numSysProps] = sysp;
 				logMessage("Defining system property '%s' with value '%s'.\n", prop, val);
