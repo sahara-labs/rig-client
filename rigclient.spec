@@ -41,8 +41,8 @@
 
 Name: RigClient
 Summary: Software abstraction of of a physical rig.
-Version: 2.0
-Release: 2
+Version: 3.0
+Release: 0.alpha
 License: BSD
 Group: Sahara
 
@@ -70,9 +70,12 @@ install -m 700 $RPM_BUILD_DIR/../../servicewrapper/rigclientservice $RPM_BUILD_R
 mkdir -p $RPM_BUILD_ROOT/%{installdir}/lib
 
 # Configuration files
-mkdir -p $RPM_BUILD_ROOT/%{installdir}/config
-cp $RPM_BUILD_DIR//../../config/batch.properties $RPM_BUILD_ROOT/%{installdir}/config/batch.properties
-cp $RPM_BUILD_DIR/../../config/rigclient.properties.unix $RPM_BUILD_ROOT/%{installdir}/config/rigclient.properties
+mkdir -p $RPM_BUILD_ROOT/%{installdir}/conf
+mkdir -p $RPM_BUILD_ROOT/%{installdir}/conf/conf.d
+mkdir -p $RPM_BUILD_ROOT/%{installdir}/conf/conf.example
+cp $RPM_BUILD_DIR/../../conf/rigclient.properties.unix $RPM_BUILD_ROOT/%{installdir}/conf/rigclient.properties
+cp $RPM_BUILD_DIR/../../conf/conf.d/*.properties $RPM_BUILD_ROOT/%{installdir}/conf/conf.d/
+cp $RPM_BUILD_DIR/../../conf/conf.example/*.properties $RPM_BUILD_ROOT/%{installdir}/conf/conf.example/
 cp $RPM_BUILD_DIR/../../rigclient_service.ini $RPM_BUILD_ROOT/%{installdir}/rigclient_service.ini
 
 # Init script, install
@@ -98,7 +101,7 @@ else
 fi
 
 # Add a symlink to the Rig Client configuration into /etc
-ln -sf %{installdir}/config /etc/Sahara/RigClient
+ln -sf %{installdir}/conf /etc/Sahara/RigClient
 
 %preun
 
@@ -118,8 +121,12 @@ fi
 rm -f  /etc/Sahara/RigClient
 
 %files
-%{installdir}/config/batch.properties
-%{installdir}/config/rigclient.properties
+%{installdir}/conf/rigclient.properties
+%{installdir}/conf/conf.d/logging.properties
+%{installdir}/conf/conf.d/rigattributes.properties
+%{installdir}/conf/conf.example/batch.properties
+%{installdir}/conf/conf.example/configuredrig.properties
+%{installdir}/conf/conf.example/primitive.properties
 %{installdir}/rigclient_service.ini
 %{installdir}/rigclient.jar
 %{installdir}/rigclientservice
