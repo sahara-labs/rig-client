@@ -33,59 +33,40 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @author <First> <Last> (mdiponio)
- * @date <Day> <Month> 2010
- *
- * Changelog:
- * - 05/10/2010 - mdiponio - Initial file creation.
+ * @author Michael Diponio (mdiponio)
+ * @date 13th October 2010
  */
 package au.edu.uts.eng.remotelabs.rigclient.action.access;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
 
 /**
- * 
+ * Access action whose methods always return <tt>false</tt> (i.e., always
+ * fail). 
  */
 public class FailAccessAction implements IAccessAction
 {
+    @Override
+    public String getFailureReason()
+    {
+        return "Only ever fails.";
+    }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAction#getActionType()
-     */
+    @Override
+    public boolean assign(String name)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean revoke(String name)
+    {
+        return false;
+    }
+
     @Override
     public String getActionType()
     {
         return "Fail action type.";
     }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAction#getFailureReason()
-     */
-    @Override
-    public String getFailureReason()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction#assign(java.lang.String)
-     */
-    @Override
-    public boolean assign(String name)
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction#revoke(java.lang.String)
-     */
-    @Override
-    public boolean revoke(String name)
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
 }
