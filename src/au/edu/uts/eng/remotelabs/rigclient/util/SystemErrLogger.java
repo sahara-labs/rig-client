@@ -44,7 +44,7 @@ package au.edu.uts.eng.remotelabs.rigclient.util;
 /**
  *  Logs messages to the system standard error stream.
  */
-class SystemErrLogger extends AbstractLogger
+public class SystemErrLogger extends AbstractLogger
 {
     /**
      * Default constructor.

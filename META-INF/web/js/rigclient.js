@@ -314,7 +314,7 @@ function loadConfStanza(stanza)
 	
 	$(".selectedtab").removeClass("selectedtab")
 					 .addClass("notselectedtab");
-	$("#" + stanza.replace(" ", "") + "tab").removeClass('notselectedtab')
+	$("#" + stanza.replace(/\s/g, "") + "tab").removeClass('notselectedtab')
 											.addClass('selectedtab');
 }
 

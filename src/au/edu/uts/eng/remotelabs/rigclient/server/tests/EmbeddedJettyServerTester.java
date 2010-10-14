@@ -46,29 +46,23 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
-import static org.easymock.EasyMock.verify;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.URL;
 import java.util.Enumeration;
 
 import junit.framework.TestCase;
 
-import org.apache.axiom.om.util.StAXUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.GetStatusResponse;
-import au.edu.uts.eng.remotelabs.rigclient.protocol.types.StatusResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.server.EmbeddedJettyServer;
 import au.edu.uts.eng.remotelabs.rigclient.server.IServer;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
+import au.edu.uts.eng.remotelabs.rigclient.util.SystemErrLogger;
 
 /**
  * Tests the EmbeddedJettyServer class.
@@ -94,59 +88,10 @@ public class EmbeddedJettyServerTester extends TestCase
         Field fld = EmbeddedJettyServer.class.getDeclaredField("config");
         fld.setAccessible(true);
         fld.set(this.server, this.config);
-    }
-    
-    @Test
-    public void testStartStop() throws Exception
-    {
-        reset(this.config);
-        expect(this.config.getProperty("Rig_Client_IP_Address"))
-            .andReturn("");
-        expect(this.config.getProperty("Listening_Network_Interface"))
-            .andReturn("");
-        expect(this.config.getProperty("Listening_Port"))
-            .andReturn("7654");
-        expect(this.config.getProperty("Concurrent_Requests"))
-            .andReturn("20");  
-        replay(this.config);
         
-        assertTrue(this.server.startListening());
-        
-        Thread.sleep(5000); // Some grace period to start up the Jetty server.
-        
-        URL url = new URL(this.server.getAddress()[0] + "/getStatus?void=void"); // Should only be one address.
-        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-        conn.setDoInput(true);
-        conn.connect();
-        
-        assertEquals(200, conn.getResponseCode());
-        assertEquals("application/xml; charset=UTF-8", conn.getContentType());
-        assertEquals("GET", conn.getRequestMethod());
-        assertTrue(conn.getHeaderField("Server").startsWith("Jetty"));
-        
-        GetStatusResponse resp = GetStatusResponse.Factory.parse(StAXUtils.createXMLStreamReader(conn.getInputStream()));
-        StatusResponseType stat = resp.getGetStatusResponse();
-        assertFalse(stat.getIsInMaintenance());
-        assertFalse(stat.getIsInSession());
-        assertFalse(stat.getIsMonitorFailed());
-        
-        assertTrue(this.server.stopListening());
-        Thread.sleep(5000);
-        
-        try
-        {
-            conn = (HttpURLConnection)url.openConnection();
-            conn.connect();
-            fail("Server still running...");
-        }
-        catch (IOException ex)
-        {
-            /* Test succeeds because the server should be shutdown. */
-            assertEquals("Connection refused", ex.getMessage());
-        }
-        
-        verify(this.config);
-        
+        fld = EmbeddedJettyServer.class.getDeclaredField("logger");
+        fld.setAccessible(true);
+        fld.set(this.server, new SystemErrLogger());
     }
     
     @Test
