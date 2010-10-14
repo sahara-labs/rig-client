@@ -55,6 +55,7 @@ public class ResourcePropertiesDescriptionsTester extends TestCase
     @Override
     public void setUp() throws Exception
     {
+        System.setProperty("prop.descriptions", "META-INF/config-descriptions.xml");
         this.pd = new ResourcePropertiesDescriptions();
     }
     

@@ -2202,8 +2202,6 @@ public class RigClientServiceTester extends TestCase
             }
         }
 
-        assertTrue(this.rig.assign("tmachet"));
-        assertTrue(this.rig.addSlave("mdiponio", true));
         file.delete();
     }
 }
