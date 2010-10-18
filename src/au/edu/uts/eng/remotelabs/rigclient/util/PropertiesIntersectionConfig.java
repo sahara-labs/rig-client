@@ -171,14 +171,19 @@ public class PropertiesIntersectionConfig implements IConfig
     @Override
     public String getProperty(String key)
     {
-        return this.props.get(key);
+        String val = this.props.get(key);
+        if (val == null || "".equals(val))
+        {
+            return val;
+        }
+        return val;
     }
 
     @Override
     public String getProperty(final String key, final String defaultValue)
     {
         final String val = this.props.get(key);
-        if (val == null)
+        if (val == null || "".equals(val))
         {
             return defaultValue;
         }

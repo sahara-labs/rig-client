@@ -51,7 +51,9 @@ public interface IConfig
 {
     /**
      * Returns the configuration value of the property key.
-     * <tt>null</tt> is returned if the key cannot be found in configuration.
+     * <tt>null</tt> is returned if the key cannot be found in configuration. 
+     * If the configured value is an empty string, <tt>null</tt> is
+     * returned.
      *
      * @param key name of the configuration item
      * @return configuration value set in properties if found, null otherwise
@@ -61,7 +63,8 @@ public interface IConfig
     /**
      * Returns the configuration value of the property key.
      * If the key value cannot be found in configuration, the 
-     * <code>defaultValue</code> parameter is returned.
+     * <code>defaultValue</code> parameter is returned. If the configured
+     * value is an empty string, <code>defaultValue</code> is returned.
      *
      * @param key name of the configuration item
      * @param defaultValue the value to return if the key value is not found

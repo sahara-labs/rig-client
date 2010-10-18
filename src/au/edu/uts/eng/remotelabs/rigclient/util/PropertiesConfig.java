@@ -114,7 +114,15 @@ public class PropertiesConfig implements IConfig
         {
             return val;    
         }
-        return val.trim();
+        
+        val = val.trim();
+        
+        if ("".equals(val))
+        {
+            return null;
+        }
+        
+        return val;
     }
     
     /* 
@@ -123,12 +131,20 @@ public class PropertiesConfig implements IConfig
     @Override
     public String getProperty(final String key, final String defaultValue)
     {
-        final String val = this.prop.getProperty(key);
+        String val = this.prop.getProperty(key);
         if (val == null)
         {
             return defaultValue;
         }
-        return val.trim();
+        
+        val = val.trim();
+        
+        if ("".equals(val))
+        {
+            return defaultValue;
+        }
+        
+        return val;
     }
     
     /* 
