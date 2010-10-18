@@ -313,15 +313,12 @@ Section "Rig Client" RigClient
 	call checkJREVersion	
 	call checkIfServiceInstalled
 	
-	; Set output path to the installation directory
+	; Set output path to the configuration directory
     SetOutPath $INSTDIR\conf
-  
-	; Copy the component files/directories
-    File /oname=rigclient.properties config\rigclient.properties.win
-    File config\batch.properties
-    
-    SetOutPath $INSTDIR\conf\conf.d
-
+    File /oname=rigclient.properties conf\rigclient.properties.win
+    File /r /x *.svn conf\conf.d
+    File /r /x *.svn conf\conf.example
+ 
     SetOutPath $INSTDIR
 	File dist\rigclient.jar
 	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
@@ -345,6 +342,23 @@ SectionEnd
 Section "Rig Client Commons" Commons
     SetOutPath $INSTDIR\lib
     File ..\RigClientCommons\trunk\dist\rigclient-commons.jar
+    
+    SetOutPath $INSTDIR\conf\conf.example
+    File ..\RigClientCommons\trunk\conf\conf.example\CDUPower.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\DeleteFilesResetAction.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\DeviceOwnershipAccessAction.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\IPSPowerResetAction.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\JPEGCameraTest.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\LabjackResetAction.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\LDAP.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\LdapGroupAccessAction.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\LinuxDeviceNodeTestAction.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\PingTestAction.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\RemoteDesktopAccess.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\SocketCommandResetAction.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\SocketPassThroughController.properties
+    File ..\RigClientCommons\trunk\conf\conf.example\WTSDetectorAction.properties
+ 
 SectionEnd
 SectionGroupEnd     
 ;--------------------------------
@@ -429,16 +443,41 @@ Section "un.Rig Client" un.RigClient
 	;Delete the component files/directories
 	Delete $R1\rigclient.jar
     Delete $R1\rigclient_service.ini
-	RMDir $R1\conf\conf.d
+    
+    ; Delete individual config files and conf.d directory
+    Delete $R1\conf\conf.d\logging.properties
+    Delete $R1\conf\conf.d\rigattributes.properties
+    RMDir $R1\conf\conf.d
+    Delete $R1\conf\conf.example\batch.properties
+    Delete $R1\conf\conf.example\configuredrig.properties
+    Delete $R1\conf\conf.example\primitive.properties
     Delete $R1\conf\rigclient.properties
     Delete $R1\conf\batch.properties
-    RMDir $R1\conf
+
 	Delete $R1\rigclientservice*
     DeleteRegKey /IfEmpty HKLM "${REGKEY}"
     Pop $R1
 SectionEnd ; end the section
 Section "un.Rig Client Commons" un.Commons
     Delete $INSTDIR\lib\rigclient-commons.jar
+    
+    
+    ; Delete individual config files
+    Delete $INSTDIR\conf\conf.example\CDUPower.properties
+    Delete $INSTDIR\conf\conf.example\DeleteFilesResetAction.properties
+    Delete $INSTDIR\conf\conf.example\DeviceOwnershipAccessAction.properties
+    Delete $INSTDIR\conf\conf.example\IPSPowerResetAction.properties
+    Delete $INSTDIR\conf\conf.example\JPEGCameraTest.properties
+    Delete $INSTDIR\conf\conf.example\LabjackResetAction.properties
+    Delete $INSTDIR\conf\conf.example\LDAP.properties
+    Delete $INSTDIR\conf\conf.example\LdapGroupAccessAction.properties
+    Delete $INSTDIR\conf\conf.example\LinuxDeviceNodeTestAction.properties
+    Delete $INSTDIR\conf\conf.example\PingTestAction.properties
+    Delete $INSTDIR\conf\conf.example\RemoteDesktopAccess.properties
+    Delete $INSTDIR\conf\conf.example\SocketCommandResetAction.properties
+    Delete $INSTDIR\conf\conf.example\SocketPassThroughController.properties
+    Delete $INSTDIR\conf\conf.example\WTSDetectorAction.properties
+    
 SectionEnd
 SectionGroupEnd
 
@@ -514,7 +553,12 @@ Section -un.postactions
         DeleteRegKey /IfEmpty HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
         Delete $INSTDIR\uninstallSaharaRigClient.exe
         ClearErrors
+        ; These directories need to be deleted in post actions as some of the files
+        ; in those directories are deleted in RigClient Commons which is uninstalled after
+        ; the RigClient
         RMDir $INSTDIR\lib
+        RMDir $INSTDIR\conf\conf.example
+        RMDir $INSTDIR\conf
         RMDir $INSTDIR
         ifErrors 0 InstDirDeleted
         MessageBox MB_ABORTRETRYIGNORE "Error in deleting the directory $INSTDIR." IDRETRY RetryDelete IDIGNORE InstDirDeleted
