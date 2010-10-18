@@ -80,7 +80,7 @@ public class DocPage extends AbstractPage
         this.toolTips = new HashMap<String, String>(4);
         this.toolTips.put("Installation", "How to install Sahara.");
         this.toolTips.put("Configuration", "Rig Client configuration properties appendix.");
-        this.toolTips.put("Extensions", "Rig Client actions, controllers and runners extension classes.");
+        this.toolTips.put("Extensions", "Rig Client actions, controllers and runners extension documentation.");
         this.toolTips.put("Development", "How to develop rigs for Sahara.");
     }
     
