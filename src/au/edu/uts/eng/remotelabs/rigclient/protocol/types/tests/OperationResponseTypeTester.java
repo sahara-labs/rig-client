@@ -85,6 +85,49 @@ public class OperationResponseTypeTester extends TestCase
     }
     
     @Test
+    public void testParseEmptyReason() throws Exception
+    {
+        String xmlStr = "<ns1:allocateResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\">" +
+        		"<success>true</success><ns1:error><code>0</code><operation>Allocate rig to user user.</operation>" +
+        		"<reason></reason></ns1:error></ns1:allocateResponse>";
+        
+        OperationResponseType resp = OperationResponseType.Factory.parse(
+                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(xmlStr.getBytes())));
+        assertNotNull(resp);
+        assertTrue(resp.getSuccess());
+        
+        ErrorType err = resp.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertEquals("Allocate rig to user user.", err.getOperation());
+    }
+    
+    @Test
+    public void testParseWillFail() throws Exception
+    {
+        String xmlStr = "<ns1:allocateResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\">\n" + 
+        		"  <success>true</success>\n" + 
+        		"  <ns1:error>\n" + 
+        		"    <code>0</code>\n" + 
+        		"    <operation>Allocate rig to user user.</operation>\n" + 
+        		"    <reason/>\n" + 
+        		"  </ns1:error>\n" + 
+        		"</ns1:allocateResponse>\n" + 
+        		"";
+        
+        OperationResponseType resp = OperationResponseType.Factory.parse(
+                StAXUtils.createXMLStreamReader(new ByteArrayInputStream(xmlStr.getBytes())));
+        assertNotNull(resp);
+        assertTrue(resp.getSuccess());
+        
+        ErrorType err = resp.getError();
+        assertNotNull(err);
+        assertEquals(0, err.getCode());
+        assertEquals("Allocate rig to user user.", err.getOperation());
+    }
+    
+    
+    @Test
     public void testParseWillCallback() throws Exception
     {
         String xmlStr = "<ns1:notifyResponse xmlns:ns1=\"http://remotelabs.eng.uts.edu.au/rigclient/protocol\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns1:OperationResponseType\">\n" + 

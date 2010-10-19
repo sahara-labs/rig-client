@@ -338,8 +338,7 @@ public class OperationResponseType implements ADBBean
                 {
                     throw new ADBException("Unexpected subelement " + reader.getLocalName());
                 }
-                
-                reader.next();
+
                 while (!reader.isStartElement() && !reader.isEndElement())
                 {
                     reader.next();
