@@ -282,35 +282,40 @@ public class StatusUpdater implements Runnable
                 }
                 else if (ex.getCause() instanceof UnknownHostException)
                 {
-                    this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                    this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rig's status" : 
                             " register the rig") + ". Error reason is unknown host " + ex.getMessage() + ". " +
                             "Configure the scheduling server host as a valid host name.");
                 }
                 else if (ex.getReason() != null && ex.getReason().contains("404"))
                 {
                     /* May be an earlier Scheduling Server version. */
-                    this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                    this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rig's status" : 
                             " register the rig") + ". Error reason is '404 Not Found' which may mean a different " +
                             " version of the Scheduling Server is running.");
                     if (this.endPoint.endsWith(SS_URL_SUFFIX))
                     {
                         this.endPoint = this.endPoint.replace(SS_URL_SUFFIX, SSv2_URL_SUFFIX);
-                        this.logger.error("Tried Scheduling Server v3+ address which failed, going to try Scheduling " +
+                        this.logger.error("Tried Scheduling Server v3+ update address which failed, going to try Scheduling " +
                         		"Server v2 address '" + this.endPoint + "'.");
                     }
                     else
                     {
                         this.endPoint = this.endPoint.replace(SSv2_URL_SUFFIX, SS_URL_SUFFIX);
-                        this.logger.error("Tried Scheduling Server v2 address which failed, going to try Scheduling " +
+                        this.logger.error("Tried Scheduling Server v2 update address which failed, going to try Scheduling " +
                                 "Server v3+ address '" + this.endPoint + "'.");
                     }
                 }
                 else
                 {
-                    this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                    this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rig's status" : 
                     " register the rig") + ". Error reason is '" + ex.getReason() + "'.");
                 }
                 
+                if (this.rig.isSessionActive())
+                {
+                    this.logger.error("Terminating an in progress session because of error updating the rig's status.");
+                    this.rig.revoke();
+                }
             }
             catch (RemoteException ex)
             {
@@ -322,8 +327,14 @@ public class StatusUpdater implements Runnable
                 StatusUpdater.isRegistered = false;
                 this.schedServerStub = null;
                 
-                this.logger.error("Remote exception when trying to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
-                " register the rig") + ". Exception message is '" + ex.getMessage() + "'.");
+                this.logger.error("Remote exception when trying to" + (StatusUpdater.isRegistered ? " update the rigs " +
+                		"status" : " register the rig") + ". Exception message is '" + ex.getMessage() + "'.");
+                
+                if (this.rig.isSessionActive())
+                {
+                    this.logger.error("Terminating an in progress session because of error updating the rig's status.");
+                    this.rig.revoke();
+                }
             }
             
             try
