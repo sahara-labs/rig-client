@@ -74,9 +74,13 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  */
 public class StatusUpdater implements Runnable
 {
-    /** Suffix for the Scheduling Server local rig provider SOAP interface 
+    /** Suffix for the Scheduling Server Rig Provider SOAP interface 
      *  end point. */
-    public static final String SS_URL_SUFFIX = "/SchedulingServer-LocalRigProvider/services/LocalRigProvider";
+    public static final String SS_URL_SUFFIX = "/SchedulingServer-RigProvider/services/RigProvider";
+    
+    /** Suffix for the Scheduling Server v2.0 Local Rig Provider SOAP 
+     * interface. */
+    public static final String SSv2_URL_SUFFIX = "/SchedulingServer-LocalRigProvider/services/LocalRigProvider";
     
     /** Default status update interval. */
     public static final int DEFAULT_UPDATE_PERIOD = 30;
@@ -85,7 +89,7 @@ public class StatusUpdater implements Runnable
     private SchedulingServerProviderStub schedServerStub;
     
     /** Scheduling server end point. */
-    private final String endPoint;
+    private String endPoint;
     
     /** The actual rig type class. */
     private final IRig rig;
@@ -261,7 +265,7 @@ public class StatusUpdater implements Runnable
                 }
             }
             catch (AxisFault ex)
-            {
+            {   
                 synchronized (StatusUpdater.class)
                 {
                     StatusUpdater.identToks[1] = null;
@@ -281,6 +285,25 @@ public class StatusUpdater implements Runnable
                     this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
                             " register the rig") + ". Error reason is unknown host " + ex.getMessage() + ". " +
                             "Configure the scheduling server host as a valid host name.");
+                }
+                else if (ex.getReason() != null && ex.getReason().contains("404"))
+                {
+                    /* May be an earlier Scheduling Server version. */
+                    this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
+                            " register the rig") + ". Error reason is '404 Not Found' which may mean a different " +
+                            " version of the Scheduling Server is running.");
+                    if (this.endPoint.endsWith(SS_URL_SUFFIX))
+                    {
+                        this.endPoint = this.endPoint.replace(SS_URL_SUFFIX, SSv2_URL_SUFFIX);
+                        this.logger.error("Tried Scheduling Server v3+ address which failed, going to try Scheduling " +
+                        		"Server v2 address '" + this.endPoint + "'.");
+                    }
+                    else
+                    {
+                        this.endPoint = this.endPoint.replace(SSv2_URL_SUFFIX, SS_URL_SUFFIX);
+                        this.logger.error("Tried Scheduling Server v2 address which failed, going to try Scheduling " +
+                                "Server v3+ address '" + this.endPoint + "'.");
+                    }
                 }
                 else
                 {
