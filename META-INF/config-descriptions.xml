@@ -195,6 +195,40 @@ The threshold indicating how many times an action can fail before the rig is put
 off line.
 </property>
 
+<property name="Force_Async_Allocation" 
+      	  stanza="Miscellaneous"
+      	  mandatory="no" 
+      	  type="BOOLEAN" 
+      	  restart="yes"
+		  example="false" 
+		  format="[true|false]" 
+		  default="false">
+The Rig Client can perform 'allocation' synchronously where the
+allocation is run then a response is returned to the Scheduling Server or
+asynchronously where an immediate response is provided then a subsequent
+call-back sent. This is because allocation may be a lengthy process and take
+longer than the Scheduling Server request time out which will cause allocation
+to fail. This property specifies whether allocation is forced to be
+asynchronous. If not, allocation is by default synchronous but may be requested
+by the Scheduling Server to be asynchronous which will occur depending on the
+'Ignore_Async_Allocation_Request' value.
+</property>
+
+<property name="Force_Async_Release" 
+      	  stanza="Miscellaneous"
+      	  mandatory="no" 
+      	  type="BOOLEAN" 
+      	  restart="yes"
+		  example="false" 
+		  format="[true|false]" 
+		  default="false">
+As with the property 'Force_Async_Allocation' for allocation, this
+specifies whether 'release' is forced to be asynchronous. If not, release
+is by default synchronous but may be requested by the Scheduling Server to be
+asynchronous which will occur depending on the
+'Ignore_Async_Release_Request' value.
+</property>
+
 <property name="Test_Light_Time"
       	  stanza="Miscellaneous"
       	  mandatory="no" 
@@ -206,7 +240,7 @@ off line.
 The time at which the laboratory 'light' time starts. The light time is when the
 test frequency is set to be specified test run interval for tests which enable
 light-dark scheduling. The time should be configured in 24 hour time with a
-column ':' between the hours and minute portions. The default light time is 09:00.		  
+colon ':' between the hours and minute portions. The default light time is 09:00.		  
 </property>
 
 <property name="Test_Dark_Time"
@@ -221,7 +255,7 @@ The time at which the laboratory 'dark' time starts. The dark time is when the
 test frequency is set to the specified test run interval multiplied by the 
 specified dark time factor for exerciser tests which enable light-dark exerciser 
 scheduling. It is the test which specifies the dark time factor. The time should 
-be configured with 24 hour time with a column ':' between the hours and minutes 
+be configured with 24 hour time with a colon ':' between the hours and minutes 
 portions. The default dark time is 18:00.
 </property>
 
