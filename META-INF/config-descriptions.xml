@@ -229,6 +229,33 @@ asynchronous which will occur depending on the
 'Ignore_Async_Release_Request' value.
 </property>
 
+<property name="Ignore_Async_Allocation_Request" 
+      	  stanza="Miscellaneous"
+      	  mandatory="no" 
+      	  type="BOOLEAN" 
+      	  restart="yes"
+		  example="false" 
+		  format="[true|false]" 
+		  default="false">
+The Scheduling Server can request allocation to be performed asynchronously.
+This property specifies whether a request to perform asynchronous allocation
+is honoured. The default behaviour is to honour a request to perform
+asynchronous allocation.
+</property>
+
+<property name="Ignore_Async_Release_Request" 
+      	  stanza="Miscellaneous"
+      	  mandatory="no" 
+      	  type="BOOLEAN" 
+      	  restart="yes"
+		  example="false" 
+		  format="[true|false]" 
+		  default="false">
+As with the property 'Ignore_Async_Allocation_Request' for allocation,
+this specifies whether a request to perform release asynchronously is honoured.
+The default behaviour is to honour a request to perform asynchronous release.
+</property>
+
 <property name="Test_Light_Time"
       	  stanza="Miscellaneous"
       	  mandatory="no" 
