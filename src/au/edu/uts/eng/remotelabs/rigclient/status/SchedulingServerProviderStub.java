@@ -69,8 +69,12 @@ import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.wsdl.WSDLConstants;
 
+import au.edu.uts.eng.remotelabs.rigclient.status.types.AllocateCallback;
+import au.edu.uts.eng.remotelabs.rigclient.status.types.AllocateCallbackResponse;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.RegisterRig;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.RegisterRigResponse;
+import au.edu.uts.eng.remotelabs.rigclient.status.types.ReleaseCallback;
+import au.edu.uts.eng.remotelabs.rigclient.status.types.ReleaseCallbackResponse;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.RemoveRig;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.RemoveRigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.status.types.UpdateRigStatus;
@@ -99,7 +103,7 @@ public class SchedulingServerProviderStub extends Stub
      */
     public SchedulingServerProviderStub() throws AxisFault
     {
-        this("http://remotelabs.eng.uts.edu.au:8080/schedserver/localrigprovider");
+        this("http://remotelabs.eng.uts.edu.au:8080/schedserver/rigprovider");
     }
 
     public SchedulingServerProviderStub(final String targetEndpoint) throws AxisFault
@@ -110,7 +114,7 @@ public class SchedulingServerProviderStub extends Stub
     public SchedulingServerProviderStub(final ConfigurationContext configurationContext)
             throws AxisFault
     {
-        this(configurationContext, "http://remotelabs.eng.uts.edu.au:8080/schedserver/localrigprovider");
+        this(configurationContext, "http://remotelabs.eng.uts.edu.au:8080/schedserver/rigprovider");
     }
 
     public SchedulingServerProviderStub(final ConfigurationContext configurationContext,
@@ -176,6 +180,26 @@ public class SchedulingServerProviderStub extends Stub
             {
                 return RegisterRigResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
+            
+            if (AllocateCallback.class.equals(type))
+            {
+                return AllocateCallback.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+            
+            if (AllocateCallbackResponse.class.equals(type))
+            {
+                return AllocateCallbackResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+            
+            if (ReleaseCallback.class.equals(type))
+            {
+                return ReleaseCallback.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+            
+            if (ReleaseCallbackResponse.class.equals(type))
+            {
+                return ReleaseCallbackResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
         }
         catch (final Exception e)
         {
@@ -220,27 +244,35 @@ public class SchedulingServerProviderStub extends Stub
         this._service = new AxisService("LocalRigProvider" + SchedulingServerProviderStub.getUniqueSuffix());
         this.addAnonymousOperations();
 
-        AxisOperation __operation;
-        this._operations = new AxisOperation[3];
+        this._operations = new AxisOperation[5];
 
         /* Remove rig operation. */
-        __operation = new OutInAxisOperation();
-        __operation.setName(new QName("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider", "removeRig"));
-        this._service.addOperation(__operation);
-        this._operations[0] = __operation;
+        AxisOperation op = new OutInAxisOperation();
+        op.setName(new QName("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider", "removeRig"));
+        this._service.addOperation(op);
+        this._operations[0] = op;
 
         /* Update status operation. */
-        __operation = new OutInAxisOperation();
-        __operation.setName(new QName("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider", "updateRigStatus"));
-        this._service.addOperation(__operation);
-        this._operations[1] = __operation;
+        op = new OutInAxisOperation();
+        op.setName(new QName("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider", "updateRigStatus"));
+        this._service.addOperation(op);
+        this._operations[1] = op;
 
         /* Register rig operation. */
-        __operation = new OutInAxisOperation();
-        __operation.setName(new QName("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider", "registerRig"));
-        this._service.addOperation(__operation);
-        this._operations[2] = __operation;
-
+        op = new OutInAxisOperation();
+        op.setName(new QName("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider", "registerRig"));
+        this._service.addOperation(op);
+        this._operations[2] = op;
+        
+        op = new OutInAxisOperation();
+        op.setName(new QName("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider", "allocateCallback"));
+        this._service.addOperation(op);
+        this._operations[3] = op;
+        
+        op = new OutInAxisOperation();
+        op.setName(new QName("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider", "releaseCallback"));
+        this._service.addOperation(op);
+        this._operations[4] = op;
     }
 
     private void populateFaults()
@@ -484,6 +516,154 @@ public class SchedulingServerProviderStub extends Stub
             _messageContext.getTransportOut().getSender().cleanup(_messageContext);
         }
     }
+    
+    public AllocateCallbackResponse allocateCallback(final AllocateCallback allocateCallback) throws RemoteException
+    {
+        MessageContext _messageContext = null;
+        try
+        {
+            final OperationClient _operationClient = this._serviceClient
+                    .createClient(this._operations[1].getName());
+            _operationClient.getOptions().setAction("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider/allocateCallback");
+            _operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
+
+            this.addPropertyToOperationClient(_operationClient, WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+
+            _messageContext = new MessageContext();
+            SOAPEnvelope env = this.toEnvelope(Stub.getFactory(_operationClient.getOptions().getSoapVersionURI()), 
+                    allocateCallback, this.optimizeContent(new QName(
+                            "http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider", "allocateCallback")));
+            this._serviceClient.addHeadersToEnvelope(env);
+            _messageContext.setEnvelope(env);
+            _operationClient.addMessageContext(_messageContext);
+            _operationClient.execute(true);
+
+            final MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            final SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
+
+            final Object object = this.fromOM(_returnEnv.getBody().getFirstElement(), AllocateCallbackResponse.class, 
+                    this.getEnvelopeNamespaces(_returnEnv));
+
+            return (AllocateCallbackResponse) object;
+        }
+        catch (final AxisFault f)
+        {
+
+            final OMElement faultElt = f.getDetail();
+            if (faultElt != null)
+            {
+                if (this.faultExceptionNameMap.containsKey(faultElt.getQName()))
+                {
+                    try
+                    {
+                        final String exceptionClassName = (String) this.faultExceptionClassNameMap
+                                .get(faultElt.getQName());
+                        final Class exceptionClass = Class.forName(exceptionClassName);
+                        final Exception ex = (Exception) exceptionClass.newInstance();
+                        final String messageClassName = (String) this.faultMessageMap.get(faultElt
+                                .getQName());
+                        final Class messageClass = Class.forName(messageClassName);
+                        final Object messageObject = this.fromOM(faultElt, messageClass, null);
+                        final Method m = exceptionClass.getMethod("setFaultMessage",
+                                new Class[] { messageClass });
+                        m.invoke(ex, new Object[] { messageObject });
+
+                        throw new RemoteException(ex.getMessage(), ex);
+                    }
+                    catch (final Exception e)
+                    {
+                        throw f;
+                    }
+                }
+                else
+                {
+                    throw f;
+                }
+            }
+            else
+            {
+                throw f;
+            }
+        }
+        finally
+        {
+            _messageContext.getTransportOut().getSender().cleanup(_messageContext);
+        }
+    }
+    
+    public ReleaseCallbackResponse releaseCallback(final ReleaseCallback releaseCallback) throws RemoteException
+    {
+        MessageContext _messageContext = null;
+        try
+        {
+            final OperationClient _operationClient = this._serviceClient
+                    .createClient(this._operations[1].getName());
+            _operationClient.getOptions().setAction("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider/releaseCallback");
+            _operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
+
+            this.addPropertyToOperationClient(_operationClient, WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+
+            _messageContext = new MessageContext();
+            SOAPEnvelope env = this.toEnvelope(Stub.getFactory(_operationClient.getOptions().getSoapVersionURI()), 
+                    releaseCallback, this.optimizeContent(new QName(
+                            "http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider", "releaseCallback")));
+            this._serviceClient.addHeadersToEnvelope(env);
+            _messageContext.setEnvelope(env);
+            _operationClient.addMessageContext(_messageContext);
+            _operationClient.execute(true);
+
+            final MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            final SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
+
+            final Object object = this.fromOM(_returnEnv.getBody().getFirstElement(), ReleaseCallbackResponse.class, 
+                    this.getEnvelopeNamespaces(_returnEnv));
+
+            return (ReleaseCallbackResponse) object;
+        }
+        catch (final AxisFault f)
+        {
+
+            final OMElement faultElt = f.getDetail();
+            if (faultElt != null)
+            {
+                if (this.faultExceptionNameMap.containsKey(faultElt.getQName()))
+                {
+                    try
+                    {
+                        final String exceptionClassName = (String) this.faultExceptionClassNameMap
+                                .get(faultElt.getQName());
+                        final Class exceptionClass = Class.forName(exceptionClassName);
+                        final Exception ex = (Exception) exceptionClass.newInstance();
+                        final String messageClassName = (String) this.faultMessageMap.get(faultElt
+                                .getQName());
+                        final Class messageClass = Class.forName(messageClassName);
+                        final Object messageObject = this.fromOM(faultElt, messageClass, null);
+                        final Method m = exceptionClass.getMethod("setFaultMessage",
+                                new Class[] { messageClass });
+                        m.invoke(ex, new Object[] { messageObject });
+
+                        throw new RemoteException(ex.getMessage(), ex);
+                    }
+                    catch (final Exception e)
+                    {
+                        throw f;
+                    }
+                }
+                else
+                {
+                    throw f;
+                }
+            }
+            else
+            {
+                throw f;
+            }
+        }
+        finally
+        {
+            _messageContext.getTransportOut().getSender().cleanup(_messageContext);
+        }
+    }
 
     private SOAPEnvelope toEnvelope(final SOAPFactory factory, final RegisterRig param, final boolean optimizeContent) throws AxisFault
     {
@@ -524,6 +704,38 @@ public class SchedulingServerProviderStub extends Stub
         {
             final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
             emptyEnvelope.getBody().addChild(param.getOMElement(UpdateRigStatus.MY_QNAME, factory));
+            return emptyEnvelope;
+        }
+        catch (final ADBException e)
+        {
+            throw AxisFault.makeFault(e);
+        }
+
+    }
+    
+    private SOAPEnvelope toEnvelope(final SOAPFactory factory, final AllocateCallback param, 
+            final boolean optimizeContent) throws AxisFault
+    {
+        try
+        {
+            final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+            emptyEnvelope.getBody().addChild(param.getOMElement(AllocateCallback.MY_QNAME, factory));
+            return emptyEnvelope;
+        }
+        catch (final ADBException e)
+        {
+            throw AxisFault.makeFault(e);
+        }
+
+    }
+    
+    private SOAPEnvelope toEnvelope(final SOAPFactory factory, final ReleaseCallback param, 
+            final boolean optimizeContent) throws AxisFault
+    {
+        try
+        {
+            final SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+            emptyEnvelope.getBody().addChild(param.getOMElement(ReleaseCallback.MY_QNAME, factory));
             return emptyEnvelope;
         }
         catch (final ADBException e)
