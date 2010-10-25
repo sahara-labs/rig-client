@@ -39,9 +39,9 @@ Changelog:
 <serviceGroup>
     <service name="RigClientService">
         <messageReceivers>
-            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientServiceMessageReceiverInOut"/>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="au.edu.uts.eng.remotelabs.rigclient.intf.RigClientServiceMessageReceiverInOut"/>
         </messageReceivers>
-        <parameter name="ServiceClass">au.edu.uts.eng.remotelabs.rigclient.protocol.RigClientService</parameter>
+        <parameter name="ServiceClass">au.edu.uts.eng.remotelabs.rigclient.intf.RigClientService</parameter>
         <parameter name="useOriginalwsdl">true</parameter>
         <parameter name="modifyUserWSDLPortAddress">true</parameter>
         <operation name="performPrimitiveControl" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://remotelabs.eng.uts.edu.au/rigclient/protocol">
