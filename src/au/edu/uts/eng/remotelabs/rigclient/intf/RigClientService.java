@@ -948,7 +948,6 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         final AttributeRequestType request = attrRequest.getGetAttribute();
         final String attrName = request.getAttribute();
         final String requestor = request.getRequestor();
-        final String ident = request.getIdentityToken();
         this.logger.debug("Received get attribute request with parameters: requestor=" + requestor + ", attribute=" +
                 attrName + ".");
         
@@ -964,15 +963,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         String attrValue;
         final ErrorType error = new ErrorType();
         error.setOperation("Finding attribute " + attrName + '.');
-        if (!(this.isSourceAuthenticated(ident) || this.rig.hasPermission(requestor, Session.SLAVE_PASSIVE)))
-        {
-            this.logger.warn("Unable to provide attribute value for " + attrName + " because of invalid permission.");
-            
-            choice.setError(error);
-            error.setCode(3);
-            error.setReason("Invalid permission.");
-        }
-        else if ((attrValue = this.rig.getRigAttribute(attrName)) == null) // Check if the attribute was found
+        if ((attrValue = this.rig.getRigAttribute(attrName)) == null) // Check if the attribute was found
         {
             this.logger.warn("Unable to provide attribute value for " + attrName + " because it is not found.");
             choice.setError(error);

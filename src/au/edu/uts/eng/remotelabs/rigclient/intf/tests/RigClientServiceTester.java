@@ -1813,13 +1813,8 @@ public class RigClientServiceTester extends TestCase
         assertEquals("Rig_Type", request.getAttribute());
         AttributeResponseTypeChoice choice = response.getAttributeResponseTypeChoice();
         assertNotNull(choice);
-        assertNotNull(choice.getError());
-        assertNull(choice.getValue());
-        
-        ErrorType err = choice.getError();
-        assertEquals(3, err.getCode());
-        assertNotNull(err.getOperation());
-        assertEquals("Invalid permission.", err.getReason());
+        assertNotNull(choice.getValue());
+
     }
 
     /**
