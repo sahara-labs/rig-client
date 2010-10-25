@@ -972,7 +972,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         else // All good!
         {
-            this.logger.info("Found attribute value " + attrValue + " for request attribute " + attrName + ".");
+            this.logger.debug("Found attribute value " + attrValue + " for request attribute " + attrName + ".");
             choice.setValue(attrValue);
         }
                 
