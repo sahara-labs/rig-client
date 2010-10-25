@@ -104,10 +104,7 @@ public class AsyncExecutor implements Runnable
         {
             try
             {
-                this.currentJob = this.jobs.take();
-                this.isExecuting = true;
-                
-                switch (this.currentJob)
+                switch (this.currentJob = this.jobs.take())
                 {
                     case ALLOCATE:
                         this.runAllocate();
@@ -116,8 +113,6 @@ public class AsyncExecutor implements Runnable
                         this.runRelease();
                         break;
                 }
-                
-                this.isExecuting = false;
             }
             catch (InterruptedException e)
             {
@@ -202,7 +197,10 @@ public class AsyncExecutor implements Runnable
         request.setAllocateCallback(callback);
         callback.setName(rig.getName());
         
+        this.isExecuting = true;
         boolean success = rig.assign(this.username);
+        this.isExecuting = false;
+        
         if (success)
         {
             callback.setSuccess(true);
@@ -274,7 +272,10 @@ public class AsyncExecutor implements Runnable
         request.setReleaseCallback(callback);
         callback.setName(rig.getName());
         
+        this.isExecuting = true;
         boolean success = rig.revoke();
+        this.isExecuting = false;
+        
         if (success)
         {
             callback.setSuccess(true);
