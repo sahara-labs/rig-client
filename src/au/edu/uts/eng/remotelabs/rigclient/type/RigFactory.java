@@ -49,15 +49,18 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 /**
  * Factory class for the rig type class whose type is loaded from
- * configuration. Only one instance of the rig type class is 
- * ever loaded.
+ * configuration. This requires manually initialisation of the rig
+ * type class.
  */
 public class RigFactory
 {
     /** Rig type class. */
     private static IRig rig;
     
-    static 
+    /**
+     * Initialises the rig type class.
+     */
+    public static synchronized void initRigInstance()
     {
         RigFactory.rig = RigFactory.loadInstance();
     }
@@ -72,7 +75,7 @@ public class RigFactory
     {
         return RigFactory.rig;
     }
-    
+
     /**
      * Loads the rig type class instance using the configured rig type class
      * name loaded from configuration. If the class cannot be resolved or

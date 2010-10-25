@@ -81,7 +81,7 @@ public class RigClient
     private static boolean doRestart = true;
     
     /** Logger. */
-    private final ILogger logger;
+    private ILogger logger;
     
     /** Configuration. */
     private final IConfig config;
@@ -103,7 +103,11 @@ public class RigClient
     {
         try
         {
+            /* In case the logger configuration has changed. */
+            LoggerFactory.reInitLogger();
+            this.logger = LoggerFactory.getLoggerInstance();
             this.logger.priority("Rig client is starting up...");
+            
             RigClient.startUpThread = Thread.currentThread();
             
             /* Pre-Start, make sure the required properties are valid. */
@@ -128,6 +132,7 @@ public class RigClient
             /* ------------------------------------------------------------------
              * ---- 1. Get the rig type class and start the exerciser tests. ----
              * ----------------------------------------------------------------*/
+            RigFactory.initRigInstance();
             final IRig rig = RigFactory.getRigInstance();
             if (rig == null)
             {

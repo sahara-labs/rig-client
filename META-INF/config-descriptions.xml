@@ -199,7 +199,7 @@ off line.
       	  stanza="Miscellaneous"
       	  mandatory="no" 
       	  type="BOOLEAN" 
-      	  restart="yes"
+      	  restart="no"
 		  example="false" 
 		  format="[true|false]" 
 		  default="false">
@@ -218,7 +218,7 @@ by the Scheduling Server to be asynchronous which will occur depending on the
       	  stanza="Miscellaneous"
       	  mandatory="no" 
       	  type="BOOLEAN" 
-      	  restart="yes"
+      	  restart="no"
 		  example="false" 
 		  format="[true|false]" 
 		  default="false">
@@ -233,7 +233,7 @@ asynchronous which will occur depending on the
       	  stanza="Miscellaneous"
       	  mandatory="no" 
       	  type="BOOLEAN" 
-      	  restart="yes"
+      	  restart="no"
 		  example="false" 
 		  format="[true|false]" 
 		  default="false">
@@ -247,7 +247,7 @@ asynchronous allocation.
       	  stanza="Miscellaneous"
       	  mandatory="no" 
       	  type="BOOLEAN" 
-      	  restart="yes"
+      	  restart="no"
 		  example="false" 
 		  format="[true|false]" 
 		  default="false">

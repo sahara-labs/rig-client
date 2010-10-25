@@ -73,11 +73,15 @@ public class LoggerFactory
         SYSTEM_ERROR, FILE, ROLLED_FILE, SYSLOG, WINEVENTS
     }
     
-    
     /** Logger instance. */
     private static volatile ILogger logger;
     
     static 
+    {
+        LoggerFactory.logger = LoggerFactory.getLoggerInternalInstance();
+    }
+    
+    public static synchronized void reInitLogger() 
     {
         LoggerFactory.logger = LoggerFactory.getLoggerInternalInstance();
     }
