@@ -128,11 +128,23 @@ public class RigClientService implements RigClientServiceSkeletonInterface
     /** Rig type class. */
     private final IRig rig;
     
+    /** Asynchronous exeuctor of allocation and release jobs. */
+    private static AsyncExecutor executor;
+    
     /** Logger. */
     private final ILogger logger;
     
     /** Configuration. */
     private final IConfig config;
+    
+    static 
+    {
+        RigClientService.executor = new AsyncExecutor();
+        Thread thr = new Thread(RigClientService.executor);
+        thr.setName("Async Executor");
+        thr.setDaemon(true);
+        thr.start();
+    }
     
     /**
      * Constructor.
@@ -170,17 +182,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             error.setReason("Not authorised to allocate a user.");
 
         }
-        /* 2) Won't attempt to allocate another user if an asynchronous operation
-         *    is already running. */
-        else if (RigClientService.isAsyncOperationRunning())
-        {
-            this.logger.warn("Failed allocating user " + user + " because there is an existing asynchronous " +
-                    "operation running.");
-            operation.setSuccess(false);
-            error.setCode(17);
-            error.setReason("Asynchronous operation already running.");
-        }
-        /* 3) Cannot allocate a rig which is already in-use. */
+        /* 2) Cannot allocate a rig which is already in-use. */
         else if (this.rig.isSessionActive())
         {
             this.logger.warn("Failed allocating user " + user + " because there is an existing session.");
@@ -188,7 +190,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             error.setCode(4);
             error.setReason("A session is already active.");
         }
-        /* 4) Cannot allocate a rig which is in bad state, i.e. has a exerciser
+        /* 3) Cannot allocate a rig which is in bad state, i.e. has a exerciser
          *    test failed. */
         else if (!this.rig.isMonitorStatusGood()) 
         {
@@ -197,24 +199,32 @@ public class RigClientService implements RigClientServiceSkeletonInterface
             error.setCode(7);
             error.setReason("Rig not operable.");
         }
-        /* 5 - 1) If requested asynchronously, perform allocation out of 
+        /* 4 - 1) If requested asynchronously, perform allocation out of 
          *    request thread. */
-        else if (async)
+        else if ((async && !Boolean.parseBoolean(this.config.getProperty("Ignore_Async_Allocation_Request", "false"))) || 
+                Boolean.parseBoolean(this.config.getProperty("Force_Async_Allocation", "false")))
         {
             this.logger.debug("Going to assign user " + user + " asychronously.");
-            
-            // TODO async work.
-            
-            operation.setSuccess(true);
-            operation.setWillCallback(true);
+
+            if (RigClientService.executor.submitAllocate(user))
+            {
+                operation.setSuccess(true);
+                operation.setWillCallback(true);
+            }
+            else
+            {
+                operation.setSuccess(false);
+                error.setCode(17);
+                error.setReason("Allocation is currently in progress");
+            }
         }
-        /* 5 - 2) The default is to allocate the user synchronously. */
+        /* 4 - 2) The default is to allocate the user synchronously. */
         else if (this.rig.assign(user))
         {
             this.logger.info("Successfully allocated user " + user + " to rig.");
             operation.setSuccess(true);
         }
-        /* 6) Something failing in synchronous assignment. */
+        /* 5) Something failing in synchronous assignment. */
         else
         {
             this.logger.warn("Failed allocating user " + user + " because of an allocation action failure.");
@@ -282,14 +292,21 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         /* 5 - 1) If requested for the operation to run asynchronously, perform
          * release out of the request thread. */
-        else if (async)
+        else if ((async && !Boolean.parseBoolean(this.config.getProperty("Ignore_Async_Release_Request", "false"))) ||
+                Boolean.parseBoolean(this.config.getProperty("Force_Async_Release", "false")))
         {
             this.logger.debug("Going to release user " + user + " asynchronously.");
-            
-            // TODO Actual async release
-            
-            operation.setSuccess(true);
-            operation.setWillCallback(true);
+            if (RigClientService.executor.submitRelease())
+            {
+                operation.setSuccess(true);
+                operation.setWillCallback(true);
+            }
+            else
+            {
+                operation.setSuccess(false);
+                error.setCode(17);
+                error.setReason("Release currently in progress.");
+            }
         }
         /* 5 - 2) Otherwise the default is to perform release synchronously. */
         else if (this.rig.revoke()) // Actual revocation
@@ -1229,37 +1246,5 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         
         return false;
-    }
-    
-    /**
-     * Returns true if an asynchronous operation is currently running.
-     * 
-     * @return true if asynchronous operation running
-     */
-    public static boolean isAsyncOperationRunning()
-    {
-        // TODO Implement async operation check
-        return false;
-//        if (RigClientService.asyncWorker == null)
-//        {
-//            return false;
-//        }
-//        else
-//        {
-//            return RigClientService.asyncWorker.isAlive();
-//        }
-    }
-    
-    /**
-     * Interrupts a running asynchronous operation This operation isn't 
-     * blocking so <tt>isAsyncOperation</tt> should be periodically called
-     * to ensure the asynchronous operation stops.
-     */
-    public static void interruptAsyncOperation()
-    {
-//        if (RigClientService.asyncWorker != null && RigClientService.asyncWorker.isAlive())
-//        {
-//            RigClientService.asyncWorker.interrupt();
-//        }
     }
 }
