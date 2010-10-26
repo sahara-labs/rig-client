@@ -108,7 +108,7 @@ public class LogsPage extends AbstractPage
         this.println("              Logs:");
         this.println("          </p>");
         this.println("      </div>");
-        this.println("      <div class='detailspanelcontents'>");
+        this.println("      <div id='logscontent' class='detailspanelcontents'>");
         this.println("          <ul id='logslist'>");
         
         this.generateLogList(logs);
@@ -181,6 +181,11 @@ public class LogsPage extends AbstractPage
         this.println(
                 "$(document).ready(function() {\n" +
                 "   setTimeout(updateLogs, 5000);\n" +
+                /* Contents pane height. */
+                "  $('#logscontent').css('height', $(window).height() - 250);" + 
+                "  $(window).resize(function() { " +
+                "    $('#logscontent').css('height', $(window).height() - 250);\n" +
+                "  });" +
                 "});");
         
         this.println("</script>");

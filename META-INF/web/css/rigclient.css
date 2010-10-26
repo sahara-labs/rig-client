@@ -544,6 +544,10 @@ a.plaina:hover {
  	width: 750px;
 }
 
+#logscontent {
+	overflow-y: scroll;
+}
+
 #logslist {
 	list-style: none;
 }
