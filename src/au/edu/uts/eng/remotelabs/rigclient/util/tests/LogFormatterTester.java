@@ -75,7 +75,7 @@ public class LogFormatterTester extends TestCase
         String mess = "Test message";
         String lvl = "INFO";
         
-        String log = this.formatter.formatLog(fmt, mess, lvl, 1);
+        String log = this.formatter.formatLog(fmt, mess, lvl);
         
         assertTrue(log.startsWith("[" + lvl + "]"));
         assertTrue(log.endsWith(mess));
@@ -106,45 +106,6 @@ public class LogFormatterTester extends TestCase
         assertEquals(Integer.parseInt(p[1]), cal.get(Calendar.MINUTE));
     }
     
-    public void testFormatLogStack()
-    {
-        String fmt = "[__LEVEL__] - (__DATE__) - <__TID__-__CLASS__-__METHOD__-__SOURCE__-__LINE_NUM__> __MESSAGE__";
-        String mess = "Test message";
-        String lvl = "INFO";
-        
-        String log = this.formatter.formatLog(fmt, mess, lvl, 2);
-
-        assertTrue(log.startsWith("[" + lvl + "]"));
-        assertTrue(log.endsWith(mess));
-        
-        String p[] = log.split("\\(", 2);
-        assertEquals(2, p.length);
-        p = p[1].split("\\)");
-        assertEquals(2, p.length);
-        
-        String d = p[0];
-        
-        p = d.split("-");
-        assertEquals(3, p.length);
-        Calendar cal = Calendar.getInstance();
-        assertEquals(Integer.parseInt(p[2]), cal.get(Calendar.YEAR));
-        assertEquals(Integer.parseInt(p[1]), cal.get(Calendar.MONTH) + 1);
-        assertEquals(Integer.parseInt(p[0]), cal.get(Calendar.DAY_OF_MONTH));
-        
-        p = log.split("<", 2);
-        assertEquals(2, p.length);
-        p = p[1].split(">", 2);
-        assertEquals(2, p.length);
-        
-        p = p[0].split("-");
-        assertEquals(5, p.length);
-        assertEquals(Thread.currentThread().getId(), Integer.parseInt(p[0]));
-        assertEquals(this.getClass().getName(), p[1]);
-        assertEquals("testFormatLogStack", p[2]);
-        assertEquals("LogFormatterTester.java", p[3]);
-        assertEquals(115, Integer.parseInt(p[4]));
-    }
-
     @Test
     public void testFormatLogTime()
     {
@@ -152,7 +113,7 @@ public class LogFormatterTester extends TestCase
         String mess = "Test message";
         String lvl = "INFO";
         
-        String log = this.formatter.formatLog(fmt, mess, lvl, 1);
+        String log = this.formatter.formatLog(fmt, mess, lvl);
         
         assertTrue(log.startsWith("[" + lvl + "]"));
         assertTrue(log.endsWith(mess));

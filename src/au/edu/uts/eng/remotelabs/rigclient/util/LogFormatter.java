@@ -87,6 +87,9 @@ public class LogFormatter
     /** List of macros. */
     private final Map<String, Macro> macros;
     
+    /** The stack position . */
+    private static int stackPos = -1;
+    
     /**
      * Constructor.
      */
@@ -111,19 +114,18 @@ public class LogFormatter
      * @param fmt format string
      * @param msg log message
      * @param lvl log level
-     * @param stackPos stack position to the log message came from
      * @return formatted log message
      */
-    public String formatLog(final String fmt, final String msg, final String lvl, final int stackPos)
+    public String formatLog(final String fmt, final String msg, final String lvl)
     {
         final Calendar cal = Calendar.getInstance();
-        final StackTraceElement[] thrStack = Thread.currentThread().getStackTrace();
+        StackTraceElement frame = null;
         
         if (fmt == null) return null;
         
         final String elements[] = fmt.split("__");
         final StringBuffer buf = new StringBuffer(fmt.length());
-        
+
         for (String e : elements)
         {
             if (this.macros.containsKey(e))
@@ -168,27 +170,27 @@ public class LogFormatter
                         break;
                         
                     case CLASS:
-                        if (thrStack.length > stackPos)
+                        if ((frame = LogFormatter.getStackTrace(frame)) != null)
                         {
-                            buf.append(thrStack[stackPos].getClassName());
+                            buf.append(frame.getClassName());
                         }
                         break;
                     case METHOD:
-                        if (thrStack.length > stackPos)
+                        if ((frame = LogFormatter.getStackTrace(frame)) != null)
                         {
-                            buf.append(thrStack[stackPos].getMethodName());
+                            buf.append(frame.getMethodName());
                         }
                         break;
                     case SOURCE:
-                        if (thrStack.length > stackPos)
+                        if ((frame = LogFormatter.getStackTrace(frame)) != null)
                         {
-                            buf.append(thrStack[stackPos].getFileName());
+                            buf.append(frame.getFileName());
                         }
                         break;
                     case LINE_NUM:
-                        if (thrStack.length > stackPos)
+                        if ((frame = LogFormatter.getStackTrace(frame)) != null)
                         {
-                            buf.append(thrStack[stackPos].getLineNumber());
+                            buf.append(frame.getLineNumber());
                         }
                         break;
                     case TID:
@@ -222,5 +224,49 @@ public class LogFormatter
         }
             
         return str;
+    }
+    
+    private static StackTraceElement getStackTrace(StackTraceElement frame)
+    {
+        if (frame != null) return frame;
+        
+        StackTraceElement[] thrStack = Thread.currentThread().getStackTrace();
+        if (LogFormatter.stackPos < 0)
+        {
+            synchronized (LogFormatter.class)
+            {
+                /* As the stack level is inconsistent accross platforms and deployment mechanisms,
+                 * we parse the StackTrace to set the pointer to the appropriate stack frame in order  
+                 * to get the details of the caller method (filename, line number etc.)
+                 * The stack is parsed from position 0 (i.e. here) till the first stack frame that is 
+                 * after a logger. */
+                
+                String fileName;
+                int newStackPos = 0;
+                boolean foundLogger = false;
+                
+                while (thrStack.length > newStackPos)
+                {
+                    fileName = thrStack[newStackPos].getFileName();
+                    if (fileName == null || fileName.endsWith("Logger.java") )
+                    {
+                        foundLogger = true;
+                        newStackPos++;
+                    }
+                    else if (!foundLogger)
+                    {
+                        newStackPos++;
+                    }
+                    else
+                    {
+                        LogFormatter.stackPos = newStackPos;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return LogFormatter.stackPos < thrStack.length && LogFormatter.stackPos >= 0 ?
+                thrStack[LogFormatter.stackPos] : null;
     }
 }

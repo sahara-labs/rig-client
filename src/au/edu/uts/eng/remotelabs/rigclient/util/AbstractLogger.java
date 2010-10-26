@@ -62,9 +62,6 @@ abstract class AbstractLogger implements ILogger
     /** Format strings for each log type. */
     private final Map<Integer, String> formatStrings;
     
-    /** The level in the stack of the calling method. */
-    protected int stackLevel;
-    
     /** The max buffer size. */
     private final int bufferLength;
     
@@ -82,10 +79,7 @@ abstract class AbstractLogger implements ILogger
         
         /* Set up log4j loggers. */
         Logger.getRootLogger().addAppender(new NullAppender());
-        
-        /* Most loggers have 3 as there stack level. */
-        this.stackLevel = 3;
-        
+
         this.bufferLength = AbstractLogger.LOG_BUFFER_SIZE;
         this.buffer = new ArrayDeque<String>(this.bufferLength);
      }
@@ -96,7 +90,7 @@ abstract class AbstractLogger implements ILogger
         if (ILogger.DEBUG <= this.logLevel)
         {
             this.innerLog(ILogger.DEBUG, 
-                    this.formatter.formatLog(this.formatStrings.get(ILogger.DEBUG), message, "DEBUG", this.stackLevel));
+                    this.formatter.formatLog(this.formatStrings.get(ILogger.DEBUG), message, "DEBUG"));
         }
     }
 
@@ -104,14 +98,14 @@ abstract class AbstractLogger implements ILogger
     public void error(final String message)
     {
         this.innerLog(ILogger.ERROR, 
-                this.formatter.formatLog(this.formatStrings.get(ILogger.ERROR), message, "ERROR", this.stackLevel));
+                this.formatter.formatLog(this.formatStrings.get(ILogger.ERROR), message, "ERROR"));
     }
 
     @Override
     public void fatal(final String message)
     {
         this.innerLog(ILogger.FATAL, 
-                this.formatter.formatLog(this.formatStrings.get(ILogger.FATAL), message, "FATAL", this.stackLevel));        
+                this.formatter.formatLog(this.formatStrings.get(ILogger.FATAL), message, "FATAL"));        
     }
 
     @Override
@@ -120,7 +114,7 @@ abstract class AbstractLogger implements ILogger
         if (ILogger.INFO <= this.logLevel)
         {
             this.innerLog(ILogger.INFO, 
-                    this.formatter.formatLog(this.formatStrings.get(ILogger.INFO), message, "INFO", this.stackLevel));
+                    this.formatter.formatLog(this.formatStrings.get(ILogger.INFO), message, "INFO"));
         }
     }
 
@@ -128,7 +122,7 @@ abstract class AbstractLogger implements ILogger
     public void priority(final String message)
     {
         this.innerLog(ILogger.PRIORITY, 
-                this.formatter.formatLog(this.formatStrings.get(ILogger.PRIORITY), message, "PRIORITY", this.stackLevel));        
+                this.formatter.formatLog(this.formatStrings.get(ILogger.PRIORITY), message, "PRIORITY"));        
     }
 
     @Override
@@ -137,7 +131,7 @@ abstract class AbstractLogger implements ILogger
         if (ILogger.WARN <= this.logLevel)
         {
             this.innerLog(ILogger.WARN, 
-                    this.formatter.formatLog(this.formatStrings.get(ILogger.WARN), message, "WARN", this.stackLevel));
+                    this.formatter.formatLog(this.formatStrings.get(ILogger.WARN), message, "WARN"));
         }
     }
     
