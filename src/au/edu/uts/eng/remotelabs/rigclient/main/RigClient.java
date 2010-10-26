@@ -48,6 +48,7 @@ import au.edu.uts.eng.remotelabs.rigclient.server.EmbeddedJettyServer;
 import au.edu.uts.eng.remotelabs.rigclient.server.IServer;
 import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.AxisCleaner;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -175,7 +176,12 @@ public class RigClient
             }
             
             /* ------------------------------------------------------------------
-             * ---- 4. Enter the run loop and wait for shutdown. ----------------
+             * ---- 4. Start the Axis cleaner. ----------------------------------
+             * ----------------------------------------------------------------*/
+            AxisCleaner.startCleaner();
+            
+            /* ------------------------------------------------------------------
+             * ---- 5. Enter the run loop and wait for shutdown. ----------------
              * ----------------------------------------------------------------*/
             while (!RigClient.doShutdown)
             {
@@ -188,11 +194,6 @@ public class RigClient
                     break;
                 }
             }
-            
-            /* ------------------------------------------------------------------
-             * ---- 5. Terminate any asynchronous operations. -------------------
-             * ----------------------------------------------------------------*/
-            // TODO terminate async operations
 
             /* ------------------------------------------------------------------
              * ---- 6. Cleanup and shutdown all services. -----------------------
@@ -217,13 +218,13 @@ public class RigClient
             /* Stop server. */
             this.server.stopListening();
             
-            /* Cleanup the '_axis2' folder if it exists. */
+            /* Cleanup the Axis2 directories and temp files. */
             File file = new File("_axis2");
             if (file.exists())
             {
                 file.delete();
             }
-            
+            AxisCleaner.forceCleanRun();
         } 
         catch (Throwable thr)
         {
