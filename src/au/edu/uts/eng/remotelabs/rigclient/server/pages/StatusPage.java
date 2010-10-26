@@ -104,6 +104,8 @@ public class StatusPage extends AbstractPage
             this.println("<div id='statuscontents'>");
             this.generateStatusContents();
             this.println("</div>");
+            
+            this.println("<div style='clear:both; margin-bottom:20px'> </div>'");
                         
             /* Page auto-update. */
             this.println(
@@ -112,7 +114,6 @@ public class StatusPage extends AbstractPage
                 "   setTimeout(updateStatus, 10000);\n" +
                 "});" +
                 "</script>");
-        
         }
     }
 

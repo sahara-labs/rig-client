@@ -141,14 +141,18 @@ function updateLogs()
 		"/logs/update",
 		null,
 		function (response) {
-			$("#logslist").empty().append(response);
-			
-			if (!$("#fatalcheck").is(":checked")) $(".fatallog").hide();
-			if (!$("#pricheck").is(":checked")) $(".prilog").hide();
-			if (!$("#errorcheck").is(":checked")) $(".errorlog").hide();
-			if (!$("#warncheck").is(":checked")) $(".warnlog").hide();
-			if (!$("#infocheck").is(":checked"))  $(".infolog").hide();
-			if (!$("#debugcheck").is(":checked")) $(".debuglog").hide();
+			if (response.indexOf("<li") == 0)
+			{
+				$("#logslist").empty().append(response);
+				
+				if (!$("#fatalcheck").is(":checked")) $(".fatallog").hide();
+				if (!$("#pricheck").is(":checked")) $(".prilog").hide();
+				if (!$("#errorcheck").is(":checked")) $(".errorlog").hide();
+				if (!$("#warncheck").is(":checked")) $(".warnlog").hide();
+				if (!$("#infocheck").is(":checked"))  $(".infolog").hide();
+				if (!$("#debugcheck").is(":checked")) $(".debuglog").hide();
+			}
+			else if (response != "") window.location.reload();
 			
 			setTimeout(updateLogs, 5000);
 		}
@@ -161,7 +165,15 @@ function updateStatus()
 		"/status/update",
 		null,
 		function (response) {
-			$("#statuscontents").empty().append(response);
+			if (response.indexOf("<div") == 0)
+			{
+				$("#statuscontents").empty().append(response);
+			}
+			else if (response != "") 
+			{
+				window.location.reload();
+			}
+			
 			setTimeout(updateStatus, 10000);
 		}
 	);
@@ -173,8 +185,11 @@ function updateNavStatus()
 		"/status/current",
 		null,
 		function (response) {
-			$("#currentstatusicon").empty().append(response);
-			setTimeout(updateNavStatus, 5000);
+			if (response.indexOf("<img") == 0)
+			{
+				$("#currentstatusicon").empty().append(response);
+				setTimeout(updateNavStatus, 5000);
+			}
 		}
 	);
 }

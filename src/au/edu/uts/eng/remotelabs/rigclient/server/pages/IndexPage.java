@@ -181,6 +181,8 @@ public class IndexPage extends AbstractPage
       
       this.println("</div>");
       
+      this.println("<div style='clear:both; margin-bottom:20px'> </div>");
+      
       /* Tooltip hover events. */
       this.println("<script type='text/javascript'>");
       

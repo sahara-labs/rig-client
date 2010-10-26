@@ -118,7 +118,7 @@ public class LoginPage extends AbstractPage
        /* Form positioning at center of screen. */
        this.println(
                "   var leftpos = Math.floor($(window).width() / 2) - 175;\n" +
-               "   var toppos = Math.floor($(window).height() / 2) - 200;\n" +
+               "   var toppos = Math.floor($(window).height() / 2) - ($(window).height() > 600 ? 200 : 75);\n" +
                "   $('#loginformoutercontainer').css('left', leftpos);\n" +
                "   $('#loginformoutercontainer').css('top', toppos)\n");
        

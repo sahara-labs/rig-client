@@ -242,7 +242,7 @@ public class OperationsPage extends AbstractPage
         this.println(
                 "$(document).ready(function() {\n" + 
                 "   var leftpos = Math.floor($(window).width() / 2) - 175;\n" +
-                "   var toppos = Math.floor($(window).height() / 2) - 200;\n" +
+                "   var toppos = Math.floor($(window).height() / 2) - ($(window).height() > 600 ? 200 : 75);\n" +
                 "   $('#confirmationcontainer').css('left', leftpos);\n" +
                 "   $('#confirmationcontainer').css('top', toppos)\n" +
                 "});");
