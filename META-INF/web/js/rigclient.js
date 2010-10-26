@@ -141,6 +141,7 @@ function updateLogs()
 		"/logs/update",
 		null,
 		function (response) {
+			response = $.trim(response);
 			if (response.indexOf("<li") == 0)
 			{
 				$("#logslist").empty().append(response);
@@ -165,6 +166,7 @@ function updateStatus()
 		"/status/update",
 		null,
 		function (response) {
+			response = $.trim(response);
 			if (response.indexOf("<div") == 0)
 			{
 				$("#statuscontents").empty().append(response);
@@ -185,6 +187,7 @@ function updateNavStatus()
 		"/status/current",
 		null,
 		function (response) {
+			response = $.trim(response);
 			if (response.indexOf("<img") == 0)
 			{
 				$("#currentstatusicon").empty().append(response);
@@ -276,12 +279,17 @@ function updateSelectedInfoTab()
 	$.get(
 		"/info/" + selectedTab,
 		null,
-		function (resp) {
-			$("#contentstable").empty()
-							  .append(resp);
-			
-			$("#contentstable tr:even").addClass("evenrow");
-			$("#contentstable tr:odd").addClass("oddrow");
+		function (response) {
+			response = $.trim(response);
+			if (response.indexOf("<tr") == 0)
+			{
+				$("#contentstable").empty()
+								  .append(response);
+				
+				$("#contentstable tr:even").addClass("evenrow");
+				$("#contentstable tr:odd").addClass("oddrow");
+			}
+			else if (response != "") window.location.reload();
 			
 			setTimeout(updateSelectedInfoTab, 5000);
 		}
@@ -301,12 +309,17 @@ function loadInfoTab(tab)
 	$.get(
 		"/info/" + tab,
 		null,
-		function (resp) {
-			$("#contentstable").empty()
-							  .append(resp);
-			
-			$("#contentstable tr:even").addClass("evenrow");
-			$("#contentstable tr:odd").addClass("oddrow");
+		function (response) {
+			response = $.trim(response);
+			if (response.indexOf("<tr") == 0)
+			{
+				$("#contentstable").empty()
+								  .append(response);
+				
+				$("#contentstable tr:even").addClass("evenrow");
+				$("#contentstable tr:odd").addClass("oddrow");
+			}
+			else window.location.reload();
 		}
 	);
 }
