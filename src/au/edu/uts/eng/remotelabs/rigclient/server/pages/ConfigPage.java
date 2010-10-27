@@ -147,8 +147,10 @@ public class ConfigPage extends AbstractPage
                 while (params.hasMoreElements())
                 {
                     
-                    String param = params.nextElement();
-                    String value = req.getParameter(param);
+                    String param = params.nextElement().trim();
+                    String value = req.getParameter(param).trim();
+                    
+                    if ("".equals(param)) continue;
                     
                     if (param.startsWith("NEW_PROP_KEY_"))
                     {
@@ -171,7 +173,7 @@ public class ConfigPage extends AbstractPage
                     else 
                     {
                         String confVal = this.config.getProperty(param);
-                        if (confVal != null && !confVal.equals(value))
+                        if (confVal == null || !confVal.equals(value))
                         {
                             this.logger.info("Changing configuration property '" + param + "' to '" + value + "'.");
                             

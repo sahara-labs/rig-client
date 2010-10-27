@@ -48,6 +48,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -341,11 +342,26 @@ public class PropertiesIntersectionConfig implements IConfig
     {
         try
         {
-            this.innerSerialise(this.canonicalFile, this.canonicalProps);
+            List<String> propList = new ArrayList<String>(this.props.size());
+            propList.addAll(this.props.keySet());
+            
+            this.innerSerialise(this.canonicalFile, this.canonicalProps, propList);
             
             for (Entry<String, Properties> e : this.extensionProps.entrySet())
             {
-                this.innerSerialise(e.getKey(), e.getValue());
+                this.innerSerialise(e.getKey(), e.getValue(), propList);
+            }
+            
+            /* Add any remaining properties to the file canonical file. */
+            for (String s : propList)
+            {
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(this.canonicalFile, true)));
+                writer.append(s);
+                writer.append(' ');
+                writer.append(this.props.get(s));
+                writer.append(System.getProperty("line.separator"));
+                writer.close();
             }
         }
         catch (IOException ex)
@@ -360,9 +376,10 @@ public class PropertiesIntersectionConfig implements IConfig
      * 
      * @param filename the name of the file to serialise to
      * @param properties the properties store
+     * @param propList of properties
      * @throws IOException 
      */
-    private void innerSerialise(String filename, Properties properties) throws IOException
+    private void innerSerialise(String filename, Properties properties, List<String> propList) throws IOException
     {
         StringBuilder buf = new StringBuilder();
         String tmp, lineSep = System.getProperty("line.separator");
@@ -403,15 +420,32 @@ public class PropertiesIntersectionConfig implements IConfig
             String kv[] = tmp.split("\\s*[\\s|=|:]\\s*", 2);
             if (!properties.containsKey(kv[0])) continue;
             
+            propList.remove(kv[0]);
+            
             buf.append(kv[0]);
             buf.append(' ');
             buf.append(properties.get(kv[0]));
             buf.append(lineSep);
-
+            
             if (tmp.charAt(tmp.length() -1 ) == '\\') extendedValue = true;
         }
         reader.close();
         backup.close();
+        
+        /* Check if any of the other properties belong in this file. */
+        int pos = 0;
+        for (int i = 0; i < propList.size(); i++)
+        {
+            String s = propList.get(i);
+            if ((pos = buf.lastIndexOf(s)) > 0)
+            {
+                /* Has the property by commented out, so seek forward and put
+                 * it on the next line. */
+                while (pos < buf.length() - 1 && buf.charAt(pos) != '\n') pos++;
+                buf.insert(pos + 1, s + ' ' + this.props.get(s) + lineSep);
+                propList.remove(s);
+            }
+        }
         
         /* Write changes back to the properties file. */
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));

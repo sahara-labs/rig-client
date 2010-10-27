@@ -392,6 +392,29 @@ public class PropertiesIntersectionConfigTester extends TestCase
             k++;
         }
     }
+    
+    /**
+     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig#serialise()}.
+     */
+    public void testSerialiseNewProperty() throws Exception
+    {
+        /* Add some new properties. */
+        this.config.setProperty("newprop1", "newval1");
+        this.config.setProperty("newprop2", "newval2");
+        this.config.setProperty("Commented_Out_Prop", "foobar");
+        
+        this.config.serialise();
+        
+        PropertiesIntersectionConfig cleanLoad = new PropertiesIntersectionConfig();
+        
+        /* Check the backing properties. */
+        assertNotNull(cleanLoad.getProperty("Commented_Out_Prop"));
+        assertEquals("foobar", cleanLoad.getProperty("Commented_Out_Prop"));
+        assertNotNull(cleanLoad.getProperty("newprop1"));
+        assertEquals("newval1", cleanLoad.getProperty("newprop1"));
+        assertNotNull(cleanLoad.getProperty("newprop2"));
+        assertEquals("newval2", cleanLoad.getProperty("newprop2"));
+    }
 
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.util.PropertiesIntersectionConfig#dumpConfiguration()}.
