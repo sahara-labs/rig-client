@@ -225,22 +225,22 @@ public class LoggerFactory
         
         final String def = config.getProperty("Default_Log_Format", "[__LEVEL__] - [__ISO8601__] - __MESSAGE__");
         String frm = config.getProperty("FATAL_Log_Format");
-        frmStrings.put(ILogger.FATAL, frm == null ? def : frm);
+        frmStrings.put(ILogger.FATAL, frm == null || "".equals(frm.trim()) ? def : frm);
         
         frm = config.getProperty("PRIORITY_Log_Format");
-        frmStrings.put(ILogger.PRIORITY, frm == null ? def : frm);
+        frmStrings.put(ILogger.PRIORITY, frm == null || "".equals(frm.trim()) ? def : frm);
         
         frm = config.getProperty("ERROR_Log_Format");
-        frmStrings.put(ILogger.ERROR, frm == null ? def : frm);
+        frmStrings.put(ILogger.ERROR, frm == null || "".equals(frm.trim()) ? def : frm);
         
         frm = config.getProperty("WARN_Log_Format");
-        frmStrings.put(ILogger.WARN, frm == null ? def : frm);
+        frmStrings.put(ILogger.WARN, frm == null || "".equals(frm.trim()) ? def : frm);
         
         frm = config.getProperty("INFO_Log_Format");
-        frmStrings.put(ILogger.INFO, frm == null ? def : frm);
+        frmStrings.put(ILogger.INFO, frm == null || "".equals(frm.trim()) ? def : frm);
         
         frm = config.getProperty("DEBUG_Log_Format");
-        frmStrings.put(ILogger.DEBUG, frm == null ? def : frm);
+        frmStrings.put(ILogger.DEBUG, frm == null || "".equals(frm.trim()) ? def : frm);
         
         return frmStrings;
     }
