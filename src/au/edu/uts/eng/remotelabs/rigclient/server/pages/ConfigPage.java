@@ -139,28 +139,62 @@ public class ConfigPage extends AbstractPage
                 /* Stored the posted values. */
                 displayStanza = this.uriSuffix;
                 
+                Map<Integer, String[]> newProps = new HashMap<Integer, String[]>();
                 boolean changed = false;
                 
                 @SuppressWarnings("unchecked")
                 Enumeration<String> params = req.getParameterNames();
                 while (params.hasMoreElements())
                 {
+                    
                     String param = params.nextElement();
                     String value = req.getParameter(param);
                     
-                    String confVal = this.config.getProperty(param);
-                    if (confVal != null && !confVal.equals(value))
+                    if (param.startsWith("NEW_PROP_KEY_"))
                     {
-                        this.logger.info("Changing configuration property '" + param + "' to '" + value + "'.");
-                        
-                        /* Property is changed so save it. */
-                        this.props.put(param, value);
-                        this.config.setProperty(param, value);
-                        changed = true;
-                        
-                        Property p = this.desc.getPropertyDescription(param);
-                        if (p == null || p.needsRestart()) showRestartMessage = true;
+                        Integer keyNum = Integer.decode(param.substring("NEW_PROP_KEY_".length()));
+                        if (!newProps.containsKey(keyNum))
+                        {
+                            newProps.put(keyNum, new String[2]);
+                        }
+                        newProps.get(keyNum)[0] = value;
                     }
+                    else if (param.startsWith("NEW_PROP_VAL_"))
+                    {
+                        Integer keyNum = Integer.decode(param.substring("NEW_PROP_VAL_".length()));
+                        if (!newProps.containsKey(keyNum))
+                        {
+                            newProps.put(keyNum, new String[2]);
+                        }
+                        newProps.get(keyNum)[1] = value;
+                    }
+                    else 
+                    {
+                        String confVal = this.config.getProperty(param);
+                        if (confVal != null && !confVal.equals(value))
+                        {
+                            this.logger.info("Changing configuration property '" + param + "' to '" + value + "'.");
+                            
+                            /* Property is changed so save it. */
+                            this.props.put(param, value);
+                            this.config.setProperty(param, value);
+                            changed = true;
+                            
+                            Property p = this.desc.getPropertyDescription(param);
+                            if (p == null || p.needsRestart()) showRestartMessage = true;
+                        }
+                    }
+                }
+                
+                /* Add the new properties. */
+                for (String[] p : newProps.values())
+                {
+                    if (p[0] == null || p[1] == null) continue;
+                    
+                    this.logger.info("Adding new property '" + p[0] + "' with value '" + p[1] + "'.");
+                    changed = true;
+                    this.props.put(p[0], p[1]);
+                    this.config.setProperty(p[0], p[1]);
                 }
                 
                 if (changed) this.config.serialise();
@@ -231,6 +265,12 @@ public class ConfigPage extends AbstractPage
                 "         resizeConfPanel();\n" +
                 "     });");
 
+        this.println(
+                "   $('.newbutton').click(function(){\n" +
+                "       addNewConfProp();\n" +
+                "   });");
+                 
+        
         this.println("});");		
         this.println("</script>");
     }
@@ -340,6 +380,9 @@ public class ConfigPage extends AbstractPage
         }
         this.println("  </table>");
         
+        this.println("  <div class='newbut'>");
+        this.println("      <input class='newbutton' type='button' value='&nbsp;+&nbsp;'>");
+        this.println("  </div>");
         this.println("  <div class='submitbut'>");
         this.println("      <input class='submitbutton' type='submit' value='Save' />");
         this.println("  </div>");

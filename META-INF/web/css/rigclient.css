@@ -922,6 +922,16 @@ span.code {
 	width: 100%;
 }
 
+.newbut {
+	float: left;
+	padding-left: 10px;
+}
+
+.newbutton {
+	width: 40px;
+}
+
+
 .submitbut {
 	float: right;
 	padding-right: 35px;

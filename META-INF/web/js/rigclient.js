@@ -337,6 +337,10 @@ function loadConfStanza(stanza)
             $("#confform").jqTransform();
             $(".jqTransformInputWrapper").css("width", "305px");
             $(".jqTransformInputInner div input").css("width", "100%");
+            
+            $(".newbutton").click(function() {
+            	addNewConfProp();
+            });
 		}
 	);
 	
@@ -354,3 +358,25 @@ function resizeConfPanel()
     if (height < tabsHeight) height = tabsHeight;
     $('#contentspane').css('height', height);
 }
+
+var propNum = 1;
+function addNewConfProp()
+{
+	var pid = 'NEW_PROP_KEY_' + propNum;
+	var vid = 'NEW_PROP_VAL_' + propNum;
+	
+	var html = "<tr class='";
+	if ($("#contentstable tr").last().hasClass("evenrow")) html += "oddrow";
+	else html += "evenrow";		
+	html += "'><td class='pcol'><div style='width:305px;' class='jqTransformInputWrapper'>" +
+			"<div class='jqTransformInputInner'><div><input style='width:100%;' id='" + pid +
+	        "' name='" + pid + "' class='jqtranformdone jqTransformInput' value='' text='' />" +
+	        "</div></div></div>" + "</td><td class='pval'><div style='width:305px;' " +
+	        "class='jqTransformInputWrapper'>" + "<div class='jqTransformInputInner'><div>" +
+	        "<input style='width:100%;' id='" + vid + "' name='" + vid + "' class='jqtranformdone " +
+	        "jqTransformInput' value='' text='' /></div></div></div></td></tr>"; 
+
+	$("#contentstable").append(html);
+	propNum++;
+}
+
