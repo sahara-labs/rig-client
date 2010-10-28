@@ -104,8 +104,6 @@ public class RigClient
     {
         try
         {
-            /* In case the logger configuration has changed. */
-            LoggerFactory.reInitLogger();
             this.logger = LoggerFactory.getLoggerInstance();
             this.logger.priority("Rig client is starting up...");
             

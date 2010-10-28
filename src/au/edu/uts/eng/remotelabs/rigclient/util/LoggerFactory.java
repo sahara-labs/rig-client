@@ -81,11 +81,6 @@ public class LoggerFactory
         LoggerFactory.logger = LoggerFactory.getLoggerInternalInstance();
     }
     
-    public static synchronized void reInitLogger() 
-    {
-        LoggerFactory.logger = LoggerFactory.getLoggerInternalInstance();
-    }
-    
     /**
      * Don't want instances of this class.
      */
@@ -125,8 +120,6 @@ public class LoggerFactory
                 return new WinEventsLogger();
                 
             default:
-                /* DODGY -> Stupid fraking compiler, anyway using system 
-                 * standard error stream logger. */
                 return new SystemErrLogger();
         }
     }
