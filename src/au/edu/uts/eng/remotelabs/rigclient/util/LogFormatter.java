@@ -242,7 +242,7 @@ public class LogFormatter
                  * after a logger. */
                 
                 String fileName;
-                int newStackPos = 0;
+                int newStackPos = 1;
                 boolean foundLogger = false;
                 
                 while (thrStack.length > newStackPos)
