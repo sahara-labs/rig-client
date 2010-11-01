@@ -315,7 +315,7 @@ Section "Rig Client" RigClient
 	
 	; Set output path to the configuration directory
     SetOutPath $INSTDIR\conf
-    File /oname=rigclient.properties conf\rigclient.properties.win
+    File conf\rigclient.properties 
     File /r /x *.svn conf\conf.d
     File /r /x *.svn conf\conf.example
  
