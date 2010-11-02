@@ -208,6 +208,11 @@ public class LogsPage extends AbstractPage
             else if (logs[i].contains("INFO")) type = "infolog";
             else if (logs[i].contains("DEBUG")) type = "debuglog";
             
+            /* Replace special characters. */
+            logs[i].replace("\"", "&quot;");
+            logs[i].replace("<", "&lt;");
+            logs[i].replace(">", "&gt;");
+            logs[i].replace("&", "&amp;");
             
             this.println("<li class='" + type + " " + (i % 2 == 0 ? "evenlog" : "oddlog")+ "'>");
             this.println("  <span class='logmessage'>" + logs[i] + "</span>");
