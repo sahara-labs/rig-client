@@ -176,6 +176,7 @@ legend {
 }
 
 .actiondialogbutton {
+	cursor: pointer;
 	display: block;
 	width: 75px;
 	height: 75px;
