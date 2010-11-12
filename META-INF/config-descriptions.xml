@@ -179,7 +179,7 @@ Scheduling Server.
 		  example="10" 
 		  format="&lt;int&gt;" 
 		  default="50">
-The number of concurrent requests the Rig Client can service. If there are more than
+The number of requests the Rig Client can concurrently service. If there are more than
 this number of requests, the extra requests are queued.
 </property>
 
@@ -206,7 +206,7 @@ off line.
 The Rig Client can perform 'allocation' synchronously where the
 allocation is run then a response is returned to the Scheduling Server or
 asynchronously where an immediate response is provided then a subsequent
-call-back sent. This is because allocation may be a lengthy process and take
+call-back is sent. This is because allocation may be a lengthy process and take
 longer than the Scheduling Server request time out which will cause allocation
 to fail. This property specifies whether allocation is forced to be
 asynchronous. If not, allocation is by default synchronous but may be requested
@@ -224,7 +224,7 @@ by the Scheduling Server to be asynchronous which will occur depending on the
 		  default="false">
 As with the property 'Force_Async_Allocation' for allocation, this
 specifies whether 'release' is forced to be asynchronous. If not, release
-is by default synchronous but may be requested by the Scheduling Server to be
+is synchronous by default but may be requested by the Scheduling Server to be
 asynchronous which will occur depending on the
 'Ignore_Async_Release_Request' value.
 </property>
@@ -327,12 +327,14 @@ as the delimiter between packages.
 		  example="access.RdpAccessAction"
 		  format="&lt;Class&gt;;...;&lt;Class&gt;"
 		  default="">
-Access actions assign access and revoke access to and from the assigned master
-user and run at the beginning and end of sessions. This configures the list 
-of access actions to use. Multiple access actions can be configured, separating 
-each with a ';' character. When multiple access actions are configured, the 
-assignment methods are invoked in order they are configured and the revocation 
-methods are invoked in reverse order they are configured.
+Access actions assign and revoke access to and from the assigned master user,
+running at the beginning and end of sessions respectively. This is the list of
+access actions to load. Multiple access actions can be configured, separating
+each with a `;' character. Each may be a fully qualified class name or a class
+name to append to one of the configured action package prefixes. When multiple
+access actions are configured, the assignment methods are invoked in order they
+are configured, and the revocation methods are invoked in reverse order they are
+configured.
 </property>
 
 <property name="Slave_Access_Actions" 
@@ -374,8 +376,8 @@ configured, separating each with a ';' character.
 		  example="detect.WTSDetectionAction"
 		  format="&lt;Class&gt;;...;&lt;Class&gt;"
 		  default="">
-Detection actions are used to verify a user is actually using a rig when in 
-session. If they are not, they are removed from the rig after a permission
+Detection actions are used to verify whether a user is actually using a rig when in 
+session. If not, the user is removed from the rig after a permission
 configured timeout period. This configures the list of detection actions to 
 load. Multiple detection actions can be configured, separating each 
 with a ';' character.
@@ -555,7 +557,7 @@ Syslog log local facility number to use (between 1 to 7).
 		  format="&lt;Format String&gt;"
 		  default="[__LEVEL__] - [__ISO8601__] - __MESSAGE__">
 <![CDATA[
-The format of the log messages can be specifying by providing a format 
+The format of the log messages can be specified by providing a format 
 string with macros which are be replaced by their actual values. 
 The following is a list of macros that may be put in format strings:  
 <ul>
@@ -754,7 +756,7 @@ directory. The default is true.
 Whether to run batch clean up. If this is set to true, the batch control 
 invocation generated files are deleted. This setting is only honoured if the
 property Batch_Create_Nester_Dir property is set to true. If not, it is 
-ignored and no clean up run. The default is false.
+ignored and no clean up is run. The default is false.
 </property>
 
 <property name="Batch_Flush_Env" 
@@ -828,7 +830,7 @@ environment variables as needed may be configured provided they follow
 the format 'Env_&lt;Integer&gt;' with the configuration value as environment 
 '&lt;Key&gt;:&lt;Value&gt;'. The Env integers must be correctly sequenced, missing a 
 number will cause subsequent environment variable configuration to not be
-loaded. Macros be use using as the value portion of the environment variable.
+loaded. Macros be used as the value portion of the environment variable.
 </property>
 
 <property name="Batch_Test_File_Extension" 
@@ -852,7 +854,7 @@ not to test a file extension.
 		  example="tar.gz"
 		  format="&lt;String&gt;"
 		  default="">
-Instruction file extension. Should be configured as a string specifying the
+Instruction file extension. This should be configured as a string specifying the
 characters of the file extension. The file extension test will check if the 
 instruction file name ends with the configured extension.
 </property>
@@ -892,7 +894,7 @@ Maximum file size of the instruction file in kilobytes.
 		  default="false">
 Whether to test the instruction file for magic number. Many files have constants
 that identify the contained data. Detecting such constants in files is an effective 
-way of distinguishing between many file formats. If this is set top true, the 
+way of distinguishing between many file formats. If this is set to true, the 
 File_Magic_Number property must be set with a hexadecimal representation of the
 file magic number. The default value is false to specify not to test for file
 magic number.
@@ -918,7 +920,7 @@ File magic number in hexadecimal format. The prefix '0x' is optional.
 		  format="[true|false]"
 		  default="false">
 Whether to synchronise the results directory (batch process working directory
-to the another directory. If true, the results directory is copied to a
+to the another directory). If true, the results directory is copied to a
 different directory. If true the Sync_Dir_Destination property and 
 the Sync_Dir_Name property must be set with the results destination path name
 and result directory name respectively. The default is false.
