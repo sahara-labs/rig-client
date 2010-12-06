@@ -177,7 +177,17 @@ public class PrimitiveCache
                     {
                         this.logger.debug("Class " + controllerName + " not found.");
                     }
+                    catch (Throwable t)
+                    {
+                        this.logger.error("Failed class initalisation, exception: " + t.getClass().getSimpleName() + 
+                                ", reason: " + t.getMessage());
+                    }
                 }
+            }
+            catch (Throwable t)
+            {
+                this.logger.error("Failed class initalisation, exception: " + t.getClass().getSimpleName() + 
+                        ", reason: " + t.getMessage());
             }
 
             /* Check if a class was found. */
