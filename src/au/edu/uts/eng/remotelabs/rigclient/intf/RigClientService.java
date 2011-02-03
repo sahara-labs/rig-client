@@ -1052,7 +1052,7 @@ public class RigClientService implements RigClientServiceSkeletonInterface
         }
         /* DODGY The reason why the rig is going into maintenance should be communicated at request.
          * However, I'm far too lazy to fix this now. */
-        else if (this.rig.setMaintenance(request.getPutOffline(), "User request.", request.getRunTests()))
+        else if (this.rig.setMaintenance(request.getPutOffline(), "In maintenance.", request.getRunTests()))
         {
             this.logger.info("Successfully put the rig to state " + (request.getPutOffline() ? "offline" : "online") +
                 ".");
