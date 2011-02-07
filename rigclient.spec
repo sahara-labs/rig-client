@@ -42,7 +42,7 @@
 Name: RigClient
 Summary: Software abstraction of of a physical rig.
 Version: 3.0
-Release: 0.alpha
+Release: 0
 License: BSD
 Group: Sahara
 
