@@ -144,7 +144,7 @@ public class OperationsPage extends AbstractPage
         {
             this.println("<div id='confirmsession' class='ui-state ui-state-highlight ui-corner-all'>");
             this.println("  <span class='detailspanelicon ui-icon ui-icon-info'></span>");
-            this.println("  A session is currently active and will be termianted.");
+            this.println("  A session is currently active and will be terminated.");
             this.println("</div>");
         }
         
