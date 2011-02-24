@@ -448,6 +448,9 @@ Section "Rig Client Commons" Commons
     SetOutPath $INSTDIR\lib
     File ..\RigClientCommons\trunk\dist\rigclient-commons.jar
     
+    SetOutPath $INSTDIR
+    File ..\RigClientCommons\trunk\resources\wts-sessions\WindowsSessions\Release\WTSSessions.dll
+    
     SetOutPath $INSTDIR\conf\conf.example
     File ..\RigClientCommons\trunk\conf\conf.example\CDUPower.properties
     File ..\RigClientCommons\trunk\conf\conf.example\DeleteFilesResetAction.properties
