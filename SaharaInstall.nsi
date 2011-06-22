@@ -560,6 +560,7 @@ Section "un.Rig Client" un.RigClient
 SectionEnd ; end the section
 Section "un.Rig Client Commons" un.Commons
     Delete $INSTDIR\lib\rigclient-commons.jar
+    Delete $INSTDIR\WTSSessions.dll
     
     
     ; Delete individual config files
