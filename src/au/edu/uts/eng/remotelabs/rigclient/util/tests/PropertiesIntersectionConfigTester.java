@@ -243,14 +243,13 @@ public class PropertiesIntersectionConfigTester extends TestCase
         f = PropertiesIntersectionConfig.class.getDeclaredField("extensionProps");
         f.setAccessible(true);
         Map<String, Properties> ext = (Map<String, Properties>)f.get(this.config);
-        int i = 5, k = 1;
+        int k = 1;
         for (Properties p : ext.values())
         {
             for (int j = 0; j < 10; j++)
             {
                 assertEquals("Value" + (60 - k * 10 - j), p.get("Prop" + k + j));
             }
-            i--;
             k++;
         }
     }
@@ -381,14 +380,13 @@ public class PropertiesIntersectionConfigTester extends TestCase
         f = PropertiesIntersectionConfig.class.getDeclaredField("extensionProps");
         f.setAccessible(true);
         Map<String, Properties> ext = (Map<String, Properties>)f.get(cleanLoad);
-        int i = 5, k = 1;
+        int k = 1;
         for (Properties p : ext.values())
         {
             for (int j = 0; j < 10; j++)
             {
                 assertEquals("Value" + (60 - k * 10 - j), p.get("Prop" + k + j));
             }
-            i--;
             k++;
         }
     }
