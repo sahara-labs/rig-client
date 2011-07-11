@@ -280,7 +280,7 @@ Changelog:
 	<property name="NSIS_Install_Path" value="C:/Program Files/NSIS" />
 	<target name="win-package" depends="dist" if="isWindows">
 		<mkdir dir="${package.dir}"/>
-	    <taskdef name="nsis" classpathref="project.tools" classname="net.sf.nsisant.Task" />
+	    <taskdef name="nsis" classpathref="project.tools" classname="com.danielreese.nsisant.Task" />
 	    <nsis script="SaharaInstall.nsi" verbosity="3" out="${package.dir}/SaharaInstaller.log" path="${NSIS_Install_Path}" />
 	</target>
 

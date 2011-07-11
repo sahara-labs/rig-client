@@ -446,26 +446,26 @@ SectionEnd
 
 Section "Rig Client Commons" Commons
     SetOutPath $INSTDIR\lib
-    File ..\RigClientCommons\trunk\dist\rigclient-commons.jar
+    File ..\RigClientCommons\dist\rigclient-commons.jar
     
     SetOutPath $INSTDIR
-    File ..\RigClientCommons\trunk\resources\wts-sessions\WindowsSessions\Release\WTSSessions.dll
+    File ..\RigClientCommons\resources\wts-sessions\WindowsSessions\Release\WTSSessions.dll
     
     SetOutPath $INSTDIR\conf\conf.example
-    File ..\RigClientCommons\trunk\conf\conf.example\CDUPower.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\DeleteFilesResetAction.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\DeviceOwnershipAccessAction.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\IPSPowerResetAction.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\JPEGCameraTest.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\LabjackResetAction.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\LDAP.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\LdapGroupAccessAction.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\LinuxDeviceNodeTestAction.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\PingTestAction.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\RemoteDesktopAccess.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\SocketCommandResetAction.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\SocketPassThroughController.properties
-    File ..\RigClientCommons\trunk\conf\conf.example\WTSDetectorAction.properties
+    File ..\RigClientCommons\conf\conf.example\CDUPower.properties
+    File ..\RigClientCommons\conf\conf.example\DeleteFilesResetAction.properties
+    File ..\RigClientCommons\conf\conf.example\DeviceOwnershipAccessAction.properties
+    File ..\RigClientCommons\conf\conf.example\IPSPowerResetAction.properties
+    File ..\RigClientCommons\conf\conf.example\JPEGCameraTest.properties
+    File ..\RigClientCommons\conf\conf.example\LabjackResetAction.properties
+    File ..\RigClientCommons\conf\conf.example\LDAP.properties
+    File ..\RigClientCommons\conf\conf.example\LdapGroupAccessAction.properties
+    File ..\RigClientCommons\conf\conf.example\LinuxDeviceNodeTestAction.properties
+    File ..\RigClientCommons\conf\conf.example\PingTestAction.properties
+    File ..\RigClientCommons\conf\conf.example\RemoteDesktopAccess.properties
+    File ..\RigClientCommons\conf\conf.example\SocketCommandResetAction.properties
+    File ..\RigClientCommons\conf\conf.example\SocketPassThroughController.properties
+    File ..\RigClientCommons\conf\conf.example\WTSDetectorAction.properties
 SectionEnd
 SectionGroupEnd     
 ;--------------------------------
