@@ -266,7 +266,7 @@ Date: 12th October 2009
 		<mkdir dir="${package.dir}"/>
 	    <taskdef name="nsis" classpathref="project.tools" classname="net.sf.nsisant.Task" />
 		<echo>Building arch ${win.target.arch}.</echo>
-	    <nsis script="SaharaInstall.nsi" verbosity="3" out="${package.dir}/SaharaInstaller.log" path="${nsis.path}">
+	    <nsis script="rigclient.nsi" verbosity="3" out="${package.dir}/rigclient.log" path="${nsis.path}">
 			<define name="Arch" value="${win.target.arch}" />
 		</nsis>
 	</target>

@@ -74,11 +74,11 @@ Var commonsDisabled
 ;Interface Settings
  
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "installerFiles\labshare.bmp"
-!define MUI_ICON "installerFiles\labshare.ico"
+!define MUI_HEADERIMAGE_BITMAP "installer\labshare.bmp"
+!define MUI_ICON "installer\labshare.ico"
 !define MUI_ABORTWARNING
   
-!define MUI_UNICON "installerFiles\win-install.ico"
+!define MUI_UNICON "installer\win-install.ico"
 
 !define Sahara_RCWindows_Service "RigClient"
 
@@ -196,7 +196,7 @@ FunctionEnd
 
 Function .onInit
 	; Splash screen 
-	advsplash::show 1000 1000 1000 -1 ..\InstallerFiles\labshare
+	advsplash::show 1000 1000 1000 -1 ..\installer\labshare
  	StrCpy $RCAlreadyInstalled "-1"
 	call CheckRCVersion
 	${If} $RCAlreadyInstalled S== "OTHER"
