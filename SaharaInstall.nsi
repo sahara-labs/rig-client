@@ -50,17 +50,21 @@
 
 
 ; The name of the installer
-Name "Sahara Rig Client"
+Name "SAHARA Labs Rig Client"
 
 !define REGKEY "SOFTWARE\$(^Name)"
 
 ; Sahara Rig Client Version
 !define Version "3.0-0"
 
+; Architecture of the installer, two applicable options are x86 (32 bit) 
+; and x64 (64 bit)
+!define Arch "x64"
+
 !define JREVersion "1.6"
 
 ; The file to write
-OutFile "package\RigClient-${Version}.exe"
+OutFile "package\RigClient-${Version}-${Arch}.exe"
 
 ; The default installation directory
 InstallDir "C:\Program Files\Sahara"
@@ -252,10 +256,39 @@ FunctionEnd
 
 Function checkJREVersion
 	; Check the JRE version to be 1.6 or higher
+	
+	${If} ${Arch} == "x64"
+		; If we are a 64 bit installer, we need to use a 64 bit JVM which 
+		; will have its keys in the 64 bit registry.
+		SetRegView 64
+	${EndIf}
+
 	ReadRegStr $0 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" CurrentVersion 
-	${If} $0 S< ${JREVersion} 
-		MessageBox MB_OK|MB_ICONSTOP "Rig Client needs JRE version ${JREVersion} or higher. It is currently $0. Aborting the installation."
-		Abort ; causes installer to quit.
+	
+	${If} ${Arch} == "x64"
+		; Restore the registry back to 32 view
+		SetRegView 32
+	${EndIf}
+	
+	${If} $0 == ""
+	${AndIf} ${Arch} == "x64"
+		; It's possible a 32 bit JVM is installed, so we should alert the user to
+		; install a 64 bit JVM if this is the case.
+		ReadRegStr $0 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" CurrentVersion 
+		${If} $0 != ""
+			MessageBox MB_OK|MB_ICONSTOP "As this is the 64 bit Rig Client, 64 bit Java (version 1.6 or later) needs to installed. Alternatively, the 32 bit Rig Client may be used.$\n$\nAborting the installation."
+		${Else}
+			MessageBox MB_OK|MB_ICONSTOP "Rig Client needs Java (version 1.6 or later) installed. None has been detected. $\n$\nAborting the installation."
+		${EndIf}
+		Abort
+	${ElseIf} $0 == ""
+		; No version detected
+		MessageBox MB_OK|MB_ICONSTOP "Rig Client needs Java (version 1.6 or later) installed. None has been detected. $\n$\nAborting the installation."
+		Abort
+	${ElseIf} $0 S< ${JREVersion} 
+		; Earlier version detected
+		MessageBox MB_OK|MB_ICONSTOP "Rig Client needs Java version ${JREVersion} or later. Detected version is $0. $\n$\nAborting the installation."
+		Abort
 	${EndIf}
 FunctionEnd
 
@@ -354,13 +387,25 @@ FunctionEnd
     Push $R1
     ReadRegStr $R1 HKLM "${REGKEY}" "Path"
     ClearErrors
-    ExecWait '"$R1\rigclientservice" uninstall'
+	
+	${If} ${Arch} == "x64"
+		ExecWait '"$R1\rigclientservice64" uninstall'
+	${Else}
+		ExecWait '"$R1\rigclientservice" uninstall'
+	${EndIf}
+	
     ifErrors 0 WinServiceNoError
     MessageBox MB_ABORTRETRYIGNORE "Error in uninstalling RigClient service.$\n$\nIf the service is installed, manually \
     uninstall the service from command prompt using: '$R1\rigclientservice uninstall' as admin and pClick 'Retry'. $\nIf the service \
     is already uninstalled, pClick 'Ignore'. $\nClick 'Abort' to end the uninstallation" IDABORT AbortUninstall IDIGNORE WinServiceNoError 
-    ;TryAgain
-    ExecWait '$R1\rigclientservice uninstall'
+	
+    ; Try again
+	${If} ${Arch} == "x64"
+		ExecWait '"$R1\rigclientservice64" uninstall'
+	${Else}
+		ExecWait '"$R1\rigclientservice" uninstall'
+	${EndIf}
+   
     ifErrors 0 WinServiceNoError
     MessageBox MB_OK|MB_ICONSTOP "Error in uninstalling RigClient service again. Aborting the ${operation}"
     AbortUninstall:
@@ -421,7 +466,13 @@ Section "Rig Client" RigClient
     ; Common steps for installation and upgrade
     SetOutPath $INSTDIR
 	File dist\rigclient.jar
-	File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
+	
+	; The service wrapper is arch specific, so install an appropriate version
+	${If} ${Arch} == "x64"
+		File servicewrapper\WindowsServiceWrapper\Release_x64\rigclientservice64.exe
+	${Else}
+		File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
+	${EndIf}
     File rigclient_service.ini
 
     ; Set output path to the configuration directory
@@ -434,9 +485,16 @@ Section "Rig Client" RigClient
     SetOutPath $INSTDIR\lib
     
 	; Add the RigClient service to the windows services
-	ExecWait '"$INSTDIR\rigclientservice" install'
-	ifErrors 0 WinServiceInstNoError
-	MessageBox MB_OK|MB_ICONSTOP "Error in executing rigclientservice.exe"
+	${If} ${Arch} == "x64"
+		ExecWait '"$INSTDIR\rigclientservice64" install'
+		ifErrors 0 WinServiceInstNoError
+		MessageBox MB_OK|MB_ICONSTOP "Error in executing rigclientservice64.exe"
+	${Else}
+		ExecWait '"$INSTDIR\rigclientservice" install'
+		ifErrors 0 WinServiceInstNoError
+		MessageBox MB_OK|MB_ICONSTOP "Error in executing rigclientservice.exe"
+	${EndIf}
+	
 	; TODO  Revert back the installed RC in case of error?
 	Abort
 	WinServiceInstNoError:
@@ -679,9 +737,9 @@ SectionEnd
 ;Descriptions
 
 ; Language strings
-LangString DESC_SecRC ${LANG_ENGLISH} "Sahara Rig Client."
-LangString DESC_SecCommons ${LANG_ENGLISH} "Sahara Rig Client Commons. $\nThis component requires Rig Client component already installed or selected for installation."
-LangString DESC_UnSecCommons ${LANG_ENGLISH} "Sahara Rig Client Commons. $\nIf this component is installed, it will be selected automatically for uninstallation when Rig Client is selected "
+LangString DESC_SecRC ${LANG_ENGLISH} "SAHARA Labs Rig Client."
+LangString DESC_SecCommons ${LANG_ENGLISH} "SAHARA Labs Rig Client Commons. $\nThis component requires Rig Client component already installed or selected for installation."
+LangString DESC_UnSecCommons ${LANG_ENGLISH} "SAHARA Labs Rig Client Commons. $\nIf this component is installed, it will be selected automatically for uninstallation when Rig Client is selected "
 
 
 ; Assign language strings to sections
