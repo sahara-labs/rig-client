@@ -60,6 +60,8 @@ Changelog:
 	<property name="reports.pmd.xml.dir" location="test/reports/pmd" /> <!-- PMD reports -->
 	<property name="reports.bugs.xml.dir" location="test/reports/bugs" /> <!-- Findbugs reports -->
 	<property name="reports.emma.dir" location="test/reports/coverage" /> <!-- Emma coverage report -->
+	
+	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
 	<!-- Classpath -->
 	<path id="project.classpath">
@@ -86,6 +88,8 @@ Changelog:
 	<condition property="isUNIX">
 		<os family="unix" />
 	</condition>
+	
+	
 
 	<!-- Everything! -->
 	<target name="all" depends="clean,build,dist,test,pmd,bugs,doc"/>
@@ -110,20 +114,6 @@ Changelog:
 			</manifest>
 			<fileset dir="${build.classes.dir}"/>
 			<zipgroupfileset dir="${lib.dir}">
-				<exclude name="**/NOTICE.txt" />
-				<include name="**/*.jar" />
-				<exclude name="**/manifest.mf"/>
-				<exclude name="**/META-INF/*.SF" />
-				<exclude name="**/*.txt" />
-			</zipgroupfileset>
-			<zipgroupfileset dir="${lib.dir}/Axis2/">
-				<exclude name="**/NOTICE.txt" />
-				<include name="**/*.jar" />
-				<exclude name="**/manifest.mf"/>
-				<exclude name="**/META-INF/*.SF" />
-				<exclude name="**/*.txt" />
-			</zipgroupfileset>
-			<zipgroupfileset dir="${lib.dir}/Jetty/">
 				<exclude name="**/NOTICE.txt" />
 				<include name="**/*.jar" />
 				<exclude name="**/manifest.mf"/>
@@ -277,11 +267,28 @@ Changelog:
 	<!-- Depends packages depending on the target OS. -->
 	<target name="package" depends="win-package,rpm-package" />
 
-	<property name="NSIS_Install_Path" value="C:/Program Files/NSIS" />
+	<!-- The Windows target arch system property generates architecture specific
+		 installation packages. The options are:
+			-> x86 - 32 bit
+			-> x64 - 64 bit 
+		If not set the os.arch system property is used. -->
+	<property name="win.target.arch" value="x86" />
+	<if>
+		<available file="C:/Program Files/NSIS" type="dir" />
+		<then>
+			<property name="NSIS_Install_Path" value="C:/Program Files/NSIS" />
+		</then>
+		<else>
+			<property name="NSIS_Install_Path" value="C:/Program Files (x86)/NSIS" />
+		</else>
+	</if>
 	<target name="win-package" depends="dist" if="isWindows">
 		<mkdir dir="${package.dir}"/>
-	    <taskdef name="nsis" classpathref="project.tools" classname="com.danielreese.nsisant.Task" />
-	    <nsis script="SaharaInstall.nsi" verbosity="3" out="${package.dir}/SaharaInstaller.log" path="${NSIS_Install_Path}" />
+	    <taskdef name="nsis" classpathref="project.tools" classname="net.sf.nsisant.Task" />
+		<echo>Building arch ${win.target.arch}.</echo>
+	    <nsis script="SaharaInstall.nsi" verbosity="3" out="${package.dir}/SaharaInstaller.log" path="${NSIS_Install_Path}">
+			<define name="Arch" value="${win.target.arch}" />
+		</nsis>
 	</target>
 
 	<!-- Generates an RPM installer. -->

@@ -57,9 +57,6 @@ Name "SAHARA Labs Rig Client"
 ; Sahara Rig Client Version
 !define Version "3.0-0"
 
-; Architecture of the installer, two applicable options are x86 (32 bit) 
-; and x64 (64 bit)
-!define Arch "x64"
 
 !define JREVersion "1.6"
 
@@ -132,7 +129,6 @@ Var NoSectionSelectedUninstall
 Var RCAlreadyInstalled ;NI=Not installed, V2=2.x version installed, SAME=installed and same version, 
                        ;V3=Major version 3 is installed but with different minor version/build,
                        ;OTHER=some other version than thsi version or 2.x is installed
-
 
 Function DirectoryPagePre
 	; If there is already an installation of Sahara Rig Client, use the same folder for this installation. Else let the user select the installation folder
@@ -507,7 +503,11 @@ Section "Rig Client Commons" Commons
     File ..\RigClientCommons\dist\rigclient-commons.jar
     
     SetOutPath $INSTDIR
-    File ..\RigClientCommons\resources\wts-sessions\WindowsSessions\Release\WTSSessions.dll
+	${If} ${Arch} == "x64"
+		File ..\RigClientCommons\resources\wts-sessions\WindowsSessions\Release_x64\WTSSessions.dll
+	${Else}
+		File ..\RigClientCommons\resources\wts-sessions\WindowsSessions\Release\WTSSessions.dll
+	${EndIf}
     
     SetOutPath $INSTDIR\conf\conf.example
     File ..\RigClientCommons\conf\conf.example\CDUPower.properties
