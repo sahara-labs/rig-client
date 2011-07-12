@@ -40,7 +40,6 @@
 #ifndef WindowsWrapper_H
 #define WindowsWrapper_H
 
-#pragma comment(lib, "advapi32.lib")
 #define _CRT_SECURE_NO_WARNINGS 1
 
 #include <windows.h>
