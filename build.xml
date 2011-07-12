@@ -30,16 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Author: Michael Diponio (mdiponio)
 Date: 12th October 2009
-
-Changelog:
-  - 12/10/2009 - mdiponio - Initial file creation
-  - 16/10/2009 - mdiponio - Added JUnit target
-  - 18/10/2009 - mdiponio - Added PMD, Findbugs & Javadoc targets
-  - 19/10/2009 - mdiponio - Removed vebosity from delete target
-  - 20/10/2009 - mdiponio - Changed JUnit target to generate an associated
-                            EMMA code coverage report
-  - 22/10/2009 - mdiponio - Added classpathref to Javadoc task to fix warning
-                            about missing classes.
 -->
 <project name="RigClient" default="build" basedir=".">
 	<!-- Properties -->
@@ -60,8 +50,6 @@ Changelog:
 	<property name="reports.pmd.xml.dir" location="test/reports/pmd" /> <!-- PMD reports -->
 	<property name="reports.bugs.xml.dir" location="test/reports/bugs" /> <!-- Findbugs reports -->
 	<property name="reports.emma.dir" location="test/reports/coverage" /> <!-- Emma coverage report -->
-	
-	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
 	<!-- Classpath -->
 	<path id="project.classpath">
@@ -105,7 +93,7 @@ Changelog:
 	</target>
 
 	<!-- Generate an executable bundle. -->
-	<target name="dist" depends="build,servicearchive">
+	<target name="dist" depends="build">
 		<mkdir dir="${dist.dir}"/>
 		<jar destfile="${dist.dir}/${dist.jar}">
 			<manifest>
@@ -273,20 +261,12 @@ Changelog:
 			-> x64 - 64 bit 
 		If not set the os.arch system property is used. -->
 	<property name="win.target.arch" value="x86" />
-	<if>
-		<available file="C:/Program Files/NSIS" type="dir" />
-		<then>
-			<property name="NSIS_Install_Path" value="C:/Program Files/NSIS" />
-		</then>
-		<else>
-			<property name="NSIS_Install_Path" value="C:/Program Files (x86)/NSIS" />
-		</else>
-	</if>
+	<property name="nsis.path" value="C:/Program Files/NSIS" />
 	<target name="win-package" depends="dist" if="isWindows">
 		<mkdir dir="${package.dir}"/>
 	    <taskdef name="nsis" classpathref="project.tools" classname="net.sf.nsisant.Task" />
 		<echo>Building arch ${win.target.arch}.</echo>
-	    <nsis script="SaharaInstall.nsi" verbosity="3" out="${package.dir}/SaharaInstaller.log" path="${NSIS_Install_Path}">
+	    <nsis script="SaharaInstall.nsi" verbosity="3" out="${package.dir}/SaharaInstaller.log" path="${nsis.path}">
 			<define name="Arch" value="${win.target.arch}" />
 		</nsis>
 	</target>
