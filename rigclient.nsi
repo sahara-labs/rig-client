@@ -469,7 +469,7 @@ Section "Rig Client" RigClient
 	${Else}
 		File servicewrapper\WindowsServiceWrapper\Release\rigclientservice.exe
 	${EndIf}
-    File rigclient_service.ini
+    File servicewrapper\rigclient_service.ini
 
     ; Set output path to the configuration directory
     SetOutPath $INSTDIR\conf
