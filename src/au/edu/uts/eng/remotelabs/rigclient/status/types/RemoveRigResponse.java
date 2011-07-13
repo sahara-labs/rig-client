@@ -75,6 +75,7 @@ public class RemoveRigResponse implements ADBBean
         this.removeRigResponse = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

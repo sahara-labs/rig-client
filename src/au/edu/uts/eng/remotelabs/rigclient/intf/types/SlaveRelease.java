@@ -73,6 +73,7 @@ public class SlaveRelease implements ADBBean
 
     protected UserType localSlaveRelease;
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

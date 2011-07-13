@@ -83,6 +83,7 @@ public class SetConfigRequestType extends AuthRequiredRequestType implements ADB
         return BeanUtil.getUniquePrefix();
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

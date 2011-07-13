@@ -73,6 +73,7 @@ public class SetMaintenanceResponse implements ADBBean
 
     protected OperationResponseType setMaintenanceResponse;
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

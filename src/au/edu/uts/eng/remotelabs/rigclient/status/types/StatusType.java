@@ -114,6 +114,7 @@ public class StatusType implements ADBBean
         this.offlineReason = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

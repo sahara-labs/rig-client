@@ -90,6 +90,7 @@ public class NotificationRequestType extends AuthRequiredRequestType implements 
         return BeanUtil.getUniquePrefix();
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

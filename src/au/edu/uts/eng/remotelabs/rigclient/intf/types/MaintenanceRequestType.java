@@ -92,6 +92,7 @@ public class MaintenanceRequestType extends AuthRequiredRequestType implements A
         return BeanUtil.getUniquePrefix();
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

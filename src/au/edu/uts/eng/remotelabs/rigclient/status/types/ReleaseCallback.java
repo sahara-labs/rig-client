@@ -75,6 +75,7 @@ public class ReleaseCallback implements ADBBean
         this.releaseCallback = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

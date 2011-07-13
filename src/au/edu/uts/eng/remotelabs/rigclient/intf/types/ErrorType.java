@@ -98,6 +98,7 @@ public class ErrorType implements ADBBean
         return BeanUtil.getUniquePrefix();
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

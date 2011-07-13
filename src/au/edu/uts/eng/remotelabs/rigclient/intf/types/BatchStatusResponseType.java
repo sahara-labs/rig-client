@@ -446,6 +446,7 @@ public class BatchStatusResponseType implements ADBBean
         xmlWriter.writeEndElement();
     }
     
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

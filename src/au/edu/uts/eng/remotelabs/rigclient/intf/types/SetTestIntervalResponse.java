@@ -74,6 +74,7 @@ public class SetTestIntervalResponse implements ADBBean
 
     protected OperationResponseType setTestIntervalResponse;
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

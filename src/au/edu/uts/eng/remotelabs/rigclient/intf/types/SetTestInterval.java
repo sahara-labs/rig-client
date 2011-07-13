@@ -73,6 +73,7 @@ public class SetTestInterval implements ADBBean
 
     protected TestIntervalRequestType setTestInterval;
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

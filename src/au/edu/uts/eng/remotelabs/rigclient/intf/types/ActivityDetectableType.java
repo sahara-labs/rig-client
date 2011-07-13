@@ -88,6 +88,7 @@ public class ActivityDetectableType implements org.apache.axis2.databinding.ADBB
         return BeanUtil.getUniquePrefix();
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

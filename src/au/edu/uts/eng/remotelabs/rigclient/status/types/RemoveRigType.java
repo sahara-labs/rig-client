@@ -102,6 +102,7 @@ public class RemoveRigType extends RigType implements ADBBean
         this.removalReason = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

@@ -394,6 +394,7 @@ public class UserType extends AuthRequiredRequestType implements ADBBean
         xmlWriter.writeAttribute(namespace, attName, attValue);
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

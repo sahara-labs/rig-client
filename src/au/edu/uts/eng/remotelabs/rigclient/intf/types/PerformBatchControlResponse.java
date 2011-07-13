@@ -73,6 +73,7 @@ public class PerformBatchControlResponse implements ADBBean
 
     protected OperationResponseType performBatchControlResponse;
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

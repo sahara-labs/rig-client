@@ -73,6 +73,7 @@ public class SetMaintenance implements ADBBean
 
     protected MaintenanceRequestType setMaintenance;
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

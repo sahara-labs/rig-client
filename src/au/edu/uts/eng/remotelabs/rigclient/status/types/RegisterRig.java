@@ -76,6 +76,7 @@ public class RegisterRig implements ADBBean
         this.registerRig = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

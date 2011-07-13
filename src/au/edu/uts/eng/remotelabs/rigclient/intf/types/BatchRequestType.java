@@ -89,6 +89,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
         return BeanUtil.getUniquePrefix();
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
@@ -439,6 +440,7 @@ public class BatchRequestType extends AuthRequiredRequestType implements ADBBean
     
     public static class Factory
     {
+        @SuppressWarnings("deprecation")
         public static BatchRequestType parse(final XMLStreamReader reader) throws Exception
         {
             final BatchRequestType object = new BatchRequestType();

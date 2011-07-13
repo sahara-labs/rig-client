@@ -91,6 +91,7 @@ public class AttributeResponseTypeChoice implements org.apache.axis2.databinding
         return BeanUtil.getUniquePrefix();
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

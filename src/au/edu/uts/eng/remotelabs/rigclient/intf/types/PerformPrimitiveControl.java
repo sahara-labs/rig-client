@@ -73,6 +73,7 @@ public class PerformPrimitiveControl implements ADBBean
 
     protected PrimitiveControlRequestType performPrimitiveControl;
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

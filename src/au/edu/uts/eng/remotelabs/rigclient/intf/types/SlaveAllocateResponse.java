@@ -72,6 +72,7 @@ public class SlaveAllocateResponse implements ADBBean
             "slaveAllocateResponse", "ns1");
 
     protected OperationResponseType slaveAllocateResponse;
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

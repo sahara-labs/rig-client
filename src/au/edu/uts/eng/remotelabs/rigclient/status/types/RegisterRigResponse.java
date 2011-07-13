@@ -75,6 +75,7 @@ public class RegisterRigResponse implements ADBBean
         this.registerRigResponse = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

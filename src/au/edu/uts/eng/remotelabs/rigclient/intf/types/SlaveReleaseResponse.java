@@ -74,6 +74,7 @@ public class SlaveReleaseResponse implements ADBBean
 
     protected OperationResponseType slaveReleaseResponse;
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

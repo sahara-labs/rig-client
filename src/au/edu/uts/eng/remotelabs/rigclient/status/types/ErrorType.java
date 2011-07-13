@@ -107,6 +107,7 @@ public class ErrorType implements ADBBean
         this.reason = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

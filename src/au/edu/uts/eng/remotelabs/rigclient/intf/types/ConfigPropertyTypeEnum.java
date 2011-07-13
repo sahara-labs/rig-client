@@ -225,6 +225,7 @@ public class ConfigPropertyTypeEnum implements ADBBean
         return this.type.toString();
     }
     
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

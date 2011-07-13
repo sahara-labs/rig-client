@@ -73,6 +73,7 @@ public class ReleaseResponse implements ADBBean
     public static final QName MY_QNAME = new QName("http://remotelabs.eng.uts.edu.au/rigclient/protocol",
             "releaseResponse", "ns1");
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

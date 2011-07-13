@@ -73,6 +73,7 @@ public class PerformBatchControl implements ADBBean
 
     protected BatchRequestType performBatchControl;
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

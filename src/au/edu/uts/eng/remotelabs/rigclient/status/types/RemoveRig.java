@@ -75,6 +75,7 @@ public class RemoveRig implements ADBBean
         this.removeRig = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

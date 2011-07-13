@@ -73,6 +73,7 @@ public class SlaveAllocate implements ADBBean
 
     protected SlaveUserType slaveAllocate;
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

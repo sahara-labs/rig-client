@@ -136,6 +136,7 @@ public class ProviderResponse implements ADBBean
         this.identityToken = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

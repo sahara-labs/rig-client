@@ -122,6 +122,7 @@ public class RegisterRigType extends RigType implements ADBBean
         this.contactUrl = param;
     }
     
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

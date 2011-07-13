@@ -80,6 +80,7 @@ public class Notify implements ADBBean
         if (namespace.equals("http://remotelabs.eng.uts.edu.au/rigclient/protocol")) return "ns1";
         return BeanUtil.getUniquePrefix();
     }
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

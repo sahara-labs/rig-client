@@ -97,6 +97,7 @@ public class PrimitiveControlRequestType extends AuthRequiredRequestType impleme
         return BeanUtil.getUniquePrefix();
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

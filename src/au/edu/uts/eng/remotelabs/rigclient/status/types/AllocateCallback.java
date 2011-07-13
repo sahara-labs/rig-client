@@ -75,6 +75,7 @@ public class AllocateCallback implements ADBBean
         this.allocateCallback = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;

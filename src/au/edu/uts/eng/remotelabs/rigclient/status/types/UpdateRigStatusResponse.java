@@ -75,6 +75,7 @@ public class UpdateRigStatusResponse implements ADBBean
         this.updateRigStatusResponse = param;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isReaderMTOMAware(final XMLStreamReader reader)
     {
         boolean isReaderMTOMAware = false;
