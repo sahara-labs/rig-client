@@ -64,9 +64,6 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         this.front = new PrimitiveFront();
     }
     
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#performPrimitive(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest)
-     */
     @Override
     public PrimitiveResponse performPrimitive(final PrimitiveRequest req)
     {
@@ -74,19 +71,21 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
                 req.getController() + ", method: " + req.getAction() + ".");
         return this.front.routeRequest(req);
     }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#expungePrimitiveControllerCache()
-     */
+
     @Override
     public void expungePrimitiveControllerCache()
     {
         this.front.expungeCache();
     }
     
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#performBatch(java.lang.String)
+    /**
+     * Returns the primitive front controller.
      */
+    public PrimitiveFront getFrontController()
+    {
+        return this.front;
+    }
+
     @Override
     public boolean performBatch(final String fileName, final String userName)
     {
@@ -132,10 +131,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         }
         return true;
     }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#isBatchRunning()
-     */
+
     @Override
     public boolean isBatchRunning()
     {
@@ -144,9 +140,6 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         return this.runner.isRunning();
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#abortBatch()
-     */
     @Override
     public boolean abortBatch()
     {
@@ -178,9 +171,6 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         return !this.isBatchRunning();
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#getBatchProgress()
-     */
     @Override
     public int getBatchProgress()
     {
@@ -222,9 +212,6 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         }
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#getBatchResults()
-     */
     @Override
     public BatchResults getBatchResults()
     {
@@ -247,9 +234,6 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         return results;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl#getBatchState()
-     */
     @Override
     public BatchState getBatchState()
     {

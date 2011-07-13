@@ -39,8 +39,8 @@
 package au.edu.uts.eng.remotelabs.rigclient.server;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +50,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.AboutPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.AbstractPage;
+import au.edu.uts.eng.remotelabs.rigclient.server.pages.PrimitivePage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.ConfigPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.DocPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.ErrorPage;
@@ -86,7 +88,7 @@ public class RootServlet extends HttpServlet
     private final List<String> resources;
     
     /** Page URL bases. */
-    private final Map<String, String> pages;
+    private final Map<String, Class<? extends AbstractPage>> pages;
     
     /** Logger. */
     private ILogger logger;
@@ -103,16 +105,17 @@ public class RootServlet extends HttpServlet
         this.resources.add("pdf");
         
         /* Pages list. */
-        this.pages = new HashMap<String, String>();
-        this.pages.put("config", ConfigPage.class.getName());
-        this.pages.put("doc", DocPage.class.getName());
-        this.pages.put("info", InfoPage.class.getName());
-        this.pages.put("logs", LogsPage.class.getName());
-        this.pages.put("status", StatusPage.class.getName());
-        this.pages.put("op", OperationsPage.class.getName());
+        this.pages = new HashMap<String, Class<? extends AbstractPage>>();
+        this.pages.put("config", ConfigPage.class);
+        this.pages.put("doc", DocPage.class);
+        this.pages.put("info", InfoPage.class);
+        this.pages.put("logs", LogsPage.class);
+        this.pages.put("status", StatusPage.class);
+        this.pages.put("op", OperationsPage.class);
+        this.pages.put("control", PrimitivePage.class);
+        this.pages.put("about", AboutPage.class);
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     public void service(final HttpServletRequest req, final HttpServletResponse resp)
     {
@@ -173,9 +176,7 @@ public class RootServlet extends HttpServlet
             else if (this.pages.containsKey(requestBase))
             {
                 /* Load the page. */
-                ClassLoader loader =  RootServlet.class.getClassLoader();
-                Class<AbstractPage> clazz = (Class<AbstractPage>) loader.loadClass(this.pages.get(requestBase));
-                clazz.newInstance().service(req, resp);
+                this.pages.get(requestBase).newInstance().service(req, resp);
             }
             else
             {
@@ -190,15 +191,6 @@ public class RootServlet extends HttpServlet
             {
                 this.logger.warn("IO Exception servicing request.");  
                 new ErrorPage(ex).service(req, resp);
-            }
-            catch (IOException e) { /* Not much we can do. */ }
-        }
-        catch (ClassNotFoundException ex)
-        {
-            this.logger.warn("Class '" + this.pages.get(parts[1]) + "' not found.");
-            try
-            {
-                new ErrorPage("Not found.").service(req, resp);
             }
             catch (IOException e) { /* Not much we can do. */ }
         }

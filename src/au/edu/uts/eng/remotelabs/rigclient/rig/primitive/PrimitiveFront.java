@@ -237,6 +237,13 @@ public class PrimitiveFront
         return response;
     }
     
+    /**
+     * Gets the cache.
+     */
+    public PrimitiveCache getCache()
+    {
+        return this.cache;
+    }
     
     /**
      * Expunge the cache forcing cleanup of all controllers.

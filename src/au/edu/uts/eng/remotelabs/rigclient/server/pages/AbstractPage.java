@@ -43,8 +43,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,9 +68,6 @@ public abstract class AbstractPage
     
     /** The rig type class. */
     protected IRig rig;
-    
-    /** Loaded help documents. */
-    protected static final Map<String, String> helpDocs = new HashMap<String, String>();
     
     /** Whether there is page framing with default contents. */
     protected boolean framing;
@@ -257,9 +252,11 @@ public abstract class AbstractPage
         this.innerNavBar("Main", "/");
         this.innerNavBar("Status", "/status");
         this.innerNavBar("Configuration", "/config");
+        this.innerNavBar("Direct Control", "/control");
         this.innerNavBar("Logs", "/logs");
         this.innerNavBar("Diagnostics", "/info");
         this.innerNavBar("Documentation", "/doc");
+        this.innerNavBar("About", "/about");
         
         this.println("   </ol>");
         this.println("   <div id='slide'> </div>");
@@ -422,8 +419,8 @@ public abstract class AbstractPage
     protected void addFooter()
     {
         this.println("<div id='footer' class='ui-corner-top'>");
-        this.println("   <a class='plaina alrpad' href='http://www.labshare.edu.au'>Labshare Australia</a>");
-        this.println("   | <a class='plaina alrpad' href='http://www.uts.edu.au'>&copy; University of Technology, Sydney 2009 - 2010</a>");
+        this.println("   <a class='plaina alrpad' href='http://www.labshare.edu.au'>Labshare</a>");
+        this.println("   | <a class='plaina alrpad' href='http://www.uts.edu.au'>&copy; University of Technology, Sydney 2009 - 2011</a>");
         this.println("</div>");
     }
     
@@ -462,47 +459,18 @@ public abstract class AbstractPage
      */
     protected String getPageHelp()
     {
-        String page = this.getPageType();
-        if (AbstractPage.helpDocs.containsKey(page))
-        {
-            return AbstractPage.helpDocs.get(page);
-        }
+        String line, page = this.getPageType();
+        StringBuilder helpBuf = new StringBuilder();
+        BufferedReader reader = null;
         
-        synchronized (AbstractPage.helpDocs)
+        try
         {
-            String line;
-            StringBuilder helpBuf = new StringBuilder();
-            BufferedReader reader = null;
-            try
-            {
-                InputStream is = AbstractPage.class.getResourceAsStream("/META-INF/web/doc/" + page + ".html");
-                if (is == null)
-                {
-                    this.logger.error("Failed to load help document file '/META-INF/web/doc/" + page + ".html' for page '" +
-                		page + "'. The help file was not found.");
-                
-                    /* Failed loading so put up an error dialog. */
-                    helpBuf.append("<div class='ui-state ui-state-error ui-corner-all' ");
-                    helpBuf.append("style='margin:0 auto; width: 260px; padding: 10px'>\n");
-                    helpBuf.append("  <span class='ui-icon ui-icon-alert' style='float:left; margin-right: 5px;'></span>\n");
-                    helpBuf.append("  Error loading help for this page.\n");
-                    helpBuf.append("</div>\n");
-                }
-                else
-                {
-                    reader = new BufferedReader(new InputStreamReader(is));    
-                    while ((line = reader.readLine()) != null)
-                    {
-                        helpBuf.append(line);
-                        helpBuf.append('\n');
-                    }
-                }
-            }
-            catch (IOException ex)
+            InputStream is = AbstractPage.class.getResourceAsStream("/META-INF/web/doc/" + page + ".html");
+            if (is == null)
             {
                 this.logger.error("Failed to load help document file '/META-INF/web/doc/" + page + ".html' for page '" +
-                		page + "'. Exceptiion message: " + ex.getMessage() + '.');
-                
+                        page + "'. The help file was not found.");
+
                 /* Failed loading so put up an error dialog. */
                 helpBuf.append("<div class='ui-state ui-state-error ui-corner-all' ");
                 helpBuf.append("style='margin:0 auto; width: 260px; padding: 10px'>\n");
@@ -510,19 +478,40 @@ public abstract class AbstractPage
                 helpBuf.append("  Error loading help for this page.\n");
                 helpBuf.append("</div>\n");
             }
-            finally
+            else
             {
-                try 
+                reader = new BufferedReader(new InputStreamReader(is));    
+                while ((line = reader.readLine()) != null)
                 {
-                    if (reader != null) reader.close();
+                    helpBuf.append(line);
+                    helpBuf.append('\n');
                 }
-                catch (IOException ex) { /* Not much to do. */ }
             }
-
-            AbstractPage.helpDocs.put(page, helpBuf.toString());
         }
-        
-        return AbstractPage.helpDocs.get(page);
+        catch (IOException ex)
+        {
+            this.logger.error("Failed to load help document file '/META-INF/web/doc/" + page + ".html' for page '" +
+                    page + "'. Exceptiion message: " + ex.getMessage() + '.');
+
+            /* Failed loading so put up an error dialog. */
+            helpBuf.append("<div class='ui-state ui-state-error ui-corner-all' ");
+            helpBuf.append("style='margin:0 auto; width: 260px; padding: 10px'>\n");
+            helpBuf.append("  <span class='ui-icon ui-icon-alert' style='float:left; margin-right: 5px;'></span>\n");
+            helpBuf.append("  Error loading help for this page.\n");
+            helpBuf.append("</div>\n");
+        }
+        finally
+        {
+            try 
+            {
+                if (reader != null) reader.close();
+            }
+            catch (IOException ex) { /* Not much to do. */ }
+        }
+
+
+
+        return helpBuf.toString();
     }
 
     /**
