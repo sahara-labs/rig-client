@@ -41,7 +41,7 @@
 
 Name: RigClient
 Summary: Software abstraction of of a physical rig.
-Version: 3.0
+Version: 3.1
 Release: 0
 License: BSD
 Group: Sahara
@@ -102,6 +102,15 @@ fi
 
 # Add a symlink to the Rig Client configuration into /etc
 ln -sf %{installdir}/conf /etc/Sahara/RigClient
+
+# Perform clean up from SRL2
+if [ -e %{installdir}/config/conf ] ; then
+    rm -f %{installdir}/config/conf
+fi
+
+if [ -e %{installdir}/interface ] ; then
+    rm -rf %{installdir}/interface
+fi
 
 %preun
 

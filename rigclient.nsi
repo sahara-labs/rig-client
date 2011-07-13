@@ -55,7 +55,7 @@ Name "SAHARA Labs Rig Client"
 !define REGKEY "SOFTWARE\$(^Name)"
 
 ; Sahara Rig Client Version
-!define Version "3.0-0"
+!define Version "3.1-0"
 
 
 !define JREVersion "1.6"
