@@ -129,6 +129,13 @@ fi
 # Remove configuration symlink
 rm -f  /etc/Sahara/RigClient
 
+%postun 
+
+# Clean up any remaining directories
+if [ -e %{installdir}/conf ] ; then
+    rm -rf %{installdir}/conf ] &> /dev/null
+fi
+
 %files
 %{installdir}/conf/rigclient.properties
 %{installdir}/conf/conf.d/logging.properties
