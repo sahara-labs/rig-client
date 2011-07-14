@@ -153,7 +153,7 @@ public abstract class AbstractRig implements IRig
         this.logger = LoggerFactory.getLoggerInstance();
         this.configuration = ConfigFactory.getInstance();
         
-        this.sessionUsers = new HashMap<String, Session>();
+        this.sessionUsers = Collections.synchronizedMap(new HashMap<String, Session>());
         
         this.accessActions = new ArrayList<IAccessAction>();
         this.slaveActions = new ArrayList<ISlaveAccessAction>();
@@ -408,10 +408,7 @@ public abstract class AbstractRig implements IRig
                 throw new IllegalStateException("Look out the window, the pigs are flying!");
         }
     }
-    
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRig#getAllRigAttributes()
-     */
+
     @Override
     public Map<String, String> getAllRigAttributes()
     {
@@ -435,9 +432,6 @@ public abstract class AbstractRig implements IRig
         return substituedProps;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRig#getCapabilities()
-     */
     @Override
     public String[] getCapabilities()
     {
@@ -491,9 +485,6 @@ public abstract class AbstractRig implements IRig
         return name;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRig#getRigAttribute(java.lang.String)
-     */
     @Override
     public String getRigAttribute(final String key)
     {
@@ -526,9 +517,6 @@ public abstract class AbstractRig implements IRig
         }
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRig#getType()
-     */
     @Override
     public String getType()
     {
@@ -544,18 +532,12 @@ public abstract class AbstractRig implements IRig
         return type;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigExerciser#getMaintenanceReason()
-     */
     @Override
     public String getMaintenanceReason()
     {
         return this.maintenanceReason;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigExerciser#getMonitorReason()
-     */
     @Override
     public String getMonitorReason()
     {
@@ -586,9 +568,6 @@ public abstract class AbstractRig implements IRig
         return buf.toString();
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigExerciser#isMonitorStatusGood()
-     */
     @Override
     public boolean isMonitorStatusGood()
     {
@@ -601,18 +580,12 @@ public abstract class AbstractRig implements IRig
         return true;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigExerciser#isNotInMaintenance()
-     */
     @Override
     public boolean isNotInMaintenance()
     {
         return !this.inMaintenance;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigExerciser#setInterval(int)
-     */
     @Override
     public boolean setInterval(final int interval)
     {
@@ -632,9 +605,6 @@ public abstract class AbstractRig implements IRig
         return true;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigExerciser#setMaintenance(boolean, java.lang.String, boolean)
-     */
     @Override
     public boolean setMaintenance(final boolean offline, final String reason, final boolean runTests)
     {
@@ -688,9 +658,6 @@ public abstract class AbstractRig implements IRig
         return true;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigExerciser#startTests()
-     */
     @Override
     public void startTests()
     {
@@ -706,9 +673,6 @@ public abstract class AbstractRig implements IRig
         }
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigExerciser#stopTests()
-     */
     @Override
     public void stopTests()
     {
@@ -734,19 +698,13 @@ public abstract class AbstractRig implements IRig
     {
         return Collections.unmodifiableList(this.testActions);
     }
-    
-    /*
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#getSessionUsers()
-     */
+  
     @Override
     public Map<String, Session> getSessionUsers()
     {
         return this.getSessionUsersClone();
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#addSlave(java.lang.String, boolean)
-     */
     @Override
     public boolean addSlave(final String name, final boolean passive)
     {
@@ -805,9 +763,6 @@ public abstract class AbstractRig implements IRig
         return true;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#assign(java.lang.String)
-     */
     @Override
     public boolean assign(final String name)
     {
@@ -859,39 +814,32 @@ public abstract class AbstractRig implements IRig
         return true;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#hasPermission(java.lang.String, au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session)
-     */
     @Override
     public boolean hasPermission(final String name, final Session ses)
     {
-        synchronized (this.sessionUsers)
-        {
-            if (!this.sessionUsers.containsKey(name))
-            {
-                return ses == Session.NOT_IN;
-            }
+        Session userSes = this.sessionUsers.get(name);
 
-            switch (this.sessionUsers.get(name))
-            {
-                case MASTER:
-                    return ses == Session.MASTER || ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE ||
-                    ses == Session.NOT_IN;
-                case SLAVE_ACTIVE:
-                    return ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE || ses == Session.NOT_IN;
-                case SLAVE_PASSIVE:
-                    return ses == Session.SLAVE_PASSIVE || ses == Session.NOT_IN;
-            }
+        if (userSes == null)
+        {
+            return ses == Session.NOT_IN;
         }
-        
+
+        switch (userSes)
+        {
+            case MASTER:
+                return ses == Session.MASTER || ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE ||
+                ses == Session.NOT_IN;
+            case SLAVE_ACTIVE:
+                return ses == Session.SLAVE_ACTIVE || ses == Session.SLAVE_PASSIVE || ses == Session.NOT_IN;
+            case SLAVE_PASSIVE:
+                return ses == Session.SLAVE_PASSIVE || ses == Session.NOT_IN;
+        }
+
         this.logger.error("All permission states unaccounted for, someone has been been naughty" +
         		"and put a Session.NOT_IN user as a session user. Please file bug report.");
         throw new IllegalStateException("Error in AbstractRig->hasPermission");
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#isInSession(java.lang.String)
-     */
     @Override
     public Session isInSession(final String name)
     {
@@ -906,9 +854,6 @@ public abstract class AbstractRig implements IRig
         }
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#notify(java.lang.String)
-     */
     @Override
     public boolean notify(final String message)
     {
@@ -933,9 +878,6 @@ public abstract class AbstractRig implements IRig
         return ret;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#revoke()
-     */
     @Override
     public boolean revoke()
     {
@@ -1017,28 +959,12 @@ public abstract class AbstractRig implements IRig
         return ret;
     }
 
-    /*
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#isSessionActive()
-     */
     @Override
     public boolean isSessionActive()
     {
-        boolean isMaster = false;
-        synchronized (this.sessionUsers)
-        {
-            for (Session ses : this.sessionUsers.values())
-            {
-                if (ses == Session.MASTER) isMaster = true;            
-            }
-        }
-        
-        this.logger.debug("Session check providing: " + (isMaster ? "Session is active." : "Session is not active."));
-        return isMaster;
+        return this.sessionUsers.values().contains(Session.MASTER);
     }
-    
-    /*
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#isActivityDetected
-     */
+   
     @Override
     public boolean isActivityDetected()
     {
@@ -1062,9 +988,6 @@ public abstract class AbstractRig implements IRig
         return false;
     }
 
-    /* 
-     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#revokeSlave(java.lang.String)
-     */
     @Override
     public boolean revokeSlave(final String name)
     {
