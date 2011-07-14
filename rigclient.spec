@@ -133,7 +133,7 @@ rm -f  /etc/Sahara/RigClient
 
 # Clean up any remaining directories
 if [ -e %{installdir}/conf ] ; then
-    rm -rf %{installdir}/conf ] &> /dev/null
+    rm -rf %{installdir}/conf &> /dev/null
 fi
 
 %files
