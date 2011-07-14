@@ -115,7 +115,12 @@ public class OperationsPage extends AbstractPage
         {
             if (this.rig instanceof IRigControl)
             {
+                this.logger.info("Expunging direct control cache.");
                 ((IRigControl)this.rig).expungePrimitiveControllerCache();
+            }
+            else
+            {
+                this.logger.warn("Unable to expunge primitive control cache because this rig type does not support it.");
             }
         }
         else if (uri.endsWith("cache"))
@@ -234,18 +239,16 @@ public class OperationsPage extends AbstractPage
         this.pageBeginning();
         this.confirmPanelStart();
         
+        this.println("<div class='confirmimg'><img src='/img/cache_huge.png' alt='cache' /></div>");
         if (!(this.rig instanceof IRigControl))
-        {
-            this.println("<div class='confirmimg'><img src='/img/restart_huge.png' alt='restart' /></div>");
+        {   
             this.println("  <div class='confirmtext'>This Rig Client does not support direct control.</div>");
             this.println("<div style='clear:both'> </div>");
             this.println("<div id='confirmbuttons'>");
             this.addButton("noconfirm", "OK", "window.location.replace(\"/\")");
-            this.println("</div>");
         }
         else if (!this.rig.isSessionActive())
         {
-            this.println("<div class='confirmimg'><img src='/img/restart_huge.png' alt='restart' /></div>");
             this.println("  <div class='confirmtext'>No session is active so the cache is not active.</div>");
             this.println("<div style='clear:both'> </div>");
             this.println("<div id='confirmbuttons'>");
@@ -254,14 +257,13 @@ public class OperationsPage extends AbstractPage
         }
         else
         {
-            this.println("<div class='confirmimg'><img src='/img/restart_huge.png' alt='restart' /></div>");
             this.println("  <div class='confirmtext'>Are you sure you want to expunge the direct control cache?</div>");
             this.println("<div style='clear:both'> </div>");
             this.println("<div id='confirmbuttons'>");
             this.addButton("noconfirm", "No", "window.location.replace(\"/\")");
             this.addButton("confirmres", "Yes", "expungeCache()");
-            this.println("</div>");
         }
+        this.println("</div>");
         
         this.confirmPanelEnd();
         this.pageEnd();
