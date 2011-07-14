@@ -84,42 +84,49 @@ public class PageResource
             return;
         }
         
-        InputStream is = PageResource.class.getResourceAsStream(path);
-        if (is == null)
+        BufferedInputStream stream = null;
+        BufferedOutputStream out = null;
+        try
         {
-            this.logger.warn("Web resource '" + path + "' not found.");
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            resp.getWriter().println("Not found.");
-            return;
+            InputStream is = PageResource.class.getResourceAsStream(path);
+            
+            if (is == null)
+            {
+                this.logger.warn("Web resource '" + path + "' not found.");
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.getWriter().println("Not found.");
+                return;
+            }
+            
+            /* Set the header at the time of start the rig client (the files are 
+             * packaged in the jar so they won't change. */
+            resp.setDateHeader("Last-Modified", this.startTime);
+           
+            stream = new BufferedInputStream(is);
+            out = new BufferedOutputStream(resp.getOutputStream());
+            
+            /* Content type. */
+            if      (path.endsWith("js"))   resp.setContentType("text/javascript");
+            else if (path.endsWith("css"))  resp.setContentType("text/css");
+            else if (path.endsWith("html")) resp.setContentType("text/html");
+            else if (path.endsWith("png"))  resp.setContentType("image/png");
+            else if (path.endsWith("jpg") 
+                  || path.endsWith("jpeg")) resp.setContentType("image/jpeg");
+            else if (path.endsWith("gif"))  resp.setContentType("image/gif");
+            else if (path.endsWith("pdf"))  resp.setContentType("application/pdf");
+            else                            resp.setContentType("application/octet-stream");
+            
+            byte buf[] = new byte[1024];
+            int len = 0;
+            while ((len = stream.read(buf)) > 0)
+            {
+                out.write(buf, 0, len);
+            }
         }
-        
-        /* Set the header at the time of start the rig client (the files are 
-         * packaged in the jar so they won't change. */
-        resp.setDateHeader("Last-Modified", this.startTime);
-       
-        
-        BufferedInputStream stream = new BufferedInputStream(is);
-        BufferedOutputStream out = new BufferedOutputStream(resp.getOutputStream());
-        
-        /* Content type. */
-        if      (path.endsWith("js"))   resp.setContentType("text/javascript");
-        else if (path.endsWith("css"))  resp.setContentType("text/css");
-        else if (path.endsWith("html")) resp.setContentType("text/html");
-        else if (path.endsWith("png"))  resp.setContentType("image/png");
-        else if (path.endsWith("jpg") 
-              || path.endsWith("jpeg")) resp.setContentType("image/jpeg");
-        else if (path.endsWith("gif"))  resp.setContentType("image/gif");
-        else if (path.endsWith("pdf"))  resp.setContentType("application/pdf");
-        else                            resp.setContentType("application/octet-stream");
-        
-        byte buf[] = new byte[1024];
-        int len = 0;
-        while ((len = stream.read(buf)) > 0)
+        finally 
         {
-            out.write(buf, 0, len);
+            if (out != null) out.flush();
+            if (stream != null) stream.close();
         }
-        
-        out.flush();
-        stream.close();
     }
 }
