@@ -69,7 +69,7 @@ public class IndexPage extends AbstractPage
         this.links = new LinkedHashMap<String, String>(5);
         this.links.put("Status", "/status");
         this.links.put("Configuration", "/config");
-        this.links.put("Direct_Control", "/control");
+//        this.links.put("Direct_Control", "/control");
         this.links.put("Logs", "/logs");
         this.links.put("Diagnostics", "/info");
         this.links.put("Documentation", "/doc");
@@ -77,6 +77,7 @@ public class IndexPage extends AbstractPage
         
         this.operations = new LinkedHashMap<String, String>(4);
         this.operations.put("Clear_Maintenance", "/op/clear");
+        this.operations.put("Expunge_Cache", "/op/cache");
         this.operations.put("Clean_Files", "/op/clean");
         this.operations.put("Garbage_Collection", "/op/gc");
         this.operations.put("Restart", "/op/restart");
@@ -85,7 +86,7 @@ public class IndexPage extends AbstractPage
         this.icons = new HashMap<String, String>(9);
         this.icons.put("Status", "status");
         this.icons.put("Configuration", "config");
-        this.icons.put("Direct_Control", "control");
+//        this.icons.put("Direct_Control", "control");
         this.icons.put("Logs", "logs");
         this.icons.put("Documentation", "doc");
         this.icons.put("About", "about");
@@ -93,6 +94,7 @@ public class IndexPage extends AbstractPage
         this.icons.put("Restart", "restart");
         this.icons.put("Shutdown", "shutdown");
         this.icons.put("Clear_Maintenance", "clearmain");
+        this.icons.put("Expunge_Cache", "cache");
         this.icons.put("Garbage_Collection", "trash");
         this.icons.put("Clean_Files", "clean");
         
@@ -100,7 +102,7 @@ public class IndexPage extends AbstractPage
         this.toolTips.put("Status", "The current status of the rig client.");
         this.toolTips.put("Configuration", "Allows configuration properties of the rig client to be viewed and " +
         		"changed.");
-        this.toolTips.put("Direct_Control", "Allows the direct control cache to be viewed and cleared.");
+  //      this.toolTips.put("Direct_Control", "Allows the direct control cache to be viewed and cleared.");
         this.toolTips.put("About", "About Rig Client.");
         this.toolTips.put("Logs", "Log viewer displaying the latest log messages.");
         this.toolTips.put("Documentation", "Documentation about the rig client.");
@@ -108,6 +110,7 @@ public class IndexPage extends AbstractPage
         this.toolTips.put("Restart", "Soft restarts the rig client.");
         this.toolTips.put("Shutdown", "Shuts down the rig client. The rig client service is stopped.");
         this.toolTips.put("Clear_Maintenance", "Clears any maintenance states the rig may have.");
+        this.toolTips.put("Expunge_Cache", "Clears the direct control cache.");
         this.toolTips.put("Garbage_Collection", "Runs garbage collection which frees unused memory.");
         this.toolTips.put("Clean_Files", "Cleans configuration and log backup files.");
     }

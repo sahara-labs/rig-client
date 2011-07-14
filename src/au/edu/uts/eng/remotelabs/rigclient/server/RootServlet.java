@@ -52,7 +52,6 @@ import javax.servlet.http.HttpSession;
 
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.AboutPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.AbstractPage;
-import au.edu.uts.eng.remotelabs.rigclient.server.pages.PrimitivePage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.ConfigPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.DocPage;
 import au.edu.uts.eng.remotelabs.rigclient.server.pages.ErrorPage;
@@ -112,7 +111,6 @@ public class RootServlet extends HttpServlet
         this.pages.put("logs", LogsPage.class);
         this.pages.put("status", StatusPage.class);
         this.pages.put("op", OperationsPage.class);
-        this.pages.put("control", PrimitivePage.class);
         this.pages.put("about", AboutPage.class);
     }
     

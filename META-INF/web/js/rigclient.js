@@ -213,6 +213,25 @@ function restartRigClient()
 	);
 }
 
+function expungeCache()
+{
+	$("#confirmationcontainer").empty().addClass('confirminprogress').append(
+		"<div><img src='/img/spinner.gif' alt='Loading' /></div>\n" +
+		"Expunging direct control cache..."
+	);
+	
+	$.post(
+		"/op/cache",
+		null,
+		function() {
+			setTimeout(function() {
+				window.location.replace("/");
+			}, 5000);
+		}
+	);
+}
+
+
 function checkIfRestarted()
 {
 	$.get(

@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.edu.uts.eng.remotelabs.rigclient.main.RigClient;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
 import au.edu.uts.eng.remotelabs.rigclient.util.BackupCleaner;
 
 /**
@@ -109,6 +110,17 @@ public class OperationsPage extends AbstractPage
         {
             System.gc();
             this.redirect(resp, "/");
+        }
+        else if (uri.endsWith("cache") && "POST".equals(req.getMethod()))
+        {
+            if (this.rig instanceof IRigControl)
+            {
+                ((IRigControl)this.rig).expungePrimitiveControllerCache();
+            }
+        }
+        else if (uri.endsWith("cache"))
+        {
+            this.displayCacheConfirmation();
         }
         else
         {
@@ -209,6 +221,47 @@ public class OperationsPage extends AbstractPage
         this.addButton("noconfirm", "No", "window.location.replace(\"/\")");
         this.addButton("clearmain", "Yes", "cleanBackups()");
         this.println("</div>");
+        
+        this.confirmPanelEnd();
+        this.pageEnd();
+    }
+    
+    /**
+     * Displays a confirmation page for cache expunge function.
+     */
+    private void displayCacheConfirmation()
+    {
+        this.pageBeginning();
+        this.confirmPanelStart();
+        
+        if (!(this.rig instanceof IRigControl))
+        {
+            this.println("<div class='confirmimg'><img src='/img/restart_huge.png' alt='restart' /></div>");
+            this.println("  <div class='confirmtext'>This Rig Client does not support direct control.</div>");
+            this.println("<div style='clear:both'> </div>");
+            this.println("<div id='confirmbuttons'>");
+            this.addButton("noconfirm", "OK", "window.location.replace(\"/\")");
+            this.println("</div>");
+        }
+        else if (!this.rig.isSessionActive())
+        {
+            this.println("<div class='confirmimg'><img src='/img/restart_huge.png' alt='restart' /></div>");
+            this.println("  <div class='confirmtext'>No session is active so the cache is not active.</div>");
+            this.println("<div style='clear:both'> </div>");
+            this.println("<div id='confirmbuttons'>");
+            this.addButton("noconfirm", "OK", "window.location.replace(\"/\")");
+            this.println("</div>");
+        }
+        else
+        {
+            this.println("<div class='confirmimg'><img src='/img/restart_huge.png' alt='restart' /></div>");
+            this.println("  <div class='confirmtext'>Are you sure you want to expunge the direct control cache?</div>");
+            this.println("<div style='clear:both'> </div>");
+            this.println("<div id='confirmbuttons'>");
+            this.addButton("noconfirm", "No", "window.location.replace(\"/\")");
+            this.addButton("confirmres", "Yes", "expungeCache()");
+            this.println("</div>");
+        }
         
         this.confirmPanelEnd();
         this.pageEnd();
