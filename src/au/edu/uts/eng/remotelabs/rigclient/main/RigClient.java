@@ -230,14 +230,14 @@ public class RigClient
             {
                 Throwable cause = thr.getCause();
                 this.logger.fatal("Unhandled exception '" + cause.getClass().getSimpleName() + "' with error message '" +
-                        cause.getMessage() + "'. This is a proverbial blue screen of death. It may be caused by using " +
-                        "an action class that isn't valid for your platform or a bug.");
+                        cause.getMessage() + "'. It may be caused by using an action class that isn't valid for " +
+                        "your platform or a bug. Please consult the Rig Client logs for further details.");
             }
             else
             {
                 this.logger.fatal("Unhandled exception '" + thr.getClass().getSimpleName() + "' with error message '" +
-                        thr.getMessage() + "'. This is a proverbial blue screen of death. It may be caused by using " +
-                        "an action class that isn't valid for your platform or a bug.");
+                        thr.getMessage() + "'. It may be caused by using an action class that isn't valid for your " +
+                        "platform or a bug. Please consult the Rig Client logs for further details.");
             }
             RigClientDefines.reportBug("Unhandled exception which popped the stack.", thr);
             return;
