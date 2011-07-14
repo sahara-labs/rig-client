@@ -117,6 +117,7 @@ public class RigFactoryTester extends TestCase
             .andReturn("au.edu.uts.eng.remotelabs.rigclient.type.tests.MockIRig");
         replay(this.mockConfig);
         
+        RigFactory.initRigInstance();
         Object rig = RigFactory.getRigInstance();
         assertNotNull(rig);
         assertTrue(rig instanceof IRig);

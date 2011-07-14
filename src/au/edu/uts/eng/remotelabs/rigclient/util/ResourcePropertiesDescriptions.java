@@ -106,7 +106,6 @@ public class ResourcePropertiesDescriptions implements IConfigDescriptions
             String desLoc = System.getProperty("prop.descriptions");
             if (desLoc == null)
             {
-                
                 Enumeration<URL> urls = this.getClass().getClassLoader().getResources(RESOURCE_LOC);
                 while (urls.hasMoreElements())
                 {

@@ -2005,8 +2005,14 @@ public class RigClientServiceTester extends TestCase
         assertFalse(resp.getIsActivityDetectableResponse().getActivity());
     }
     
-    public void testGetConfig()
+    public void testGetConfig() throws Exception
     {
+        Field f = ConfigFactory.class.getDeclaredField("descriptions");
+        f.setAccessible(true);
+        f.set(null, null);
+        
+        System.setProperty("prop.descriptions", "META-INF/config-descriptions.xml");
+        
         GetConfig request = new GetConfig();
         NullType nll = new NullType();
         request.setGetConfig(nll);

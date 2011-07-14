@@ -178,7 +178,7 @@ public class AbstractBatchRunnerTester extends TestCase
             assertTrue(stdout.contains("Sleep loop count is 0")); // This is unreliable as it's based on timing
             assertNotNull(stdout);
             
-            Thread.sleep(1000);
+            Thread.sleep(1500);
             stdout = this.runner.getBatchStandardOut();
             assertNotNull(stdout);          
             assertTrue(stdout.contains("Sleep loop count is 2")); // This is unreliable as it's based on correct timing
@@ -306,7 +306,7 @@ public class AbstractBatchRunnerTester extends TestCase
             assertTrue(stderr.contains("Sleep loop count is 0")); // This is unreliable as it's based on timing
             assertNotNull(stderr);
             
-            Thread.sleep(1000);
+            Thread.sleep(1500);
             stderr = this.runner.getBatchStandardError();
             assertNotNull(stderr);          
             assertTrue(stderr.contains("Sleep loop count is 2")); // This is unreliable as it's based on correct timing
