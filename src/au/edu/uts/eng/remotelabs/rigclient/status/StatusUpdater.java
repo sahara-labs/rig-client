@@ -277,7 +277,7 @@ public class StatusUpdater implements Runnable
                 if (ex.getCause() instanceof ConnectException)
                 {
                     this.logger.error("Unable to" + (StatusUpdater.isRegistered ? " update the rigs status" : 
-                            " register the rig") + ". Error reason is connection error with reason: " + ex.getMessage() +
+                            " register the rig") + ". Error reason is connection error: " + ex.getMessage() +
                             ". Ensure the Scheduling Server is running and listening on the configured port number.");
                 }
                 else if (ex.getCause() instanceof UnknownHostException)
