@@ -399,3 +399,13 @@ function addNewConfProp()
 	propNum++;
 }
 
+function loadAboutTab(tab)
+{
+	/* Change tab indicator. */
+	$("#lefttabbar .selectedtab").removeClass("selectedtab").addClass("notselectedtab");
+	$("#" + tab + "tab").removeClass("notselectedtab").addClass("selectedtab");
+	
+	/* Change tab contents. */
+	$("#contentspane .displayed").removeClass("displayed").addClass("notdisplayed");	
+	$("#" + tab + "contents").removeClass("notdisplayed").addClass("displayed");
+}

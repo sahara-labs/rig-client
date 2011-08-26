@@ -419,9 +419,8 @@ public abstract class AbstractPage
     protected void addFooter()
     {
         this.println("<div id='footer' class='ui-corner-top'>");
-        this.println("   <a class='plaina alrpad' href='http://sourceforge.net/projects/labshare-sahara'>SAHARA Labs</a>");
-        this.println("   | <a class='plaina alrpad' href='http://www.labshare.edu.au'>Labshare</a>");
-        this.println("   | <a class='plaina alrpad' href='http://www.uts.edu.au'>&copy; University of Technology, Sydney 2009 - 2011</a>");
+        this.println("<a class='plaina' href='http://sourceforge.net/projects/labshare-sahara/' target='_blank'>" +
+        		"Powered by the open source <strong>SAHARA Labs r3.1</strong> system.</a>");
         this.println("</div>");
     }
     

@@ -38,7 +38,10 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +56,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class AboutPage extends AbstractPage
 {
-    /** The names of the tabs. */
+        /** The names of the tabs. */
     private final Map<String, String> tabNames;
     
     /** Methods that provide specific tab information. */
@@ -102,7 +105,7 @@ public class AboutPage extends AbstractPage
         this.tabIcons.put("libraries", "lib");
         
         this.tabTooltips = new HashMap<String, String>();
-        this.tabTooltips.put("about", "Short description about the Rig Client.");
+        this.tabTooltips.put("about", "Short description about this software.");
         this.tabTooltips.put("developers", "Who the developers are.");
         this.tabTooltips.put("license", "The license of SAHARA Labs which specifies your rights and responsiblities " +
                 "with respect to the software.");
@@ -125,7 +128,7 @@ public class AboutPage extends AbstractPage
             if (i == 0) classes = "ui-corner-tl selectedtab";
             else if (i == this.tabNames.size() - 1) classes += " ui-corner-bl";
 
-            this.println("<li><a id='" + name + "tab' class='" + classes + "' onclick='loadInfoTab(\"" + name + "\")'>");
+            this.println("<li><a id='" + name + "tab' class='" + classes + "' onclick='loadAboutTab(\"" + name + "\")'>");
             this.println("  <div class='linkbutcont'>");
             this.println("    <div class='linkbutconticon'>");
             this.println("      <img src='/img/" + this.tabIcons.get(name) + "_small.png' alt='" + name + "' />");
@@ -164,6 +167,7 @@ public class AboutPage extends AbstractPage
             {
                 this.logger.error("Error invoking about page method. This is a bug so please report it.");
             }
+            this.println("</div>");
         }
         this.println("</div>");
 
@@ -217,27 +221,225 @@ public class AboutPage extends AbstractPage
     
     protected void adTab()
     {
-        this.println("about");
+        this.println("<div id='slbanner'>");
+        this.println("    <span>Scheduling Server r3.1</span><br />");
+        this.println("    Part of the SAHARA Labs r3.1 suite that schedules and assigns local laboratory rigs.");
+        this.println("</div>");
+        
+        this.println("<div id='slcopyright'>");
+        this.println("   Copyright &copy; 2009 - 2011, University of Technology, Sydney");
+        this.println("</div>");
     }
     
     protected void dvTab()
     {
-        this.println("developers");
+        this.println("<div id='devimage'>");
+        this.println("   <img src='/img/team.jpg' alt='Developers' />");
+        this.println("</div>");
+        
+        this.println("<div id='devdesc'>");
+        this.println("From left:");
+        this.println("   <ul>");
+        this.println("      <li>Michael Diponio - designed and wrote the system.</li>");
+        this.println("      <li>Tania Machet - managed the process.</li>");
+        this.println("      <li>Michel de la Villefromoy - the <em>boss</em>.</li>");
+        this.println("      <li>Tejaswini Despandi - tested the system.</li>");
+        this.println("   </ul>");
+        this.println("</div>");
     }
     
     protected void lcTab()
     {
-        this.println("license");
+        this.println("<div id='saharalicense'>");
+        this.println("  <div class='licensebrief'>SAHARA Labs is released under the terms:</div>");
+        this.println("  <div class='licensetext'>");
+        this.printLicense("/META-INF/web/lic/SAHARA_Labs");
+        this.println("  </div>");
+        this.println("</div>");
     }
     
+    /**
+     * The license tab which prints out information about the 
+     */
     protected void ldTab()
     {
-        this.println("libraries");
+        this.println("<div id='saharalibs'>");
+        this.println("  <div id='saharalibsbrief'>");
+        this.println("      SAHARA Labs is built on the libraries:");
+        this.println("  </div>");
+        
+        /* -- Jetty ---------------------------------------------------------- */
+        this.println("<div class='libblock'>");
+        this.println("  <div class='libname'>");
+        this.println("      <img src='/img/libs/jetty.gif' alt='Jetty' />");
+        this.println("  </div>");
+        this.println("  <div class='liblicense'>");
+        this.println("      <div class='liblicenseheader'>Jetty</div>"); 
+        this.printLicense("/META-INF/web/lic/Jetty");
+        this.println("  </div>");
+        this.println("</div>");
+        
+        /* -- Axis2 ---------------------------------------------------------- */
+        this.println("<div class='libblock'>");
+        this.println("  <div class='libname'>");
+        this.println("      <img src='/img/libs/axis.jpg' alt='Axis2' />");
+        this.println("  </div>");
+        this.println("  <div class='liblicense'>");
+        this.println("      <div class='liblicenseheader'>Apache Axis2</div>"); 
+        this.printLicense("/META-INF/web/lic/Axis2");
+        this.println("  </div>");
+        this.println("</div>");
+
+        /* -- Equinox -------------------------------------------------------- */
+        this.println("<div class='libblock'>");
+        this.println("  <div class='libname'>");
+        this.println("      <img src='/img/libs/equinox.png' alt='Equinox' />");
+        this.println("  </div>");
+        this.println("  <div class='liblicense'>");
+        this.println("      <div class='liblicenseheader'>Equinox (OSGi)</div>"); 
+        this.printLicense("/META-INF/web/lic/Equinox");
+        this.println("  </div>");
+        this.println("</div>");
+        
+        /* -- Hibernate ------------------------------------------------------ */
+        this.println("<div class='libblock'>");
+        this.println("  <div class='libname'>");
+        this.println("      <img src='/img/libs/hibernate.gif' alt='Hibernate' />");
+        this.println("  </div>");
+        this.println("  <div class='liblicense'>");
+        this.println("      <div class='liblicenseheader'>Hibernate</div>"); 
+        this.printLicense("/META-INF/web/lic/Hibernate");
+        this.println("  </div>");
+        this.println("</div>");
+        
+        /* -- MySQL connector ------------------------------------------------ */
+        this.println("<div class='libblock'>");
+        this.println("  <div class='libname'>");
+        this.println("      <img src='/img/libs/mysql.png' alt='MySQL' />");
+        this.println("  </div>");
+        this.println("  <div class='liblicense'>");
+        this.println("      <div class='liblicenseheader'>MySQL Connector/J</div>"); 
+        this.printLicense("/META-INF/web/lic/MySQLConnector");
+        this.println("  </div>");
+        this.println("</div>");
+        
+        /* -- PostgreSQL connector ------------------------------------------- */
+        this.println("<div class='libblock'>");
+        this.println("  <div class='libname'>");
+        this.println("      <img src='/img/libs/postgresql.jpeg' alt='PostgreSQL' />");
+        this.println("  </div>");
+        this.println("  <div class='liblicense'>");
+        this.println("      <div class='liblicenseheader'>PostgreSQL JDBC Connector</div>"); 
+        this.printLicense("/META-INF/web/lic/PostgreSQLConnector");
+        this.println("  </div>");
+        this.println("</div>");
+        
+        /* -- jTDS SQLServer connector --------------------------------------- */
+        this.println("<div class='libblock'>");
+        this.println("  <div class='libname'>");
+        this.println("      <img src='/img/libs/jTDS.gif' alt='jTDS' />");
+        this.println("  </div>");
+        this.println("  <div class='liblicense'>");
+        this.println("      <div class='liblicenseheader'>jTDS SQLServer JDBC driver</div>"); 
+        this.printLicense("/META-INF/web/lic/jTDS");
+        this.println("  </div>");
+        this.println("</div>");
+        
+        
+        /* -- c3p0 connector ------------------------------------------------- */
+        this.println("<div class='libblock'>");
+        this.println("  <div class='libname'>");
+        this.println("      c3p0");
+        this.println("  </div>");
+        this.println("  <div class='liblicense'>");
+        this.println("      <div class='liblicenseheader'>c3p0 (connection pooling)</div>"); 
+        this.printLicense("/META-INF/web/lic/c3p0");
+        this.println("  </div>");
+        this.println("</div>");
+        
+        /* -- log4j ---------------------------------------------------------- */
+        this.println("<div class='libblock'>");
+        this.println("  <div class='libname'>");
+        this.println("      <img src='/img/libs/log4j.jpg' alt='log4j' />");
+        this.println("  </div>");
+        this.println("  <div class='liblicense'>");
+        this.println("      <div class='liblicenseheader'>Apache log4j</div>"); 
+        this.printLicense("/META-INF/web/lic/log4j");
+        this.println("  </div>");
+        this.println("</div>");
+        
+        /* -- jQuery --------------------------------------------------------- */
+        this.println("<div class='libblock'>");
+        this.println("  <div class='libname'>");
+        this.println("      <img src='/img/libs/jquery.png' alt='jQuery' />");
+        this.println("  </div>");
+        this.println("  <div class='liblicense'>");
+        this.println("      <div class='liblicenseheader'>jQuery</div>"); 
+        this.printLicense("/META-INF/web/lic/jQuery");
+        this.println("  </div>");
+        this.println("</div>");
+        
+        this.println("</div>");
+        
+        this.println("<script type='text/javascript'>");
+        this.println("$(document).ready(function() {\n" + 
+        		"    $('#saharalibs .libname').click(function() {\n" + 
+        		"        var lic = $(this).next();\n" + 
+        		"        lic.css('display', lic.css('display') == 'block' ? 'none' : 'block');\n" + 
+        		"    });\n" + 
+        		"});");
+        this.println("</script>");
     }
 
     @Override
     protected String getPageType()
     {
         return "About";
+    }
+    
+    /** 
+     * Prints out a license given by the name.
+     * 
+     * @param path file path
+     */
+    private void printLicense(String path)
+    {
+        BufferedReader reader = null;
+        try
+        {
+            InputStream is = PageResource.class.getResourceAsStream(path);
+            if (is == null)
+            {
+                this.logger.error("Unable to find license file '" + path + "', this is a bug so please report.");
+                return;
+            }
+            
+            reader = new BufferedReader(new InputStreamReader(is));
+
+            String line = null;
+            while ((line = reader.readLine()) != null)
+            {
+                line = line.replace(" ", "&nbsp;");
+                if ("".equals(line)) line = "&nbsp;";
+
+                this.println("<div class='licenseline'>" + line + "</div>");
+            }
+        }
+        catch (IOException ex)
+        {
+            this.logger.error("Exception reading license file '" + path + "', this is a bug so please report.");
+        }
+        finally 
+        {
+            if (reader != null)
+                try
+                {
+                    reader.close();
+                }
+                catch (IOException e)
+                {
+                    this.logger.error("Exception closing license file '" + path + "', this is a bug so please report.");
+                }
+        }
     }
 }

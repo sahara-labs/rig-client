@@ -962,3 +962,118 @@ span.code {
 	width: 350px;
 	padding: 5px;
 }
+
+/******************************************************************************
+ ** About page.                                                              **
+ ******************************************************************************/
+  
+.notdisplayed {
+	display: none;
+}
+
+#aboutcontents {
+	position: relative;
+	height: 100%;
+	width: 100%;
+	background-color: #A0A0A0;
+}
+
+#slbanner {
+	color: #EFEFEF;
+    position: absolute;
+    text-align: center;
+    top: 40%;
+    width: 100%;
+}
+
+#slbanner span {
+	font-size: 35pt;
+	font-weight: bolder;
+}
+
+#slcopyright {
+	bottom: 5px;
+    color: #EFEFEF;
+    font-weight: bold;
+    margin-left: 14px;
+    position: absolute;
+}
+
+#devimage {
+	width: 600px;
+	margin: 20px auto;
+}
+
+#devdesc {
+	margin-left: 15px;
+	font-weight: bold;
+}
+
+#devdesc ul {
+	margin: 0 0 10px 20px;
+	font-weight: normal;
+}
+
+
+#saharalicense, #saharalibs {
+	padding: 10px;
+}
+
+.licensebrief, #saharalibsbrief {
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.licensetext { 
+	padding: 15px;
+	background-color: #FCFCFC;
+}
+
+.licenseline {
+	clear: both;
+	font-family: Courier New, Monospace;
+	font-size: 10.5pt;
+}
+
+#saharalibs .libname {
+	float: left;
+	height: 55px;
+	width: 265px;
+	border: 1px solid #A0A0A0;
+	background-color: #EFEFEF;
+	margin: 15px;
+	border-radius: 5px;
+	box-shadow: 0 0 4px #A0A0A0;
+	-moz-box-shadow: 0 0 4px #A0A0A0;
+	-webkit-box-shadow: 0 0 4px #A0A0A0;
+	padding: 8px 5px;
+	font-size: 13pt;
+	color: #606060;
+	font-weight: bold;
+	text-align: center;
+}
+
+
+#saharalibs .libname:hover {
+	border: 1px solid #FCEFA1;
+	background-color: #FCFAF2;
+	-moz-box-shadow: 0 0 12px #FCEFA1;
+	-webkit-box-shadow: 0 0 12px #606060;
+	box-shadow: 0 0 12px #606060;
+}
+
+#saharalibs .libname img {
+	height: 50px;
+}
+
+#saharalibs .liblicense {
+	display: none;
+}
+
+#saharalibs .liblicenseheader {
+	clear: left;
+	background-color: #EFEFEF;
+	font-weight: bold;
+	padding: 4px 0 4px 15px;
+	border-radius: 4px;
+}
