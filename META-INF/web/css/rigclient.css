@@ -982,13 +982,18 @@ span.code {
 	color: #EFEFEF;
     position: absolute;
     text-align: center;
-    top: 40%;
+    top: 25px;
     width: 100%;
 }
 
 #slbanner span {
 	font-size: 35pt;
 	font-weight: bolder;
+}
+
+#slbanner img {
+	display: block;
+	margin: 10px auto 25px;
 }
 
 #slcopyright {
