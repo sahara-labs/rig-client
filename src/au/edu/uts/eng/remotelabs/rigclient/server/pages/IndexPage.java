@@ -72,7 +72,7 @@ public class IndexPage extends AbstractPage
 //        this.links.put("Direct_Control", "/control");
         this.links.put("Logs", "/logs");
         this.links.put("Diagnostics", "/info");
-        this.links.put("Documentation", "/doc");
+//        this.links.put("Documentation", "/doc");
         this.links.put("About", "/about");
         
         this.operations = new LinkedHashMap<String, String>(4);

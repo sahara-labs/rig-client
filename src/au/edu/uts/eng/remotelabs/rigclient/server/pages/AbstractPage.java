@@ -255,7 +255,7 @@ public abstract class AbstractPage
 //        this.innerNavBar("Direct Control", "/control");
         this.innerNavBar("Logs", "/logs");
         this.innerNavBar("Diagnostics", "/info");
-        this.innerNavBar("Documentation", "/doc");
+//        this.innerNavBar("Documentation", "/doc");
         this.innerNavBar("About", "/about");
         
         this.println("   </ol>");
