@@ -47,7 +47,7 @@ EXE_NAME=rigclientservice
 all: unixwrapper
 
 unixwrapper: jvmrunner.o unixwrapper.o
-	cc ${CCOPTS} ${INCS} ${LIBS} jvmrunner.o unixwrapper.o -o ${EXE_NAME}
+	cc ${CCOPTS} ${INCS} jvmrunner.o unixwrapper.o -o ${EXE_NAME} ${LIBS}
 
 unixwrapper.o: unixwrapper.c
 	cc -c ${CCOPTS} ${INCS} unixwrapper.c
