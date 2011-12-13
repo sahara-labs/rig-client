@@ -210,12 +210,10 @@ public abstract class AbstractPage
         this.println("  <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
         this.println("  <link href='/css/rigclient.css' media='screen' rel='stylesheet' type='text/css' />");
         this.println("  <link href='/css/smoothness/jquery-ui.custom.css' rel='stylesheet' type='text/css' />");
-        this.println("  <link href='/css/jqtransform.css' rel='stylesheet' type='text/css' />");
         this.println("  <link href='/css/validationEngine.jquery.css' rel='stylesheet' type='text/css' />");
         this.println("  <script type='text/javascript' src='/js/jquery.js'> </script>");
         this.println("  <script type='text/javascript' src='/js/jquery-ui.js'> </script>");
         this.println("  <script type='text/javascript' src='/js/rigclient.js'> </script>");
-        this.println("  <script type='text/javascript' src='/js/jquery.jqtransform.js'> </script>");
         this.println("  <script type='text/javascript' src='/js/jquery.validationEngine-en.js'> </script>");
         this.println("  <script type='text/javascript' src='/js/jquery.validationEngine.js'> </script>");
         this.println("</head>");
@@ -229,13 +227,10 @@ public abstract class AbstractPage
         this.println("<div id='header'>");
         this.println("    <div class='headerimg' >");
         this.println("        <a href='http://sourceforge.net/projects/labshare-sahara/'>" +
-        		"<img src='/img/logo.png' alt='Sourceforge Project' /></a>");
+                "<img src='/img/logo.png' alt='Sourceforge Project' /></a>");
         this.println("   </div>");
         this.println("   <div class='headerimg' >");
         this.println("        <img src='/img/sahara.png' alt='Sahara Labs' />");
-        this.println("    </div>");
-        this.println("    <div id='labshareimg'>");
-        this.println("        <a href='http://www.labshare.edu.au/'><img src='/img/labshare.png' alt='LabShare' /></a>");
         this.println("    </div>");
         this.println("</div>");   
     }
@@ -420,7 +415,13 @@ public abstract class AbstractPage
     {
         this.println("<div id='footer' class='ui-corner-top'>");
         this.println("<a class='plaina' href='http://sourceforge.net/projects/labshare-sahara/' target='_blank'>" +
-        		"Powered by the open source <strong>SAHARA Labs r3.1</strong> system.</a>");
+                "<img src='/img/logo_small.png' alt='Logo' />" +
+                "Powered by the open source <strong>SAHARA Labs r3.2</strong> system.</a>");
+        this.println(
+                "<div>" +
+                    "<a class='plaina' href='http://www.feit.uts.edu.au/facilities/remote-lab/index.html' target='_blank'>" +
+                    "&copy; UTS 2009-2011</a>" +
+                "</div>");
         this.println("</div>");
     }
     

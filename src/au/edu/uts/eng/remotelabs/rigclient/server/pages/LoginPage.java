@@ -92,15 +92,15 @@ public class LoginPage extends AbstractPage
        this.println("          Login:");
        this.println("      </p>");
        this.println("   </div>");
-       this.println("   <div class='detailspanelcontents'>");
+       this.println("   <div class='detailspanelcontents saharaform'>");
 
        this.println("  <div class='forminput'>\n" +
                     "    <div class='formlabel'>Username:</div>\n" +
-                    "    <div class='forminut'><input id='usernamefield' class='validate[required]' type='text' name='username' /></div>\n" +
+                    "    <div class='formval'><input id='usernamefield' class='validate[required]' type='text' name='username' /></div>\n" +
                     "  </div>");
        this.println("  <div class='forminput'>\n" +
                     "    <div class='formlabel'>Password:</div>\n" +
-                    "    <div class='forminut'><input id='passwordfield' class='validate[required]' type='password' name='password' /></div>\n" +
+                    "    <div class='formval'><input id='passwordfield' class='validate[required]' type='password' name='password' /></div>\n" +
                     "  </div>");
 
        this.println("   </div>");
@@ -127,9 +127,10 @@ public class LoginPage extends AbstractPage
       
        /* Form styling. */
        this.println(
-               "   $('#loginform').jqTransform();\n" + 
-               "   $('.jqTransformInputWrapper').css('margin-top', '8px').css('width', '200px');\n" +
-               "   $('#subbutton').removeClass('jqTransformButton').button();\n");
+               "   $('.saharaform input')" +
+               "       .focusin(formFocusIn)" +
+               "       .focusout(formFocusOut);" +
+               "   $('#subbutton').button();\n");
        
        this.println("});");
        this.println("</script>");

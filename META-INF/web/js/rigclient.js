@@ -126,6 +126,17 @@ function resizeFooter()
 	n.style.minHeight = height + "px";
 }
 
+function formFocusIn() 
+{
+	$(this).css("border", "1px solid #606060");
+}
+
+function formFocusOut()
+{
+	$(this).css("border", "1px solid #AAAAAA");
+}
+
+
 function loadToolTip(pre, id, tt)
 {
 	if (tt[id])

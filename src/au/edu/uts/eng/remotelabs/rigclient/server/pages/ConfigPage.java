@@ -255,10 +255,7 @@ public class ConfigPage extends AbstractPage
         this.println("<script type='text/javascript'>");
         this.println(
                 "$(document).ready(function() {\n" +
-                "     $('#confform').validationEngine();\n" +
-                "     $('#confform').jqTransform();\n" +
-                "     $('.jqTransformInputWrapper').css('width', '305px');\n" +
-                "     $('.jqTransformInputInner div input').css('width', '100%');\n");
+                "     $('#confform').validationEngine();\n");
 
         /* Contents pane height. */
         this.println("     resizeConfPanel();");
@@ -287,7 +284,7 @@ public class ConfigPage extends AbstractPage
         Map<String, String> stanzaProps = this.stanzas.get(stanza);
         List<Property> stanzaPropList = this.desc.getPropertyDescriptions(stanza);
         
-        this.println("<form id='confform' action='/config/" + stanza + "' method='POST'>");
+        this.println("<form id='confform' action='/config/" + stanza + "' method='POST' class='saharaform'>");
         this.println("  <table id='contentstable'>");
         int i = 0;
         
@@ -383,10 +380,10 @@ public class ConfigPage extends AbstractPage
         this.println("  </table>");
         
         this.println("  <div class='newbut'>");
-        this.println("      <input class='newbutton' type='button' value='&nbsp;+&nbsp;'>");
+        this.println("      <button class='newbutton' type='button'>&nbsp;+&nbsp;</button>");
         this.println("  </div>");
         this.println("  <div class='submitbut'>");
-        this.println("      <input class='submitbutton' type='submit' value='Save' />");
+        this.println("      <button class='submitbutton' type='submit'>Save</button>");
         this.println("  </div>");
         
         this.println("</form>");

@@ -281,6 +281,16 @@ a.plaina:hover {
 	-moz-box-shadow: 0 -2px 2px #B5B5B5;
 	-webkit-box-shadow: 0 -2px 2px #B5B5B5;
 	box-shadow: 0 -2px 2px #B5B5B5;
+	overflow: hidden;
+}
+
+#footer img {
+	margin: 0 5px -11px;
+	border: none;
+}
+
+#footer div {
+	float: right;
 }
 
 /******************************************************************************
@@ -649,6 +659,10 @@ a.plaina:hover {
 	color: #606060;
 }
 
+#confform input {
+	width: 290px;
+}
+
 /******************************************************************************
  ** Login page.                                                              **
  ******************************************************************************/
@@ -671,10 +685,14 @@ a.plaina:hover {
 }
 
 .formlabel {
-	margin-top: 15px;
+	margin-top: 10px;
 	margin-left: 0px;
 	float: left;
 	width: 85px;
+}
+
+.formval {
+	margin-top: 3px;
 }
 
 #loginfail {
@@ -1082,3 +1100,17 @@ span.code {
 	padding: 4px 0 4px 15px;
 	border-radius: 4px;
 }
+
+/******************************************************************************
+ ** Form styling.                                                            **
+ ******************************************************************************/
+
+.saharaform input, .saharaform textarea, .saharaform select {
+	border: 1px solid #AAAAAA;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	padding: 4px;
+	background: url("../img/linear_grad.png") repeat-x scroll 0 0 #FDFDFD;
+}
+
