@@ -210,7 +210,7 @@ Test_Light_Time 7:00
 # when the test frequency is set to be the specified test run interval
 # multiplied by the specified dark time factor for exerciser tests which
 # enable light-dark exerciser scheduling. It is the test which specifies
-test sd
+test vommm
 # the dark time factor. The time should be configured with 24 hour time
 # with a column ':' between the hours and minute portions. The default
 # dark time is 18:00.

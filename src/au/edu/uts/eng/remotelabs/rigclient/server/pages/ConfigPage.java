@@ -61,6 +61,9 @@ import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions.Property;
  */
 public class ConfigPage extends AbstractPage
 {
+    /** Stanza where properties go if they don't exist in other stanzas. */
+    public static final String OTHER_STANZA = "Other";
+    
     /** Sorted configuration stanzas. */
     private  Map<String, Map<String, String>> stanzas;
     
@@ -84,7 +87,7 @@ public class ConfigPage extends AbstractPage
         for (Entry<String, String> e : this.props.entrySet())
         {
             Property p = this.desc.getPropertyDescription(e.getKey());
-            String sta = "Unknown";
+            String sta = ConfigPage.OTHER_STANZA;
             if (p != null)
             {
                 /* The property description exists so add the property to the 
@@ -189,7 +192,7 @@ public class ConfigPage extends AbstractPage
                 }
                 
                 /* Add the new properties. */
-                for (String[] p : newProps.values())
+                for (String p[] : newProps.values())
                 {
                     if (p[0] == null || p[1] == null) continue;
                     
@@ -265,10 +268,15 @@ public class ConfigPage extends AbstractPage
                 "     });");
 
         this.println(
-                "   $('.newbutton').click(function(){\n" +
-                "       addNewConfProp();\n" +
-                "   });");
-                 
+                "   $('#newbutton').button().click(addNewConfProp);");
+        
+        this.println(
+                "  $('#submitbutton').button().click(saveConfForm);");
+        
+        this.println(
+                "   $('#confform input')" +
+                "       .focusin(formFocusIn)" +
+                "       .focusout(formFocusOut);");
         
         this.println("});");		
         this.println("</script>");
@@ -377,15 +385,7 @@ public class ConfigPage extends AbstractPage
                 i++;
             }
         }
-        this.println("  </table>");
-        
-        this.println("  <div class='newbut'>");
-        this.println("      <button class='newbutton' type='button'>&nbsp;+&nbsp;</button>");
-        this.println("  </div>");
-        this.println("  <div class='submitbut'>");
-        this.println("      <button class='submitbutton' type='submit'>Save</button>");
-        this.println("  </div>");
-        
+        this.println("  </table>");       
         this.println("</form>");
     }
 

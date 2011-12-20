@@ -361,16 +361,17 @@ function loadConfStanza(stanza)
 		null,
 		function(data) {
 			/* Content pane. */
-	        $("#contentspane").empty()
-	        				  .append(data);
+	        $("#contentspane")
+	        	.empty()
+	        	.append(data);
 	        $("#confform").validationEngine();
-            $("#confform").jqTransform();
-            $(".jqTransformInputWrapper").css("width", "305px");
-            $(".jqTransformInputInner div input").css("width", "100%");
-            
-            $(".newbutton").click(function() {
-            	addNewConfProp();
-            });
+	        
+	        $("#confform input")
+	        	.focusin(formFocusIn)
+	        	.focusout(formFocusOut);
+
+	        $("#newbutton").button().click(addNewConfProp);
+	        $("#submitbutton").button().click(saveConfForm);
 		}
 	);
 	
@@ -398,16 +399,45 @@ function addNewConfProp()
 	var html = "<tr class='";
 	if ($("#contentstable tr").last().hasClass("evenrow")) html += "oddrow";
 	else html += "evenrow";		
-	html += "'><td class='pcol'><div style='width:305px;' class='jqTransformInputWrapper'>" +
-			"<div class='jqTransformInputInner'><div><input style='width:100%;' id='" + pid +
-	        "' name='" + pid + "' class='jqtranformdone jqTransformInput' value='' text='' />" +
-	        "</div></div></div>" + "</td><td class='pval'><div style='width:305px;' " +
-	        "class='jqTransformInputWrapper'>" + "<div class='jqTransformInputInner'><div>" +
-	        "<input style='width:100%;' id='" + vid + "' name='" + vid + "' class='jqtranformdone " +
-	        "jqTransformInput' value='' text='' /></div></div></div></td></tr>"; 
-
+	html += "'>" +
+				"<td class='pcol'>" +
+					"<div style='width:305px;'>" +
+						"<input id='" + pid + "' name='" + pid + "' value='' text='' />" +
+					"</div>" + 
+				"</td>" +
+				"<td class='pval'>" +
+					"<div style='width:305px;'>" +
+						"<input id='" + vid + "' name='" + vid + "' value='' text='' />" +
+					"</div>" +
+				"</td>" +
+			"</tr>"; 
+	
 	$("#contentstable").append(html);
 	propNum++;
+}
+
+function saveConfForm() 
+{
+	var props = {};
+	
+	$("#confform .pval input").each(function() {
+		var name = $(this).attr('name');
+		if (name.indexOf("NEW_PROP_VAL_") === 0)
+		{
+			var key = $("#NEW_PROP_KEY_" + name.substring(13)).val();
+			alert(key);
+			if (key.length > 0)
+			{
+				props[key] = $(this).val();
+			}
+		}
+		else props[name] = $(this).val();
+	});
+	
+	for (i in props)
+	{
+		alert(i + " = " + props[i]);
+	}
 }
 
 function loadAboutTab(tab)
