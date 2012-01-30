@@ -354,7 +354,7 @@ function loadInfoTab(tab)
 	);
 }
 
-function loadConfStanza(stanza)
+function loadConfStanza(stanza, callback)
 {
 	$.get(
 		"/config/" + stanza,
@@ -369,9 +369,8 @@ function loadConfStanza(stanza)
 	        $("#confform input")
 	        	.focusin(formFocusIn)
 	        	.focusout(formFocusOut);
-
-	        $("#newbutton").button().click(addNewConfProp);
-	        $("#submitbutton").button().click(saveConfForm);
+	        
+	        if (callback) callback.call();
 		}
 	);
 	
@@ -391,7 +390,24 @@ function resizeConfPanel()
 }
 
 var propNum = 1;
-function addNewConfProp()
+function addConfProp()
+{
+	/* New configuration properties generally get added to 'Other', so the displayed
+	 * stanza is switched to 'Other' so there is no interaction where a new 
+	 * configuration property is entered in another stanza and when saved it no
+	 * longer is displayed there. */
+	
+	if ($("#lefttablist .selectedtab").attr("id") == 'Othertab')
+	{
+		addProp();
+	}
+	else
+	{
+		loadConfStanza('Other', addProp);
+	}
+}
+
+function addProp()
 {
 	var pid = 'NEW_PROP_KEY_' + propNum;
 	var vid = 'NEW_PROP_VAL_' + propNum;
@@ -402,7 +418,7 @@ function addNewConfProp()
 	html += "'>" +
 				"<td class='pcol'>" +
 					"<div style='width:305px;'>" +
-						"<input id='" + pid + "' name='" + pid + "' value='' text='' />" +
+						"<input id='" + pid + "' name='" + pid + "' class='NEW_PROP_KEY' value='' text='' />" +
 					"</div>" + 
 				"</td>" +
 				"<td class='pval'>" +
@@ -413,19 +429,23 @@ function addNewConfProp()
 			"</tr>"; 
 	
 	$("#contentstable").append(html);
+	
+	$("#NEW_PROP_KEY_" + propNum + ", #NEW_PROP_VAL_" + propNum).focusin(formFocusIn).focusout(formFocusOut);
 	propNum++;
 }
 
-function saveConfForm() 
+function saveConf() 
 {
-	var props = {};
+	var props = {},
+		stanza = $("#lefttablist .selectedtab").attr('id');
+	
+	stanza = stanza.substring(0, stanza.indexOf('tab'))
 	
 	$("#confform .pval input").each(function() {
 		var name = $(this).attr('name');
 		if (name.indexOf("NEW_PROP_VAL_") === 0)
 		{
 			var key = $("#NEW_PROP_KEY_" + name.substring(13)).val();
-			alert(key);
 			if (key.length > 0)
 			{
 				props[key] = $(this).val();
@@ -434,10 +454,26 @@ function saveConfForm()
 		else props[name] = $(this).val();
 	});
 	
-	for (i in props)
-	{
-		alert(i + " = " + props[i]);
-	}
+	$.post(
+			"/config/" + stanza,
+			props,
+			function(resp) {
+				/* Content pane. */
+		        $("#contentspane")
+		        	.empty()
+		        	.append(resp);
+		        $("#confform").validationEngine();
+		        
+		        $("#confform input")
+		        	.focusin(formFocusIn)
+		        	.focusout(formFocusOut);
+		        
+		        if (stanza == 'Other')
+		        {
+		        	loadConfStanza('Other');
+		        }
+			}
+	);
 }
 
 function loadAboutTab(tab)

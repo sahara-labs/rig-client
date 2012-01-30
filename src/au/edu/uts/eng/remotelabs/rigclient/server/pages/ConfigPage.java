@@ -41,6 +41,8 @@ package au.edu.uts.eng.remotelabs.rigclient.server.pages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -121,7 +123,7 @@ public class ConfigPage extends AbstractPage
         if (!"/config".equals(url))
         {
             this.uriSuffix = url.substring(url.lastIndexOf("/config") + 8);
-            if (this.stanzas.containsKey(this.uriSuffix) && !"POST".equalsIgnoreCase(req.getMethod()))
+            if (this.stanzas.containsKey(this.uriSuffix))
             {
                 this.framing = false;
             }
@@ -133,10 +135,11 @@ public class ConfigPage extends AbstractPage
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
         String displayStanza = "Rig";
-        boolean showRestartMessage = false;
         
         if (this.stanzas.containsKey(this.uriSuffix))
         {
+            List<String> restartProps = new ArrayList<String>();
+            
             if ("POST".equalsIgnoreCase(req.getMethod()))
             {
                 /* Stored the posted values. */
@@ -186,7 +189,7 @@ public class ConfigPage extends AbstractPage
                             changed = true;
                             
                             Property p = this.desc.getPropertyDescription(param);
-                            if (p == null || p.needsRestart()) showRestartMessage = true;
+                            if (p == null || p.needsRestart()) restartProps.add(param);
                         }
                     }
                 }
@@ -204,20 +207,9 @@ public class ConfigPage extends AbstractPage
                 
                 if (changed) this.config.serialise();
             }
-            else
-            {
-                this.getConfigStanza(this.uriSuffix);
-                return;
-            }
-        }
-        
-        /* Display restart warning. */
-        if (showRestartMessage)
-        {
-            this.println("<div id='confrestartwarning' class='ui-state ui-state-error ui-corner-all confalert'>");
-            this.println("  <span class='ui-icon ui-icon-alert helphinticon'> </span>");
-            this.println("  The change will be applied next time the rig client is started.");
-            this.println("</div>");
+    
+            this.getConfigStanza(this.uriSuffix, restartProps);
+            return;
         }
 
         /* Add tabs to page. */
@@ -249,8 +241,14 @@ public class ConfigPage extends AbstractPage
         this.println("  </ul>");
         this.println("</div>");
 
+        /* Save and new property buttons. */
+        this.println("<div id='confbuttonbar'>" +
+                      "  <div id='newbutton'>Add Property</div>" +
+                      "  <div id='savebutton'>Save Changes</div>" +
+                      "</div>");
+        
         this.println("<div id='contentspane' class='ui-corner-tr ui-corner-bottom'>");
-        this.getConfigStanza(displayStanza);
+        this.getConfigStanza(displayStanza, Collections.<String>emptyList());
         this.println("</div>");
         
         this.println("<div style='clear: both;'> </div>");
@@ -268,10 +266,10 @@ public class ConfigPage extends AbstractPage
                 "     });");
 
         this.println(
-                "   $('#newbutton').button().click(addNewConfProp);");
+                "   $('#newbutton').button().click(addConfProp);");
         
         this.println(
-                "  $('#submitbutton').button().click(saveConfForm);");
+                "  $('#savebutton').button().click(saveConf);");
         
         this.println(
                 "   $('#confform input')" +
@@ -286,8 +284,9 @@ public class ConfigPage extends AbstractPage
      * Gets the configuration for the supplied stanza.
      * 
      * @param stanza stanza name
+     * @param restartProps properties whose details should be annotated with restart required
      */
-    private void getConfigStanza(String stanza)
+    private void getConfigStanza(String stanza, List<String> restartProps)
     {
         Map<String, String> stanzaProps = this.stanzas.get(stanza);
         List<Property> stanzaPropList = this.desc.getPropertyDescriptions(stanza);
@@ -363,6 +362,12 @@ public class ConfigPage extends AbstractPage
                         this.println("<input id='" + name + "' type='text' name='" + name + "' class='" + vd + "]' value='" + 
                                 val + "' />");
                         break;
+                }
+                
+                if (restartProps.contains(name))
+                {
+                    this.println("<div class='restartrequired'>" +
+                    		"A restart is required for this value to be applied.</div>");
                 }
 
                 this.println("  </td>");
