@@ -107,7 +107,7 @@ public class RigClientServiceMessageReceiverInOut extends AbstractInOutMessageRe
         {
             /* Get the implementation class for the Web Service. */
             final Object obj = this.getTheImplementationObject(msgContext);
-            final RigClientServiceSkeletonInterface serviceImpl = (RigClientServiceSkeletonInterface) obj;
+            final RigClientServiceInterface serviceImpl = (RigClientServiceInterface) obj;
 
             /* Out envelope. */
             SOAPEnvelope envelope = null;

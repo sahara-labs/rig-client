@@ -123,7 +123,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 /**
  * Rig client SOAP interface implementation.
  */
-public class RigClientService implements RigClientServiceSkeletonInterface
+public class RigClientService implements RigClientServiceInterface
 {
     /** Rig type class. */
     private final IRig rig;

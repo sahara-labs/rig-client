@@ -41,7 +41,7 @@
  */
 
 /**
- * RigClientServiceSkeletonInterface.java This file was auto-generated from WSDL
+ * RigClientServiceInterface.java This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.4.1 Built on : Aug 19, 2008 (10:13:39 LKT)
  */
 package au.edu.uts.eng.remotelabs.rigclient.intf;
@@ -80,9 +80,9 @@ import au.edu.uts.eng.remotelabs.rigclient.intf.types.SlaveRelease;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.SlaveReleaseResponse;
 
 /**
- * RigClientServiceSkeletonInterface skeleton interface for the Axis service.
+ * RigClientServiceInterface skeleton interface for the Axis service.
  */
-public interface RigClientServiceSkeletonInterface
+public interface RigClientServiceInterface
 {    
     /**
      * Request to allocate a specified user to the rig.
