@@ -35,13 +35,6 @@
  *
  * @author Michael Diponio (mdiponio)
  * @date 7th October 2009
- *
- * Changelog:
- * - 07/10/2009 - mdiponio - Initial file creation.
- * - 21/10/2009 - mdiponio - Fixed bugs in setMonitorBadFromActionFailure and
- *                           assign and revoke methods.
- * - 22/10/2009 - mdiponio - Refactored setMonitorBadFromActionFailure to
- *                           a more sensible name and fixed enum Javadoc.
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
@@ -170,15 +163,13 @@ public abstract class AbstractRig implements IRig
         try
         {
             this.failureThreshold = Integer.parseInt(this.configuration.getProperty("Action_Failure_Threshold"));
-            this.logger.info("Loaded action fail threshold as " + this.failureThreshold);
+            this.logger.debug("Loaded action fail threshold as " + this.failureThreshold);
         }
         catch (NumberFormatException nfe)
         {
             this.failureThreshold = 3;
-            this.logger.error("Failed to load the action failure threshold configuration item, so using " + 
-                    this.failureThreshold +  " as the default. Please check the configuration " +
-            		this.configuration.getConfigurationInfomation() + " and ensure the property " +
-                    "'Action_Failure_Threshold' is present and populated with a valide integer.");
+            this.logger.debug("Failed to load the action failure threshold configuration item, so using " + 
+                    this.failureThreshold +  " as the default.");
         }
         this.actionFailures = new HashMap<IAction, Integer>();
         
