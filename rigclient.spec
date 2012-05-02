@@ -140,7 +140,6 @@ fi
 %{installdir}/conf/rigclient.properties
 %{installdir}/conf/conf.d/logging.properties
 %{installdir}/conf/conf.d/rigattributes.properties
-%{installdir}/conf/conf.example/batch.properties
 %{installdir}/conf/conf.example/configuredrig.properties
 %{installdir}/conf/conf.example/primitive.properties
 %{installdir}/rigclient_service.ini
