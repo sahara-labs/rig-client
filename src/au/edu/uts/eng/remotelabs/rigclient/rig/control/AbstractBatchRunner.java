@@ -105,10 +105,10 @@ public abstract class AbstractBatchRunner implements Runnable
     private BufferedReader batchStdErr;
     
     /** Buffer containing all captured batch process standard out. */
-    private final StringBuffer stdOutBuffer;
+    protected final StringBuffer stdOutBuffer;
     
     /** Buffer containing all captured batch process standard err. */
-    private final StringBuffer stdErrBuffer;
+    protected final StringBuffer stdErrBuffer;
     
     /** Command line argument to invoke. */
     protected String command;
