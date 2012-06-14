@@ -48,6 +48,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -737,7 +738,7 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     public List<String> getResultsFiles()
     {
-        if (this.resultsFiles == null) return null;
+        if (this.resultsFiles == null) return Collections.emptyList();
         
         return new ArrayList<String>(Arrays.asList(this.resultsFiles.toArray(new String[0])));
     }

@@ -172,7 +172,7 @@ public interface IRigControl
         private String instructionFile;
         
         /** List of generated result files. */
-        private List<String> resultsFiles;
+        private final List<String> resultsFiles;
         
         /** Standard out output of the batch process. */
         private String standardOut;
@@ -282,7 +282,8 @@ public interface IRigControl
          */
         public void setResultsFiles(List<String> results)
         {
-            this.resultsFiles = results;
+            this.resultsFiles.clear();
+            if (results != null) this.resultsFiles.addAll(results);
         }
 
         /**
