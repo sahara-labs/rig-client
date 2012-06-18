@@ -96,13 +96,13 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 public abstract class AbstractBatchRunner implements Runnable
 {
     /** Batch process. */
-    private Process batchProc;
+    protected Process batchProc;
     
     /** Standard out of the batch process. */
-    private BufferedReader batchStdOut;
+    protected BufferedReader batchStdOut;
     
     /** Standard err of the batch process. */
-    private BufferedReader batchStdErr;
+    protected BufferedReader batchStdErr;
     
     /** Buffer containing all captured batch process standard out. */
     protected final StringBuffer stdOutBuffer;
@@ -121,6 +121,14 @@ public abstract class AbstractBatchRunner implements Runnable
     
     /** User name who invoked batch control. */
     protected String username;
+    
+    /** Whether the working directory is manually set in the concrete class
+     *  or automatically created using configuration information. If this 
+     *  is set to true the configuration property <tt>Batch_Working_Dir</tt> is
+     *  ignored and the variables <tt>workingDirBase</tt> and <tt>workingDir</tt> 
+     *  must be set in the concrete class. The default is to automatically 
+     *  set the working directory. */
+    protected boolean manualWorkingDir = false;
     
     /** Batch process working directory base (base has a new folder added to
      *  be set as the batch processes CWD. */
@@ -233,19 +241,16 @@ public abstract class AbstractBatchRunner implements Runnable
             {
                 this.logger.warn("Batch control invocation has failed.");
                 this.failed = true;
-                this.running = false;
-                return;
             }
             else
             {
                 this.exitCode = this.batchProc.waitFor(); // Blocks up process completion.
                 this.logger.info("The batch control process terminated with error code " + this.exitCode + " at " +
                         this.getTimeStamp('/', ' ', ':') + ".");
+                this.failed = false;
             }
             
             this.running = false;
-            this.failed = false;
-            
             if (!this.failed)
             {            
                 /* Find out the list of results files. */            
@@ -357,55 +362,62 @@ public abstract class AbstractBatchRunner implements Runnable
          * ---- 2. Set up working directory. ----------------------------------
          * --------------------------------------------------------------------*/
         final IConfig config = ConfigFactory.getInstance();
-        if ((this.workingDirBase = config.getProperty("Batch_Working_Dir")) == null)
+        if (!this.manualWorkingDir)
         {
-            /* Default is a directory in the system directory. */
-            this.workingDirBase = System.getProperty("java.io.tmpdir");
-            if (this.workingDirBase == null)
+            if ((this.workingDirBase = config.getProperty("Batch_Working_Dir")) == null)
             {
-                this.logger.warn("The temporary directory system property (java.io.tmpdir) did not find the system" +
-                        "temporary directory. Going to use the current Rig Client working directory as base.");
-                this.workingDirBase = System.getProperty("user.dir");
-                this.logger.warn("Using Rig Client working directory " + this.workingDirBase + " as batch control " +
-                        "working directory base.");
+                /* Default is a directory in the system directory. */
+                this.workingDirBase = System.getProperty("java.io.tmpdir");
+                if (this.workingDirBase == null)
+                {
+                    this.logger.warn("The temporary directory system property (java.io.tmpdir) did not find the system" +
+                            "temporary directory. Going to use the current Rig Client working directory as base.");
+                    this.workingDirBase = System.getProperty("user.dir");
+                    this.logger.warn("Using Rig Client working directory " + this.workingDirBase + " as batch control " +
+                            "working directory base.");
+                }
             }
-        }
-        else
-        {
-            this.logger.info("User set batch working directory base is " + this.workingDirBase);
-        }
-        this.workingDirBase = new File(this.workingDirBase).getCanonicalPath();
-        
-        if (Boolean.parseBoolean(config.getProperty("Batch_Create_Nested_Dir", "true")))
-        {
-            /* Add a new folder with a timestamp as the name. */
-            final String dirName = this.getTimeStamp('-', '-', '-');
-            this.workingDir = this.workingDirBase + File.separatorChar + dirName;
-            this.logger.debug("Creating a nested working directory with name " + dirName + ".");
+            else
+            {
+                this.logger.info("User set batch working directory base is " + this.workingDirBase);
+            }
+            this.workingDirBase = new File(this.workingDirBase).getCanonicalPath();
             
-            final File wDir = new File(this.workingDir);
-            if (!wDir.mkdir())
+            if (Boolean.parseBoolean(config.getProperty("Batch_Create_Nested_Dir", "true")))
             {
-                final File wdBase = new File(this.workingDirBase);
-                final StringBuffer buf = new StringBuffer(25);
-                buf.append("Unable to create batch process working directory (" + this.workingDir + ").");
-                if (!wdBase.exists()) buf.append(" Base " + this.workingDirBase + " does not exist. ");
-                if (!wdBase.isDirectory()) buf.append(" Base " + this.workingDirBase + " is not a directory. ");
-                if (!wdBase.canWrite()) buf.append("Base " + this.workingDirBase +  " is not writeable. ");
-                this.logger.warn(buf.toString());
+                /* Add a new folder with a timestamp as the name. */
+                final String dirName = this.getTimeStamp('-', '-', '-');
+                this.workingDir = this.workingDirBase + File.separatorChar + dirName;
+                this.logger.debug("Creating a nested working directory with name " + dirName + ".");
                 
-                this.errorCode = 16;
-                this.errorReason = buf.toString();
-                return false;
+                final File wDir = new File(this.workingDir);
+                if (!wDir.mkdir())
+                {
+                    final File wdBase = new File(this.workingDirBase);
+                    final StringBuffer buf = new StringBuffer(25);
+                    buf.append("Unable to create batch process working directory (" + this.workingDir + ").");
+                    if (!wdBase.exists()) buf.append(" Base " + this.workingDirBase + " does not exist. ");
+                    if (!wdBase.isDirectory()) buf.append(" Base " + this.workingDirBase + " is not a directory. ");
+                    if (!wdBase.canWrite()) buf.append("Base " + this.workingDirBase +  " is not writeable. ");
+                    this.logger.warn(buf.toString());
+                    
+                    this.errorCode = 16;
+                    this.errorReason = buf.toString();
+                    return false;
+                }
             }
+            else
+            {
+                this.logger.debug("Not creating a nested working directory.");
+                this.workingDir = this.workingDirBase;
+            }
+            builder.directory(new File(this.workingDir));
+            this.logger.info("Batch process working directory is " + this.workingDir);
         }
         else
         {
-            this.logger.debug("Not creating a nested working directory.");
-            this.workingDir = this.workingDirBase;
+            this.logger.debug("Using a manually set working directory");
         }
-        builder.directory(new File(this.workingDir));
-        this.logger.info("Batch process working directory is " + this.workingDir);
         
         /* --------------------------------------------------------------------
          * ---- 3. Set up environment variables. -------------------------------
@@ -538,14 +550,18 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     public void terminate()
     {
-        /* Do a read as the input streams may not be readable after 
-         * termination. */
-        this.getBatchStandardOut();
-        this.getBatchStandardError();
+        if (this.batchProc != null)
+        {
+            /* Do a read as the input streams may not be readable after 
+             * termination. */
+            this.getBatchStandardOut();
+            this.getBatchStandardError();
+            
+            this.logger.info("Terminating batch process.");        
+            this.batchProc.destroy();
+        }
         
-        this.logger.info("Terminating batch process.");
         this.killed = true;
-        this.batchProc.destroy();
     }
     
     /**

@@ -886,11 +886,17 @@ public abstract class AbstractRig implements IRig
         if (this instanceof IRigControl)
         {
             IRigControl controlRig = (IRigControl)this;
+            
+            /* Abort any running batch control invocations. */
             if (controlRig.isBatchRunning())
             {
                 this.logger.info("Aborting batch control because of session termination.");
                 controlRig.abortBatch();
+                
             }
+            
+            /* Clear batch state so it does not persist across sessions. */
+            controlRig.clearBatchState();
             
             /* Clear the primitive control cache. */
             controlRig.expungePrimitiveControllerCache();

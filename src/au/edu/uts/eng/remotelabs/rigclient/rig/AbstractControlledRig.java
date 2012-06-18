@@ -170,6 +170,21 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         
         return !this.isBatchRunning();
     }
+    
+    @Override
+    public void clearBatchState()
+    {
+        if (this.runner != null)
+        {
+            if (this.runner.isRunning() && !this.abortBatch())
+            {
+                this.logger.error("When clearing batch control state, the previous batch invocation is still running " +
+                		"and failed to be aborted. This could leak to process leaks and should be investigated.");
+            }
+            
+            this.runner = null;
+        }
+    }
 
     @Override
     public int getBatchProgress()

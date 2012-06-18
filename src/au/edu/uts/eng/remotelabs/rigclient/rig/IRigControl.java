@@ -139,6 +139,12 @@ public interface IRigControl
     public boolean abortBatch();
     
     /**
+     * Clears any batch state of the previous invocation so the next call 
+     * to getBatchState method returns the 'CLEAR' batch state.  
+     */
+    public void clearBatchState();
+    
+    /**
      * Gets the batch results for either the in-progress or finished batch
      * control invocation. If no invocations have been started 
      * <code>null</code> is returned.
