@@ -228,18 +228,18 @@ public abstract class AbstractBatchRunner implements Runnable
         {
             if (!this.init()) // Batch initialisation
             {
-                this.logger.warn("Batch process initialisation has failed.");
+                this.logger.info("Batch process initialisation has failed.");
                 this.failed = true;
                 return;
             }
             else if (!this.checkFile()) // Check batch file
             {
-                this.logger.warn("Uploaded batch file has failed the instruction file sanity test.");
+                this.logger.info("Uploaded batch file has failed the instruction file sanity test.");
                 this.failed = true;
             }          
             else if (!this.invoke()) // Invoke command and create process
             {
-                this.logger.warn("Batch control invocation has failed.");
+                this.logger.info("Batch control invocation has failed.");
                 this.failed = true;
             }
             else
