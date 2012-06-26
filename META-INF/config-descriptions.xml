@@ -701,9 +701,11 @@ is left blank, the system default temporary directory is used.
 		  example="30"
 		  format="&lt;int&gt;"
 		  default="60">
-Batch time out in seconds. Time to wait at batch startup before failing 
-batch control, if the batch process has not started. The default is 60
-seconds.
+Batch time out in seconds. Time to wait at batch startup before failing
+batch control, if the batch process has not started. If the timeout is 
+0, there is no batch startup wait and batch control immediately returns
+without checking whether batch control invocation is successful. The
+default is 60 seconds.
 </property>
 
 <property name="Batch_Termination_TimeOut" 

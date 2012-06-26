@@ -169,6 +169,7 @@ public class AbstractBatchRunnerTester extends TestCase
                 if (to > 50) fail("Starting batch process timed out."); 
             }
 
+            assertFalse(this.runner.isInSetup());
             assertTrue(this.runner.isStarted());
             assertTrue(this.runner.isRunning());
             assertFalse(this.runner.isFailed());
@@ -215,6 +216,226 @@ public class AbstractBatchRunnerTester extends TestCase
             
             String stderr = this.runner.getAllStandardErr();
             assertEquals("", stderr);
+            
+            /* Check cleanup. */
+            File[] files = new File(wdBase).listFiles();
+            Calendar cal = Calendar.getInstance();
+            for (File f : files)
+            {
+                if (f.getName().startsWith(String.valueOf(cal.get(Calendar.DATE))))
+                {
+                    fail("File " + f.getName() + " not cleaned up.");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+           fail(e.getClass().getName() + " - " + e.getMessage());
+        }   
+    }
+    
+    @Test
+    public void testRunInit()
+    {
+        final String wdBase = System.getProperty("user.dir") + "/test/resources/BatchRunner";
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Batch_Working_Dir"))
+            .andReturn(wdBase);
+        expect(this.mockConfig.getProperty("Batch_Create_Nested_Dir", "true"))
+            .andReturn("true").atLeastOnce();
+        expect(this.mockConfig.getProperty("Batch_Flush_Env", "false"))
+            .andReturn("false");
+        expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
+            .andReturn("true");
+        expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "true"))
+            .andReturn("false");
+        replay(this.mockConfig);
+        
+        this.runner.spinCheckFile = 5;
+        
+        try
+        {
+            Field field = AbstractBatchRunner.class.getDeclaredField("command");
+            field.setAccessible(true);
+            
+            /* Sets a command which prints out the contents of a test file. On
+             * Windows uses 'type' (apparently) and on sane operating
+             * systems - Linux / UNIX, uses'cat'. */
+            if (System.getProperty("os.name").equals("Windows"))
+            {
+                // LATER Windows equivalent batch script
+                fail("Windows equivalent batch script not implemented");
+            }
+            else
+            {
+                field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/BatchRunnerTest.sh");
+            }
+            
+            List<String> args = new ArrayList<String>();
+            args.add(String.valueOf(10));
+            args.add("stdout");
+            args.add(String.valueOf(15));
+            field = AbstractBatchRunner.class.getDeclaredField("commandArgs");
+            field.setAccessible(true);
+            field.set(this.runner, args);
+            
+            field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            field.set(this.runner, wdBase + "/test/resources/AbstractRig.class");
+            
+            Thread t = new Thread(this.runner);
+            t.start();
+            
+            Thread.sleep(100);
+            
+            assertTrue(this.runner.isInSetup());
+            assertFalse(this.runner.isFailed());
+            assertFalse(this.runner.isStarted());
+            assertFalse(this.runner.isRunning());
+            assertFalse(this.runner.isKilled());
+            
+            Thread.sleep(7000);
+            
+            assertFalse(this.runner.isInSetup());
+            assertFalse(this.runner.isFailed());
+            assertTrue(this.runner.isStarted());
+            assertTrue(this.runner.isRunning());
+            assertFalse(this.runner.isKilled());
+      
+            
+            Thread.sleep(1000);
+            String stdout = this.runner.getBatchStandardOut();
+            assertNotNull(stdout);
+            
+            Thread.sleep(1500);
+            stdout = this.runner.getBatchStandardOut();
+            assertNotNull(stdout);          
+
+            Thread.sleep(10000);
+            
+            assertTrue(this.runner.isStarted());
+            assertFalse(this.runner.isRunning());
+            assertFalse(this.runner.isFailed());
+            assertEquals(15, this.runner.getExitCode());
+            
+            field = AbstractBatchRunner.class.getDeclaredField("workingDirBase");
+            field.setAccessible(true);
+            assertEquals(wdBase, field.get(this.runner));
+            
+            field = AbstractBatchRunner.class.getDeclaredField("workingDir");
+            field.setAccessible(true);
+            assertFalse(wdBase.equals(field.get(this.runner)));
+            
+            stdout = this.runner.getAllStandardOut();
+            for (int i = 0; i < 10; i++)
+            {
+                assertTrue(stdout.contains("Sleep loop count is " + i));
+            }
+            
+            String stderr = this.runner.getAllStandardErr();
+            assertEquals("", stderr);
+            
+            /* Check cleanup. */
+            File[] files = new File(wdBase).listFiles();
+            Calendar cal = Calendar.getInstance();
+            for (File f : files)
+            {
+                if (f.getName().startsWith(String.valueOf(cal.get(Calendar.DATE))))
+                {
+                    fail("File " + f.getName() + " not cleaned up.");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+           fail(e.getClass().getName() + " - " + e.getMessage());
+        }   
+    }
+    
+    @Test
+    public void testRunInitKilled()
+    {
+        final String wdBase = System.getProperty("user.dir") + "/test/resources/BatchRunner";
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Batch_Working_Dir"))
+            .andReturn(wdBase);
+        expect(this.mockConfig.getProperty("Batch_Create_Nested_Dir", "true"))
+            .andReturn("true").atLeastOnce();
+        expect(this.mockConfig.getProperty("Batch_Flush_Env", "false"))
+            .andReturn("false");
+        expect(this.mockConfig.getProperty("Batch_Clean_Up", "false"))
+            .andReturn("true");
+        expect(this.mockConfig.getProperty("Batch_Instruct_File_Delete", "true"))
+            .andReturn("false");
+        replay(this.mockConfig);
+        
+        this.runner.spinCheckFile = 5;
+        
+        try
+        {
+            Field field = AbstractBatchRunner.class.getDeclaredField("command");
+            field.setAccessible(true);
+            
+            /* Sets a command which prints out the contents of a test file. On
+             * Windows uses 'type' (apparently) and on sane operating
+             * systems - Linux / UNIX, uses'cat'. */
+            if (System.getProperty("os.name").equals("Windows"))
+            {
+                // LATER Windows equivalent batch script
+                fail("Windows equivalent batch script not implemented");
+            }
+            else
+            {
+                field.set(this.runner, System.getProperty("user.dir") + "/test/resources/BatchRunner/BatchRunnerTest.sh");
+            }
+            
+            List<String> args = new ArrayList<String>();
+            args.add(String.valueOf(10));
+            args.add("stdout");
+            args.add(String.valueOf(15));
+            field = AbstractBatchRunner.class.getDeclaredField("commandArgs");
+            field.setAccessible(true);
+            field.set(this.runner, args);
+            
+            field = AbstractBatchRunner.class.getDeclaredField("fileName");
+            field.setAccessible(true);
+            field.set(this.runner, wdBase + "/test/resources/AbstractRig.class");
+            
+            Thread t = new Thread(this.runner);
+            t.start();
+            
+            Thread.sleep(100);
+            
+            assertTrue(this.runner.isInSetup());
+            assertFalse(this.runner.isFailed());
+            assertFalse(this.runner.isStarted());
+            assertFalse(this.runner.isRunning());
+            assertFalse(this.runner.isKilled());
+            
+            Thread.sleep(2000);
+            
+            assertTrue(this.runner.isInSetup());
+            assertFalse(this.runner.isFailed());
+            assertFalse(this.runner.isStarted());
+            assertFalse(this.runner.isRunning());
+            assertFalse(this.runner.isKilled());
+            
+            this.runner.terminate();
+            
+            Thread.sleep(5000);
+            
+            assertFalse(this.runner.isInSetup());
+            assertTrue(this.runner.isFailed());
+            assertFalse(this.runner.isStarted());
+            assertFalse(this.runner.isRunning());
+            assertTrue(this.runner.isKilled());
+            
+            
+            String stdout = this.runner.getBatchStandardOut();
+            assertEquals("", stdout);     
+            
+            String stderr = this.runner.getBatchStandardError();
+            assertEquals("", stderr);     
             
             /* Check cleanup. */
             File[] files = new File(wdBase).listFiles();

@@ -108,7 +108,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         int timeCount = 0;
         final int timeOut = Integer.parseInt(this.configuration.getProperty("Batch_Timeout", "60"));
         this.logger.debug("Loaded batch start up timeout as " + timeOut + " seconds.");
-        while (!(this.runner.isStarted() || this.runner.isFailed()))
+        while (timeOut > 0 && !(this.runner.isStarted() || this.runner.isFailed()))
         {
             try
             {
@@ -137,7 +137,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     {
         if (this.runner == null) return false;
         
-        return this.runner.isRunning();
+        return this.runner.isInSetup() || this.runner.isRunning();
     }
 
     @Override
@@ -176,7 +176,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     {
         if (this.runner != null)
         {
-            if (this.runner.isRunning() && !this.abortBatch())
+            if ((this.runner.isInSetup() || this.runner.isRunning()) && !this.abortBatch())
             {
                 this.logger.error("When clearing batch control state, the previous batch invocation is still running " +
                 		"and failed to be aborted. This could leak to process leaks and should be investigated.");
@@ -191,7 +191,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     {
         /* No batch invocation has been started. */
         if (this.runner == null) return 0;
-        if (!this.runner.isStarted()) return 0;
+        if (!(this.runner.isInSetup() || this.runner.isStarted())) return 0;
         
         /* Batch invocation failed or finished. */
         if (!this.isBatchRunning()) return 100;
@@ -255,14 +255,14 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
         /* Not started. */
         if (this.runner == null) return BatchState.CLEAR;
         
-        /* Running - in progress. */
-        if (this.runner.isRunning()) return BatchState.IN_PROGRESS;
-        
         /* Failed. */
         if (this.runner.isFailed()) return BatchState.FAILED;
         
         /* Aborted. */
         if (this.runner.isKilled()) return BatchState.ABORTED;
+        
+        /* Running - in progress. */
+        if (this.runner.isInSetup() || this.runner.isRunning()) return BatchState.IN_PROGRESS;
         
         /* Not started. */
         if (!this.runner.isStarted()) return BatchState.CLEAR;

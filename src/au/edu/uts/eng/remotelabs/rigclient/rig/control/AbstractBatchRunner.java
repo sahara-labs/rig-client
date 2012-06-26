@@ -140,9 +140,12 @@ public abstract class AbstractBatchRunner implements Runnable
     /** Environment variables for the batch process. */
     protected Map<String, String> envMap;
     
+    /** Flag to specify if batch setup is running. */
+    protected boolean inSetup;
+    
     /** Flag to specify if batch execution has started. */
     protected boolean started;
-    
+        
     /** Flag to specify if batch execution is running. */
     protected boolean running;
     
@@ -226,6 +229,7 @@ public abstract class AbstractBatchRunner implements Runnable
     {
         try
         {
+            this.inSetup = true;
             if (!this.init()) // Batch initialisation
             {
                 this.logger.info("Batch process initialisation has failed.");
@@ -250,7 +254,9 @@ public abstract class AbstractBatchRunner implements Runnable
                 this.failed = false;
             }
             
+            this.inSetup = false;
             this.running = false;
+            
             if (!this.failed)
             {            
                 /* Find out the list of results files. */            
@@ -265,6 +271,8 @@ public abstract class AbstractBatchRunner implements Runnable
         }
         catch (Exception ex)
         {
+            this.failed = true;
+            this.inSetup = false;
             this.logger.warn("Batch control failed with exception of type " + ex.getClass().getName() + " and with " +
             		"message " + ex.getMessage());
         }
@@ -504,14 +512,25 @@ public abstract class AbstractBatchRunner implements Runnable
         /* --------------------------------------------------------------------
          * ---- 5. Invoke command. --------------------------------------------
          * ------------------------------------------------------------------*/
-        this.batchProc = builder.start();
-        this.batchStdOut = new BufferedReader(new InputStreamReader(this.batchProc.getInputStream()));
-        this.batchStdErr = new BufferedReader(new InputStreamReader(this.batchProc.getErrorStream()));
-        this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
-        
-        this.started = true;
-        this.running = true;
-        return true;
+        /* Final check to make sure we haven't been killed during setup. */
+        if (!this.killed)
+        {
+            this.batchProc = builder.start();
+            this.batchStdOut = new BufferedReader(new InputStreamReader(this.batchProc.getInputStream()));
+            this.batchStdErr = new BufferedReader(new InputStreamReader(this.batchProc.getErrorStream()));
+            this.logger.info("Invoked batch command at " + this.getTimeStamp('/', ' ', ':'));
+            
+            this.started = true;
+            this.running = true;
+            this.inSetup = false;
+            return true;
+        }
+        else
+        {
+            this.logger.debug("Did not invoke batch command because the batch invocation was killed during setup.");
+            this.inSetup = false;
+            return false;
+        }
     }
     
     /**
@@ -699,6 +718,18 @@ public abstract class AbstractBatchRunner implements Runnable
     {
         this.getBatchStandardError();
         return this.stdErrBuffer.toString();
+    }
+    
+    /**
+     * Returns <code>true</code> if batch is in the process of being setup.
+     * This is <code>true</code> before the batch process has been started 
+     * and <code>false</code> afterwards.
+     * 
+     * @return true if in setup
+     */
+    public boolean isInSetup()
+    {
+        return this.inSetup;
     }
     
     /**

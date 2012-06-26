@@ -60,6 +60,12 @@ public class MockBatchRunner extends AbstractBatchRunner
     /** Flag to specify if sync returns true. */
     private boolean syncFlag;
     
+    /** The number of seconds to spin in checkfile. */ 
+    int spinCheckFile = 0;
+    
+    /** The number of seconds to spin in init. */
+    int spinInit = 0;
+    
     /**
      * Constructor  - sets instruction file name.
      * 
@@ -112,6 +118,21 @@ public class MockBatchRunner extends AbstractBatchRunner
     @Override
     protected boolean checkFile()
     {
+        if (this.spinCheckFile > 0) 
+        {
+            while(this.spinCheckFile-- > 0)
+                try
+                {
+                    Thread.sleep(1000);
+                }
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            
+        }
+        
         return this.checkFileFlag;
     }
 
@@ -121,7 +142,20 @@ public class MockBatchRunner extends AbstractBatchRunner
     @Override
     protected boolean init()
     {
-       return this.initFlag;
+        if (this.spinInit > 0)
+        {
+            while (this.spinInit-- > 0)
+                try
+                {
+                    Thread.sleep(1000);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+        }
+        
+        return this.initFlag;
     }
 
     /* 
