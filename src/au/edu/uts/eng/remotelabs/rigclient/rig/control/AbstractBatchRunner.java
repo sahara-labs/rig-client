@@ -73,16 +73,6 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  *     control and should do synchronisation of the generated results 
  *     files to a persistent store.</li>
  * </ul>
- * In each of the above methods, the fields <code>errorCode</code> and
- * <code>errorReason</code> should be set if they fail to provide
- * meaningful information to the requestor. Some important error
- * codes are:
- * <ul>
- *     <li><strong>11</strong> - if the batch file sanity check fails.</li>
- *     <li><strong>16</strong> - catch all for other errors. The specific
- *     meaning of this is <em>unknown error</em> but is used for lab
- *     setup and configuration errors.</li>
- * </ul>
  * 
  * <strong>NOTE:</strong>The premise of uploading code and running it on 
  * a laboratory server is inherently <strong><em>insecure.</em></strong>
