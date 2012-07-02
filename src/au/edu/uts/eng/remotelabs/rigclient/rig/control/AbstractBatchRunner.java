@@ -340,7 +340,7 @@ public abstract class AbstractBatchRunner implements Runnable
         
         final List<String> invocation = new ArrayList<String>();
         invocation.add(this.command);
-        this.logger.info("Batch command that will be invoked is " + this.command);
+        this.logger.debug("Batch command that will be invoked is " + this.command);
         
         if (this.commandArgs == null)
         {
@@ -351,7 +351,7 @@ public abstract class AbstractBatchRunner implements Runnable
         else
         {
             invocation.addAll(this.commandArgs);
-            this.logger.info("Batch command arguments are " + this.commandArgs.toString());
+            this.logger.debug("Batch command arguments are " + this.commandArgs.toString());
         }
         
         final ProcessBuilder builder = new ProcessBuilder(invocation);
@@ -377,7 +377,7 @@ public abstract class AbstractBatchRunner implements Runnable
             }
             else
             {
-                this.logger.info("User set batch working directory base is " + this.workingDirBase);
+                this.logger.debug("User set batch working directory base is " + this.workingDirBase);
             }
             this.workingDirBase = new File(this.workingDirBase).getCanonicalPath();
             
@@ -410,7 +410,7 @@ public abstract class AbstractBatchRunner implements Runnable
                 this.workingDir = this.workingDirBase;
             }
             builder.directory(new File(this.workingDir));
-            this.logger.info("Batch process working directory is " + this.workingDir);
+            this.logger.debug("Batch process working directory is " + this.workingDir);
         }
         else
         {
@@ -428,10 +428,10 @@ public abstract class AbstractBatchRunner implements Runnable
         
         for (Entry<String, String> e : this.envMap.entrySet())
         {
-            this.logger.info("Adding batch control env variable " + e.getKey() + " with value " + e.getValue());
+            this.logger.debug("Adding batch control env variable " + e.getKey() + " with value " + e.getValue());
             env.put(e.getKey(), e.getValue());
         }
-        this.logger.info("Batch control environment variables: " + env.toString());
+        this.logger.debug("Batch control environment variables: " + env.toString());
         
         /* --------------------------------------------------------------------
          * ---- 4. Test command. ----------------------------------------------
@@ -533,12 +533,12 @@ public abstract class AbstractBatchRunner implements Runnable
         final String[] files = new File(this.workingDir).list();
         if (files == null)
         {
-            this.logger.info("No results files have been detected.");
+            this.logger.debug("No results files have been detected.");
             return;
         }
 
         this.resultsFiles = Arrays.asList(files);
-        this.logger.info("Detected batch results files " + this.resultsFiles);
+        this.logger.debug("Detected batch results files " + this.resultsFiles);
     }
     
     /**
@@ -566,7 +566,7 @@ public abstract class AbstractBatchRunner implements Runnable
             this.getBatchStandardOut();
             this.getBatchStandardError();
             
-            this.logger.info("Terminating batch process.");        
+            this.logger.debug("Terminating batch process.");        
             this.batchProc.destroy();
         }
         
