@@ -239,7 +239,7 @@ public abstract class AbstractBatchRunner implements Runnable
             else
             {
                 this.exitCode = this.batchProc.waitFor(); // Blocks up process completion.
-                this.logger.info("The batch control process terminated with error code " + this.exitCode + " at " +
+                this.logger.info("The batch control process terminated with exit code " + this.exitCode + " at " +
                         this.getTimeStamp('/', ' ', ':') + ".");
                 this.failed = false;
             }
