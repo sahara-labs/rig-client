@@ -270,6 +270,8 @@ public abstract class AbstractBatchRunner implements Runnable
         {
             /* Cleanup. */
             this.cleanup();
+            this.inSetup = false;
+            this.running = false;
         }
     }
 
