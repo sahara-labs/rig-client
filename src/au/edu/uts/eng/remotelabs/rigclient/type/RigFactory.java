@@ -131,7 +131,9 @@ public class RigFactory
                     e.getMessage());
         }
         
-        logger.fatal("Failed loading rig type class. This is ominous and unrecoverable.");
+        logger.fatal("Failed loading rig type class. If you are unsure of which rig type class to use try setting the" +
+        		"'Rig_Class' property to 'au.edu.uts.remotelabs.rigclient.ConfiguredControlledRig' which is an " +
+        		"appropriate rig class for most cases.");
         return null;
     }
 }
