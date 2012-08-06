@@ -674,7 +674,6 @@ public abstract class AbstractBatchRunner implements Runnable
         this.logger.debug("--- End batch process standard out read ------");
 
         this.stdOutBufferSize = this.appendScrollback(this.stdOutBuffer, this.stdOutBufferSize, buf, numLines);
-        System.out.println("Scroll back size is: " + this.stdOutBufferSize);
         return buf.toString();
     }
     
