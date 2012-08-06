@@ -79,12 +79,11 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  * Care must be taken with what is run, what may be generated, 
  * how it is cleaned up and with what permission the batch process is run
  * with.
- * 
- * <div align="center"><strong style="color:red;font-size:3em">YOU HAVE BEEN 
- * WARNED!</strong></div>
  */
 public abstract class AbstractBatchRunner implements Runnable
 {
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    
     /** Batch process. */
     protected Process batchProc;
     
@@ -97,8 +96,17 @@ public abstract class AbstractBatchRunner implements Runnable
     /** Buffer containing all captured batch process standard out. */
     protected final StringBuffer stdOutBuffer;
     
+    /** The number of lines in the standard out buffer. */ 
+    private int stdOutBufferSize;
+    
     /** Buffer containing all captured batch process standard err. */
     protected final StringBuffer stdErrBuffer;
+    
+    /** The number of lines in the standard error buffer. */
+    private int stdErrBufferSize;
+    
+    /** The maximum allowed number of lines in the stdout / stderr buffers. */
+    protected final int scrollBackSize;
     
     /** Command line argument to invoke. */
     protected String command;
@@ -193,6 +201,19 @@ public abstract class AbstractBatchRunner implements Runnable
         
         this.stdOutBuffer = new StringBuffer();
         this.stdErrBuffer = new StringBuffer();
+        
+        int tmp = 1000;
+        try
+        {
+            tmp = Integer.parseInt(ConfigFactory.getInstance().getProperty("Batch_ScrollBack", "1000"));
+        }
+        catch (NumberFormatException ex)
+        {
+            this.logger.warn("Loaded batch scroll size is invalid, using the default size of 1000 lines.");
+        }
+        this.scrollBackSize = tmp;
+        this.stdOutBufferSize = 0;
+        this.stdErrBufferSize = 0;
     }
     
     /**
@@ -275,8 +296,6 @@ public abstract class AbstractBatchRunner implements Runnable
         }
     }
 
- 
-    
     /**
      * Sets the required batch control process variables. The variables that
      * should be set in this method are:
@@ -632,13 +651,16 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     public String getBatchStandardOut()
     {
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
+        int numLines = 0;
+        
         try
         {
             while (this.batchStdOut != null && this.batchStdOut.ready())
             {
                 buf.append(this.batchStdOut.readLine());
-                buf.append(System.getProperty("line.separator"));
+                buf.append(LINE_SEPARATOR);
+                numLines++;
             }
         }
         catch (IOException e)
@@ -651,7 +673,8 @@ public abstract class AbstractBatchRunner implements Runnable
         this.logger.debug(buf.toString());
         this.logger.debug("--- End batch process standard out read ------");
 
-        this.stdOutBuffer.append(buf);
+        this.stdOutBufferSize = this.appendScrollback(this.stdOutBuffer, this.stdOutBufferSize, buf, numLines);
+        System.out.println("Scroll back size is: " + this.stdOutBufferSize);
         return buf.toString();
     }
     
@@ -680,13 +703,16 @@ public abstract class AbstractBatchRunner implements Runnable
      */
     public String getBatchStandardError()
     {
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
+        int numLines = 0;
+        
         try
         {
             while (this.batchStdErr != null && this.batchStdErr.ready())
             {
                 buf.append(this.batchStdErr.readLine());
-                buf.append(System.getProperty("line.separator"));
+                buf.append(LINE_SEPARATOR);
+                numLines++;
             }
         }
         catch (IOException e)
@@ -699,7 +725,7 @@ public abstract class AbstractBatchRunner implements Runnable
         this.logger.debug(buf.toString());
         this.logger.debug("--- End batch process standard err read ------");
         
-        this.stdErrBuffer.append(buf);
+        this.stdErrBufferSize = this.appendScrollback(this.stdErrBuffer, this.stdErrBufferSize, buf, numLines);
         return buf.toString();
     }
     
@@ -710,6 +736,30 @@ public abstract class AbstractBatchRunner implements Runnable
     {
         this.getBatchStandardError();
         return this.stdErrBuffer.toString();
+    }
+    
+    /**
+     * Appends a buffer to the destination buffer whilst not allowing the 
+     * destination buffer to exceed the allowed buffer scroll back size.
+     * 
+     * @param dest destination buffer
+     * @param destSize the number of lines in the destination buffer
+     * @param src the source to append into the destination
+     * @param srcSize the number of lines in the source
+     * @return the new size of the destination
+     */
+    private int appendScrollback(StringBuffer dest, int destSize, StringBuilder src, int srcSize)
+    {
+        dest.append(src);
+        destSize += srcSize;
+        
+        while (this.scrollBackSize > 0 && destSize > this.scrollBackSize)
+        {
+            dest.delete(0, dest.indexOf(LINE_SEPARATOR) + 1);
+            destSize--;
+        }
+       
+        return destSize;
     }
     
     /**

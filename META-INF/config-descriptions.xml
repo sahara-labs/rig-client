@@ -693,6 +693,20 @@ Directory where batch control uploaded instruction files are stored. If this
 is left blank, the system default temporary directory is used. 
 </property>
 
+<property name="Batch_ScrollBack" 
+          stanza="Batch Control" 
+          mandatory="no" 
+          type="INTEGER" 
+          restart="no"
+		  example="100"
+		  format="&lt;int&gt;"
+		  default="1000">
+The number of lines in batch stdin / stderr scroll back. If this limit is
+reached the oldest lines in the scroll back are deleted and replaced with
+new lines. The default is 1000 lines. If the value is set to -1, an 
+infinite size scroll back is used.
+</property>
+
 <property name="Batch_Timeout" 
           stanza="Batch Control" 
           mandatory="no" 
