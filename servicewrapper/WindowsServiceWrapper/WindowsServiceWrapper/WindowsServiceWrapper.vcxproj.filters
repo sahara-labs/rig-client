@@ -29,5 +29,8 @@
     <ClInclude Include="..\..\windowswrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\win32\jni_md.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

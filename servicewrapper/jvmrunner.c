@@ -187,6 +187,7 @@ int loadConfig(void)
 		char regData[FILENAME_MAX], *clstart;
 		DWORD regDataSize = FILENAME_MAX, err;
 		float version;
+		char regKeyAddress[FILENAME_MAX];
 
 		if ((err = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\JavaSoft\\Java Runtime Environment", 0, KEY_READ, &regKey)) == ERROR_SUCCESS &&
 			(err = RegQueryValueEx(regKey, "CurrentVersion", NULL, NULL, regData, &regDataSize)) == ERROR_SUCCESS)
@@ -194,11 +195,17 @@ int loadConfig(void)
 			RegCloseKey(regKey);
 
 			version = (float)atof(regData);
-			if (atof(regData) >= 1.6)
+			// Check if installed version is OK, then find the RuntimeDLL location
+			if(version >= 1.6)
 			{
-				/* Version is installed and OK, so now need to find the RuntimeDLL location. */
+				// Create registry key path for the version of Java installed
+				memset(regKeyAddress, 0, FILENAME_MAX);
+
+				strcat(regKeyAddress, "SOFTWARE\\JavaSoft\\Java RunTime Environment\\");
+				strcat(regKeyAddress, regData);
+				
 				regDataSize = FILENAME_MAX;
-				if ((err = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\JavaSoft\\Java Runtime Environment\\1.6", 0, KEY_READ, &regKey)) == ERROR_SUCCESS &&
+				if((err = RegOpenKeyEx(HKEY_LOCAL_MACHINE, regKeyAddress, 0, KEY_READ, &regKey)) == ERROR_SUCCESS &&
 					(err = RegQueryValueEx(regKey, "RuntimeLib", NULL, NULL, regData, &regDataSize)) == ERROR_SUCCESS &&
 					regDataSize > 0)
 				{
@@ -211,10 +218,10 @@ int loadConfig(void)
 					/* The Sun Java 6 (at least version 26) sets RuntimeLib registry
 					 * key to the 'client' VM, but no client VM is actually installed.
 					 * So we are changing the library location to the server VM. */
-					if (clstart = strstr(jvmSo, "client"))
+					if(clstart = strstr(jvmSo, "client"))
 					{
 						memcpy(clstart, "server", 6);
-						logMessage("Changed to using server JVM (no client VM installed on 64 bit).\n");
+						logMessage("Changed to using server JVM (no client VM installed on 64 bit). \n");
 						logMessage("New Java runtime library location is '%s'.\n", jvmSo);
 					}
 #endif
@@ -222,8 +229,9 @@ int loadConfig(void)
 			}
 			else
 			{
-				logMessage("The version of Java you have installed (%.2f) is too old. It must be at least version 1.6.", atof(regData));
+				logMessage("The version of Java you have installed (%.2f) is too old. It must be at least 1.6.\n", atof(regData));
 			}
+
 		}
 		else
 		{
