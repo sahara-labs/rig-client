@@ -669,10 +669,6 @@ public abstract class AbstractBatchRunner implements Runnable
             return null;
         }
         
-        this.logger.debug("--- Batch process standard out read at " + this.getTimeStamp('/', ' ', ':') + " ------");
-        this.logger.debug(buf.toString());
-        this.logger.debug("--- End batch process standard out read ------");
-
         this.stdOutBufferSize = this.appendScrollback(this.stdOutBuffer, this.stdOutBufferSize, buf, numLines);
         return buf.toString();
     }
@@ -719,10 +715,6 @@ public abstract class AbstractBatchRunner implements Runnable
             this.logger.warn("Reading batch process standard error stream failed with error " + e.getMessage() + ".");
             return null;
         }
-        
-        this.logger.debug("--- Batch process standard err read at " + this.getTimeStamp('/', ' ', ':') + " ------");
-        this.logger.debug(buf.toString());
-        this.logger.debug("--- End batch process standard err read ------");
         
         this.stdErrBufferSize = this.appendScrollback(this.stdErrBuffer, this.stdErrBufferSize, buf, numLines);
         return buf.toString();
