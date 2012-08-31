@@ -555,7 +555,7 @@ public abstract class AbstractRig implements IRig
             return null;
         }
         
-        this.logger.info("Monitor bad reason:" + buf.toString() + ".");
+        this.logger.debug("Monitor bad reason:" + buf.toString() + ".");
         return buf.toString();
     }
 
