@@ -71,7 +71,5 @@
 	<classpathentry kind="lib" path="test/lib/easymock-2.5.2.jar"/>
 	<classpathentry kind="lib" path="test/lib/hamcrest-core-1.1.jar"/>
 	<classpathentry kind="lib" path="test/lib/junit-4.7.jar"/>
-	<classpathentry kind="lib" path="/RigClient-iRobot/bin" sourcepath="/RigClient-iRobot/src"/>
-	<classpathentry kind="lib" path="/RigClient-Nexys/bin"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
