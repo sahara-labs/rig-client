@@ -1,7 +1,7 @@
 Sahara Labs: Rig Client
 ======================
 
-Client for rigs in the Sahara Labs framework.
+Remote laboratory framework (as deployed at https://remotelabs.eng.uts.edu.au)
 
 What is Sahara?
 ----------------------
