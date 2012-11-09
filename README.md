@@ -15,4 +15,5 @@ The Rig Client is one component of the Sahara Remote Labs framework (along with 
 More information and installation files can be found at: http://sourceforge.net/projects/labshare-sahara/
 
 The Scheduling Server can be found at:https://github.com/mdiponio/sahara-labs-scheduling-server/blob/master/README.md
+
 The Web Interface can boue found at: https://github.com/mdiponio/sahara-labs-web-interface
