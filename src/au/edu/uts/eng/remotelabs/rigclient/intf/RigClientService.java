@@ -581,7 +581,6 @@ public class RigClientService implements RigClientServiceInterface
         
         final IRigControl controlledRig = (IRigControl)this.rig;
         
-        
         /* ----------------------------------------------------------------
          * ---- 4. Check batch is not already running.                   --
          * --------------------------------------------------------------*/
@@ -593,7 +592,6 @@ public class RigClientService implements RigClientServiceInterface
             error.setReason("Existing batch operation.");
             return response;
         }
-
 
         /* --------------------------------------------------------------------
          * ---- 5. Download the batch instruction file.                      --
@@ -668,12 +666,16 @@ public class RigClientService implements RigClientServiceInterface
         }
         catch (FileNotFoundException e)
         {
+            this.logger.error("Failed to save batch file because the file was not found. Ensure the configured " +
+            		"download directory 'Batch_Download_Dir' exists.");
             operation.setSuccess(false);
             error.setCode(16);
             error.setReason("Unable to upload batch instruction file.");
         }
         catch (IOException e)
         {
+            this.logger.error("Failed to save batch file because of an IO exception: " + e.getClass().getSimpleName() +                    
+                    ", with message: " + e.getMessage());
             operation.setSuccess(false);
             error.setCode(16);
             error.setReason("Unable to upload batch instruction file.");        
