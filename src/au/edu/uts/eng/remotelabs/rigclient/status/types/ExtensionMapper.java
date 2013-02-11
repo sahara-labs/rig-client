@@ -99,7 +99,19 @@ public class ExtensionMapper
         {
             return ErrorType.Factory.parse(reader);
         }
-
+        
+        if ("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider".equals(namespaceURI)
+                && "SessionFile".equals(typeName))
+        {
+            return SessionFile.Factory.parse(reader);
+        }
+        
+        if ("http://remotelabs.eng.uts.edu.au/schedserver/localrigprovider".equals(namespaceURI)
+                && "SessionFiles".equals(typeName))
+        {
+            return SessionFiles.Factory.parse(reader);
+        }
+        
         throw new ADBException("Unsupported type " + namespaceURI + " " + typeName);
     }
 }
