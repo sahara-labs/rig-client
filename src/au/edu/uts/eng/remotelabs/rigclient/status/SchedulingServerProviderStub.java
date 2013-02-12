@@ -817,7 +817,6 @@ public class SchedulingServerProviderStub extends Stub
         {
             throw AxisFault.makeFault(e);
         }
-
     }
     
     private SOAPEnvelope toEnvelope(final SOAPFactory factory, final ReleaseCallback param, 
