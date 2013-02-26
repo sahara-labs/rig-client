@@ -6,6 +6,23 @@ Directory for Rig Client test libraries.  The required libraries are:
                         - Download compressed file from site.  
                         - Copy the easymock-*.jar file into the 
                           RigClient/test/lib/ directory.
+                          
+  - easymockclasse - EasyMock class extension library v2 (http://easymock.org/index.html)
+    xtension-x-.jar  Allows classes to mock as well as interfaces.
+                     Released under same terms as EasyMock.
+    
+  - cglib-2.2.jar  - Code generation library (needed by EasyMock class extenison)
+                     (http://cglib.sourceforge.net/).
+                     Rekeased under Apache Version 2.0 license
+                     
+  - asm-3.1.jar    - Java Bytecode manipulation (needed by cglib)
+                     (http://asm.ow2.org/)
+                     Released under BSD license
+                     
+  - objenesis-1.   - Instantiates new object of a class (needed by EasyMock
+    3.jar            class extension) (http://objenesis.googlecode.com/svn/docs/index.html)
+                     Released under MIT license
+                          
   - junit-X.jar    - JUnit library v4 (http://www.junit.org/)
                      JUnit is a framework for writing and running automated 
                      tests.
