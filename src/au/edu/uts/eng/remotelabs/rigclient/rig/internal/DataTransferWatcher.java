@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -140,7 +141,7 @@ public class DataTransferWatcher extends Thread
         try
         {
             meth = TransferMethod.valueOf(conf.getProperty("Data_Transfer_Method", "WEBDAV"));
-            this.logger.debug("Using session data transfer method '" + this.method + "'.");
+            this.logger.debug("Using session data transfer method '" + meth + "'.");
         }
         catch (IllegalArgumentException ex)
         {
@@ -351,6 +352,7 @@ public class DataTransferWatcher extends Thread
                 
                 String user = line.substring(0, pos);
                 this.sessionFiles.put(user, new HashSet<File>());
+                this.transferredFiles.put(user, new ArrayList<File>());
                 
                 for (String path : line.substring(pos).split(RESTORE_FILE_DELIM))
                 {
@@ -365,6 +367,13 @@ public class DataTransferWatcher extends Thread
                         this.logger.warn("Cannot set session data file '" + path + "' of user '" + user + "' for " +
                         		"transfer for user access as it not longer exists.");
                     }
+                }
+                
+                if (this.sessionFiles.get(user).size() == 0)
+                {
+                    /* All data files not valid, removing the user from list. */
+                    this.sessionFiles.remove(user);
+                    this.transferredFiles.remove(user);
                 }
             }
         }
@@ -442,6 +451,7 @@ public class DataTransferWatcher extends Thread
         this.inSession = true;
         this.currentUser = user;
         this.sessionFiles.put(this.currentUser, new HashSet<File>());
+        this.transferredFiles.put(this.currentUser, new ArrayList<File>());
     }
     
     /**

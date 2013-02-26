@@ -39,13 +39,21 @@
 
 package au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests;
 
+import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.reset;
+import static org.easymock.classextension.EasyMock.verify;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
-import java.security.InvalidParameterException;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -145,21 +153,75 @@ public class DataTransferWatcherTester extends TestCase
     }
     
     @Test
-    public void testConfiguration()
+    public void testConfiguration() throws Exception
     {
+        reset(this.mockConfig);
+        expect(this.mockConfig.getProperty("Data_Transfer_Method", "WEBDAV")).andReturn("ATTACHMENT");
+        expect(this.mockConfig.getProperty("Data_Transfer_Local_Directory", "")).andReturn("/tmp");
+        expect(this.mockConfig.getProperty("Data_Transfer_Restore_File", "./dfrestore")).andReturn("./someotherdir");
+        expect(this.mockConfig.getProperty("Scheduling_Server_Address")).andReturn("localhost");
+        expect(this.mockConfig.getProperty("Scheduling_Server_Port", "8080")).andReturn("8080");
+        replay(this.mockConfig);
         
+        DataTransferWatcher dw = new DataTransferWatcher(this.mockRig);
+        
+        Field f = DataTransferWatcher.class.getDeclaredField("method");
+        f.setAccessible(true);
+        TransferMethod tm = (TransferMethod)f.get(dw);
+        assertNotNull(tm);
+        assertEquals(TransferMethod.ATTACHMENT, tm);
+        
+        f = DataTransferWatcher.class.getDeclaredField("localDirectory");
+        f.setAccessible(true);
+        String ld = (String)f.get(dw);
+        assertNotNull(ld);
+        assertEquals("/tmp", ld);
+        
+        f = DataTransferWatcher.class.getDeclaredField("restoreFile");
+        f.setAccessible(true);
+        String rf = (String)f.get(dw);
+        assertNotNull(rf);
+        assertEquals("./someotherdir", rf);
+                
+        verify(this.mockConfig);
     }
     
     @Test
-    public void testRestore()
+    @SuppressWarnings("unchecked")
+    public void testRestore() throws Exception
     {
+        File restoreFile = new File("./test/resources/DataTransfer/dfrestoretmp");
+        
+        /* Restore file will be deleted a copy of a template is created. */
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream("./test/resources/DataTransfer/dfrestore")));
+        PrintWriter out = new PrintWriter(restoreFile);
+        
+        String line;
+        while ((line = in.readLine()) != null) out.println(line);
+        out.close();
+        in.close();
+        
         reset(this.mockConfig);
         expect(this.mockConfig.getProperty("Data_Transfer_Method", "WEBDAV")).andReturn("WEBDAV");
         expect(this.mockConfig.getProperty("Data_Transfer_Local_Directory", "")).andReturn("/tmp");
-        expect(this.mockConfig.getProperty("Data_Transfer_Restore_File", "./dfrestore")).andReturn("./dfrestore");
+        expect(this.mockConfig.getProperty("Data_Transfer_Restore_File", "./dfrestore")).andReturn(restoreFile.getPath());
+        expect(this.mockConfig.getProperty("Scheduling_Server_Address")).andReturn("localhost");
+        expect(this.mockConfig.getProperty("Scheduling_Server_Port", "8080")).andReturn("8080");        
         replay(this.mockConfig);
         
         
+        
+        DataTransferWatcher df = new DataTransferWatcher(this.mockRig);
+        
+        Method method = DataTransferWatcher.class.getDeclaredMethod("loadRestoreFile");
+        method.setAccessible(true);
+        method.invoke(df);
+        
+        Field f = DataTransferWatcher.class.getDeclaredField("sessionFiles");
+        f.setAccessible(true);
+        
+        Map<String, Set<File>> files = (Map<String, Set<File>>)f.get(df);
+        assertEquals(3, files.size());
     }
    
     @Test

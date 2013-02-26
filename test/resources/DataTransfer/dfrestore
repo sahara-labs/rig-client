@@ -1,0 +1,5 @@
+ 
+user1 ./test/resources/DataTransfer/file1:#:./test/resources/DataTransfer/file2:#:./test/resources/DataTransfer/file3
+user2 ./test/resources/DataTransfer/file2:#:./test/resources/DataTransfer/file4
+user3 ./test/resources/DataTransfer/file3:#:./test/resources/DataTransfer/file5
+user4 ./test/resources/DataTransfer/file5
