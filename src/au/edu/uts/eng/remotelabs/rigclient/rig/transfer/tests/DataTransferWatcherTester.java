@@ -427,7 +427,7 @@ public class DataTransferWatcherTester extends TestCase
     @Test
     public void testTransferNoFilesSession() throws Exception
     {
-        expect(this.mockRig.detectSessionFiles()).andReturn(new ArrayList<File>(0));
+        expect(this.mockRig.detectSessionFiles()).andReturn(new HashSet<File>(0));
         replay(this.mockRig);
         replay(this.mockStub);
         
@@ -470,7 +470,7 @@ public class DataTransferWatcherTester extends TestCase
         files.add(new File("./test/resources/DataTransfer/file1"));
         files.add(new File("./test/resources/DataTransfer/file2"));
         
-        expect(this.mockRig.detectSessionFiles()).andReturn(files);
+        expect(this.mockRig.detectSessionFiles()).andReturn(new HashSet<File>(files));
         expect(this.mockRig.getName()).andReturn("Rig 1");
         replay(this.mockRig);
                 
@@ -556,7 +556,7 @@ public class DataTransferWatcherTester extends TestCase
         assertTrue(hasFile2);
         
         reset(this.mockRig);
-        expect(this.mockRig.detectSessionFiles()).andReturn(files);
+        expect(this.mockRig.detectSessionFiles()).andReturn(new HashSet<File>(files));
         replay(this.mockRig);
         
         reset(this.mockStub);
@@ -585,7 +585,7 @@ public class DataTransferWatcherTester extends TestCase
         files.add(new File("./test/resources/DataTransfer/file2"));
         files.add(new File("./test/resources/DataTransfer/file3-notexist"));
         
-        expect(this.mockRig.detectSessionFiles()).andReturn(files);
+        expect(this.mockRig.detectSessionFiles()).andReturn(new HashSet<File>(files));
         expect(this.mockRig.getName()).andReturn("Rig 1");
         replay(this.mockRig);
                 
@@ -667,7 +667,7 @@ public class DataTransferWatcherTester extends TestCase
         assertTrue(hasFile2);   
 
         reset(this.mockRig);
-        expect(this.mockRig.detectSessionFiles()).andReturn(files);
+        expect(this.mockRig.detectSessionFiles()).andReturn(new HashSet<File>(files));
         replay(this.mockRig);
         
         reset(this.mockStub);
@@ -696,7 +696,7 @@ public class DataTransferWatcherTester extends TestCase
         files.add(new File("./test/resources/DataTransfer/file2"));
         files.add(new File("./test/resources/DataTransfer/file3-notexist"));
         
-        expect(this.mockRig.detectSessionFiles()).andReturn(files);
+        expect(this.mockRig.detectSessionFiles()).andReturn(new HashSet<File>(files));
         expect(this.mockRig.getName()).andReturn("Rig 1");
         replay(this.mockRig);
                 
@@ -784,7 +784,7 @@ public class DataTransferWatcherTester extends TestCase
         reset(this.mockRig);
         
         files.add(new File("./test/resources/DataTransfer/file3"));
-        expect(this.mockRig.detectSessionFiles()).andReturn(files);
+        expect(this.mockRig.detectSessionFiles()).andReturn(new HashSet<File>(files));
         expect(this.mockRig.getName()).andReturn("Rig 1");
         replay(this.mockRig);
         
@@ -834,7 +834,7 @@ public class DataTransferWatcherTester extends TestCase
         expect(this.mockConfig.getProperty("Scheduling_Server_Port", "8080")).andReturn("8080");        
         replay(this.mockConfig);
 
-        List<File> files = new ArrayList<File>();
+        Set<File> files = new HashSet<File>();
         files.add(new File("./test/resources/DataTransfer/file1"));
         files.add(new File("./test/resources/DataTransfer/file2"));
         files.add(new File("./test/resources/DataTransfer/file3-notexist"));
@@ -987,7 +987,7 @@ public class DataTransferWatcherTester extends TestCase
         
         for (File file : files) assertTrue(file.exists());
 
-        expect(this.mockRig.detectSessionFiles()).andReturn(files);
+        expect(this.mockRig.detectSessionFiles()).andReturn(new HashSet<File>(files));
         expect(this.mockRig.getName()).andReturn("Rig 1");
         replay(this.mockRig);
 
@@ -1039,7 +1039,7 @@ public class DataTransferWatcherTester extends TestCase
         assertEquals("user1", sesFiles.getUser());
 
         reset(this.mockRig);
-        expect(this.mockRig.detectSessionFiles()).andReturn(files);
+        expect(this.mockRig.detectSessionFiles()).andReturn(new HashSet<File>(files));
         replay(this.mockRig);
 
         reset(this.mockStub);
