@@ -1022,5 +1022,34 @@ Client to connect with the Scheduling Server WebDav server. The default is
 'WEBDAV' as it is most suitable for most use cases. 
 </property>
 
+<property name="Data_Transfer_Local_Directory" 
+          stanza="Data Transfer" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="/var/cache/rigclient"
+		  format="&lt;Path&gt;"
+		  default="">
+The local directory for data files that should not be provided to the Scheduling
+Server as part of data file paths. This is useful, for example, if a file system is 
+shared with the Scheduling Server and the file system mount should be stripped from
+the directory path that is to be provided to Scheduling Server so it can find 
+the file.
+</property>
+
+<property name="Data_Transfer_Restore_File" 
+          stanza="Data Transfer" 
+          mandatory="no" 
+          type="STRING" 
+          restart="yes"
+		  example="./dfrestore"
+		  format="&lt;Path&gt;"
+		  default="./dfrestore">
+The restore file used to persist data files yet to be transferred to allow the Rig 
+Client can continue transferring data files after it has shutdown. The default restore  
+file is stored in the Rig Client installation directory. If the Rig Client does not have 
+write permissions to this directory, this property allows the location to be set to 
+a directory where the Rig Client has write permission. 
+</property>
 
 </config>
