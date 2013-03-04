@@ -42,9 +42,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter;
 import au.edu.uts.eng.remotelabs.rigclient.rig.transfer.DataTransferWatcher;
@@ -1074,10 +1076,17 @@ public abstract class AbstractRig implements IRig
     }
     
     @Override
-    public List<File> detectSessionFiles()
+    public Set<File> detectSessionFiles()
     {
-        // TODO 
-        return Collections.emptyList();
+        /* If the rig is not in session, there should is no files to detect. */
+        if (!this.isSessionActive()) return Collections.emptySet();
+        
+        Set<File> files = new HashSet<File>();
+        for (IFilesDetectorAction detector : this.filesActions)
+        {
+            files.addAll(detector.listFiles());
+        }
+        return files;
     }
     
     /**

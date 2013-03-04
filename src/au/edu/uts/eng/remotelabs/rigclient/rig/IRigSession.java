@@ -43,8 +43,8 @@
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface for rig session operations.
@@ -187,7 +187,7 @@ public interface IRigSession
     /**
      * Provides a list of session files that have been generated in this session.
      * 
-     * @return
+     * @return list of session files
      */
-    public List<File> detectSessionFiles();
+    public Set<File> detectSessionFiles();
 }

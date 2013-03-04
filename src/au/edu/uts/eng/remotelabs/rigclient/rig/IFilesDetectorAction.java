@@ -39,11 +39,16 @@
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
 import java.io.File;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for session data file detection. Session data files are those 
- * that are to be stored and provided to the user of the rig for download. 
+ * that are to be stored and provided to the user of the rig for download.
+ * <br />
+ * This interface only contains the method that provides the session files 
+ * list; if implementations require setup and cleanup at the start and end 
+ * of sessions, they should also implement the {@link IAccessAction} 
+ * interface.
  */
 public interface IFilesDetectorAction extends IAction
 {
@@ -54,5 +59,5 @@ public interface IFilesDetectorAction extends IAction
      * 
      * @return list of session files
      */
-    public List<File> listFiles();
+    public Set<File> listFiles();
 }

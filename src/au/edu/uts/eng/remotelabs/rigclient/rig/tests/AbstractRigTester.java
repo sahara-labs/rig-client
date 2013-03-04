@@ -47,9 +47,12 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -60,6 +63,7 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IActivityDetectorAction;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IFilesDetectorAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.INotifyAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IResetAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
@@ -1094,12 +1098,58 @@ public class AbstractRigTester extends TestCase
     }
     
     /**
-     * Tests registering a files detector.
+     * Tests the files detector when in session.
+     * 
+     * @throws Exception 
      */
     @Test
-    public void testFilesDetector()
+    public void testFilesDetector() throws Exception
     {
+        IFilesDetectorAction detector = createMock(IFilesDetectorAction.class);
+        expect(detector.getActionType()).andReturn("Mock Files Detector").atLeastOnce();
         
+        Set<File> files = new HashSet<File>();  
+        files.add(new File("./file1"));
+        files.add(new File("./file1").getAbsoluteFile());
+        files.add(new File("./file2"));
+        files.add(new File("./file3"));
+        expect(detector.listFiles()).andReturn(files).atLeastOnce();
+        replay(detector);
+        
+        assertTrue(this.rig.register(detector, ActionType.FILES));
+        
+        Set<File> retFiles = this.rig.detectSessionFiles();
+        assertNotNull(retFiles);
+        assertEquals(3, retFiles.size());
+        assertTrue(files.equals(retFiles));
+        
+        verify(detector);
+    }
+    
+    /**
+     * Tests registering a files detector with no session.
+     */
+    @Test
+    public void testFilesDetectorNoSession()
+    {
+        IFilesDetectorAction detector = createMock(IFilesDetectorAction.class);
+        expect(detector.getActionType()).andReturn("Mock Files Detector").atLeastOnce();
+        replay(detector);
+        
+        assertTrue(this.rig.register(detector, ActionType.FILES));
+        assertEquals(0, this.rig.detectSessionFiles().size());
+        
+        verify(detector);
+    }
+    
+    /**
+     * Test file detection with no detector.
+     */
+    @Test
+    public void testFilesDetectorNoAction() 
+    {
+        assertTrue(this.rig.assign("mdiponio"));
+        assertEquals(0, this.rig.detectSessionFiles().size());
     }
 
     /**

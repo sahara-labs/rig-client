@@ -43,8 +43,8 @@ package au.edu.uts.eng.remotelabs.rigclient.type.tests;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 
@@ -265,9 +265,9 @@ public class MockIRig implements IRig
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#detectSessionFiles()
      */
     @Override
-    public List<File> detectSessionFiles()
+    public Set<File> detectSessionFiles()
     {
-        return Collections.emptyList();
+        return Collections.emptySet();
     }
 
 }
