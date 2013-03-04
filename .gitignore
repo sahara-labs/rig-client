@@ -1,0 +1,54 @@
+
+# /
+/bin
+/_axis2
+/*.log
+/dist
+/package
+
+# /.settings/
+/.settings/*.prefs
+
+# /META-INF/web/pdf/
+/META-INF/web/pdf/*.pdf
+
+# /lib/
+/lib/*.jar
+
+# /servicewrapper/
+/servicewrapper/rigclientservice
+
+# /servicewrapper/WindowsServiceWrapper/
+/servicewrapper/WindowsServiceWrapper/*.sdf
+/servicewrapper/WindowsServiceWrapper/ipch
+
+# /servicewrapper/WindowsServiceWrapper/Release/
+/servicewrapper/WindowsServiceWrapper/Release/*.pdb
+
+# /servicewrapper/WindowsServiceWrapper/Release_x64/
+/servicewrapper/WindowsServiceWrapper/Release_x64/*.pdb
+
+# /servicewrapper/WindowsServiceWrapper/WindowsServiceWrapper/
+/servicewrapper/WindowsServiceWrapper/WindowsServiceWrapper/Release
+/servicewrapper/WindowsServiceWrapper/WindowsServiceWrapper/Release_x64
+
+# /test/lib/
+/test/lib/*.jar
+
+# /test/reports/
+/test/reports/bugs
+/test/reports/coverage
+/test/reports/junit
+/test/reports/pmd
+
+# /test/resources/BatchRunner/
+/test/resources/BatchRunner/TestFileToCat.txt
+
+# /test/tools/
+/test/tools/Packages
+/test/tools/emma-2.0
+/test/tools/findbugs-1.3.9
+/test/tools/findbugs-1.3.9.tar.gz
+/test/tools/nsisant-1.2.jar
+/test/tools/pmd-4.2.5
+/test/tools/pmd-bin-4.2.5.zip
