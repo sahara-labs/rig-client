@@ -42,14 +42,17 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Interface for session data file detection. 
+ * Interface for session data file detection. Session data files are those 
+ * that are to be stored and provided to the user of the rig for download. 
  */
-public interface IFilesDetectorAction
+public interface IFilesDetectorAction extends IAction
 {
     /**
+     * The list of all the data files for the session. Only files that are 
+     * ready for upload to the server and will not be further modified
+     * should be in the list of data files.
      * 
-     * 
-     * @return
+     * @return list of session files
      */
     public List<File> listFiles();
 }

@@ -124,36 +124,10 @@ public class StatusUpdater implements Runnable
         IConfig config = ConfigFactory.getInstance();
         
         /* Generate the end point URL. */
-        StringBuilder ep = new StringBuilder();
-        ep.append("http://");
-        String tmp = config.getProperty("Scheduling_Server_Address");
-        if (tmp == null || tmp.length() < 1)
-        {
-            this.logger.fatal("Unable to load the Scheduling Server address. Ensure the property " +
-            		"'Scheduling_Server_Address' is set with a valid host name or IP address.");
-            throw new Exception("Unable to load scheduling server address.");
-        }
-        this.logger.debug("Loaded scheduling server address ('Scheduling_Server_Address') property as " + tmp + '.');
-        ep.append(tmp);
-        
-        tmp = config.getProperty("Scheduling_Server_Port", "8080");
-        try
-        {
-            ep.append(':');
-            ep.append(Integer.parseInt(tmp)); // Check to ensure the port number is valid
-        }
-        catch (NumberFormatException ex)
-        {
-            this.logger.fatal("Invalid Scheduling Server port number loaded. Ensure the property " +
-            		"'Scheduling_Server_Port' is either set to a valid port number or not set (defaults to 8080).");
-            throw new Exception("Invalid port number for scheduling server.");
-        }
-        
-        ep.append(StatusUpdater.SS_URL_SUFFIX);
-        this.endPoint = ep.toString();
+        this.endPoint = getSchedulingServerEndpoint();
         this.logger.info("Scheduling server end point address is " + this.endPoint + '.');
         
-        tmp = config.getProperty("Scheduling_Server_Update_Period", String.valueOf(StatusUpdater.DEFAULT_UPDATE_PERIOD));
+        String tmp = config.getProperty("Scheduling_Server_Update_Period", String.valueOf(StatusUpdater.DEFAULT_UPDATE_PERIOD));
         try
         {
             this.updatePeriod = Integer.parseInt(tmp);
@@ -434,5 +408,51 @@ public class StatusUpdater implements Runnable
         }
         
         return msg;
+    }
+    
+    /**
+     * Gets the Scheduling Server end point for the Rig Provider interface.
+     * 
+     * @return String end point
+     * @throws Exception error loading end point
+     */
+    public static String getSchedulingServerEndpoint() throws Exception
+    {
+        IConfig config = ConfigFactory.getInstance();
+        ILogger logger = LoggerFactory.getLoggerInstance();
+        
+        StringBuilder ep = new StringBuilder();
+        
+        /* Protocol, only HTTP is supported currentlty. */
+        ep.append("http://"); 
+        
+        /* IP Address or host name. */
+        String tmp = config.getProperty("Scheduling_Server_Address");
+        if (tmp == null || tmp.length() < 1)
+        {
+            logger.fatal("Unable to load the Scheduling Server address. Ensure the property " +
+                    "'Scheduling_Server_Address' is set with a valid host name or IP address.");
+            throw new Exception("Unable to load scheduling server address.");
+        }
+        
+        logger.debug("Loaded scheduling server address ('Scheduling_Server_Address') property as " + tmp + '.');
+        ep.append(tmp);
+        
+        /* Port number. */
+        tmp = config.getProperty("Scheduling_Server_Port", "8080");
+        try
+        {
+            ep.append(':');
+            ep.append(Integer.parseInt(tmp)); // Check to ensure the port number is valid
+        }
+        catch (NumberFormatException ex)
+        {
+            logger.fatal("Invalid Scheduling Server port number loaded. Ensure the property " +
+                    "'Scheduling_Server_Port' is either set to a valid port number or not set (defaults to 8080).");
+            throw new Exception("Invalid port number for scheduling server.");
+        }
+        
+        ep.append(StatusUpdater.SS_URL_SUFFIX);
+        return ep.toString();
     }
 }

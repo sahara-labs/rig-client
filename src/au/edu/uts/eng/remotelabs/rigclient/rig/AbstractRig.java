@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter;
+import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DataTransferWatcher;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -114,7 +115,7 @@ public abstract class AbstractRig implements IRig
     private final List<IActivityDetectorAction> detectionActions;
     
     /** File detector action list. */
-    
+    private final List<IFilesDetectorAction> filesActions;
     
     /** Test actions thread group. */
     private final ThreadGroup testThreads;
@@ -138,6 +139,9 @@ public abstract class AbstractRig implements IRig
     /** Macro substituter for the <code>getRigAttribute</code> method. */ 
     protected final AttributeMacroSubstituter macroSubstituter;
     
+    /** Thread used to transfer files to the Scheduling Server. */
+    private final DataTransferWatcher dataTransfer;
+    
     /** Rig client configuration. */
     protected IConfig configuration;
     
@@ -160,6 +164,7 @@ public abstract class AbstractRig implements IRig
         this.resetActions = new ArrayList<IResetAction>();
         this.testActions = new ArrayList<ITestAction>();
         this.detectionActions = new ArrayList<IActivityDetectorAction>();
+        this.filesActions = new ArrayList<IFilesDetectorAction>();
         this.testThreads = new ThreadGroup("Test Threads");
         
         this.macroSubstituter = new AttributeMacroSubstituter();
@@ -182,6 +187,10 @@ public abstract class AbstractRig implements IRig
         /* Call initialisation. */
         this.logger.debug("Calling derived class implementing init.");
         this.init();
+        
+        /* Start data transfer service. */
+        this.dataTransfer = new DataTransferWatcher(this);
+        this.dataTransfer.start();
     }
     
     /**
@@ -375,7 +384,7 @@ public abstract class AbstractRig implements IRig
                 if (!(action instanceof IActivityDetectorAction))
                 {
                     this.logger.error("Provided action type instance with class name " + 
-                            action.getClass().getCanonicalName() + "is not a activity detector action type (must be " +
+                            action.getClass().getCanonicalName() + "is not an activity detector action type (must be " +
                             "derived from au.edu.uts.edu.remotelabs.rigclient.rig.IActivityDetectorAction. " +
                             "Action type registration has failed.");
                     return false;
@@ -396,6 +405,34 @@ public abstract class AbstractRig implements IRig
                     this.logger.info("Registering an activity detector action with provided type of " + 
                             detector.getActionType() + ".");
                     return this.detectionActions.add(detector);
+                }
+                
+            case FILES: /* Adding a session file detector type. */
+                this.logger.debug("Requested to  register a file detector type.");
+                if (!(action instanceof IFilesDetectorAction))
+                {
+                    this.logger.error("Provided action type instance with class name " + 
+                            action.getClass().getCanonicalName() + " is not a file detector type (must be " +
+                            "derived from " + IFilesDetectorAction.class.getCanonicalName() + ". Action type " +
+                            "registration has failed.");
+                    return false;
+                }
+                
+                synchronized (this.filesActions)
+                {
+                    for (IFilesDetectorAction a : this.filesActions)
+                    {
+                        if (a == action)
+                        {
+                            this.logger.error("Cannot register the same action instance twice.");
+                            return false;
+                        }
+                        
+                        final IFilesDetectorAction detector = (IFilesDetectorAction)action;
+                        this.logger.info("Registering an session file detector action with provided type of " +
+                                detector.getActionType() + '.');
+                        return this.filesActions.add(detector);
+                    }
                 }
                 
             default:
@@ -808,6 +845,10 @@ public abstract class AbstractRig implements IRig
 
             this.sessionUsers.put(name, Session.MASTER);
         }
+        
+        /* Notify the data transfer service a session has started. */
+       this.dataTransfer.sessionStarted(name);
+        
         return true;
     }
 
@@ -887,6 +928,9 @@ public abstract class AbstractRig implements IRig
             this.logger.warn("Unable to terminate a session as there is no currently running session.");
             return false;
         }
+        
+        /* Notify the data transfer service that the session has completed. */
+        this.dataTransfer.sessionComplete();
         
         /* Revoke any running batch control operations. */
         if (this instanceof IRigControl)
@@ -1068,8 +1112,10 @@ public abstract class AbstractRig implements IRig
                 actions = this.slaveActions;
                 break;
             case TEST:
-                actions = this.testActions;
+                actions = this.testActions;                
                 break;
+            case FILES:
+                actions = this.filesActions;
         }
         
         for (IAction a : actions)
@@ -1093,6 +1139,7 @@ public abstract class AbstractRig implements IRig
     public void cleanUp()
     {
         this.testThreads.interrupt();
+        this.dataTransfer.shutdown();
     }
     
     /**
@@ -1123,6 +1170,9 @@ public abstract class AbstractRig implements IRig
                 break;
             case DETECT:
                 typeStr = "Activity detector";
+                break;
+            case FILES:
+                typeStr = "Files detector";
                 break;
             default:
                 throw new IllegalStateException("Unknown action type, this is a bug.");
