@@ -1052,4 +1052,15 @@ write permissions to this directory, this property allows the location to be set
 a directory where the Rig Client has write permission. 
 </property>
 
+<property name="Delete_Data_Files_After_Transfer" 
+          stanza="Data Transfer" 
+          mandatory="no" 
+          type="BOOLEAN" 
+          restart="yes"
+		  example="false"
+		  format="true|false"
+		  default="./dfrestore">
+Whether to delete data files after transferring them for user access.
+</property>
+
 </config>

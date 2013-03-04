@@ -37,7 +37,7 @@
  * @date 20th February 2013
  */
 
-package au.edu.uts.eng.remotelabs.rigclient.rig.internal;
+package au.edu.uts.eng.remotelabs.rigclient.rig.transfer;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -93,10 +94,10 @@ public class DataTransferWatcher extends Thread
     
     /* Interface to Scheduling Server. */
     private SchedulingServerProviderStub stub;
-    
+
     /** Configured transfer method. */
-    private final TransferMethod method;
-    
+    private final TransferMethod transferMethod;
+
     /** Local directory of Rig Client data storage. */
     private final String localDirectory;
     
@@ -114,6 +115,9 @@ public class DataTransferWatcher extends Thread
     
     /** Transferred files. */
     private final Map<String, List<File>> transferredFiles;
+    
+    /** Whether to clean files after transfer. */
+    private final boolean cleanFiles;
     
     /** Whether data transfers are disabled. */
     private boolean isDisabled;
@@ -149,14 +153,16 @@ public class DataTransferWatcher extends Thread
             		"option, using 'WEBDAV' transfer method.");
             meth = TransferMethod.WEBDAV;
         }
-        this.method = meth;
-        
-        this.localDirectory = conf.getProperty("Data_Transfer_Local_Directory", "");
-        if ("".equals(this.localDirectory))
+        this.transferMethod = meth;
+            
+        String tmp = conf.getProperty("Data_Transfer_Local_Directory", "");
+        if ("".equals(tmp))
         {
             this.logger.debug("No local directory configured for session data transfer paths. Providing full file paths to the" +
             		"Scheduling Server.");
         }
+        else tmp = new File(tmp).getAbsolutePath();
+        this.localDirectory = tmp;
         
         this.restoreFile = conf.getProperty("Data_Transfer_Restore_File", DEFAULT_RESTORE_FILE);
         this.logger.debug("Using session data transfer restore file: " + this.restoreFile);
@@ -169,6 +175,17 @@ public class DataTransferWatcher extends Thread
         {
             this.isDisabled = true;
             this.logger.error("Unable to load Scheduling Server location, disabling session data file transfers.");
+        }
+        
+        if (this.cleanFiles = this.transferMethod != TransferMethod.FILESYSTEM &&
+                "true".equals(conf.getProperty("Delete_Data_Files_After_Transfer")))
+        {
+            this.logger.info("Data transfer files will be deleted after they are transferred for user access.");
+        }
+        else
+        {
+            this.logger.info("Data transfer files will not be deleted after they are transferred for user access. This " +
+            		"may be because the configured transfer method is 'FILESYSTEM' or data file deletion is not configured.");
         }
     }
 
@@ -183,119 +200,9 @@ public class DataTransferWatcher extends Thread
         
         while (!this.shutdown)
         {
-            if (this.inSession)
+            synchronized (this)
             {
-                /* Poll for session files. */
-                this.sessionFiles.get(this.currentUser).addAll(this.rig.detectSessionFiles());
-            }
-            
-            for (Entry<String, Set<File>> e : this.sessionFiles.entrySet())
-            {
-                /* Nothing to send. */
-                if (e.getValue().size() == 0) continue; 
-                
-                /* Request parameters. */
-                AddSessionFiles request = new AddSessionFiles();
-                
-                SessionFiles filesParam = new SessionFiles();
-                filesParam.setName(this.rig.getName());
-                filesParam.setUser(e.getKey());
-                request.setAddSessionFiles(filesParam);
-                
-                /* Add the files to request. */
-                int attachmentSize = 0;
-                for (File f : e.getValue())
-                {
-                    /* We don't want to send a SOAP message to the Scheduling Server that is too large
-                     * so we limit it here. */
-                    if (attachmentSize > TOTAL_ATTACHMENT_SIZE) break;
-                    
-                    /* Check the file has not already been sent. */
-                    if (this.transferredFiles.get(e.getKey()).contains(f)) continue;
-                    this.transferredFiles.get(e.getKey()).add(f);
-                    
-                    if (!f.exists())
-                    {
-                        /* If a file no longer exists, there is no much point trying to send it. */
-                        this.logger.warn("Cannot transfer session data file '" + f.getName() + "' because it no longer exists.");
-                        continue;
-                    }
-                    
-                    /* File name. */
-                    SessionFile fileParam = new SessionFile();
-                    fileParam.setName(f.getName());
-                    
-                    /* File path. */
-                    if (!"".equals(this.localDirectory) && f.getPath().startsWith(this.localDirectory))
-                    {
-                        fileParam.setPath(f.getParent().substring(this.localDirectory.length()));
-                    }
-                    else fileParam.setPath(f.getParent());
-                    
-                    /* File timestamp. */
-                    Calendar ts = Calendar.getInstance();
-                    ts.setTimeInMillis(f.lastModified());
-                    fileParam.setTimestamp(ts);
-                    
-                    /* Transfer method. */
-                    fileParam.setTransfer(SessionFileTransfer.Factory.fromValue(this.method.toString()));
-                    switch (this.method)
-                    {
-                        case ATTACHMENT:
-                            /* Attachment has the file contents appended to the SOAP message. */
-                            if (f.length() > MAX_ATTACHMENT_SIZE) 
-                            {
-                                this.logger.error("File '" + f.getPath() + "' is larger than maximum allowed attachment size " +
-                                        "so will not be transferred for user access. Choose a different transfer method (i.e. 'WEBDAV' " +
-                                        "to allow a user to view it.");
-                                continue;
-                            }
-                            
-                            attachmentSize += f.length();
-                            fileParam.setFile(new DataHandler(new FileDataSource(f)));
-                            break;
-                            
-                        case FILESYSTEM:
-                            /* No special actions need to occur in this case. */
-                            break;
-                            
-                        case WEBDAV:
-                            // TODO WebDav client
-                            break;
-                    }
-                    
-                    filesParam.addFiles(fileParam);
-                }
-                
-                try
-                {
-                    /* Send the request. */
-                     AddSessionFilesResponse resp = this.stub.addSessionFiles(request);
-                     if (!resp.getAddSessionFilesResponse().getSuccessful())
-                     {
-                         this.logger.error("Scheduling Server failed to accept session data files with reason: " + 
-                                 resp.getAddSessionFilesResponse().getErrorReason() + ". Will attempt to send them" +
-                                 "again at a later time.");
-                         this.rollbackCommunication(filesParam);
-                     }
-                }
-                catch (RemoteException ex)
-                {
-                    this.logger.error("Failed to communicate with the Scheduling Server to send session data files. Error is " + 
-                            ex.getClass().getSimpleName() + ": " + ex.getMessage() + ". Will attempt to send them again at a later time.");
-                    this.rollbackCommunication(filesParam);
-                }
-                
-                /* Perform cleanup. */
-                if (!e.getKey().equals(this.currentUser) && 
-                        this.sessionFiles.get(e.getKey()).size() == this.transferredFiles.get(e.getKey()).size())
-                {
-                    // TODO clean files
-                    
-                    
-                    this.sessionFiles.remove(e.getKey());
-                    this.transferredFiles.remove(e.getKey());
-                }
+                this.transferFiles();
             }
             
             try
@@ -305,22 +212,136 @@ public class DataTransferWatcher extends Thread
             catch (InterruptedException e)
             { /* Expected interrupt. */ }
         }
+
         
         /* We are persisting the lists of data files to send so on next load they
          * can be sent. */
         this.storeRestoreFile();
     }
-    
+
     /**
-     * Rolls back files marked as being sent so they will be attempted to be resent.
-     * 
-     * @param files files to be unmarked as being sent
+     * Checks if there are files to transfer and if there are, transfers them.
      */
-    private void rollbackCommunication(SessionFiles files)
+    private void transferFiles()
     {
-        for (SessionFile sf : files.getFiles())
+        if (this.inSession)
         {
+            /* Poll for session files. */
+            this.sessionFiles.get(this.currentUser).addAll(this.rig.detectSessionFiles());
+        }
+        
+        for (Entry<String, Set<File>> e : this.sessionFiles.entrySet())
+        {
+            /* Nothing to send. */
+            if (e.getValue().size() == 0 || 
+                    e.getValue().size() == this.transferredFiles.get(e.getKey()).size()) continue; 
             
+            /* Request parameters. */
+            AddSessionFiles request = new AddSessionFiles();
+            
+            SessionFiles filesParam = new SessionFiles();
+            filesParam.setName(this.rig.getName());
+            filesParam.setUser(e.getKey());
+            request.setAddSessionFiles(filesParam);
+            
+            /* Add the files to request. */
+            int attachmentSize = 0;
+            List<File> sentFiles = new ArrayList<File>();
+            for (File f : e.getValue())
+            {
+                /* We don't want to send a SOAP message to the Scheduling Server that is too large
+                 * so we limit it here. */
+                if (attachmentSize > TOTAL_ATTACHMENT_SIZE) break;
+                
+                /* Check the file has not already been sent. */
+                f = f.getAbsoluteFile();
+                if (this.transferredFiles.get(e.getKey()).contains(f)) continue;
+                this.transferredFiles.get(e.getKey()).add(f);
+                
+                if (!f.exists())
+                {
+                    /* If a file no longer exists, there is no much point trying to send it. */
+                    this.logger.warn("Cannot transfer session data file '" + f.getName() + "' because it no longer exists.");
+                    continue;
+                }
+                
+                /* File name. */
+                SessionFile fileParam = new SessionFile();
+                fileParam.setName(f.getName());
+                
+                /* File path. */
+                String path = f.getAbsoluteFile().getParent();
+                if (!"".equals(this.localDirectory) && path.startsWith(this.localDirectory))
+                {
+                    path = path.substring(this.localDirectory.length());
+                }
+                fileParam.setPath(path);
+                
+                /* File timestamp. */
+                Calendar ts = Calendar.getInstance();
+                ts.setTimeInMillis(f.lastModified());
+                fileParam.setTimestamp(ts);
+                
+                /* Transfer method. */
+                fileParam.setTransfer(SessionFileTransfer.Factory.fromValue(this.transferMethod.toString()));
+                if (this.transferMethod == TransferMethod.ATTACHMENT)
+                {
+                        /* Attachment has the file contents appended to the SOAP message. */
+                        if (f.length() > MAX_ATTACHMENT_SIZE) 
+                        {
+                            this.logger.error("File '" + f.getPath() + "' is larger than maximum allowed attachment size " +
+                                    "so will not be transferred for user access. Choose a different transfer method (i.e. 'WEBDAV' " +
+                                    "to allow a user to view it.");
+                            continue;
+                        }
+                        
+                        attachmentSize += f.length();
+                        fileParam.setFile(new DataHandler(new FileDataSource(f)));
+                }       
+
+                sentFiles.add(f);
+                filesParam.addFiles(fileParam);
+            }
+            
+            try
+            {
+                /* Send the request. */
+                 AddSessionFilesResponse resp = this.stub.addSessionFiles(request);
+                 if (resp.getAddSessionFilesResponse().getSuccessful())
+                 {
+                     if (this.transferMethod == TransferMethod.WEBDAV)
+                     {
+                         /* For WebDAV files, we want to submit them for transfer. */
+                         
+                     }
+                     else if (this.transferMethod == TransferMethod.ATTACHMENT && this.cleanFiles)
+                     {
+                         this.logger.debug("Cleaning data transfer files after attachment, files: " + sentFiles);
+                         for (File f : sentFiles) f.delete();
+                     }
+                 }
+                 else
+                 {
+                     this.logger.error("Scheduling Server failed to accept session data files with reason: " + 
+                             resp.getAddSessionFilesResponse().getErrorReason() + ". Will attempt to send them " +
+                             "again at a later time.");
+                     for (File f : sentFiles) this.transferredFiles.get(e.getKey()).remove(f);
+                 }
+            }
+            catch (RemoteException ex)
+            {
+                this.logger.error("Failed to communicate with the Scheduling Server to send session data files. Error is " + 
+                        ex.getClass().getSimpleName() + ": " + ex.getMessage() + ". Will attempt to send them again at a later time.");
+                for (File f : sentFiles) this.transferredFiles.get(e.getKey()).remove(f);
+            }
+            
+            /* Perform cleanup. */
+            if (!e.getKey().equals(this.currentUser) && 
+                    this.sessionFiles.get(e.getKey()).size() == this.transferredFiles.get(e.getKey()).size())
+            {
+                this.sessionFiles.remove(e.getKey());
+                this.transferredFiles.remove(e.getKey());
+            }
         }
     }
     
@@ -356,7 +377,7 @@ public class DataTransferWatcher extends Thread
                 
                 for (String path : line.substring(pos).split(RESTORE_FILE_DELIM))
                 {
-                    File file = new File(path);
+                    File file = new File(path.trim());
                     if (file.exists())
                     {
                         this.logger.warn("Restore session file '" + path + "' for transfer.");
@@ -413,17 +434,22 @@ public class DataTransferWatcher extends Thread
             
             for (Entry<String, Set<File>> e : this.sessionFiles.entrySet())
             {
+                /* No need to store user if they have no files pending transfer. */
+                if (e.getValue().size() == this.transferredFiles.get(e.getKey()).size()) continue;
+                
                 /* User name. */
                 writer.print(e.getKey());
                 writer.print(' ');
                 
                 /* List of files. */
-                for (File f : e.getValue())
+                Iterator<File> it = e.getValue().iterator();
+                while (it.hasNext())
                 {
+                    File f = it.next();
                     if (this.transferredFiles.get(e.getKey()).contains(f)) continue;
 
                     writer.print(f.getPath());
-                    writer.print(RESTORE_FILE_DELIM);
+                    if (it.hasNext()) writer.print(RESTORE_FILE_DELIM);
                 }
                 
                 writer.println();
@@ -460,11 +486,21 @@ public class DataTransferWatcher extends Thread
     public synchronized void sessionComplete()
     {
         this.sessionFiles.get(this.currentUser).addAll(this.rig.detectSessionFiles());
+        
+        String releasedUser = this.currentUser;
         this.currentUser = null;
         this.inSession = true;
         
-        /* Interrupt the thread so it will send through data files. */
-        this.interrupt();
+        if (this.sessionFiles.get(releasedUser).size() == this.transferredFiles.get(releasedUser).size())
+        {
+            this.sessionFiles.remove(releasedUser);
+            this.transferredFiles.remove(releasedUser);
+        }
+        else
+        {
+            /* Interrupt the thread so it will send through data files. */
+            this.interrupt();
+        }
     }
 
     public void shutdown()
