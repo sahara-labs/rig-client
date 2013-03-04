@@ -247,7 +247,7 @@ Date: 12th October 2009
 
     <!-- Javadoc -->
     <target name="doc">
-        <javadoc access="public" destdir="${javadoc.dir}" classpathref="project.classpath" version="true" use="true" windowtitle="Sahara Rig Client">
+        <javadoc access="private" destdir="${javadoc.dir}" classpathref="project.classpath" version="true" use="true" windowtitle="Sahara Rig Client">
             <fileset dir="${src.dir}" defaultexcludes="yes">
                 <include name="**/*.java"/>
                 <exclude name="**/*Tester.java" />
