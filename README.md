@@ -16,6 +16,6 @@ More information and installation files can be found at: http://sourceforge.net/
 
 The Scheduling Server can be found at: https://github.com/mdiponio/sahara-labs-scheduling-server.
 
-The Web Interface can boue found at: https://github.com/mdiponio/sahara-labs-web-interface.
+The Web Interface can be found at: https://github.com/mdiponio/sahara-labs-web-interface.
 
 The Rig Client Commons project can be found at: https://github.com/mdiponio/sahara-labs-rig-client-commons.
