@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.internal.AttributeMacroSubstituter;
-import au.edu.uts.eng.remotelabs.rigclient.rig.internal.DataTransferWatcher;
+import au.edu.uts.eng.remotelabs.rigclient.rig.transfer.DataTransferWatcher;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
