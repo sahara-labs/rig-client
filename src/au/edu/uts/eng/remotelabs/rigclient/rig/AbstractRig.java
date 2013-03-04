@@ -38,6 +38,7 @@
  */
 package au.edu.uts.eng.remotelabs.rigclient.rig;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,7 +87,9 @@ public abstract class AbstractRig implements IRig
         /** Monitor test. */
         TEST,
         /** Activity detection. */
-        DETECT
+        DETECT,
+        /** Session file detection. */
+        FILES
     }
     
     /** Session users in the form key => user name, value => user type */
@@ -109,6 +112,9 @@ public abstract class AbstractRig implements IRig
     
     /** Activity detector action list. */
     private final List<IActivityDetectorAction> detectionActions;
+    
+    /** File detector action list. */
+    
     
     /** Test actions thread group. */
     private final ThreadGroup testThreads;
@@ -1022,6 +1028,13 @@ public abstract class AbstractRig implements IRig
         }
         
         return ret;
+    }
+    
+    @Override
+    public List<File> detectSessionFiles()
+    {
+        // TODO 
+        return Collections.emptyList();
     }
     
     /**
