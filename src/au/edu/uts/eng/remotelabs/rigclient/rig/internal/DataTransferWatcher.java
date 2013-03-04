@@ -81,6 +81,9 @@ public class DataTransferWatcher extends Thread
     /** Make size file size for attachments to SOAP messages. */
     public static final int MAX_ATTACHMENT_SIZE = 2 * 1024 * 1024;
     
+    /** Default data transfer restore file. */
+    public static final String DEFAULT_RESTORE_FILE = "./dfrestore";
+    
     /** Delimiter for the list of files in the restore file. */
     public static final String RESTORE_FILE_DELIM = ":#:";
     
@@ -154,7 +157,7 @@ public class DataTransferWatcher extends Thread
             		"Scheduling Server.");
         }
         
-        this.restoreFile = conf.getProperty("Data_Transfer_Restore_File", "./dfrestore");
+        this.restoreFile = conf.getProperty("Data_Transfer_Restore_File", DEFAULT_RESTORE_FILE);
         this.logger.debug("Using session data transfer restore file: " + this.restoreFile);
 
         try
@@ -460,7 +463,7 @@ public class DataTransferWatcher extends Thread
     }
     
     /** List of possible transfer methods. */
-    enum TransferMethod
+    public enum TransferMethod
     {
         /** Attachment to SOAP notification message. */
         ATTACHMENT, /** Shared filesystem with Scheduling Server. */
