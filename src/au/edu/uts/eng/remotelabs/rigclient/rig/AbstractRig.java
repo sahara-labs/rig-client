@@ -436,10 +436,9 @@ public abstract class AbstractRig implements IRig
                 }
                 
             default:
-                /* DODGY This is an impossible situation that _should_ never be hit. 
-                 * Java type safety ahoy! */
-                this.logger.error("Look out the window, the pigs are flying!");
-                throw new IllegalStateException("Look out the window, the pigs are flying!");
+                /* DODGY This is an impossible situation that _should_ never be hit. */
+                this.logger.error("BUG: Unknown action type: " + type + ". Check Rig Client version.");
+                throw new IllegalStateException("BUG: Unknown action type: " + type + ". Check Rig Client version.");
         }
     }
 

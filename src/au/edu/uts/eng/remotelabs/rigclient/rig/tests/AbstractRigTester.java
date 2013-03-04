@@ -109,6 +109,13 @@ public class AbstractRigTester extends TestCase
         expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn(null);
         expect(this.mockConfig.getProperty("Rig_Class")).andReturn("does.not.exist");
         
+        expect(this.mockConfig.getProperty("Data_Transfer_Method", "WEBDAV")).andReturn("ATTACHMENT");
+        expect(this.mockConfig.getProperty("Data_Transfer_Local_Directory", "")).andReturn(".");
+        expect(this.mockConfig.getProperty("Data_Transfer_Restore_File", "./dfrestore")).andReturn("./dfrestore");
+        expect(this.mockConfig.getProperty("Delete_Data_Files_After_Transfer")).andReturn("false");
+        expect(this.mockConfig.getProperty("Scheduling_Server_Address")).andReturn("localhost");
+        expect(this.mockConfig.getProperty("Scheduling_Server_Port", "8080")).andReturn("8080");  
+        
         replay(this.mockConfig);
         
         Field configField = ConfigFactory.class.getDeclaredField("instance");
@@ -1084,6 +1091,15 @@ public class AbstractRigTester extends TestCase
     public void testActivityDetectionNoSession()
     {
         assertFalse(this.rig.isActivityDetected());
+    }
+    
+    /**
+     * Tests registering a files detector.
+     */
+    @Test
+    public void testFilesDetector()
+    {
+        
     }
 
     /**

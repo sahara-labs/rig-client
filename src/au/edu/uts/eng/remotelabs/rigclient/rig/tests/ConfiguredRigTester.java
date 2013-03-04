@@ -115,22 +115,21 @@ public class ConfiguredRigTester extends TestCase
         expect(this.mockConfig.getProperty("Action_Package_Prefixes", ""))
             .andReturn("au.edu.uts.eng.remotelabs;au.edu.uts.eng.remotelabs.rigclient.rig.internal.tests;" +
                     "au.edu.uts.eng.remotelabs.rigclient.rig.internal");
-        expect(this.mockConfig.getProperty("Access_Actions"))
-            .andReturn("MockAccessActionOne;MockAccessActionTwo");
-        expect(this.mockConfig.getProperty("Slave_Access_Actions"))
-            .andReturn("");
-        expect(this.mockConfig.getProperty("Notify_Actions"))
-            .andReturn("");
-        expect(this.mockConfig.getProperty("Detection_Actions"))
-            .andReturn("");
-        expect(this.mockConfig.getProperty("Reset_Actions"))
-            .andReturn("");
-        expect(this.mockConfig.getProperty("Test_Actions"))
-            .andReturn("");
-        expect(this.mockConfig.getProperty("Action_Failure_Threshold"))
-            .andReturn("3");
+        expect(this.mockConfig.getProperty("Access_Actions")).andReturn("MockAccessActionOne;MockAccessActionTwo");
+        expect(this.mockConfig.getProperty("Slave_Access_Actions")).andReturn("");
+        expect(this.mockConfig.getProperty("Notify_Actions")).andReturn("");
+        expect(this.mockConfig.getProperty("Detection_Actions")).andReturn("");
+        expect(this.mockConfig.getProperty("Reset_Actions")).andReturn("");
+        expect(this.mockConfig.getProperty("Test_Actions")).andReturn("");
+        expect(this.mockConfig.getProperty("Action_Failure_Threshold")).andReturn("3");
         expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn(null);
         expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn(null);
+        expect(this.mockConfig.getProperty("Data_Transfer_Method", "WEBDAV")).andReturn("ATTACHMENT");
+        expect(this.mockConfig.getProperty("Data_Transfer_Local_Directory", "")).andReturn(".");
+        expect(this.mockConfig.getProperty("Data_Transfer_Restore_File", "./dfrestore")).andReturn("./dfrestore");
+        expect(this.mockConfig.getProperty("Delete_Data_Files_After_Transfer")).andReturn("false");
+        expect(this.mockConfig.getProperty("Scheduling_Server_Address")).andReturn("localhost");
+        expect(this.mockConfig.getProperty("Scheduling_Server_Port", "8080")).andReturn("8080");  
         replay(this.mockConfig);
         
         this.rig = new ConfiguredRig();
