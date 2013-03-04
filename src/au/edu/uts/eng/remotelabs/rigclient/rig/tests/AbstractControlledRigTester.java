@@ -103,6 +103,13 @@ public class AbstractControlledRigTester extends TestCase
         expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("Rig_Client_IP_Address")).andReturn(null);
         expect(this.mockConfig.getProperty("Listening_Network_Interface")).andReturn(null);
+        expect(this.mockConfig.getProperty("Data_Transfer_Method", "WEBDAV")).andReturn("ATTACHMENT");
+        expect(this.mockConfig.getProperty("Data_Transfer_Local_Directory", "")).andReturn(".");
+        expect(this.mockConfig.getProperty("Data_Transfer_Restore_File", "./dfrestore")).andReturn("./dfrestore");
+        expect(this.mockConfig.getProperty("Delete_Data_Files_After_Transfer")).andReturn("false");
+        expect(this.mockConfig.getProperty("Scheduling_Server_Address")).andReturn("localhost");
+        expect(this.mockConfig.getProperty("Scheduling_Server_Port", "8080")).andReturn("8080");  
+        
         replay(this.mockConfig);
 
         Field configField = ConfigFactory.class.getDeclaredField("instance");
@@ -248,6 +255,7 @@ public class AbstractControlledRigTester extends TestCase
                 .andReturn("false");
             expect(this.mockConfig.getProperty("Batch_Timeout", "60"))
                 .andReturn("180");
+            expect(this.mockConfig.getProperty("Batch_ScrollBack", "1000")).andReturn("1000");
             replay(this.mockConfig);
             
             /* Set up batch runner. */
@@ -339,6 +347,7 @@ public class AbstractControlledRigTester extends TestCase
                 .andReturn("false");
             expect(this.mockConfig.getProperty("Batch_Timeout", "60"))
                 .andReturn("30");
+            expect(this.mockConfig.getProperty("Batch_ScrollBack", "1000")).andReturn("1000");
             replay(this.mockConfig);
             
             /* Set up batch runner. */
@@ -409,6 +418,7 @@ public class AbstractControlledRigTester extends TestCase
                 .andReturn("30");
             expect(this.mockConfig.getProperty("Batch_Termination_TimeOut", "10"))
                 .andReturn("10");
+            expect(this.mockConfig.getProperty("Batch_ScrollBack", "1000")).andReturn("1000");
             replay(this.mockConfig);
             
             assertTrue(this.rig.assign("mdiponio"));
@@ -475,6 +485,7 @@ public class AbstractControlledRigTester extends TestCase
                 .andReturn("180");
             expect(this.mockConfig.getProperty("Batch_Termination_TimeOut", "10"))
                 .andReturn("10");
+            expect(this.mockConfig.getProperty("Batch_ScrollBack", "1000")).andReturn("1000");
             replay(this.mockConfig);
             
             /* Set up batch runner. */
@@ -557,6 +568,7 @@ public class AbstractControlledRigTester extends TestCase
                 .andReturn("false");
             expect(this.mockConfig.getProperty("Batch_Timeout", "60"))
                 .andReturn("180");
+            expect(this.mockConfig.getProperty("Batch_ScrollBack", "1000")).andReturn("1000");
             replay(this.mockConfig);
             
             if (System.getProperty("os.name").equals("Windows"))
@@ -625,6 +637,7 @@ public class AbstractControlledRigTester extends TestCase
                 .andReturn("false");
             expect(this.mockConfig.getProperty("Batch_Timeout", "60"))
                 .andReturn("180");
+            expect(this.mockConfig.getProperty("Batch_ScrollBack", "1000")).andReturn("1000");
             replay(this.mockConfig);
             
             /* Set up batch runner. */
@@ -697,6 +710,7 @@ public class AbstractControlledRigTester extends TestCase
                 .andReturn("false");
             expect(this.mockConfig.getProperty("Batch_Timeout", "60"))
                 .andReturn("100");
+            expect(this.mockConfig.getProperty("Batch_ScrollBack", "1000")).andReturn("1000");
             replay(this.mockConfig);
 
             /* Set up batch runner. */
