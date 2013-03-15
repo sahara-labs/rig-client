@@ -429,12 +429,12 @@ public abstract class AbstractRig implements IRig
                             this.logger.error("Cannot register the same action instance twice.");
                             return false;
                         }
-                        
-                        final IFilesDetectorAction detector = (IFilesDetectorAction)action;
-                        this.logger.info("Registering an session file detector action with provided type of " +
-                                detector.getActionType() + '.');
-                        return this.filesActions.add(detector);
                     }
+                    
+                    final IFilesDetectorAction detector = (IFilesDetectorAction)action;
+                    this.logger.info("Registering an session file detector action with provided type of " +
+                            detector.getActionType() + '.');
+                    return this.filesActions.add(detector);
                 }
                 
             default:
