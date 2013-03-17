@@ -489,7 +489,7 @@ public class DataTransferWatcher extends Thread
         
         String releasedUser = this.currentUser;
         this.currentUser = null;
-        this.inSession = true;
+        this.inSession = false;
         
         if (this.sessionFiles.get(releasedUser).size() == this.transferredFiles.get(releasedUser).size())
         {

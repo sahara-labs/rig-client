@@ -706,7 +706,7 @@ public class SchedulingServerProviderStub extends Stub
             final MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             final SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
 
-            final Object object = this.fromOM(_returnEnv.getBody().getFirstElement(), ReleaseCallbackResponse.class, 
+            final Object object = this.fromOM(_returnEnv.getBody().getFirstElement(), AddSessionFilesResponse.class, 
                     this.getEnvelopeNamespaces(_returnEnv));
 
             return (AddSessionFilesResponse) object;
