@@ -118,6 +118,10 @@ public class ConfigurationActionLoader
                 this.logger.debug("Loading the test action type configured instances.");
                 conf = this.config.getProperty("Test_Actions");
                 break;
+            case FILES:
+                this.logger.debug("Loading the files action type configured instances.");
+                conf = this.config.getProperty("Files_Actions");
+                break;
             default:
                 throw new IllegalStateException("This shouldn't happen and is probably bug. Initially thrown " +
                 		"in ConfigurationActionLoader->getConfiguredActions.");

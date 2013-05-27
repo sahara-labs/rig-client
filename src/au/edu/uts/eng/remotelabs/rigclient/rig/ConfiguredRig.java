@@ -93,6 +93,12 @@ public class ConfiguredRig extends AbstractRig
         {
             this.registerAction(action, ActionType.DETECT);
         }
+        
+        /* Files detection actions. */
+        for (IAction action : loader.getConfiguredActions(ActionType.FILES))
+        {
+            this.registerAction(action, ActionType.FILES);
+        }
     }
 
 }
