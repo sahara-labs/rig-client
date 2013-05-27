@@ -142,6 +142,8 @@ fi
 %{installdir}/conf/conf.d/rigattributes.properties
 %{installdir}/conf/conf.example/configuredrig.properties
 %{installdir}/conf/conf.example/primitive.properties
+%{installdir}/conf/conf.example/batch.properties
+%{installdir}/conf/conf.example/filetransfer.properties
 %{installdir}/rigclient_service.ini
 %{installdir}/rigclient.jar
 %{installdir}/rigclientservice
