@@ -61,7 +61,7 @@ Name "SAHARA Labs Rig Client"
 !define JREVersion "1.6"
 
 ; The file to write
-OutFile "package\RigClient-${Version}-${Arch}.exe"
+OutFile "package\RigClient.exe"
 
 ; The default installation directory
 InstallDir "C:\Program Files\Sahara"
@@ -500,30 +500,30 @@ SectionEnd
 
 Section "Rig Client Commons" Commons
     SetOutPath $INSTDIR\lib
-    File ..\RigClientCommons\dist\rigclient-commons.jar
+    File ..\sahara-labs-rig-client-commons\dist\rigclient-commons.jar
     
     SetOutPath $INSTDIR
 	${If} ${Arch} == "x64"
-		File ..\RigClientCommons\resources\wts-sessions\WindowsSessions\Release_x64\WTSSessions.dll
+		File ..\sahara-labs-rig-client-commons\resources\wts-sessions\WindowsSessions\Release_x64\WTSSessions.dll
 	${Else}
-		File ..\RigClientCommons\resources\wts-sessions\WindowsSessions\Release\WTSSessions.dll
+		File ..\sahara-labs-rig-client-commons\resources\wts-sessions\WindowsSessions\Release\WTSSessions.dll
 	${EndIf}
     
     SetOutPath $INSTDIR\conf\conf.example
-    File ..\RigClientCommons\conf\conf.example\CDUPower.properties
-    File ..\RigClientCommons\conf\conf.example\DeleteFilesResetAction.properties
-    File ..\RigClientCommons\conf\conf.example\DeviceOwnershipAccessAction.properties
-    File ..\RigClientCommons\conf\conf.example\IPSPowerResetAction.properties
-    File ..\RigClientCommons\conf\conf.example\JPEGCameraTest.properties
-    File ..\RigClientCommons\conf\conf.example\LabjackResetAction.properties
-    File ..\RigClientCommons\conf\conf.example\LDAP.properties
-    File ..\RigClientCommons\conf\conf.example\LdapGroupAccessAction.properties
-    File ..\RigClientCommons\conf\conf.example\LinuxDeviceNodeTestAction.properties
-    File ..\RigClientCommons\conf\conf.example\PingTestAction.properties
-    File ..\RigClientCommons\conf\conf.example\RemoteDesktopAccess.properties
-    File ..\RigClientCommons\conf\conf.example\SocketCommandResetAction.properties
-    File ..\RigClientCommons\conf\conf.example\SocketPassThroughController.properties
-    File ..\RigClientCommons\conf\conf.example\WTSDetectorAction.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\CDUPower.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\DeleteFilesResetAction.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\DeviceOwnershipAccessAction.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\IPSPowerResetAction.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\JPEGCameraTest.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\LabjackResetAction.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\LDAP.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\LdapGroupAccessAction.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\LinuxDeviceNodeTestAction.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\PingTestAction.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\RemoteDesktopAccess.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\SocketCommandResetAction.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\SocketPassThroughController.properties
+    File ..\sahara-labs-rig-client-commons\conf\conf.example\WTSDetectorAction.properties
 SectionEnd
 SectionGroupEnd     
 ;--------------------------------
