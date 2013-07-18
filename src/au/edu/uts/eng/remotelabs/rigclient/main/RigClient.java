@@ -216,6 +216,9 @@ public class RigClient
             /* Stop server. */
             this.server.stopListening();
             
+            /* Tell the rig to clean up. */
+            rig.cleanUp();
+            
             /* Cleanup the Axis2 directories and temp files. */
             File file = new File("_axis2");
             if (file.exists())

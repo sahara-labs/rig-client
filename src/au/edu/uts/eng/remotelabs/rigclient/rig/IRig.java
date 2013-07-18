@@ -84,4 +84,10 @@ public interface IRig extends IRigExerciser, IRigSession
      * @return map of key, value attribute pairs
      */
     public Map<String, String> getAllRigAttributes();
+    
+    /**
+     * Clean up the rig. This is called during the shut down procedure of 
+     * the Rig Client. 
+     */
+    public void cleanUp();
 }

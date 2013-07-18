@@ -261,7 +261,7 @@ public class MockIRig implements IRig
         return null;
     }
 
-    /**
+    /*
      * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession#detectSessionFiles()
      */
     @Override
@@ -270,4 +270,12 @@ public class MockIRig implements IRig
         return Collections.emptySet();
     }
 
+    /*
+     * @see au.edu.uts.eng.remotelabs.rigclient.rig.IRig#cleanUp()
+     */
+    @Override
+    public void cleanUp()
+    {
+        /* Nothing to do. */
+    }
 }

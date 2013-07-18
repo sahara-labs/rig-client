@@ -1144,6 +1144,7 @@ public abstract class AbstractRig implements IRig
      * Cleans up this class. This should be called before the rig client
      * is shutdown. 
      */
+    @Override
     public void cleanUp()
     {
         this.testThreads.interrupt();

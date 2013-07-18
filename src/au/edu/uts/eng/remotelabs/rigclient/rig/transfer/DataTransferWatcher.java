@@ -506,6 +506,7 @@ public class DataTransferWatcher extends Thread
     public void shutdown()
     {
         this.shutdown = true;
+        this.interrupt();
     }
     
     /** List of possible transfer methods. */
