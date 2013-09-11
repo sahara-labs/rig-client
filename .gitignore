@@ -17,6 +17,7 @@
 
 # /servicewrapper/
 /servicewrapper/rigclientservice
+*.o
 
 # /servicewrapper/WindowsServiceWrapper/
 /servicewrapper/WindowsServiceWrapper/*.sdf
