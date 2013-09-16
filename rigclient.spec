@@ -41,15 +41,15 @@
 
 Name: RigClient
 Summary: Software abstraction of of a physical rig.
-Version: 3.2
-Release: 0
+Version: 3.3
+Release: ANDS_Research
 License: BSD
 Group: Sahara
 
 URL: http://sourceforge.net/projects/labshare-sahara/
 Distribution: Redhat, SuSE
 Vendor: University of Technology, Sydney
-Packager: Tania Machet <tmachet@eng.uts.edu.au>, Michael Diponio <mdiponio@eng.uts.edu.au>
+Packager: Michael Diponio <michael.diponio@uts.edu.au>
 Requires: jre >= 1.6.0
 
 %define installdir /usr/lib/rigclient
