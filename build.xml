@@ -269,7 +269,7 @@ Date: 12th October 2009
     <property name="nsis.path" value="C:/Program Files/NSIS" />
     <target name="win-package" depends="dist" if="isWindows">
         <mkdir dir="${package.dir}"/>
-        <taskdef name="nsis" classpathref="project.tools" classname="net.sf.nsisant.Task" />
+        <taskdef name="nsis" classpathref="project.tools" classname="com.danielreese.nsisant.Task" />
         <echo>Building arch ${win.target.arch}.</echo>
         <nsis script="rigclient.nsi" verbosity="3" out="${package.dir}/rigclient.log" path="${nsis.path}">
             <define name="Arch" value="${win.target.arch}" />
