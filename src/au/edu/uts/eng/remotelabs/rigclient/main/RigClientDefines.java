@@ -59,10 +59,10 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 public class RigClientDefines
 {
     /** Bug reporting email. */
-    public static final String RC_BUG_REPORTING_TO = "mdiponio@eng.uts.edu.au (Developer)";
+    public static final String RC_BUG_REPORTING_TO = "Michael Diponio <michael.diponio@uts.edu.au>";
     
     /** Rig Client version. */
-    public static final String RC_VERSION = "3.1";
+    public static final String RC_VERSION = "3.3";
     
     /** Rig client SOAP interface name space. */
     public static final String NAME_SPACE = "http://remotelabs.eng.uts.edu.au/rigclient/protocol";

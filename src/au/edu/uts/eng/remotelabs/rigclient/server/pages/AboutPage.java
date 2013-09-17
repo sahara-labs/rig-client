@@ -222,7 +222,7 @@ public class AboutPage extends AbstractPage
     protected void adTab()
     {
         this.println("<div id='slbanner'>");
-        this.println("    <span>Rig Client r3.2</span><br />");
+        this.println("    <span>Rig Client r3.3</span><br />");
         this.println("    <img src='/img/logo_large.png' alt='SAHARA Labs' />");
         this.println("    Software abstraction of physical rig to provide rig session control " + 
         		"and rig device control. Automatically tests rig hardware and reports " + 
@@ -230,7 +230,7 @@ public class AboutPage extends AbstractPage
         this.println("</div>");
         
         this.println("<div id='slcopyright'>");
-        this.println("   Copyright &copy; 2009 - 2011, University of Technology, Sydney");
+        this.println("   Copyright &copy; 2009 - 2013, University of Technology, Sydney");
         this.println("</div>");
     }
     
