@@ -141,19 +141,20 @@ public class DataTransferWatcher extends Thread
 
         IConfig conf = ConfigFactory.getInstance();
         
-        TransferMethod meth;
-        try
-        {
-            meth = TransferMethod.valueOf(conf.getProperty("Data_Transfer_Method", "WEBDAV"));
-            this.logger.debug("Using session data transfer method '" + meth + "'.");
-        }
-        catch (IllegalArgumentException ex)
-        {
-            this.logger.error("Session data transfer method '" + conf.getProperty("Data_Transfer_Method") + "' is not a valid " +
-            		"option, using 'WEBDAV' transfer method.");
-            meth = TransferMethod.WEBDAV;
-        }
-        this.transferMethod = meth;
+//        TransferMethod meth;
+//        try
+//        {
+//            meth = TransferMethod.valueOf(conf.getProperty("Data_Transfer_Method", "WEBDAV"));
+//            this.logger.debug("Using session data transfer method '" + meth + "'.");
+//        }
+//        catch (IllegalArgumentException ex)
+//        {
+//            this.logger.error("Session data transfer method '" + conf.getProperty("Data_Transfer_Method") + "' is not a valid " +
+//            		"option, using 'WEBDAV' transfer method.");
+//            meth = TransferMethod.WEBDAV;
+//        }
+//        this.transferMethod = meth;
+        this.transferMethod = TransferMethod.FILESYSTEM;
             
         String tmp = conf.getProperty("Data_Transfer_Local_Directory", "");
         if ("".equals(tmp))

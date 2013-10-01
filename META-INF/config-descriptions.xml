@@ -1005,6 +1005,8 @@ The default compression level is 'DEFAULT'.
 ## File: filetransfer.properties                                              ##
 ################################################################################
  -->
+ 
+<!-- Disabling because not implemented yet.
 <property name="Data_Transfer_Method" 
           stanza="Data Transfer" 
           mandatory="no" 
@@ -1020,7 +1022,7 @@ an externally configured shared file system between the Scheduling Server
 and Rig Client machines; 'WEBDAV' which uses a WebDav client within the Rig
 Client to connect with the Scheduling Server WebDav server. The default is 
 'WEBDAV' as it is most suitable for most use cases. 
-</property>
+</property> -->
 
 <property name="Data_Transfer_Local_Directory" 
           stanza="Data Transfer" 
