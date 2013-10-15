@@ -69,10 +69,9 @@ public class IndexPage extends AbstractPage
         this.links = new LinkedHashMap<String, String>(5);
         this.links.put("Status", "/status");
         this.links.put("Configuration", "/config");
-//        this.links.put("Direct_Control", "/control");
+        this.links.put("Controllers", "/control");
         this.links.put("Logs", "/logs");
         this.links.put("Diagnostics", "/info");
-//        this.links.put("Documentation", "/doc");
         this.links.put("About", "/about");
         
         this.operations = new LinkedHashMap<String, String>(4);
@@ -86,7 +85,7 @@ public class IndexPage extends AbstractPage
         this.icons = new HashMap<String, String>(9);
         this.icons.put("Status", "status");
         this.icons.put("Configuration", "config");
-//        this.icons.put("Direct_Control", "control");
+        this.icons.put("Controllers", "control");
         this.icons.put("Logs", "logs");
         this.icons.put("Documentation", "doc");
         this.icons.put("About", "about");
@@ -102,7 +101,7 @@ public class IndexPage extends AbstractPage
         this.toolTips.put("Status", "The current status of the rig client.");
         this.toolTips.put("Configuration", "Allows configuration properties of the rig client to be viewed and " +
         		"changed.");
-  //      this.toolTips.put("Direct_Control", "Allows the direct control cache to be viewed and cleared.");
+        this.toolTips.put("Controllers", "Allows controller classes to be loaded, viewed, invoked and cleared.");
         this.toolTips.put("About", "About Rig Client.");
         this.toolTips.put("Logs", "Log viewer displaying the latest log messages.");
         this.toolTips.put("Documentation", "Documentation about the rig client.");
