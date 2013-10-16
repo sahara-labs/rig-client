@@ -206,7 +206,7 @@ public abstract class AbstractPage
     protected void addHead()
     {
         this.println("<head>");
-        this.println("  <title>" + this.stringTransform(this.config.getProperty("Rig_Name")) + " - " + this.getPageTitle() + "</title>");
+        this.println("  <title>Rig Client: " + this.stringTransform(this.config.getProperty("Rig_Name")) + " - " + this.getPageTitle() + "</title>");
         this.println("  <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
         this.println("  <link href='/css/rigclient.css' media='screen' rel='stylesheet' type='text/css' />");
         this.println("  <link href='/css/smoothness/jquery-ui.custom.css' rel='stylesheet' type='text/css' />");
