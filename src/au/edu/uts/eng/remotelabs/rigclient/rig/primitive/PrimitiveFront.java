@@ -109,24 +109,7 @@ public class PrimitiveFront
         }
         
         /* --------------------------------------------------------------------
-         * ---- 2. Run the ACL filter hook if the controller supports it. -----
-         * ------------------------------------------------------------------*/
-        if (controller instanceof IPrimitiveAcl)
-        {
-            IPrimitiveAcl acl = (IPrimitiveAcl)controller;
-            if (!acl.allowRole(request.getRole(), request.getAction()))
-            {
-                this.logger.info("Failing primitive control because the role " + request.getRole() + " does not " +
-                		"have permission to run " + request.getAction() + " on " + request.getController() + '.');
-                response.setErrorCode(-9);
-                response.setErrorReason("ACL check does not allow the role the perform the action.");
-                response.setSuccessful(false);
-                return response;
-            }
-        }
-        
-        /* --------------------------------------------------------------------
-         * ---- 3. Get the requested controller action. -----------------------
+         * ---- 2. Get the requested controller action. -----------------------
          * ------------------------------------------------------------------*/
         if (request.getAction() == null)
         {
@@ -141,7 +124,7 @@ public class PrimitiveFront
         this.logger.debug("Requested action is " + actionName + ".");
         
         /* --------------------------------------------------------------------
-         * ---- 4. Invoke the preRoute method. --------------------------------
+         * ---- 3. Invoke the preRoute method. --------------------------------
          * ------------------------------------------------------------------*/
         if (!controller.preRoute())
         {
@@ -160,7 +143,7 @@ public class PrimitiveFront
             this.logger.debug("Found action method has the signature: " + meth.toGenericString());
             
             /* ----------------------------------------------------------------
-             * ---- 5. Invoke the action method. ------------------------------
+             * ---- 4. Invoke the action method. ------------------------------
              * --------------------------------------------------------------*/
             /* Works for both static and instance methods. If it is a static 
              * method the instance parameter is ignored. */
