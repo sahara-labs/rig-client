@@ -52,6 +52,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.axis2.transport.http.AxisServlet;
 import org.mortbay.jetty.Connector;
@@ -61,6 +62,7 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.thread.QueuedThreadPool;
 
+import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -186,7 +188,16 @@ public class EmbeddedJettyServer implements IServer
          * --- 4. Create and configure the handler. ---------------------------
          * ------------------------------------------------------------------*/
         /* The handler routes the requests to the Apache Axis 2 servlet. */
-        this.context = new Context(this.server, "/", Context.SESSIONS);        
+        this.context = new Context(this.server, "/", Context.SESSIONS);    
+
+        /* Set the session cookie for the admin interface. */
+        @SuppressWarnings("unchecked")
+        Map<String, String> initParams = this.context.getInitParams();
+        initParams.put("org.mortbay.jetty.servlet.SessionCookie", 
+                "session-rigclient-" + RigFactory.getRigInstance().getName());
+        initParams.put("org.mortbay.jetty.servlet.MaxAge", "3600");
+        this.context.setInitParams(initParams);
+        
         ServletHolder holder = new ServletHolder(new AxisServlet());
         
         /* DODGY To put the repository in a Jar '/' is needed at the end of the
@@ -207,7 +218,7 @@ public class EmbeddedJettyServer implements IServer
         /* --------------------------------------------------------------------
          * ---- 5. Add the default handler (not the SOAP service). ------------
          * ------------------------------------------------------------------*/
-        holder = new ServletHolder(new RootServlet());
+        holder = new ServletHolder(new RootServlet());  
         this.context.addServlet(holder, "/*");
     }
 
