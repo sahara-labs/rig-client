@@ -233,7 +233,7 @@ public class IndexPage extends AbstractPage
     @Override
     protected String getPageHeader()
     {
-        return "Welcome to " + this.config.getProperty("Rig_Name");
+        return "Rig Client: " + this.config.getProperty("Rig_Name");
     }
     
     @Override
