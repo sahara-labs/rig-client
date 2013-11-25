@@ -80,7 +80,13 @@ Date: 12th October 2009
     
 
     <!-- Everything! -->
-    <target name="all" depends="clean,build,dist,test,pmd,bugs,doc"/>
+    <target name="all" depends="clean,build,dist,test,pmd,bugs,doc,package"/>
+	
+    <!-- Almost Everything! -->
+    <target name="main" depends="clean,build,dist,doc,package"/>
+	
+    <!-- Almost Everything! -->
+    <target name="quick" depends="build,dist,package"/>
 
     <!-- Code compilation -->
     <target name="build">
@@ -266,10 +272,10 @@ Date: 12th October 2009
             -> x64 - 64 bit 
         If not set the os.arch system property is used. -->
     <property name="win.target.arch" value="x86" />
-    <property name="nsis.path" value="C:/Program Files/NSIS" />
+    <property name="nsis.path" value="C:/Program Files (x86)/NSIS" />
     <target name="win-package" depends="dist" if="isWindows">
         <mkdir dir="${package.dir}"/>
-        <taskdef name="nsis" classpathref="project.tools" classname="net.sf.nsisant.Task" />
+        	<taskdef name="nsis" classpathref="project.tools" classname="com.danielreese.nsisant.Task"/>
         <echo>Building arch ${win.target.arch}.</echo>
         <nsis script="rigclient.nsi" verbosity="3" out="${package.dir}/rigclient.log" path="${nsis.path}">
             <define name="Arch" value="${win.target.arch}" />

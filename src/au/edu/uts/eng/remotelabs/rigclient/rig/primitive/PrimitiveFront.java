@@ -44,6 +44,7 @@ package au.edu.uts.eng.remotelabs.rigclient.rig.primitive;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import au.edu.uts.eng.remotelabs.rigclient.collaboration.CollaborationEngine;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -152,6 +153,17 @@ public class PrimitiveFront
             response.setErrorReason("preRoute failed.");
             response.setSuccessful(false);
             return response;
+        }
+        /* --------------------------------------------------------------------
+         * ---- 4.5. Check if user has permission to perform operation-------
+         * ------------------------------------------------------------------*/
+        if (!CollaborationEngine.hasControl(request.getRequestor()) &&
+        		!CollaborationEngine.checkSlaveAction(actionName)){
+        	this.logger.debug("The user " + request.getRequestor() + " doesn't have permission to perform that action");
+        	response.setErrorCode(-9);
+        	response.setErrorReason("User " + request.getRequestor() + " doesn't have permission.");
+        	response.setSuccessful(false);
+        	return response;
         }
         
         try

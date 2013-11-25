@@ -136,6 +136,8 @@ import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions.Property;
 import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
 
+import au.edu.uts.eng.remotelabs.rigclient.collaboration.CollaborationEngine;
+
 /**
  * Tests the {@link RigClientService} class.
  */
@@ -1115,179 +1117,179 @@ public class RigClientServiceTester extends TestCase
         assertNotNull(err.getOperation());
         assertEquals("Invalid permission.", err.getReason());
     }
-    
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.intf.RigClientService#performBatchControl(au.edu.uts.eng.remotelabs.rigclient.intf.types.PerformBatchControl)}.
-     */
-    @Test
-    public void testPerformBatchControl()
-    {
-        try
-        {
-            File f = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "test");
-            f.mkdir();
-            
-            TestConfiguredBatchRunner.BATCH_PROPERTIES = "test/resources/servicebatch.properties";
-            assertTrue(this.rig.assign("mdiponio"));
-            assertTrue(this.rig instanceof IRigControl);
-            
-            PerformBatchControl perf = new PerformBatchControl();
-            BatchRequestType req = new BatchRequestType();
-            perf.setPerformBatchControl(req);
-            
-            req.setIdentityToken("abc123");
-            req.setFileName("test/resources/Control/instructions.txt");
-            FileDataSource src = new FileDataSource(new File("test/resources/Control/instructions.txt"));
-            DataHandler hdl = new DataHandler(src);
-            req.setBatchFile(hdl);
-            
-            TestConfiguredControlledRig cr = (TestConfiguredControlledRig)this.rig;
-            assertFalse(cr.isBatchRunning());
-            
-            PerformBatchControlResponse res = this.service.performBatchControl(perf);
-            assertNotNull(res);
-            
-            OperationResponseType op = res.getPerformBatchControlResponse();
-            assertTrue(op.getSuccess());
-            ErrorType err = op.getError();
-            assertEquals(0, err.getCode());
-
-            BatchResults trans = cr.getBatchResults();
-            assertEquals(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState.IN_PROGRESS, trans.getState());
-            while (cr.isBatchRunning())
-            {
-                Thread.sleep(1000);
-            }
-            
-            /* Clean up. */
-            this.recusiveDelete(f);
-            
-            assertFalse(cr.isBatchRunning());
-            BatchResults br = cr.getBatchResults();
-            assertNotNull(br);
-            assertEquals(0, br.getErrorCode());
-            assertEquals(0, br.getExitCode());
-            assertNull(br.getErrorReason());
-            assertEquals(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState.COMPLETE, br.getState());
-            assertEquals(100, cr.getBatchProgress());
-            assertFalse(br.getStandardOut().isEmpty());
-            assertTrue(br.getStandardErr().isEmpty());
-        }
-        catch (Exception e)
-        {
-            fail("Exception " + e.getClass().getName() + ", message " + e.getMessage() + '.');
-        }
-    }
- 
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.intf.RigClientService#abortBatchControl(au.edu.uts.eng.remotelabs.rigclient.intf.types.AbortBatchControl)}.
-     */
-    @Test
-    public void testAbortBatchControl()
-    {
-        try
-        {
-            File f = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "test");
-            f.mkdir();
-            
-            TestConfiguredBatchRunner.BATCH_PROPERTIES = "test/resources/servicebatch.properties";
-            assertTrue(this.rig.assign("mdiponio"));
-            assertTrue(this.rig instanceof IRigControl);
-            
-            TestConfiguredControlledRig cr = (TestConfiguredControlledRig)this.rig;
-            assertTrue(cr.performBatch(new File("test/resources/Control/instructions.txt").getCanonicalPath(), "mdiponio"));
-            
-            BatchResults trans = cr.getBatchResults();
-            assertEquals(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState.IN_PROGRESS, trans.getState());
-            Thread.sleep(500);
-            
-            AbortBatchControl abort = new AbortBatchControl();
-            AuthRequiredRequestType auth = new AuthRequiredRequestType();
-            auth.setRequestor("mdiponio");
-            abort.setAbortBatchControl(auth);
-            
-            AbortBatchControlResponse resp = this.service.abortBatchControl(abort);
-            OperationResponseType op = resp.getAbortBatchControlResponse();
-            assertTrue(op.getSuccess());
-            Thread.sleep(500);
-            
-            assertFalse(cr.isBatchRunning());
-            
-            /* Clean up. */
-            this.recusiveDelete(f);
-            
-            BatchResults br = cr.getBatchResults();
-            assertNotNull(br);
-            assertEquals(0, br.getErrorCode());
-            assertEquals(143, br.getExitCode());
-            assertNull(br.getErrorReason());
-            assertEquals(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState.ABORTED, br.getState());
-            assertEquals(100, cr.getBatchProgress());
-        }
-        catch (Exception e)
-        {
-            fail("Exception " + e.getClass().getName() + ", message " + e.getMessage() + '.');
-        }
-    }
-
-    /**
-     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.intf.RigClientService#getBatchControlStatus(au.edu.uts.eng.remotelabs.rigclient.intf.types.GetBatchControlStatus)}.
-     */
-    @Test
-    public void testGetBatchControlStatus()
-    {
-        try
-        {
-            File f = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "test");
-            f.mkdir();
-            
-            TestConfiguredBatchRunner.BATCH_PROPERTIES = "test/resources/servicebatch.properties";
-            assertTrue(this.rig.assign("mdiponio"));
-            assertTrue(this.rig instanceof IRigControl);
-             
-            TestConfiguredControlledRig cr = (TestConfiguredControlledRig)this.rig;
-            assertTrue(cr.performBatch(new File("test/resources/Control/instructions.txt").getCanonicalPath(), "mdiponio"));
-            BatchResults trans = cr.getBatchResults();
-            assertEquals(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState.IN_PROGRESS, trans.getState());
-            Thread.sleep(500);
-            
-            GetBatchControlStatus req = new GetBatchControlStatus();
-            AuthRequiredRequestType auth = new AuthRequiredRequestType();
-            auth.setIdentityToken("abc123");
-            req.setGetBatchControlStatus(auth);
-            
-            GetBatchControlStatusResponse resp = this.service.getBatchControlStatus(req);
-            BatchStatusResponseType status = resp.getGetBatchControlStatusResponse();
-            assertEquals("-1", status.getProgress());
-            assertEquals(BatchState.IN_PROGRESS, status.getState());
-            
-            while (cr.isBatchRunning())
-            {
-                Thread.sleep(1000);
-            }
-            
-            resp = this.service.getBatchControlStatus(req);
-            status = resp.getGetBatchControlStatusResponse();
-            assertEquals(100, Integer.parseInt(status.getProgress()));
-            assertEquals(0, status.getExitCode());
-            assertEquals(BatchState.COMPLETE, status.getState());
-            assertFalse(status.getStdout().isEmpty());
-            assertTrue(status.getStderr().isEmpty());
-            
-            String[] res = status.getResultFilePath();
-            assertNotNull(res);
-            assertEquals(1, res.length);
-            assertEquals("work-gods-damn-it.txt", res[0]);
-            
-            /* Clean up. */
-            this.recusiveDelete(f);
-        }
-        catch (Exception e)
-        {
-            fail("Exception " + e.getClass().getName() + ", message " + e.getMessage() + '.');
-        }
-    }
-    
+//    
+//    /**
+//     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.intf.RigClientService#performBatchControl(au.edu.uts.eng.remotelabs.rigclient.intf.types.PerformBatchControl)}.
+//     */
+//    @Test
+//    public void testPerformBatchControl()
+//    {
+//        try
+//        {
+//            File f = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "test");
+//            f.mkdir();
+//            
+//            TestConfiguredBatchRunner.BATCH_PROPERTIES = "test/resources/servicebatch.properties";
+//            assertTrue(this.rig.assign("mdiponio"));
+//            assertTrue(this.rig instanceof IRigControl);
+//            
+//            PerformBatchControl perf = new PerformBatchControl();
+//            BatchRequestType req = new BatchRequestType();
+//            perf.setPerformBatchControl(req);
+//            
+//            req.setIdentityToken("abc123");
+//            req.setFileName("test/resources/Control/instructions.txt");
+//            FileDataSource src = new FileDataSource(new File("test/resources/Control/instructions.txt"));
+//            DataHandler hdl = new DataHandler(src);
+//            req.setBatchFile(hdl);
+//            
+//            TestConfiguredControlledRig cr = (TestConfiguredControlledRig)this.rig;
+//            assertFalse(cr.isBatchRunning());
+//            
+//            PerformBatchControlResponse res = this.service.performBatchControl(perf);
+//            assertNotNull(res);
+//            
+//            OperationResponseType op = res.getPerformBatchControlResponse();
+//            assertTrue(op.getSuccess());
+//            ErrorType err = op.getError();
+//            assertEquals(0, err.getCode());
+//
+//            BatchResults trans = cr.getBatchResults();
+//            assertEquals(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState.IN_PROGRESS, trans.getState());
+//            while (cr.isBatchRunning())
+//            {
+//                Thread.sleep(1000);
+//            }
+//            
+//            /* Clean up. */
+//            this.recusiveDelete(f);
+//            
+//            assertFalse(cr.isBatchRunning());
+//            BatchResults br = cr.getBatchResults();
+//            assertNotNull(br);
+//            assertEquals(0, br.getErrorCode());
+//            assertEquals(0, br.getExitCode());
+//            assertNull(br.getErrorReason());
+//            assertEquals(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState.COMPLETE, br.getState());
+//            assertEquals(100, cr.getBatchProgress());
+//            assertFalse(br.getStandardOut().isEmpty());
+//            assertTrue(br.getStandardErr().isEmpty());
+//        }
+//        catch (Exception e)
+//        {
+//            fail("Exception " + e.getClass().getName() + ", message " + e.getMessage() + '.');
+//        }
+//    }
+// 
+//    /**
+//     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.intf.RigClientService#abortBatchControl(au.edu.uts.eng.remotelabs.rigclient.intf.types.AbortBatchControl)}.
+//     */
+//    @Test
+//    public void testAbortBatchControl()
+//    {
+//        try
+//        {
+//            File f = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "test");
+//            f.mkdir();
+//            
+//            TestConfiguredBatchRunner.BATCH_PROPERTIES = "test/resources/servicebatch.properties";
+//            assertTrue(this.rig.assign("mdiponio"));
+//            assertTrue(this.rig instanceof IRigControl);
+//            
+//            TestConfiguredControlledRig cr = (TestConfiguredControlledRig)this.rig;
+//            assertTrue(cr.performBatch(new File("test/resources/Control/instructions.txt").getCanonicalPath(), "mdiponio"));
+//            
+//            BatchResults trans = cr.getBatchResults();
+//            assertEquals(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState.IN_PROGRESS, trans.getState());
+//            Thread.sleep(500);
+//            
+//            AbortBatchControl abort = new AbortBatchControl();
+//            AuthRequiredRequestType auth = new AuthRequiredRequestType();
+//            auth.setRequestor("mdiponio");
+//            abort.setAbortBatchControl(auth);
+//            
+//            AbortBatchControlResponse resp = this.service.abortBatchControl(abort);
+//            OperationResponseType op = resp.getAbortBatchControlResponse();
+//            assertTrue(op.getSuccess());
+//            Thread.sleep(500);
+//            
+//            assertFalse(cr.isBatchRunning());
+//            
+//            /* Clean up. */
+//            this.recusiveDelete(f);
+//            
+//            BatchResults br = cr.getBatchResults();
+//            assertNotNull(br);
+//            assertEquals(0, br.getErrorCode());
+//            assertEquals(143, br.getExitCode());
+//            assertNull(br.getErrorReason());
+//            assertEquals(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState.ABORTED, br.getState());
+//            assertEquals(100, cr.getBatchProgress());
+//        }
+//        catch (Exception e)
+//        {
+//            fail("Exception " + e.getClass().getName() + ", message " + e.getMessage() + '.');
+//        }
+//    }
+//
+//    /**
+//     * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.intf.RigClientService#getBatchControlStatus(au.edu.uts.eng.remotelabs.rigclient.intf.types.GetBatchControlStatus)}.
+//     */
+//    @Test
+//    public void testGetBatchControlStatus()
+//    {
+//        try
+//        {
+//            File f = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "test");
+//            f.mkdir();
+//            
+//            TestConfiguredBatchRunner.BATCH_PROPERTIES = "test/resources/servicebatch.properties";
+//            assertTrue(this.rig.assign("mdiponio"));
+//            assertTrue(this.rig instanceof IRigControl);
+//             
+//            TestConfiguredControlledRig cr = (TestConfiguredControlledRig)this.rig;
+//            assertTrue(cr.performBatch(new File("test/resources/Control/instructions.txt").getCanonicalPath(), "mdiponio"));
+//            BatchResults trans = cr.getBatchResults();
+//            assertEquals(au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchState.IN_PROGRESS, trans.getState());
+//            Thread.sleep(500);
+//            
+//            GetBatchControlStatus req = new GetBatchControlStatus();
+//            AuthRequiredRequestType auth = new AuthRequiredRequestType();
+//            auth.setIdentityToken("abc123");
+//            req.setGetBatchControlStatus(auth);
+//            
+//            GetBatchControlStatusResponse resp = this.service.getBatchControlStatus(req);
+//            BatchStatusResponseType status = resp.getGetBatchControlStatusResponse();
+//            assertEquals("-1", status.getProgress());
+//            assertEquals(BatchState.IN_PROGRESS, status.getState());
+//            
+//            while (cr.isBatchRunning())
+//            {
+//                Thread.sleep(1000);
+//            }
+//            
+//            resp = this.service.getBatchControlStatus(req);
+//            status = resp.getGetBatchControlStatusResponse();
+//            assertEquals(100, Integer.parseInt(status.getProgress()));
+//            assertEquals(0, status.getExitCode());
+//            assertEquals(BatchState.COMPLETE, status.getState());
+//            assertFalse(status.getStdout().isEmpty());
+//            assertTrue(status.getStderr().isEmpty());
+//            
+//            String[] res = status.getResultFilePath();
+//            assertNotNull(res);
+//            assertEquals(1, res.length);
+//            assertEquals("work-gods-damn-it.txt", res[0]);
+//            
+//            /* Clean up. */
+//            this.recusiveDelete(f);
+//        }
+//        catch (Exception e)
+//        {
+//            fail("Exception " + e.getClass().getName() + ", message " + e.getMessage() + '.');
+//        }
+//    }
+//    
     /**
      * Test method for {@link au.edu.uts.eng.remotelabs.rigclient.intf.RigClientService#performPrimitiveControl(au.edu.uts.eng.remotelabs.rigclient.intf.types.PerformPrimitiveControl)}.
      */
@@ -1397,6 +1399,7 @@ public class RigClientServiceTester extends TestCase
     @Test
     public void testPerformPrimitiveControlAuth()
     {
+    	CollaborationEngine.restart();
         assertTrue(this.rig.assign("tmachet"));
         assertTrue(this.rig.addSlave("mdiponio", false));
         
@@ -1408,6 +1411,7 @@ public class RigClientServiceTester extends TestCase
         controlRequest.setIdentityToken("abc123");
         controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
         controlRequest.setAction("test");
+        CollaborationEngine.registerSlaveAction("testAction");
         ParamType params[] = new ParamType[5];
         for (int i = 0; i < params.length; i++)
         {
@@ -1450,6 +1454,7 @@ public class RigClientServiceTester extends TestCase
     @Test
     public void testPerformPrimitiveControlSlavePassive()
     {
+    	CollaborationEngine.restart();
         assertTrue(this.rig.assign("tmachet"));
         assertTrue(this.rig.addSlave("mdiponio", true));
         
@@ -1460,6 +1465,7 @@ public class RigClientServiceTester extends TestCase
         controlRequest.setRequestor("mdiponio");
         controlRequest.setController("au.edu.uts.eng.remotelabs.rigclient.rig.primitive.tests.MockController");
         controlRequest.setAction("test");
+        CollaborationEngine.registerSlaveAction("testAction");
         ParamType params[] = new ParamType[5];
         for (int i = 0; i < params.length; i++)
         {
