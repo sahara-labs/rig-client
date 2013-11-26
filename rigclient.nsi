@@ -754,4 +754,3 @@ LangString DESC_UnSecCommons ${LANG_ENGLISH} "SAHARA Labs Rig Client Commons. $\
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
 
 ;--------------------------------
-

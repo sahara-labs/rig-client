@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import au.edu.uts.eng.remotelabs.rigclient.collaboration.CollaborationEngine;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.AbortBatchControl;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.AbortBatchControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.ActivityDetectableType;
@@ -103,6 +104,7 @@ import au.edu.uts.eng.remotelabs.rigclient.intf.types.SlaveReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.SlaveUserType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.StatusResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.TestIntervalRequestType;
+import au.edu.uts.eng.remotelabs.rigclient.intf.types.TypeSlaveUser;
 import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
@@ -159,6 +161,7 @@ public class RigClientService implements RigClientServiceInterface
     @Override
     public AllocateResponse allocate(final Allocate allocRequest)
     {   
+    	
         /* Request parameters. */
         final String user = allocRequest.getAllocate().getUser();
         final boolean async = allocRequest.getAllocate().getAsync();
@@ -243,7 +246,9 @@ public class RigClientService implements RigClientServiceInterface
                 error.setReason("Action failure");
             }
         }
-
+        
+        if (operation.getSuccess())
+        	CollaborationEngine.restart();
         return response;
     }
 
@@ -252,6 +257,7 @@ public class RigClientService implements RigClientServiceInterface
     {
         /* Request parameters. */
         final String user = relRequest.getRelease().getUser();
+        
         final boolean async = relRequest.getRelease().getAsync();
         this.logger.debug("Received release request with parameter: user=" + user + ", async=" + async + '.');
         

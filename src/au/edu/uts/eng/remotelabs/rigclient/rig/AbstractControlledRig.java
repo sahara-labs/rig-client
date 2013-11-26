@@ -54,7 +54,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     private AbstractBatchRunner runner;
     
     /** Primitive front controller. */
-    private PrimitiveFront front;
+    protected PrimitiveFront front;
     
     /**
      * Constructor.
