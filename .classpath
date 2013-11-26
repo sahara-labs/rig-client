@@ -4,30 +4,28 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/antlr-2.7.7.jar"/>
-	<classpathentry kind="lib" path="lib/axiom-api-1.2.12.jar"/>
-	<classpathentry kind="lib" path="lib/axiom-dom-1.2.12.jar"/>
-	<classpathentry kind="lib" path="lib/axiom-impl-1.2.12.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-adb-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-adb-codegen-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-ant-plugin-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-clustering-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-codegen-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-corba-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-fastinfoset-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-java2wsdl-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-jaxbri-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-jaxws-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-jibx-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-json-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-kernel-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-metadata-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-mtompolicy-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-saaj-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-soapmonitor-servlet-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-spring-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-transport-http-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-transport-local-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/axis2-xmlbeans-1.5.6.jar"/>
+	<classpathentry kind="lib" path="lib/axiom-api-1.2.11.jar"/>
+	<classpathentry kind="lib" path="lib/axiom-dom-1.2.11.jar"/>
+	<classpathentry kind="lib" path="lib/axiom-impl-1.2.11.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-adb-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-clustering-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-codegen-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-corba-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-fastinfoset-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-java2wsdl-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-jaxbri-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-jaxws-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-jibx-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-json-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-kernel-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-metadata-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-mtompolicy-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-saaj-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-soapmonitor-servlet-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-spring-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-transport-http-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-transport-local-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-xmlbeans-1.5.5.jar"/>
 	<classpathentry kind="lib" path="lib/bcel-5.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.2.jar"/>
@@ -54,9 +52,8 @@
 	<classpathentry kind="lib" path="lib/jibx-run-1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/juli-6.0.16.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1.4.jar"/>
-	<classpathentry kind="lib" path="lib/mex-1.5.6-impl.jar"/>
+	<classpathentry kind="lib" path="lib/mex-1.5.5-impl.jar"/>
 	<classpathentry kind="lib" path="lib/neethi-2.0.5.jar"/>
 	<classpathentry kind="lib" path="lib/regexp-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.5-20081211.jar"/>
@@ -70,12 +67,12 @@
 	<classpathentry kind="lib" path="lib/xml-resolver-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/XmlSchema-1.4.3.jar"/>
-	<classpathentry kind="lib" path="test/lib/easymock-2.5.2.jar"/>
-	<classpathentry kind="lib" path="test/lib/hamcrest-core-1.3.jar"/>
-	<classpathentry kind="lib" path="test/lib/junit-4.7.jar"/>
-	<classpathentry kind="lib" path="test/lib/easymockclassextension-2.5.2.jar"/>
-	<classpathentry kind="lib" path="test/lib/cglib-2.2.jar"/>
 	<classpathentry kind="lib" path="test/lib/asm-3.1.jar"/>
+	<classpathentry kind="lib" path="test/lib/cglib-2.2.jar"/>
+	<classpathentry kind="lib" path="test/lib/easymock-2.5.2.jar"/>
+	<classpathentry kind="lib" path="test/lib/easymockclassextension-2.5.2.jar"/>
+	<classpathentry kind="lib" path="test/lib/hamcrest-core-1.1.jar"/>
+	<classpathentry kind="lib" path="test/lib/junit-4.7.jar"/>
 	<classpathentry kind="lib" path="test/lib/objenesis-1.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
