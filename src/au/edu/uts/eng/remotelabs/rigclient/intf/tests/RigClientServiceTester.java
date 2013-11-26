@@ -56,33 +56,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
-
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import au.edu.uts.eng.remotelabs.rigclient.collaboration.CollaborationEngine;
 import au.edu.uts.eng.remotelabs.rigclient.intf.RigClientService;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.AbortBatchControl;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.AbortBatchControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.Allocate;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.AllocateResponse;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.AttributeRequestType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.AttributeResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.AttributeResponseTypeChoice;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.AuthRequiredRequestType;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.BatchRequestType;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.BatchState;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.BatchStatusResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.ConfigPropertyType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.ConfigResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.ErrorType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.GetAttribute;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.GetAttributeResponse;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.GetBatchControlStatus;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.GetBatchControlStatusResponse;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.GetConfig;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.GetConfigResponse;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.GetStatus;
@@ -96,8 +86,6 @@ import au.edu.uts.eng.remotelabs.rigclient.intf.types.NotifyResponse;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.NullType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.OperationResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.ParamType;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.PerformBatchControl;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.PerformBatchControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.PerformPrimitiveControl;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.PerformPrimitiveControlResponse;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.PrimitiveControlRequestType;
@@ -124,8 +112,6 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.ConfiguredRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IAccessAction;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
-import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
-import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.BatchResults;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
 import au.edu.uts.eng.remotelabs.rigclient.rig.tests.MockRig;
 import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
@@ -135,8 +121,6 @@ import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfigDescriptions.Property;
 import au.edu.uts.eng.remotelabs.rigclient.util.PropertiesConfig;
-
-import au.edu.uts.eng.remotelabs.rigclient.collaboration.CollaborationEngine;
 
 /**
  * Tests the {@link RigClientService} class.
@@ -2181,6 +2165,7 @@ public class RigClientServiceTester extends TestCase
         verify(conf);
     }
     
+    @SuppressWarnings("unused")
     private void recusiveDelete(final File file) throws IOException
     {   
         /* Try to detect symbolic links so some mischievous moron doesn't 

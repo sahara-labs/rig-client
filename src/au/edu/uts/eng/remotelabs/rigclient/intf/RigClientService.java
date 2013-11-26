@@ -104,7 +104,6 @@ import au.edu.uts.eng.remotelabs.rigclient.intf.types.SlaveReleaseResponse;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.SlaveUserType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.StatusResponseType;
 import au.edu.uts.eng.remotelabs.rigclient.intf.types.TestIntervalRequestType;
-import au.edu.uts.eng.remotelabs.rigclient.intf.types.TypeSlaveUser;
 import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig;
 import au.edu.uts.eng.remotelabs.rigclient.rig.AbstractRig.ActionType;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;

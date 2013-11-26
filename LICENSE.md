@@ -1,4 +1,4 @@
-Copyright (c) 2009 - 2011, University of Technology, Sydney
+Copyright (c) 2009 - 2014, University of Technology, Sydney
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or 
