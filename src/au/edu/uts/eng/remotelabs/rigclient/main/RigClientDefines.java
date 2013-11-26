@@ -46,12 +46,13 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory.LoggerType;
 
 /**
  * Global definitions and convenient functions.
@@ -62,7 +63,10 @@ public class RigClientDefines
     public static final String RC_BUG_REPORTING_TO = "Michael Diponio <michael.diponio@uts.edu.au>";
     
     /** Rig Client version. */
-    public static final String RC_VERSION = "3.3";
+    public static final String RC_VERSION = "3.4";
+    
+    /** Rig Client status. */
+    public static final String RC_RELEASE = "alpha"; 
     
     /** Rig client SOAP interface name space. */
     public static final String NAME_SPACE = "http://remotelabs.eng.uts.edu.au/rigclient/protocol";
@@ -86,7 +90,7 @@ public class RigClientDefines
         builder.append("with the following attached:\n");
         builder.append('\n');
         builder.append("================================================================================\n");
-        builder.append("== Rig Client v" + RigClientDefines.RC_VERSION + '\n');
+        builder.append("== Rig Client r" + RigClientDefines.RC_VERSION + " (" + RigClientDefines.RC_RELEASE + ")\n");
         builder.append("== " + cal.get(Calendar.DAY_OF_MONTH) + "/" + (cal.get(Calendar.MONTH) + 1) + "/" + cal.get(Calendar.YEAR)
                 + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND) + '\n');
         builder.append("================================================================================\n");
@@ -150,8 +154,12 @@ public class RigClientDefines
         builder.append("################################################################################\n");
         builder.append('\n');
         
-        System.out.println(builder.toString());
-        LoggerFactory.getLoggerInstance().fatal(builder.toString());
+        System.err.println(builder.toString());
+        if (LoggerFactory.getLoggerType() != LoggerType.SYSTEM_ERROR) 
+        {
+            LoggerFactory.getLoggerInstance().fatal(builder.toString());
+        }
+        
     }
     
     /**

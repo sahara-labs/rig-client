@@ -1,4 +1,7 @@
-Copyright (c) 2009 - 2014, University of Technology, Sydney
+Copyright (c) 2009 - 2013, University of Technology, Sydney
+Copyright (c) 2011, Michael Diponio
+Copyright (c) 2013, Barath Kannan
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or 
