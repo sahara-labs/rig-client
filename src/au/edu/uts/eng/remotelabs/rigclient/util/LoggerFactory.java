@@ -131,7 +131,7 @@ public class LoggerFactory
      * 
      * @return LoggerType enumeration value
      */
-    private static LoggerType getLoggerType()
+    public static LoggerType getLoggerType()
     {
         final String type = ConfigFactory.getInstance().getProperty("Logger_Type");
         
