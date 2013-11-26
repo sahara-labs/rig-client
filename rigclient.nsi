@@ -55,10 +55,10 @@ Name "SAHARA Labs Rig Client"
 !define REGKEY "SOFTWARE\$(^Name)"
 
 ; Sahara Rig Client Version
-!define Version "3.3-AND_Research"
+!define Version "3.4-Collaboration-alpha"
 
 
-!define JREVersion "1.6"
+!define JREVersion "1.7"
 
 ; The file to write
 OutFile "package\RigClient-${Version}-${Arch}.exe"

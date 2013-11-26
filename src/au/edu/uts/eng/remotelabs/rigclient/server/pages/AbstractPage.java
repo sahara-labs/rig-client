@@ -47,6 +47,7 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.edu.uts.eng.remotelabs.rigclient.main.RigClientDefines;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
 import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
@@ -415,7 +416,7 @@ public abstract class AbstractPage
         this.println("<div id='footer' class='ui-corner-top'>");
         this.println("<a class='plaina' href='http://sourceforge.net/projects/labshare-sahara/' target='_blank'>" +
                 "<img src='/img/logo_small.png' alt='Logo' />" +
-                "Powered by the open source <strong>SAHARA Labs r3.3</strong> system.</a>");
+                "Powered by the open source <strong>SAHARA Labs r" + RigClientDefines.RC_VERSION + "</strong> system.</a>");
         this.println(
                 "<div>" +
                     "<a class='plaina' href='http://www.feit.uts.edu.au/facilities/remote-lab/index.html' target='_blank'>" +

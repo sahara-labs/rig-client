@@ -51,6 +51,8 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.edu.uts.eng.remotelabs.rigclient.main.RigClientDefines;
+
 /**
  * About page.
  */
@@ -74,7 +76,6 @@ public class AboutPage extends AbstractPage
         
         this.tabNames = new TreeMap<String, String>();
         this.tabNames.put("about", "About");
-        this.tabNames.put("developers", "Developers");
         this.tabNames.put("license", "License");
         this.tabNames.put("libraries", "Libraries");
         
@@ -222,7 +223,8 @@ public class AboutPage extends AbstractPage
     protected void adTab()
     {
         this.println("<div id='slbanner'>");
-        this.println("    <span>Rig Client r3.3</span><br />");
+        this.println("    <span>Rig Client r" + RigClientDefines.RC_VERSION + " (" + RigClientDefines.RC_RELEASE
+                + ")</span><br />");
         this.println("    <img src='/img/logo_large.png' alt='SAHARA Labs' />");
         this.println("    Software abstraction of physical rig to provide rig session control " + 
         		"and rig device control. Automatically tests rig hardware and reports " + 
