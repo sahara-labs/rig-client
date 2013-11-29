@@ -209,10 +209,10 @@ public class AboutPage extends AbstractPage
         }
 		
 		/* Contents pane height. */
-		this.println("  $('#contentspane').css('height', $(window).height() - 230);");
+		this.println("  $('#contentspane').css('height', $(window).height() - 105);");
 		this.println(
 		        "  $(window).resize(function() { " +
-				"    $('#contentspane').css('height', $(window).height() - 230);\n" +
+				"    $('#contentspane').css('height', $(window).height() - 105);\n" +
 				"  });");
 
         
@@ -226,9 +226,6 @@ public class AboutPage extends AbstractPage
         this.println("    <span>Rig Client r" + RigClientDefines.RC_VERSION + " (" + RigClientDefines.RC_RELEASE
                 + ")</span><br />");
         this.println("    <img src='/img/logo_large.png' alt='SAHARA Labs' />");
-        this.println("    Software abstraction of physical rig to provide rig session control " + 
-        		"and rig device control. Automatically tests rig hardware and reports " + 
-        		"the rig status to ensure rig goodness.");
         this.println("</div>");
         
         this.println("<div id='slcopyright'>");

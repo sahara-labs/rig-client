@@ -323,9 +323,9 @@ public abstract class AbstractPage
         this.println("      </a></li>");
         
         /* Help. */
-        this.println("      <li><a id='help' class='actiondialogbutton plaina ui-corner-all'>");
-        this.println("          <img style='margin-bottom:10px' src='/img/help.png' alt='Help' /><br />Help");
-        this.println("      </a></li>");
+//        this.println("      <li><a id='help' class='actiondialogbutton plaina ui-corner-all'>");
+//        this.println("          <img style='margin-bottom:10px' src='/img/help.png' alt='Help' /><br />Help");
+//        this.println("      </a></li>");
         
         this.println("  </ul>");
         this.println("</div>");
@@ -343,10 +343,10 @@ public abstract class AbstractPage
         		"</div>");
         
         /* Help action button contents. */
-        this.println(
-                "<div id='helpdialog' title='Help and Troubleshooting'>\n" + 
-        		"   " + this.getPageHelp() +
-        		"</div>");
+//        this.println(
+//                "<div id='helpdialog' title='Help and Troubleshooting'>\n" + 
+//        		"   " + this.getPageHelp() +
+//        		"</div>");
         
         
         this.println("<script type='text/javascript'>");
@@ -403,9 +403,12 @@ public abstract class AbstractPage
      */
     protected void addPageHeading()
     {
-        this.println("<div class='contentheader'>");
-        this.println("  <h2>" + this.stringTransform(this.getPageHeader()) + "</h2>");
-        this.println("</div>");
+        if ("Main".equals(this.getPageType()))
+        {
+            this.println("<div class='contentheader'>");
+            this.println("  <h2>" + this.stringTransform(this.getPageHeader()) + "</h2>");
+            this.println("</div>");
+        }
     }
     
     /**
