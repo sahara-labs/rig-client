@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
 import au.edu.uts.eng.remotelabs.rigclient.status.StatusUpdater;
 import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
@@ -247,7 +248,7 @@ public abstract class AbstractPage
         this.innerNavBar("Main", "/");
         this.innerNavBar("Status", "/status");
         this.innerNavBar("Configuration", "/config");
-        this.innerNavBar("Controllers", "/control");
+        if (RigFactory.getRigInstance() instanceof IRigControl) this.innerNavBar("Controllers", "/control");
         this.innerNavBar("Logs", "/logs");
         this.innerNavBar("Diagnostics", "/info");
         this.innerNavBar("About", "/about");

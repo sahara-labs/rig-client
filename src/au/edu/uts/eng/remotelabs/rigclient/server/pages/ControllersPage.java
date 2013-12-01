@@ -43,16 +43,40 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRig;
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
+import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront;
+import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
+
 /**
  * Controllers page.
  */
 public class ControllersPage extends AbstractPage
 {
+    
+    /** Primitive front controller. */
+    private PrimitiveFront front;
+    
+    @Override
+    public void preService(HttpServletRequest req)
+    {
+        IRig rig = RigFactory.getRigInstance();
+        
+        /* This page is only relevant if the rig supports the control interfaces. */
+        if (!(rig instanceof IRigControl)) return;
+        
+        this.front = ((IRigControl)rig).getFrontController();
+    }
 
     @Override
     public void contents(HttpServletRequest req, HttpServletResponse resp) throws IOException
     {
-        // TODO Auto-generated method stub
+        if (this.front == null)
+        {
+            /* Control not supported. Put up warning message. */
+            this.println("<div id='control-not-supported' class='ui-state-error'><span class='ui-icon ui-icon-alert'></span>Control is not supported.</div>");
+            return;
+        }
 
     }
     

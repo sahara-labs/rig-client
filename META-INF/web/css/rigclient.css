@@ -1139,3 +1139,18 @@ span.code {
 	background: url("../img/linear_grad.png") repeat-x scroll 0 0 #FDFDFD;
 }
 
+/******************************************************************************
+ ** Controllers page.                                                        **
+ ******************************************************************************/
+#control-not-supported {
+	margin: 10px auto;
+	width: 200px;
+	padding: 5px;
+	border-radius: 4px;
+}
+
+#control-not-supported .ui-icon {
+	float: left;
+	margin-right: 5px;
+}
+

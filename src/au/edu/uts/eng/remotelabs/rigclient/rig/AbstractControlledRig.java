@@ -81,6 +81,7 @@ public abstract class AbstractControlledRig extends AbstractRig implements IRigC
     /**
      * Returns the primitive front controller.
      */
+    @Override
     public PrimitiveFront getFrontController()
     {
         return this.front;

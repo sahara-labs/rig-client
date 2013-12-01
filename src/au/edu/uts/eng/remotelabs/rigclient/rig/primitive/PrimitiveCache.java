@@ -267,7 +267,7 @@ public class PrimitiveCache
             }
         }
     }
-
+    
     /**
      * Expunges the primitive controller cache. 
      */
@@ -283,5 +283,45 @@ public class PrimitiveCache
             }
             this.cache.clear();
         }
+    }
+    
+    /**
+     * Gets the controller packages that have been configured in the property 
+     * '<code>Package_Prefixes</code>'.
+     * 
+     * @return list of configured packages
+     */
+    public List<String> getControllerPackages()
+    {
+        return new ArrayList<String>(this.packages);
+    }
+    
+    /**
+     * Returns the controller classes in the configured package prefixes filtered
+     * by package.
+     * 
+     * @return controller classes
+     */
+    public Map<String, List<Class<IPrimitiveController>>> getControllers()
+    {
+        Map<String, List<Class<IPrimitiveController>>> controllers = 
+                new HashMap<String, List<Class<IPrimitiveController>>>(this.packages.size());
+        
+        for (String p : this.packages)
+        {
+            // TODO List controllers from package.
+        }
+        
+        return controllers;
+    }
+    
+    /**
+     * Returns all the controller instances that have been loaded. 
+     * 
+     * @return loaded controllers map 
+     */
+    public List<IPrimitiveController> getControllersInstances()
+    {
+        return new ArrayList<IPrimitiveController>(this.cache.values());
     }
 }

@@ -47,6 +47,9 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl;
+import au.edu.uts.eng.remotelabs.rigclient.type.RigFactory;
+
 /**
  * The default page.
  */
@@ -69,7 +72,7 @@ public class IndexPage extends AbstractPage
         this.links = new LinkedHashMap<String, String>(5);
         this.links.put("Status", "/status");
         this.links.put("Configuration", "/config");
-        this.links.put("Controllers", "/control");
+        if (RigFactory.getRigInstance() instanceof IRigControl) this.links.put("Controllers", "/control");
         this.links.put("Logs", "/logs");
         this.links.put("Diagnostics", "/info");
         this.links.put("About", "/about");

@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigSession.Session;
+import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.PrimitiveFront;
 
 /**
  * Interface for rig client control. Rig client provide control takes
@@ -160,6 +161,13 @@ public interface IRigControl
      * @return primitive response 
      */
     public PrimitiveResponse performPrimitive(PrimitiveRequest req);
+    
+    /**
+     * Returns the front controller. 
+     * 
+     * @return front controller
+     */
+    public PrimitiveFront getFrontController();
     
     /**
      * Expunges the controller cache. 
