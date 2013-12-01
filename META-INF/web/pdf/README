@@ -1,7 +1,0 @@
-This directory should contain the following documentation PDFs
-so they may be embedded with in the rig client. The PDFs are:
-
-  * Handbook.pdf - Sahara Development Handbook
-  * RigClientConfiguration.pdf - Rig Client Configuration Appendix
-  * RigClientExtensions.pdf - Rig Client Extensions Appendix
-  * Installation.pdf - Sahara Installation Guide

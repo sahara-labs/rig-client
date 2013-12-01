@@ -382,7 +382,7 @@ function loadConfStanza(stanza, callback)
 
 function resizeConfPanel()
 {
-	var height = $(window).height() - 230;
+	var height = $(window).height() - 105;
     var tabsHeight = $('#lefttablist').height();
     
     if (height < tabsHeight) height = tabsHeight;

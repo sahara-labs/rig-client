@@ -230,10 +230,10 @@ public class InfoPage extends AbstractPage
 		this.println("  $('#contentstable tr:odd').addClass('oddrow');");
 		
 		/* Contents pane height. */
-		this.println("  $('#contentspane').css('height', $(window).height() - 230);");
+		this.println("  $('#contentspane').css('height', $(window).height() - 100);");
 		this.println(
 		        "  $(window).resize(function() { " +
-				"    $('#contentspane').css('height', $(window).height() - 230);\n" +
+				"    $('#contentspane').css('height', $(window).height() - 100);\n" +
 				"  });");
 		
 		/* Automatic page updating. */

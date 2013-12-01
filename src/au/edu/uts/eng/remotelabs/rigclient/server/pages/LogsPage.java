@@ -182,9 +182,9 @@ public class LogsPage extends AbstractPage
                 "$(document).ready(function() {\n" +
                 "   setTimeout(updateLogs, 5000);\n" +
                 /* Contents pane height. */
-                "  $('#logscontent').css('height', $(window).height() - 258);" + 
+                "  $('#logscontent').css('height', $(window).height() - 130);" + 
                 "  $(window).resize(function() { " +
-                "    $('#logscontent').css('height', $(window).height() - 258);\n" +
+                "    $('#logscontent').css('height', $(window).height() - 130);\n" +
                 "  });" +
                 "});");
         

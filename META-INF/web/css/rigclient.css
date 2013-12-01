@@ -84,7 +84,7 @@ legend {
 #header {
 	color: #333;
 	padding: 4px;
-	height: 0px;
+	height: 2px;
 	position: relative;
 	overflow: hidden;
 }
@@ -251,7 +251,7 @@ a.plaina:hover {
 #content {
 	padding-bottom: 40px;
 	width: 750px;
-	margin: 0 auto;
+	margin: 11px auto 0;
 }
 
 .contentheader {
@@ -452,7 +452,7 @@ a.plaina:hover {
 #statelegend {
 	position: absolute;
 	left: 0;
-	top: 150px;
+	top: 100px;
 }
 
 #statelegend p {
@@ -461,7 +461,7 @@ a.plaina:hover {
 
 #statelegend ul {
 	list-style: circle;
-	font-size: 0.8em;
+	font-size: 0.8em;  
 }
 
 #statelegend ul li {
@@ -618,7 +618,7 @@ a.plaina:hover {
 #logchecks {
 	position: absolute;
 	left: 0;
-	top: 177px;
+	top: 58px;
 	width: 88px;
 }
 
@@ -786,7 +786,7 @@ a.plaina:hover {
 	float:left;
 	height:500px;
 	margin-left:-2px;
-	width:650px;
+	width:670px;
 	-moz-box-shadow: 0 0 8px #A0A0A0;
 	-webkit-box-shadow: 0 0 8px #A0A0A0;
 	box-shadow: 0 0 8px #A0A0A0;

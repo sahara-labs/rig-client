@@ -579,6 +579,15 @@ public interface IRigControl
         }
         
         /**
+         * @param name the name of the result to add
+         * @param value the value of the result to add
+         */
+        public void addResult(String name, Object value)
+        {
+            this.results.put(name, value == null ? "" : value.toString());
+        }
+        
+        /**
          * @param name the name of the value to get
          * @return the value
          */
