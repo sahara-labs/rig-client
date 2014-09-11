@@ -96,6 +96,7 @@ public class AbstractBatchRunnerTester extends TestCase
         expect(this.mockConfig.getProperty("WARN_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("INFO_Log_Format")).andReturn(null);
         expect(this.mockConfig.getProperty("DEBUG_Log_Format")).andReturn(null);
+        expect(this.mockConfig.getProperty("Batch_ScrollBack", "1000")).andReturn("1000");
         replay(this.mockConfig);
         
         Field configField = ConfigFactory.class.getDeclaredField("instance");

@@ -84,6 +84,9 @@ public abstract class AbstractBatchRunner implements Runnable
 {
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
     
+    /** Number of characters to read from stdin and stderr at a time. */
+    private static final int READ_SZ = 255;
+    
     /** Batch process. */
     protected Process batchProc;
     
@@ -652,15 +655,17 @@ public abstract class AbstractBatchRunner implements Runnable
     public String getBatchStandardOut()
     {
         final StringBuilder buf = new StringBuilder();
-        int numLines = 0;
+        char str[] = new char[READ_SZ];
+        int numLines = 0, read, nl = 0;
         
         try
         {
-            while (this.batchStdOut != null && this.batchStdOut.ready())
+            while (this.batchStdOut != null && this.batchStdOut.ready() && (read = this.batchStdOut.read(str)) > 0)
             {
-                buf.append(this.batchStdOut.readLine());
-                buf.append(LINE_SEPARATOR);
-                numLines++;
+                buf.append(str, 0, read);
+                
+                String s = String.valueOf(str);
+                while ((nl = s.indexOf(LINE_SEPARATOR, nl + 1)) != -1) numLines++;
             }
         }
         catch (IOException e)
@@ -699,15 +704,18 @@ public abstract class AbstractBatchRunner implements Runnable
     public String getBatchStandardError()
     {
         final StringBuilder buf = new StringBuilder();
-        int numLines = 0;
+        char str[] = new char[READ_SZ];
+        int numLines = 0, read, nl = 0;
         
         try
         {
-            while (this.batchStdErr != null && this.batchStdErr.ready())
+            while (this.batchStdErr != null && this.batchStdErr.ready() && 
+                    (read = this.batchStdErr.read(str)) > 0)
             {
-                buf.append(this.batchStdErr.readLine());
-                buf.append(LINE_SEPARATOR);
-                numLines++;
+                buf.append(str, 0, read);
+                
+                String s = String.valueOf(str);
+                while ((nl = s.indexOf(LINE_SEPARATOR, nl + 1)) != -1) numLines++;
             }
         }
         catch (IOException e)
